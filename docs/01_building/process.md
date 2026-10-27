@@ -61,6 +61,12 @@ without touching `docs/`.
 
 | Date | Topic | Assistant proposed | Author decided | Where |
 |---|---|---|---|---|
+| 2026-10-27 | Backup location | Options: GitHub artifacts only, plus a monthly offline copy, or object storage (R2/B2) | Monthly offline copy of the dump plus the app's CSV export; object storage only if that becomes a chore | security.md |
+| 2026-10-27 | Environments | Separate dev and production projects | One project with a demo account; migrations only from CI after a backup; previews off | ADR-017 |
+| 2026-10-27 | Hosting plan | Supabase Pro for backups and no pausing | Free plans until a real limit is hit; our dump is the only backup | ADR-016 |
+| 2026-10-27 | Password reset | Flagged it missing: a forgotten password locked the account | Build it now | SEC-05 |
+| 2026-10-27 | Invitations | Defer the set-password page to phase 2; create users in the dashboard meanwhile | Build it now: invite-only needs a way to accept an invite | SEC-02 |
+| 2026-10-27 | Dev environment | No Docker on macOS 12: either install an older Docker runtime, or use a hosted dev database with tests in CI | Hosted dev project, tests in CI; Node installed by the author | ADR-014 |
 | 2026-10-27 | Portfolio | Assessed the project as a portfolio piece: strong on method and security, weak on visibility and on its distinctive features arriving late | A public demo, a portfolio cut, and this file | improvements.md, DEM-01..02 |
 | 2026-10-27 | Emoji picker | Flagged that the Google image mode breaks the CSP | Asked whether the picker should change; kept it with a self-hosted font | ADR-013 |
 | 2026-10-27 | Plan review | Found: no transactions through supabase-js, ambiguous transaction currency, transfers between currencies, double-counted contributions, budgets without currency, scope too wide | Applied all of it; v1 cut to phases 0 to 2 | ADR-012, TRX-11 |

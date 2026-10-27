@@ -14,14 +14,23 @@ Each phase ends with something usable on real data. No dates: this is a personal
 ## Phase 0: Foundation
 Nothing financial yet; the walls go up first.
 
+**Status (2026-10-27):** code done and checked locally; waiting on accounts.
+Done: scaffold, Supabase config and first migration with tests, auth with TOTP, invitation
+and set-password pages with bilingual email templates, FR/EN,
+CSP and headers, CI and backup workflows. Open: the project (`db:link`, `db:config-push`,
+first CI run applying migrations, first sign-in; JWT signing key confirmed ECC), the first CI run (pgTAP has not run yet), the Netlify
+site, production and its backup secrets, the owner's two authenticators.
+
 - Scaffold TanStack Start in `src/app`, shadcn/ui, Tailwind, strict TypeScript, Vitest.
-- `src/supabase`: local stack, first migration with `profiles`, the RLS and MFA policy
-  pattern, and a pgTAP test proving user B sees none of user A's rows.
+- `src/supabase`: first migration with `profiles`, the RLS and MFA policy pattern, a
+  pgTAP test proving user B sees none of user A's rows, and guard tests that every table has
+  RLS, the MFA policy and no anon grants. Runs in CI (ADR-014).
+- One Supabase project, `money-tracker` in Canada, free plan, with the owner's account and a
+  demo account (ADR-016, ADR-017). Migrations applied by CI after a backup.
 - Auth: sign-in, TOTP enrolment and challenge, sign-up disabled. SEC-01..03.
 - react-i18next with French and English resources, locale on the profile and in a cookie, the
   language switcher, `Intl` formatting helpers. SET-04, 05 (ADR-008).
-- Netlify: production site, security headers, preview deploys on a separate Supabase
-  project.
+- Netlify: production site, security headers, deploy previews off (ADR-017).
 - CI: lint, type-check, unit tests, `supabase db lint`, pgTAP, and a docs check: relative
   links resolve (lychee, offline mode) and every requirement ID cited in roadmap, ADRs and
   process.md exists in requirements.md (a short script).
@@ -44,6 +53,9 @@ Replace daily use of the spreadsheet.
   currencies), splits, status, notes. TRX-01..06, 09..11. Multi-row writes as SQL functions
   with pgTAP tests (ADR-012).
 - Emoji picker in native mode with the self-hosted Noto Color Emoji font. CAT-07 (ADR-013).
+- **Gate before the spreadsheet is retired:** backup workflow enabled, one restore tested,
+  the first monthly copy on the offline drive, and the private key in the password manager
+  and on paper (security.md, Backups).
 - **CSV import and export in the fixed format** (IMP-01, 04, 05, SEC-04 export, ADR-010). This is the
   milestone: eight years of history in the app.
   1. Settle the new category tree (worked out together from the old Aspire names).

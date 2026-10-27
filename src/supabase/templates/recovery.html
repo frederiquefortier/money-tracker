@@ -1,0 +1,10 @@
+<!-- Password reset. Same landing page as invitations: the token is spent by a button click,
+     not by opening the link. If the account has two-factor authentication, the code is asked
+     before the new password is accepted. -->
+<h2>Réinitialiser votre mot de passe</h2>
+<p>Une réinitialisation a été demandée pour {{ .Email }}. Ce lien expire dans une heure. Si ce n’est pas vous, ignorez ce courriel.</p>
+<p><a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&amp;type=recovery">Choisir un nouveau mot de passe</a></p>
+<hr />
+<h2>Reset your password</h2>
+<p>A reset was requested for {{ .Email }}. This link expires in one hour. If this was not you, ignore this email.</p>
+<p><a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&amp;type=recovery">Choose a new password</a></p>

@@ -198,7 +198,7 @@ The "Canada" section, generalised because the data already spans Canada and Swit
 | ID | Requirement | Source | Phase |
 |---|---|---|---|
 | DEM-01 | A public demo deployment on its own Supabase project, holding invented data only. MFA is relaxed there and only there, by a separate policy migration, and the demo banner says so. | portfolio | 2 |
-| DEM-02 | A demo-data generator: a fictional person with several years of multi-currency spending (one move between countries), transfers, splits, budgets. Deterministic, so screenshots are reproducible. Also used for local development and previews. | portfolio | 1 |
+| DEM-02 | A demo-data generator: a fictional person with several years of multi-currency spending (one move between countries), transfers, splits, budgets. Deterministic, so screenshots are reproducible. It writes files in the import format, loaded into the demo account used for development (ADR-017). | portfolio | 1 |
 
 ## 17. Security and accounts (`SEC`)
 
@@ -207,9 +207,10 @@ Not in the notes, required by the brief. Details in [security.md](../01_building
 | ID | Requirement | Source | Phase |
 |---|---|---|---|
 | SEC-01 | Multiple users, each seeing only their own data, enforced in the database. | brief | 0 |
-| SEC-02 | Sign-up closed while the app is private; accounts by invitation. | brief | 0 |
+| SEC-02 | Sign-up closed while the app is private; accounts by invitation. The invite email leads to a page that sets the password, then to MFA enrolment. A password change sends a notification email. | brief | 0 |
 | SEC-03 | TOTP two-factor authentication, required to read financial data. | brief | 0 |
 | SEC-04 | Full export of a user's data in an open format (IMP-04, phase 1), and full account deletion (phase 2). | brief | 1, 2 |
+| SEC-05 | Password reset by email, through the same landing page as invitations. If the account has TOTP, the code is required before the new password is saved. | brief | 0 |
 
 ---
 

@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "f=$(sed -n 's/.*\"file_path\"[[:space:]]*:[[:space:]]*\"\\([^\"]*\\)\".*/\\1/p'); case \"$f\" in *data*local*|*.env|*.env.*|*.dump|*.age) printf '%s' '{\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"permissionDecision\":\"deny\",\"permissionDecisionReason\":\"src/data/local, .env files and dumps hold real financial data or secrets. They are never read into a transcript.\"}}';; esac",
+            "command": "f=$(sed -n 's/.*\"file_path\"[[:space:]]*:[[:space:]]*\"\\([^\"]*\\)\".*/\\1/p'); case \"$f\" in *.env.example) ;; *data*local*|*.env|*.env.*|*.dump|*.age) printf '%s' '{\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"permissionDecision\":\"deny\",\"permissionDecisionReason\":\"src/data/local, .env files and dumps hold real financial data or secrets. They are never read into a transcript.\"}}';; esac",
             "statusMessage": "Checking for private data"
           }
         ]

@@ -34,7 +34,9 @@ There is no seed of user data; history comes in through the fixed-format CSV imp
 root keeps only `README.md`, `CLAUDE.md`, `.gitignore`, `.github/`, `.claude/` and `docs/`
 ([ADR-007](docs/01_building/decisions.md)).
 
-**npm commands run from `src/app/`. Supabase CLI commands run from `src/`.**
+**Every command runs from `src/app/`**, including the Supabase CLI through the `db:*` npm
+scripts. Migrations are never pushed from a laptop: CI applies them on `main` after a backup
+(ADR-017). Try unfinished work in the demo account, never the owner's.
 
 ## Working in the docs (dev journal)
 - Before changing direction, check [decisions.md](docs/01_building/decisions.md) (ADRs).

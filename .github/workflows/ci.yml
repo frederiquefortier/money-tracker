@@ -1,0 +1,93 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+      - name: Requirement IDs resolve
+        run: node .github/scripts/check-requirement-ids.mjs
+      - name: Relative links resolve
+        uses: lycheeverse/lychee-action@v2
+        with:
+          args: --offline --no-progress --exclude-path docs/00_briefing/notes './**/*.md'
+          fail: true
+
+  app:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: src/app
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: src/app/package-lock.json
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npx prettier --check .
+      - run: npm test
+      - run: npm run build
+      # The browser never talks to Supabase (ADR-006); fail if a server module leaks into it.
+      - name: No server code in the client bundle
+        run: |
+          if grep -rlE "createServerClient|SUPABASE_URL|sb_publishable_|sb_secret_" dist/client; then
+            echo "Server-only code found in dist/client"; exit 1
+          fi
+
+  database:
+    runs-on: ubuntu-latest
+    # The Supabase CLI looks for supabase/ in the working directory (ADR-007).
+    defaults:
+      run:
+        working-directory: src
+    steps:
+      - uses: actions/checkout@v7
+      - uses: supabase/setup-cli@v3
+        with:
+          version: 2.122.0
+      # Local development has no Docker (ADR-014), so CI is where the stack runs.
+      - name: Start the local stack
+        run: supabase db start
+      - name: Lint the schema
+        run: supabase db lint --level warning --fail-on warning
+      - name: pgTAP
+        run: supabase test db
+
+  # One database for development and real use (ADR-017). Migrations reach it only from main,
+  # after every check has passed and right after a fresh encrypted backup.
+  backup:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.BACKUP_ENABLED == 'true'
+    needs: [docs, app, database]
+    uses: ./.github/workflows/backup.yml
+    secrets: inherit
+
+  migrate:
+    needs: backup
+    runs-on: ubuntu-latest
+    concurrency:
+      group: migrate
+      cancel-in-progress: false
+    defaults:
+      run:
+        working-directory: src
+    steps:
+      - uses: actions/checkout@v7
+      - uses: supabase/setup-cli@v3
+        with:
+          version: 2.122.0
+      - name: Apply pending migrations
+        env:
+          DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: supabase db push --db-url "$DB_URL"

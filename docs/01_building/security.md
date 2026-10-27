@@ -18,9 +18,9 @@ easy to catch.
 
 Two plan-level caveats:
 
-- **The free plan is not enough for real money data.** Free projects pause after a week of
-  inactivity and have no backups you control. Use the Pro plan (daily backups, no pausing),
-  and keep our own encrypted dump as well (see Backups).
+- **The free plan has no backups you can download** and pauses a project after a week of
+  inactivity. The project stays on it anyway (ADR-016), which makes our own encrypted dump
+  the only backup (see Backups).
 - **Pick the region at creation; it cannot be changed later.** Choose the one closest to
   where the data's owner lives (Central EU / Zurich if offered, otherwise Frankfurt).
 
@@ -32,9 +32,9 @@ Two plan-level caveats:
 | Stolen password | Medium | TOTP MFA required by policy (`aal2`), not just offered; sign-up closed |
 | Secret key leaks to the browser | Medium (one wrong `import`) | Secret key used only in server modules; build check that no `sb_secret_` string ends up in the client bundle |
 | XSS steals the session | Low with React, higher with emoji/HTML inputs | Strict Content-Security-Policy in `netlify.toml`, no `dangerouslySetInnerHTML`, emoji validated as emoji |
-| Deploy preview hits production data | High by default on Netlify | Previews point at a separate Supabase project with demo data (on a free organization: a second project in the Pro organization costs extra), or previews are off |
+| Deploy preview hits production data | High by default on Netlify | Deploy previews are off: there is one database, holding real data (ADR-017) |
 | Supabase account takeover | Low | MFA on the Supabase and Netlify accounts themselves, GitHub too |
-| Data loss | Medium over years | Pro-plan backups plus a nightly encrypted dump kept elsewhere |
+| Data loss | Medium over years | Nightly encrypted dump in GitHub (30 days), monthly dump and CSV export on an offline drive; restore tested before real data arrives (Backups) |
 | Vendor disappears or changes pricing | Low, long horizon | Plain Postgres with SQL migrations in Git; a dump restores anywhere |
 
 ## Rules
@@ -70,8 +70,10 @@ Two plan-level caveats:
 3. **The secret key** (`SUPABASE_SECRET_KEY`) is only for jobs that are not acting for a
    user: fetching exchange rates, the scheduled recurring-transaction run. It lives in Netlify
    environment variables scoped to Functions.
-4. **Security headers** in `netlify.toml`: CSP, HSTS, `frame-ancestors 'none'`,
+4. **Security headers** set by the server entry on every page (ADR-015): a CSP with a
+   per-request nonce and `'strict-dynamic'`, HSTS, `frame-ancestors 'none'`,
    `Referrer-Policy: same-origin`, `Permissions-Policy` locking off camera, mic, geolocation.
+   `netlify.toml` sets the same headers on static assets.
 5. **Third-party calls** (the rates API) happen server-side only. Fonts, emoji included,
    are served from our own origin (ADR-013). The browser's CSP allows
    only our own origin and Supabase.
@@ -80,26 +82,69 @@ Two plan-level caveats:
 
 ### Auth
 
-- Email and password plus TOTP. Sign-up disabled in the Supabase dashboard; new users by
-  invitation from the dashboard.
-- A custom SMTP sender for auth email (the built-in one is rate-limited and meant for
-  development).
-- Short-lived access tokens (default one hour) with refresh rotation, which is Supabase's
-  default.
-- **No recovery codes**: Supabase TOTP has none. Enrol two authenticators (phone and a
-  password manager) at setup. A user who loses both is unlocked by removing the factor in
+- Email and password plus TOTP. Sign-up disabled (`config.toml`, pushed with
+  `db:config-push`); new users by invitation from the dashboard.
+- **Invitation flow:** the email links to `/auth/confirm`, which only shows a button. The
+  one-time token is spent by that button's POST, never by the GET, because email security
+  scanners open links before the person does. The invitee then sets a password (same rule as
+  `config.toml`, checked in the form and by Supabase) and must enrol TOTP before seeing
+  anything. Changing a password later requires `aal2`, and sends a notification email.
+- **Password reset** uses the same landing page and button. The forgot-password form gives
+  the same answer whether or not the address has an account, and Supabase sends at most one
+  reset email per address per minute. A reset link opens an `aal1` session only: if the
+  account has TOTP, the code is required before the new password is accepted, so a stolen
+  inbox alone cannot take the account.
+- **Brute force (open):** Supabase rate-limits sign-in and code attempts per IP, but every
+  auth call now comes from the server, so Supabase sees the server's IP. A per-IP and
+  per-email throttle of our own is needed before anyone but the owner uses the app.
+- A custom SMTP sender for auth email. Supabase's built-in sender is rate-limited and only
+  delivers to members of the Supabase organization, so it can invite the owner but nobody
+  else.
+- Access tokens last 15 minutes, with refresh rotation. The page-level session check
+  verifies them locally (ADR-018), which requires an asymmetric JWT signing key on the
+  project.
+- **No recovery codes yet.** supabase-js has MFA recovery codes behind an experimental
+  flag; not used until they are stable. Instead, scan the enrolment QR code into two apps
+  (phone and password manager) at setup: one secret, two devices. A user who loses both is unlocked by removing the factor in
   the Supabase dashboard, after verifying them out of band. A self-service recovery flow is
   needed before anyone but the owner uses the app.
 
 ### Backups
 
-- Supabase Pro daily backups.
-- A nightly scheduled GitHub Action runs `pg_dump` (Netlify Functions cannot), encrypts it
-  with `age` to a public key, and stores it outside Supabase. The database connection string
-  lives in GitHub encrypted secrets, scoped to that one workflow; the `age` private key lives
-  offline, never in GitHub. That is the 3-2-1 copy that survives losing the
-  Supabase account.
-- A restore is tested once, then after every major schema change.
+Needed from the day the app becomes the record, which is the day the spreadsheet stops
+being updated. Until then the spreadsheet is the backup. The free plan has no Supabase
+backups (ADR-016), and one database holds real data (ADR-017).
+
+Three copies, two kinds:
+
+| Copy | What | Where | How often | Kept |
+|---|---|---|---|---|
+| Live | The database | Supabase (`ca-central-1`) | | |
+| Cloud | Encrypted `pg_dump` (roles, schema, data) | GitHub Actions artifact, private repo | Nightly, and before every migration | 30 days |
+| Cold | The latest encrypted dump, plus the app's CSV export (IMP-04) | External drive, kept offline | Monthly, by hand | Indefinitely |
+
+- **The dump** is full fidelity: everything Postgres holds, including auth users. It is
+  encrypted with `age` to a public key (`BACKUP_AGE_RECIPIENT`); the database connection
+  string is a GitHub secret.
+- **The CSV export** is the second kind on purpose. It is readable in any spreadsheet and
+  restores through the app's own import, so it does not depend on Postgres, Supabase or the
+  `age` key. It does not hold auth users or MFA factors: restoring from it means inviting
+  the account again.
+- **The private key** is the single point of failure for every dump. It lives in the
+  password manager, plus a paper copy stored apart from the drive. Never in GitHub, never in
+  the repo, never on the drive next to the dumps.
+
+**Monthly routine** (first weekend of the month, about five minutes):
+1. Download the latest `backup` artifact from GitHub Actions to the drive.
+2. Export from the app (IMP-04) to the same drive, in a folder named for the month.
+3. Every third month, open one dump with the private key to prove the key still works.
+
+**Restore tests:** once before the first real import (the gate in roadmap phase 1), then
+after every major schema change. A test restores the dump into a scratch Postgres in CI
+(Docker is available there) and checks row counts against the app's export.
+
+**Upgrade path:** if the monthly download becomes a chore, the nightly job uploads to
+S3-compatible storage with long retention (Cloudflare R2 or Backblaze B2), as a new ADR.
 
 ### What is deliberately not done
 

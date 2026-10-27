@@ -36,7 +36,7 @@
 | Server functions (user session) | Everything user-owned | supabase-js, RLS enforced. Multi-row writes call `security invoker` SQL functions with `.rpc()` (ADR-012). |
 | Rates job (secret key) | `exchange_rates` | Netlify scheduled function, daily |
 | Recurring job (secret key) | `transactions` generated from `recurring_rules` | Netlify scheduled function, daily. Sets `user_id` from the rule, never from input. |
-| Migrations | Schema, global seed data | Supabase CLI, `src/supabase/migrations/` |
+| Migrations | Schema, global reference data | `src/supabase/migrations/`, applied by CI on `main` after a backup (ADR-017) |
 | Importer | Rows in the fixed CSV format | Server function, then one `import_batch` SQL call ([import.md](import.md)) |
 
 Nothing writes from the browser.
@@ -61,6 +61,6 @@ amount and rate so the UI can mark it (CUR-09). See [database.md](database.md#mo
 
 | Environment | Supabase project | Netlify |
 |---|---|---|
-| Local | `supabase start` (Docker), seeded with demo data | `netlify dev` / `vite dev` |
-| Preview | A separate project with demo data only | Deploy previews |
-| Production | The real project, Pro plan | Main branch |
+| Local | `money-tracker` (`ca-central-1`, free plan), signed in as the demo account | `vite dev` |
+| CI | A throwaway local stack inside GitHub Actions, for lint and pgTAP | |
+| Production | `money-tracker`, the owner's account. Migrations applied by CI after a backup (ADR-017) | Main branch; deploy previews off |

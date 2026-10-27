@@ -4,6 +4,179 @@ Document architectural choices with context, alternatives considered, and trade-
 
 <!-- Newest first: a new ADR goes directly below this line. Template at the bottom. -->
 
+### ADR-018: The session check verifies the token locally (2026-10-27)
+
+**Context:**
+- Every navigation runs `getSession` (root route). It called `getUser`, the MFA level and
+  `listFactors`: two to three Auth requests per page, from the Ohio functions region.
+- supabase-js `getClaims()` verifies the access token against the project's public
+  signing key (JWKS, cached) with no Auth request, when the project signs with an
+  asymmetric key. With the legacy shared secret it silently falls back to a request.
+
+**Decision:**
+- `getSession` and `setLocale` use `getClaims()`. An `aal2` token proves a verified factor
+  (TOTP is the only factor enabled), so only an `aal1` session, on the MFA and set-password
+  pages, still asks Auth for its factors.
+- Password change and TOTP enrolment keep `getUser()`: rare, sensitive, worth the request.
+- Access tokens last 15 minutes instead of 60 (`jwt_expiry = 900`).
+- The project must sign with an asymmetric key (Dashboard, JWT Keys). If it still uses the
+  legacy secret, rotate to an ECC key before relying on this.
+
+**Alternatives Considered:**
+- Keep `getUser()` on every page -> Notices a revoked session at once, at the cost of an
+  Auth round trip on every navigation.
+- Cache the session check in the app -> Our own invalidation logic for something Supabase
+  already signs.
+
+**Consequences:**
+- A signed-in page load makes no Auth request; the JWKS is fetched once per function
+  instance.
+- A session revoked elsewhere (signed out on another device, user deleted) keeps passing
+  the page check until its token expires, at most 15 minutes. RLS trusts the same token
+  the same way, so the data is guarded exactly as before.
+- Tokens refresh four times as often while the app is open; each refresh is one request.
+
+### ADR-017: One Supabase project for development and real use (2026-10-27)
+
+**Context:**
+- The owner is the only user, the project is in Canada (`ca-central-1`, close to the Ohio
+  functions region Netlify's free plan uses), and the free plan allows two projects.
+- ADR-014 and ADR-016 planned a demo-only dev project plus a production project. For one
+  person whose main goal is retiring a spreadsheet, that is a second database to keep in
+  step for no user benefit.
+- Without Docker on the laptop, migrations could not be tested locally anyway; CI already
+  runs them on a fresh database.
+
+**Decision:**
+- One project, `money-tracker`, holds real data.
+- **Two accounts in it:** the owner's, and a demo account with invented data (DEM-02) for
+  developing and trying features. RLS keeps them apart; this is the multi-user isolation
+  the app needs anyway, used every day.
+- **Migrations are applied only by CI**, on `main`, after docs, app and database checks
+  pass, and right after an encrypted backup (`ci.yml`: `backup` then `migrate`). There is
+  no `db:push` from the laptop.
+- **Migrations are additive** (expand, then contract in a later change): Netlify deploys
+  the app and CI migrates the database independently, so either may land first.
+- **Netlify deploy previews are off.** A preview runs unreviewed code against real data.
+- The second free slot stays empty, for the public demo (DEM-01), which relaxes MFA and so
+  must never share a database with real data.
+
+**Alternatives Considered:**
+- Separate dev and production projects (ADR-014, ADR-016) -> Safer for experiments, but
+  a second schema to keep in step, and it uses the slot the public demo needs.
+- Push migrations from the laptop -> Needs Docker for the dump that should precede it, and
+  skips the CI checks.
+
+**Consequences:**
+- Supersedes the dev project in ADR-014 and the two-project layout in ADR-016.
+- `.env.local` on the laptop points at the real project. The publishable key grants nothing
+  without a session, and a session sees nothing without MFA.
+- A bad migration reaches real data directly; the defences are pgTAP on a fresh database,
+  the additive rule, and the backup taken minutes before.
+- Work in progress is tried in the demo account, never in the owner's.
+
+### ADR-016: Free plans until a real limit is hit (2026-10-27)
+
+*The two-project layout is superseded by ADR-017 (one project).*
+
+**Context:**
+- ADR-001 assumed Supabase Pro (about US$25 a month) for backups and no pausing. The owner
+  will stay on free plans, Supabase and Netlify, until something concrete forces a change.
+- What the free Supabase plan does not give: backups you can download, and protection from
+  pausing (a project with a week of inactivity is paused until restored by hand in the
+  dashboard). It allows two active projects.
+- What the free Netlify plan does not give: choosing the functions region. Functions run in
+  US East (Ohio).
+
+**Decision:**
+- Two free Supabase projects: dev (demo data, ADR-014) and production. That uses both
+  free slots.
+- **Our nightly encrypted dump is the only backup**, so it is a blocker: the backup
+  workflow is enabled and one restore is tested before any real data enters production
+  (before the Aspire import, IMP-01).
+- A pause is accepted as an annoyance: restore it from the dashboard. Nothing is built to
+  keep the project awake artificially.
+- Upgrade triggers, each one a new ADR when it happens: the database nears 500 MB, pauses
+  become a real problem, page latency from the Ohio functions region is noticeable in use,
+  or invitations need more email than the built-in sender allows (that last one is solved
+  with a free custom SMTP sender, not a plan change).
+
+**Alternatives Considered:**
+- Supabase Pro from the start -> Daily backups and no pausing, for a cost the project does
+  not need to carry yet.
+- Production on dev's project -> One slot freed, but demo data and real data would share a
+  database and keys.
+
+**Consequences:**
+- Supersedes the plan choice in ADR-001 and the Pro production project in ADR-014.
+- The backup workflow moves from "nice to have in phase 0" to a gate on the first import.
+- Data loss risk rests on one GitHub Action and one offline key. The restore test is what
+  makes it real.
+
+### ADR-015: A per-request CSP nonce, set by the server entry (2026-10-27)
+
+**Context:**
+- TanStack Start renders inline hydration scripts. A CSP of `script-src 'self'` blocks
+  them; `'unsafe-inline'` would let any injected script run, which is the case a CSP exists
+  to stop.
+- Netlify's `netlify.toml` headers apply to static files, not to responses from the
+  server function that renders every page, and they cannot vary per request anyway.
+- The router accepts `ssr.nonce` and stamps it on every script and preload it renders.
+
+**Decision:**
+- A custom server entry (`src/app/src/server.ts`) generates 16 random bytes per request,
+  passes them to the Start handler as request context, and sets the CSP header on the HTML
+  response: `script-src 'nonce-…' 'strict-dynamic'`, `connect-src 'self'`,
+  `frame-ancestors 'none'`, `object-src 'none'`, `base-uri 'none'`.
+- The router reads the nonce with `getGlobalStartContext()`.
+- The same entry sets HSTS, nosniff, referrer and permissions policies on every response.
+  `netlify.toml` repeats them for static assets.
+- In the Vite dev server the CSP is off, since Vite injects un-nonced scripts there.
+
+**Alternatives Considered:**
+- `'unsafe-inline'` for scripts -> Defeats the CSP's main purpose.
+- Hashes of the inline scripts -> The hydration payload changes per page and per user.
+- Carrying the nonce as a request header -> Rebuilding the runtime's `Request` fails on
+  its private fields; the request context is the supported channel.
+
+**Consequences:**
+- Verified on a production build: every script and modulepreload carries that request's
+  nonce, and a new nonce is generated per request.
+- `style-src` keeps `'unsafe-inline'` for the inline `style` attributes Radix sets.
+- A third-party script would need an explicit CSP change, which is the point.
+
+### ADR-014: Develop against a hosted dev project; database tests run in CI (2026-10-27)
+
+*Production on the Pro plan is superseded by ADR-016; the separate dev project by ADR-017.*
+
+**Context:**
+- The development machine runs macOS 12 on Intel. Current Docker Desktop no longer supports
+  it, and the local Supabase stack (`supabase start`, `supabase test db`) needs Docker.
+- Installing an unsupported Docker build on a machine that will hold financial exports is
+  the wrong trade.
+
+**Decision:**
+- One hosted Supabase project, **dev**, on a free organization, holding demo data only. It
+  serves local development and Netlify deploy previews. Migrations reach it with
+  `supabase db push` from `src/`.
+- GitHub Actions runs the database checks on every push: `supabase db start` (Docker is
+  available there), `supabase db lint`, `supabase test db`.
+- **production** is a separate project on the Pro plan. Nothing but `main` deploys to it,
+  and no migration is pushed there before CI is green.
+
+**Alternatives Considered:**
+- An older Docker Desktop or Colima on macOS 12 -> Unsupported software, and a local
+  database stack competing for an older machine's memory.
+- Separate dev and preview projects -> A free organization allows two projects; one demo
+  project covers both while there is one developer.
+
+**Consequences:**
+- pgTAP results come back from CI, not instantly. A migration is written, pushed to a branch,
+  and checked there before `db push` to dev.
+- The dev project's keys are low-stakes (demo data), which makes it safe to use from
+  `.env.local` and from previews.
+- If the machine changes, `supabase start` works again and this ADR is superseded.
+
 ### ADR-013: Google-style emoji from a self-hosted font (2026-10-27)
 
 **Context:**
@@ -115,6 +288,10 @@ Document architectural choices with context, alternatives considered, and trade-
 
 **Consequences:**
 - About ten runtime dependencies instead of fifteen.
+- shadcn 4 imports `cn` from its own new package (`cn`, 0.x). Not adopted: the components
+  use `src/lib/utils.ts` (clsx + tailwind-merge), and a lint rule rejects `import ... from
+  'cn'`. After each `shadcn add`, point the import back and uninstall `cn`.
+- shadcn components depend on `radix-ui`, the single Radix package.
 - A new dependency needs a line in this ADR's tables or its own ADR.
 - Trade-off: some things the libraries gave for free (form dirty state, query
   deduplication) are written by hand when needed.
@@ -234,8 +411,8 @@ repo/  README.md  CLAUDE.md  .gitignore  .github/  .claude/  docs/
        src/supabase/   Supabase CLI project: config.toml, migrations/, tests/ (pgTAP), seed.sql (demo data)
        src/data/       reference/ (Git: lookup CSVs) + local/ (gitignored: real data)
 ```
-- **npm commands run from `src/app/`. Supabase CLI commands run from `src/`** (the CLI
-  looks for a `supabase/` folder in the working directory).
+- **Every command runs from `src/app/`.** The Supabase CLI is a dev dependency there, and
+  the `db:*` npm scripts call it with `--workdir ..` so it finds `src/supabase/`.
 
 **Alternatives Considered:**
 - `supabase/` at the repo root -> The CLI default, but it puts a sub-project at the root,
@@ -258,8 +435,10 @@ repo/  README.md  CLAUDE.md  .gitignore  .github/  .claude/  docs/
 **Decision:**
 - All data access goes through TanStack Start server functions. They call Supabase with the
   user's session, so RLS still applies.
-- The publishable key is used only by the auth flow in the browser. No data query exists in
-  client code.
+- Sign-in, MFA enrolment and the MFA challenge are server functions too. The browser bundle
+  contains no Supabase client and no key at all; CI fails if one appears in `dist/client`.
+- With no client-side reader, the session cookies are `httpOnly`, `secure` and
+  `SameSite=Lax`.
 
 **Alternatives Considered:**
 - Browser to Supabase directly -> Less code, but every validation rule must also live in
@@ -366,6 +545,8 @@ repo/  README.md  CLAUDE.md  .gitignore  .github/  .claude/  docs/
   is an ADR then.
 
 ### ADR-001: Supabase Postgres is the source of truth (2026-10-27)
+
+*The Pro plan is superseded by ADR-016 (free plans).*
 
 **Context:**
 - Multiple users from day one, financial data, a hosted web app.

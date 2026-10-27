@@ -1,0 +1,10 @@
+<!-- Invitation email. Bilingual: the invitee has not chosen a language yet. The link opens
+     a page with a button; the token is spent only on that click, so email link scanners
+     cannot use it up. -->
+<h2>Invitation : Money Tracker</h2>
+<p>Vous êtes invité·e à créer votre compte. Ce lien expire dans une heure.</p>
+<p><a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&amp;type=invite">Créer mon mot de passe</a></p>
+<hr />
+<h2>Invitation: Money Tracker</h2>
+<p>You are invited to create your account. This link expires in one hour.</p>
+<p><a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&amp;type=invite">Set my password</a></p>
