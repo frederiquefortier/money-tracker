@@ -4,6 +4,44 @@ Track future enhancements and feature ideas. Review this file during planning se
 
 <!-- Newest first: a new idea goes directly below this line. Template at the bottom. -->
 
+### 2026-10-27 - Portfolio cut
+
+**Description:**
+- A presentable version of the project for readers who will spend two minutes on it: v1
+  plus one signature feature, on the public demo (DEM-01) with generated data (DEM-02).
+- The signature feature is a slice of the yearly review (YR-02, 03, 04): the sticky-month
+  timeline, the top 3 days, who I spent the most with. It needs a minimal people model
+  (PPL-01, 03) pulled forward from v2.
+- README for skimmers: a hero screenshot or short clip, the demo link, the security section
+  with a "try to break it" angle, and links to process.md and two or three ADRs that show
+  judgment (ADR-005, ADR-010, ADR-012).
+
+**Motivation:**
+- Budget trackers are a common portfolio project; the ledger alone does not stand out. What
+  does: the method (process.md), the security work, the multi-currency handling, and the
+  social view nobody else has.
+- A private app with real data and enforced MFA cannot be shown. The demo is the only way
+  anyone sees it run.
+
+**Potential Approach:**
+- Build after v1 ships, before the rest of v2.
+- Screenshots and the clip come from the demo generator's fixed seed, so they can be
+  regenerated after UI changes.
+
+**Priority:**
+- [x] High - Critical improvement
+- [ ] Medium - Nice to have
+- [ ] Low - Future consideration
+
+**Dependencies:**
+- v1 (phases 0 to 2), DEM-01, DEM-02.
+
+**Status:**
+- [x] Proposed
+- [ ] In Progress
+- [ ] Completed
+- [ ] Deferred
+
 ### 2026-10-27 - Import wizard (IMP-03)
 
 **Description:**

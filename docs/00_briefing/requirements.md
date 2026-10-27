@@ -11,8 +11,9 @@ The organized feature list. It merges four sources and removes the duplicates be
 | `sheet` | Something the current spreadsheets do that the notes never mention ([reference-sheets.md](reference-sheets.md)) |
 
 Each requirement has a stable ID (`ACC-03`) so ADRs, issues and commits can point at it.
-**Phase** refers to [roadmap.md](../03_planning/roadmap.md); `later` means not in v1 and
-tracked in [improvements.md](../03_planning/improvements.md). The UI ships in French and
+**Phase** refers to [roadmap.md](../03_planning/roadmap.md). **v1 is phases 0 to 2**: the
+point where the spreadsheet can be retired. Phases 3 and 4 are v2, phase 5 is v3, and
+`later` is tracked in [improvements.md](../03_planning/improvements.md). The UI ships in French and
 English; this file is in English like every other meta-doc.
 
 ---
@@ -46,15 +47,16 @@ English; this file is in English like every other meta-doc.
 | ID | Requirement | Source | Phase |
 |---|---|---|---|
 | TRX-01 | Add an expense or an income, with a date and an optional time. | v1, ai, misc | 1 |
-| TRX-02 | Currency is required on every transaction, prefilled from the account, then the user default. | add, C6 | 1 |
+| TRX-02 | Currency is required on every transaction, prefilled from the account. The amount booked is always in the account's currency; choosing another currency records it as the original price (CUR-08). | add, C6 | 1 |
 | TRX-03 | Balance adjustment: set an account to a known balance; the app records the difference. | v1, ai | 1 |
-| TRX-04 | Transfer between two accounts. Optional fee, recorded as an expense on the source account under a "Frais bancaires" category. Edit and delete act on all legs together, with a confirmation before delete. List shows "Transfert : A → B". | add, C5 | 1 |
+| TRX-04 | Transfer between two accounts. Optional fee, recorded as an expense on the source account in the category chosen once in settings. Edit and delete act on all legs together, with a confirmation before delete. List shows "Transfert : A → B". | add, C5 | 1 |
 | TRX-05 | A transaction can be linked to a merchant. | v1, ai | 1 |
 | TRX-06 | Split a transaction across several categories by amount, share or percentage. | v1, ai | 1 |
 | TRX-07 | Link an income to an expense as its reimbursement. | v1, ai | 3 |
 | TRX-08 | Recurring transactions. Changing the amount keeps the old amount and the change date as history. The recurrence can be stopped. | v1, ai | 2 |
 | TRX-09 | Status: pending or cleared, so a pending card charge does not count as reconciled. | sheet | 1 |
 | TRX-10 | A transaction can carry a free-text note (the memo). | sheet | 1 |
+| TRX-11 | A transfer between accounts in different currencies records what left one and what arrived in the other; the gap against that day's market rate shows as the conversion cost. | net-worth data (CAD to CHF) | 1 |
 
 ## 4. Multi-currency (`CUR`)
 
@@ -80,7 +82,7 @@ English; this file is in English like every other meta-doc.
 | CAT-04 | Archived categories are absent from every picker. Editing an old transaction still shows its archived category with a badge and lets you change it. | add, C8 | 1 |
 | CAT-05 | The category page shows active categories first and archived ones in a collapsed section with a count and "archivée depuis [date]". | add, C9 | 1 |
 | CAT-06 | Favourite categories sit in a "Favoris" group at the top of the picker, shown as "Parent > Enfant", toggled with a star inside the picker. They are not repeated below. | v1, ai, add, C7 | 1 |
-| CAT-07 | A category has an emoji icon, chosen from the full emoji set (emoji-picker-react, Google style). A default is suggested from the name; "Réinitialiser" returns to it. | v1, ai, add, C11 | 1 |
+| CAT-07 | A category has an emoji icon, chosen from the full emoji set (emoji-picker-react), shown in the Google style everywhere through a self-hosted Noto Color Emoji font (ADR-013). A default is suggested from the name; "Réinitialiser" returns to it. | v1, ai, add, C11 | 1 |
 | CAT-08 | A category can be excluded from the emergency-fund calculation. | v1, ai | 2 |
 
 ## 6. Merchants (`MER`)
@@ -152,7 +154,7 @@ English; this file is in English like every other meta-doc.
 |---|---|---|---|
 | NW-01 | Holdings: investment accounts, debts and other assets, each with a type (TFSA/CELI, RRSP/REER, FHSA/CELIAPP, DPSP, 2nd pillar, 3a, life-insurance buyout...) and an institution and country. | v1, ai | 4 |
 | NW-02 | Dated value snapshots per holding. Months with no snapshot can be hidden in charts. | v1, ai | 4 |
-| NW-03 | Contributions per holding, split between my money and employer money. Shows amount placed and profit in amount and percent. | v1, ai, net-worth data | 4 |
+| NW-03 | Contributions per holding, split between my money (transactions linked to the holding) and employer or other money (entered on the holding). Shows amount placed and profit in amount and percent. | v1, ai, net-worth data | 4 |
 | NW-04 | Net worth chart (total, investments, debts) and percent change over any range; default is account start to today. | v1, ai | 4 |
 | NW-05 | A holding can be excluded from the net worth total (the life insurance "with/without" line). | net-worth data | 4 |
 | NW-06 | Projections at fixed growth rates (5, 7, 10 %) or custom inputs. | v1, ai | later |
@@ -188,10 +190,17 @@ The "Canada" section, generalised because the data already spans Canada and Swit
 | IMP-01 | Import from one fixed, documented CSV format (accounts, transactions, optional splits). The user prepares their data beforehand. Missing categories, accounts and merchants are created and listed before commit. Files are read in the browser and never stored. See [import.md](../01_building/import.md). | sheet, ADR-010 | 1 |
 | IMP-02 | Net-worth history through the same format (optional holdings and snapshots files). | net-worth data | 4 |
 | IMP-03 | Import wizard: source profiles, column and category mapping, merchant-alias matching, suggested transfer pairs and reimbursements. | v1 misc ("Csv importer visual"), MER-02 | later |
-| IMP-04 | Export my data in the import format; export then import reproduces it. | ADR-010, SEC-04 | 1 |
+| IMP-04 | Export my data in the import format; export then import reproduces it. This is the export half of SEC-04. | ADR-010, SEC-04 | 1 |
 | IMP-05 | Each import is one all-or-nothing batch that can be undone in one action. Re-importing a row with a known `ref` is skipped. | ADR-010 | 1 |
 
-## 16. Security and accounts (`SEC`)
+## 16. Demo and portfolio (`DEM`)
+
+| ID | Requirement | Source | Phase |
+|---|---|---|---|
+| DEM-01 | A public demo deployment on its own Supabase project, holding invented data only. MFA is relaxed there and only there, by a separate policy migration, and the demo banner says so. | portfolio | 2 |
+| DEM-02 | A demo-data generator: a fictional person with several years of multi-currency spending (one move between countries), transfers, splits, budgets. Deterministic, so screenshots are reproducible. Also used for local development and previews. | portfolio | 1 |
+
+## 17. Security and accounts (`SEC`)
 
 Not in the notes, required by the brief. Details in [security.md](../01_building/security.md).
 
@@ -200,7 +209,7 @@ Not in the notes, required by the brief. Details in [security.md](../01_building
 | SEC-01 | Multiple users, each seeing only their own data, enforced in the database. | brief | 0 |
 | SEC-02 | Sign-up closed while the app is private; accounts by invitation. | brief | 0 |
 | SEC-03 | TOTP two-factor authentication, required to read financial data. | brief | 0 |
-| SEC-04 | Full export of a user's data in an open format, and full deletion. | brief | 2 |
+| SEC-04 | Full export of a user's data in an open format (IMP-04, phase 1), and full account deletion (phase 2). | brief | 1, 2 |
 
 ---
 
@@ -217,6 +226,10 @@ Not in the notes, required by the brief. Details in [security.md](../01_building
 - **Transfers.** C5 stores a transfer as two transactions pointing at each other. The schema
   uses a shared `transfer_id` on the legs instead; same behaviour, no circular foreign keys.
   See [database.md](../01_building/database.md).
+- **Transfer fee category.** C5 auto-created "Frais bancaires". With categories built by the
+  user, the fee category is a setting instead (`profiles.transfer_fee_category_id`).
+- **Emoji style.** C11 asks for the picker's Google theme, which loads images from a CDN.
+  The Google look is kept through a self-hosted font instead (ADR-013).
 - **"Canada"** became region packs (`LOC`), since 2026 data is Swiss.
 - **v1 "account hidden for future transactions"** was dropped from `ai`, probably by
   accident. Kept as ACC-04; delete it if the drop was deliberate.

@@ -48,6 +48,24 @@ root keeps only `README.md`, `CLAUDE.md`, `.gitignore`, `.github/`, `.claude/` a
 - Keep each doc in the format defined at the bottom of its file. New entries go at the top,
   newest first, directly below the comment marker.
 
+## Definition of done
+A change is done when the docs it affects are updated in the same change. A stop hook
+flags a session that touched `src/` without touching `docs/`.
+
+| The change... | ...also updates |
+|---|---|
+| adds, changes or drops a feature | [requirements.md](docs/00_briefing/requirements.md) (the row, its phase) and [roadmap.md](docs/03_planning/roadmap.md) |
+| touches the schema | [database.md](docs/01_building/database.md), with a pgTAP test |
+| makes or reverses a structural choice | a new ADR in [decisions.md](docs/01_building/decisions.md) (never edit an old ADR's decision; supersede it) |
+| adds a dependency | its line in ADR-011 |
+| changes the import format | [import.md](docs/01_building/import.md) and the templates |
+| changes a security rule | [security.md](docs/01_building/security.md) |
+| changes direction on a proposal | a row in [process.md](docs/01_building/process.md#who-decided-what) saying what was proposed and what was decided |
+| ends a working session | an entry in [sessions.md](docs/01_building/sessions.md) |
+| changes what the project is or how to run it | [README.md](README.md) |
+
+Commit messages reference requirement IDs (`feat(TRX-04): ...`).
+
 ## Conventions
 - Meta-documentation and code are in **English**. The **interface ships in French and
   English** ([ADR-008](docs/01_building/decisions.md)): every visible string is a react-i18next

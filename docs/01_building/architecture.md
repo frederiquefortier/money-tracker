@@ -33,11 +33,11 @@
 
 | Writer | Writes | How |
 |---|---|---|
-| Server functions (user session) | Everything user-owned | supabase-js, RLS enforced |
+| Server functions (user session) | Everything user-owned | supabase-js, RLS enforced. Multi-row writes call `security invoker` SQL functions with `.rpc()` (ADR-012). |
 | Rates job (secret key) | `exchange_rates` | Netlify scheduled function, daily |
 | Recurring job (secret key) | `transactions` generated from `recurring_rules` | Netlify scheduled function, daily. Sets `user_id` from the rule, never from input. |
 | Migrations | Schema, global seed data | Supabase CLI, `src/supabase/migrations/` |
-| Importer | Historical data from an import package | Server function with a review step, never a raw SQL load ([import.md](import.md)) |
+| Importer | Rows in the fixed CSV format | Server function, then one `import_batch` SQL call ([import.md](import.md)) |
 
 Nothing writes from the browser.
 

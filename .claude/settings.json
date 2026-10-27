@@ -22,6 +22,17 @@
           }
         ]
       }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/docs-check.sh",
+            "statusMessage": "Checking docs are part of the change"
+          }
+        ]
+      }
     ]
   }
 }

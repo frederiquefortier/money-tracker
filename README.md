@@ -9,8 +9,9 @@ It replaces an eight-year budgeting spreadsheet and is built to import all of it
 ## Status
 
 Planning. The requirements, schema design, security model and first decisions are written;
-no code yet. Next is [phase 0 of the roadmap](docs/03_planning/roadmap.md): scaffold, auth
-with MFA, and the row-level security pattern with its tests.
+no code yet. v1 is roadmap phases 0 to 2, the point where the spreadsheet can be retired.
+Next is [phase 0](docs/03_planning/roadmap.md): scaffold, auth with MFA, and the row-level
+security pattern with its tests.
 
 ## Stack
 
@@ -39,6 +40,7 @@ database directly. Full model: [security.md](docs/01_building/security.md).
 | [database.md](docs/01_building/database.md) | Schema design |
 | [security.md](docs/01_building/security.md) | Threat model and rules |
 | [roadmap.md](docs/03_planning/roadmap.md) | Phases |
+| [process.md](docs/01_building/process.md) | How it is built with an AI assistant, and who decided what |
 
 ## Layout
 

@@ -19,8 +19,22 @@ It works, but it cannot answer the questions that matter now:
 - Every transaction, in its real currency, converted at that day's rate.
 - Budgets and an emergency-fund view that read real averages.
 - People, groups and events attached to spending, with a yearly review built from them.
-- Net worth with contributions vs. growth, and projections.
+- Net worth with contributions vs. growth (projections come later).
 - Import the full spreadsheet history so day one already has eight years of data.
+
+## Who it is for
+- **Now:** the owner, retiring a spreadsheet kept since 2018.
+- **Later:** a few invited people with their own data, which is why multi-user and the
+  import format exist from v1.
+- **Also:** readers of the code. The repo is a portfolio piece on AI-assisted development;
+  [process.md](../01_building/process.md) records the method.
+
+## v1 is done when
+- Eight years of Aspire history are imported and every account balance matches the sheet.
+- A month of new transactions is entered in the app and not in the sheet.
+- The dashboard and budgets answer what the Aspire dashboard answered.
+- A second test user sees none of the owner's data (pgTAP), and MFA is enforced.
+- The public demo runs on invented data.
 
 ## Non-goals (for now)
 - Bank connections. CSV import only.

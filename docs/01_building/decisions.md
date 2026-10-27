@@ -4,6 +4,70 @@ Document architectural choices with context, alternatives considered, and trade-
 
 <!-- Newest first: a new ADR goes directly below this line. Template at the bottom. -->
 
+### ADR-013: Google-style emoji from a self-hosted font (2026-10-27)
+
+**Context:**
+- CAT-07 asks for emoji-picker-react in the Google style. In that mode the library loads
+  every emoji as an image from the jsDelivr CDN, which the Content-Security-Policy blocks
+  (security.md), and which tells a third party when the app is in use.
+- The emoji is stored as text, so outside the picker it renders in the device's own style
+  anyway: Google look in the picker, Apple or Microsoft look everywhere else.
+
+**Decision:**
+- Keep emoji-picker-react (asked for by name, maintained), with `emojiStyle="native"`: it
+  draws characters, not images.
+- Serve Google's emoji font, Noto Color Emoji, from our own origin through
+  `@fontsource/noto-color-emoji`, and put it first in the emoji font stack. Fontsource ships
+  it split by `unicode-range`, so the browser downloads only the slices that are used.
+- The picker and every place an icon is shown use that stack, so the Google style is the
+  same everywhere, on every device.
+
+**Alternatives Considered:**
+- Picker in Google image mode with `getEmojiUrl` pointing at self-hosted images -> Works
+  inside the picker only, and means hosting thousands of PNGs.
+- Allow jsDelivr in the CSP -> A third-party request on a financial app, for decoration.
+- emoji-mart -> Popular, but releases have been sparse; no advantage here.
+
+**Consequences:**
+- CSP stays `self` plus Supabase.
+- Windows, which renders flags as letters, shows real flags.
+- One more small dependency (the font package), listed in ADR-011.
+
+### ADR-012: Writes that touch several rows are Postgres functions (2026-10-27)
+
+**Context:**
+- supabase-js talks to PostgREST, one HTTP request per call, with no transaction spanning
+  calls.
+- Several writes must be atomic: a transfer (two legs and a fee), a transaction with its
+  splits (the sum check is a deferred constraint, so both must land in one transaction), an
+  import batch, an undo.
+- Netlify Functions time out after about 10 seconds by default and accept request bodies up
+  to about 6 MB.
+
+**Decision:**
+- Any write touching more than one row is a PL/pgSQL function called with `.rpc()`:
+  `save_transaction`, `save_transfer`, `delete_transfer`, `import_batch`, `undo_import_batch`.
+- These functions are `security invoker`, so RLS applies exactly as for a direct query, and
+  set `search_path = ''`.
+- The server function still validates input with Zod first (ADR-006); the SQL function
+  re-checks the invariants it owns (sums, transfer shape, currencies).
+- The import sends all rows in one request (about 10,000 rows is 1 to 2 MB of JSON) to one
+  `import_batch(jsonb)` call, which commits or rolls back as a whole inside Postgres.
+
+**Alternatives Considered:**
+- A direct Postgres connection from the server with real transactions -> RLS would only
+  apply if every query set the role and JWT claims by hand (ADR-006).
+- Several calls and a compensating delete on failure -> Not atomic; a crash between calls
+  leaves half a transfer.
+- Chunked upload into a staging table -> Needed only past the body limit, far beyond one
+  person's history.
+
+**Consequences:**
+- Business rules for money movement live in SQL, versioned in migrations and tested with
+  pgTAP.
+- Single-row reads and writes stay plain supabase-js calls.
+- A history larger than the body limit would need staging; not expected.
+
 ### ADR-011: The platform first, a dependency only when it earns its place (2026-10-27)
 
 **Context:**
@@ -39,7 +103,8 @@ Document architectural choices with context, alternatives considered, and trade-
   | shadcn/ui (Radix underneath) and Tailwind | Accessible combobox, dialog, popover, menu: focus management and keyboard handling that are hard to get right by hand. Components are added one at a time, only when a screen uses them. |
   | i18next, react-i18next | Plurals, interpolation and server-rendered language switching for FR and EN (ADR-008) |
   | Recharts (through shadcn charts) | Line, bar, area and donut charts with tooltips and responsive sizing |
-  | emoji-picker-react | Asked for by name (CAT-07), lazy-loaded |
+  | emoji-picker-react | Asked for by name (CAT-07), lazy-loaded, native emoji mode (ADR-013) |
+  | @fontsource/noto-color-emoji | Google-style emoji from our own origin (ADR-013) |
 
 **Alternatives Considered:**
 - The full set from the correction prompts (TanStack Query, Zustand, react-hook-form,
@@ -49,7 +114,7 @@ Document architectural choices with context, alternatives considered, and trade-
   grouped combobox (CAT-06, CUR-03) still needs custom keyboard and ARIA work.
 
 **Consequences:**
-- About nine runtime dependencies instead of fifteen.
+- About ten runtime dependencies instead of fifteen.
 - A new dependency needs a line in this ADR's tables or its own ADR.
 - Trade-off: some things the libraries gave for free (form dirty state, query
   deduplication) are written by hand when needed.
@@ -204,7 +269,8 @@ repo/  README.md  CLAUDE.md  .gitignore  .github/  .claude/  docs/
   once.
 
 **Consequences:**
-- Two walls: Zod validation in the server function, RLS in the database.
+- Two walls: Zod validation in the server function, RLS in the database. Multi-row writes
+  go through `security invoker` SQL functions, which keep RLS in force (ADR-012).
 - Every query costs one extra hop through a Netlify Function. Fine at this scale.
 - Realtime subscriptions are off the table without opening a browser channel. Not needed.
 

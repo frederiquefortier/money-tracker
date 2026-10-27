@@ -32,7 +32,7 @@ Two plan-level caveats:
 | Stolen password | Medium | TOTP MFA required by policy (`aal2`), not just offered; sign-up closed |
 | Secret key leaks to the browser | Medium (one wrong `import`) | Secret key used only in server modules; build check that no `sb_secret_` string ends up in the client bundle |
 | XSS steals the session | Low with React, higher with emoji/HTML inputs | Strict Content-Security-Policy in `netlify.toml`, no `dangerouslySetInnerHTML`, emoji validated as emoji |
-| Deploy preview hits production data | High by default on Netlify | Previews point at a separate Supabase project with demo data, or previews are off |
+| Deploy preview hits production data | High by default on Netlify | Previews point at a separate Supabase project with demo data (on a free organization: a second project in the Pro organization costs extra), or previews are off |
 | Supabase account takeover | Low | MFA on the Supabase and Netlify accounts themselves, GitHub too |
 | Data loss | Medium over years | Pro-plan backups plus a nightly encrypted dump kept elsewhere |
 | Vendor disappears or changes pricing | Low, long horizon | Plain Postgres with SQL migrations in Git; a dump restores anywhere |
@@ -72,7 +72,8 @@ Two plan-level caveats:
    environment variables scoped to Functions.
 4. **Security headers** in `netlify.toml`: CSP, HSTS, `frame-ancestors 'none'`,
    `Referrer-Policy: same-origin`, `Permissions-Policy` locking off camera, mic, geolocation.
-5. **Third-party calls** (the rates API) happen server-side only. The browser's CSP allows
+5. **Third-party calls** (the rates API) happen server-side only. Fonts, emoji included,
+   are served from our own origin (ADR-013). The browser's CSP allows
    only our own origin and Supabase.
 6. **No financial data in logs or error messages**, and none in analytics. No third-party
    analytics at all while the app is private.
@@ -85,12 +86,18 @@ Two plan-level caveats:
   development).
 - Short-lived access tokens (default one hour) with refresh rotation, which is Supabase's
   default.
+- **No recovery codes**: Supabase TOTP has none. Enrol two authenticators (phone and a
+  password manager) at setup. A user who loses both is unlocked by removing the factor in
+  the Supabase dashboard, after verifying them out of band. A self-service recovery flow is
+  needed before anyone but the owner uses the app.
 
 ### Backups
 
 - Supabase Pro daily backups.
-- A nightly scheduled job runs `pg_dump`, encrypts it with `age` to a key that is not stored
-  next to it, and keeps it outside Supabase. That is the 3-2-1 copy that survives losing the
+- A nightly scheduled GitHub Action runs `pg_dump` (Netlify Functions cannot), encrypts it
+  with `age` to a public key, and stores it outside Supabase. The database connection string
+  lives in GitHub encrypted secrets, scoped to that one workflow; the `age` private key lives
+  offline, never in GitHub. That is the 3-2-1 copy that survives losing the
   Supabase account.
 - A restore is tested once, then after every major schema change.
 

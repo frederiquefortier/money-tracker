@@ -18,11 +18,13 @@ never app code.
 1. Upload   accounts.csv, transactions.csv, optionally splits.csv (read in the browser)
 2. Check    every row validated; errors listed by file and line, nothing written
 3. Summary  counts, date range, and what will be created: new accounts, categories, merchants
-4. Commit   one import batch, written in one database transaction; undoable in one action
+4. Commit   one request, one `import_batch(jsonb)` call, one database transaction; undoable
 ```
 
 Files are read in the browser with `File.text()` and never uploaded or stored. The server
-receives the parsed rows, validates them again with Zod, and writes them.
+receives all parsed rows in one request (about 10,000 rows is 1 to 2 MB), validates them
+again with Zod, and passes them to the `import_batch` SQL function, which commits or rolls
+back as a whole (ADR-012).
 
 Import is all or nothing: one invalid row blocks the batch, so a file is never half
 imported.
@@ -65,14 +67,14 @@ overwritten.
 | `time` | no | |
 | `account` | yes | An account name, from accounts.csv or already in the app |
 | `kind` | yes | `expense`, `income`, `transfer`, `adjustment` |
-| `amount` | yes | What the account moved, in `currency` |
-| `currency` | yes | |
+| `amount` | yes | What the account moved |
+| `currency` | yes | Must be the account's currency. A purchase in another currency goes in the next two columns. |
 | `original_amount` | no | The receipt price, when paid in another currency |
 | `original_currency` | with `original_amount` | |
-| `category` | yes, except transfers | A category path. For a split, leave empty and use splits.csv. |
+| `category` | yes for `expense` and `income` | A category path. Empty for transfers and adjustments. For a split, leave empty and use splits.csv. |
 | `merchant` | no | Created if new, matched by exact name otherwise |
 | `status` | no | `cleared` (default) or `pending` |
-| `transfer_group` | for transfers | Same value on both legs, and on the fee row if there is one (a `kind = expense` row on the source account). Exactly two `transfer` rows per group, on two accounts. |
+| `transfer_group` | for transfers | Same value on both legs, and on the fee row if there is one (a `kind = expense` row on the source account). Exactly two `transfer` rows per group, on two accounts. Same currency: amounts mirror. Different currencies: each leg holds what really moved. |
 | `note` | no | |
 
 ## splits.csv (optional)
@@ -87,7 +89,8 @@ For transactions spread over several categories.
 
 ## Later columns
 
-Features from later phases add optional columns (tags, people, events, reimbursement links)
+Features from later phases add optional columns (tags, people, events, reimbursement links,
+`holding` for investment contributions)
 and optional files (net-worth holdings and snapshots, IMP-02). A file in the v1 format stays
 valid.
 
