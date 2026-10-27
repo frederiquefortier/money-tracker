@@ -1,0 +1,66 @@
+# Architecture
+
+```
+  Browser (React, shadcn/ui, TanStack Router + Query)
+        │  server functions only (no direct DB access)
+        ▼
+  TanStack Start server (Node, on Netlify Functions)
+        │  supabase-js with the user's session  ──►  RLS applies
+        │  supabase-js with the secret key       ──►  rate fetch, scheduled jobs only
+        ▼
+  Supabase: Postgres (source of truth) + Auth (TOTP MFA)
+        ▲
+        │  daily rates + 2018 backfill
+  Frankfurter (ECB rates, conversion)    HexaRate (validates added currencies)
+```
+
+## Stack
+
+| Layer | Choice | Why (ADR) |
+|---|---|---|
+| Database and auth | Supabase (Postgres + Auth) | ADR-001 |
+| Backend | TanStack Start server functions, running on Node in Netlify Functions | ADR-002 |
+| UI | React 19, TanStack Router (loaders, no separate query cache), shadcn/ui on Tailwind, Recharts for charts | ADR-003, ADR-011 |
+| Forms | Native React 19 form actions; Zod validates every server function input | ADR-003, ADR-011 |
+| Money | `numeric` in Postgres, strings over the wire, `BigInt` minor units for the rare TypeScript calculation | ADR-004, ADR-011 |
+| Exchange rates | Frankfurter for history and daily rates, HexaRate to validate new currencies | ADR-009 |
+| Languages | French and English: react-i18next for messages, `Intl` for formatting | ADR-008 |
+| Dependencies | Platform first; the short list of what stays is in ADR-011 | ADR-011 |
+| Hosting | Netlify | brief |
+| Language | TypeScript everywhere, strict mode | |
+
+## Who writes what
+
+| Writer | Writes | How |
+|---|---|---|
+| Server functions (user session) | Everything user-owned | supabase-js, RLS enforced |
+| Rates job (secret key) | `exchange_rates` | Netlify scheduled function, daily |
+| Recurring job (secret key) | `transactions` generated from `recurring_rules` | Netlify scheduled function, daily. Sets `user_id` from the rule, never from input. |
+| Migrations | Schema, global seed data | Supabase CLI, `src/supabase/migrations/` |
+| Importer | Historical data from an import package | Server function with a review step, never a raw SQL load ([import.md](import.md)) |
+
+Nothing writes from the browser.
+
+## Derived values
+
+Balances, category totals and net worth are computed, never stored, until a measured
+performance problem says otherwise. A few thousand transactions a year is small for
+Postgres. When a view gets slow, the fix is an index or a materialized view refreshed by the
+write path, recorded as an ADR.
+
+## Currency conversion
+
+A transaction stores what happened: the amount that left the account in its currency, and
+the receipt price and currency when they differ. It never stores a display-currency amount.
+Display conversion joins `exchange_rates` on the transaction date at read time, so switching
+the display currency is a re-query, not a migration. An amount already in the display
+currency skips conversion, and every converted amount comes back flagged with its original
+amount and rate so the UI can mark it (CUR-09). See [database.md](database.md#money).
+
+## Environments
+
+| Environment | Supabase project | Netlify |
+|---|---|---|
+| Local | `supabase start` (Docker), seeded with demo data | `netlify dev` / `vite dev` |
+| Preview | A separate project with demo data only | Deploy previews |
+| Production | The real project, Pro plan | Main branch |

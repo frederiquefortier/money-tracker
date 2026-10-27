@@ -1,0 +1,4 @@
+name,type,currency,institution,institution_url,opening_balance,opened_on,closed_on
+Compte chèque,checking,CAD,Banque Exemple,https://example.com,1250.00,2018-01-01,
+Épargne,savings,CAD,Banque Exemple,https://example.com,5000.00,2018-01-01,
+Compte suisse,checking,CHF,Banque Alpine,,0.00,2026-01-15,

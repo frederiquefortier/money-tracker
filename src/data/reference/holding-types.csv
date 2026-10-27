@@ -1,0 +1,18 @@
+code,country,kind,label_fr,label_en
+CA_TFSA,CA,investment,CELI,TFSA
+CA_RRSP,CA,investment,REER,RRSP
+CA_DPSP,CA,investment,RPDB,DPSP
+CA_FHSA,CA,investment,CELIAPP,FHSA
+CA_RESP,CA,investment,REEE,RESP
+CA_NONREG,CA,investment,Compte non enregistré,Non-registered
+CH_PILLAR2,CH,investment,2e pilier (LPP),2nd pillar (BVG/LPP)
+CH_PILLAR3A,CH,investment,3e pilier A,Pillar 3a
+CH_PILLAR3B,CH,investment,3e pilier B,Pillar 3b
+CH_VESTED,CH,investment,Compte de libre passage,Vested benefits account
+ANY_BROKERAGE,,investment,Compte de courtage,Brokerage
+ANY_LIFE_INSURANCE,,asset,Assurance-vie (valeur de rachat),Life insurance (buyout value)
+ANY_PROPERTY,,asset,Immobilier,Real estate
+ANY_LOAN,,debt,Prêt,Loan
+ANY_STUDENT_LOAN,,debt,Prêt étudiant,Student loan
+ANY_MORTGAGE,,debt,Hypothèque,Mortgage
+ANY_CREDIT_LINE,,debt,Marge de crédit,Line of credit

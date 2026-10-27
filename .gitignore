@@ -1,0 +1,30 @@
+.DS_Store
+/.idea
+/.vscode
+
+# Real financial data: spreadsheets, exports, dumps
+src/data/local/
+*.dump
+*.sql.gz
+*.age
+
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Node / TanStack Start
+node_modules/
+src/app/dist/
+src/app/.output/
+src/app/.tanstack/
+src/app/.vinxi/
+src/app/.nitro/
+coverage/
+
+# Netlify
+.netlify/
+
+# Supabase local state
+src/supabase/.branches/
+src/supabase/.temp/
