@@ -61,6 +61,7 @@ without touching `docs/`.
 
 | Date | Topic | Assistant proposed | Author decided | Where |
 |---|---|---|---|---|
+| 2026-11-02 | Font and layout | System rounded font; Google Fonts loaded from Google were blocked | Nunito, self-hosted; TravelSpend as the mobile layout reference | designs/00-layout-reference.md |
 | 2026-11-02 | Sign-in screen | Logo with name, field icons, title removed, invitation note as subtitle | Logo alone, no field icons, title kept, invitation note dropped; show/hide password; language toggle top right | SET-07 |
 | 2026-11-02 | Category icons | Emoji with a Google-style picker and font (ADR-013) | coolicons, the logo's set, for every icon including categories | ADR-020 |
 | 2026-11-02 | Languages | Six regional locales | French and English only | ADR-019 |

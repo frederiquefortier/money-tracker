@@ -28,3 +28,6 @@ coverage/
 # Supabase local state
 src/supabase/.branches/
 src/supabase/.temp/
+
+# Third-party screenshots used as design references; copyrighted, kept local only
+docs/00_briefing/designs/references/

@@ -79,9 +79,21 @@ export const en: Messages = {
     weakPassword: 'This password is too weak.',
     samePassword: 'Choose a password different from the current one.',
   },
-  home: {
-    greeting: 'Hello {{email}}',
-    intro:
-      'Phase 0: sign-in, two-factor authentication and data security are in place. The rest is coming.',
+  nav: {
+    label: 'Main navigation',
+    transactions: 'Transactions',
+    dashboard: 'Dashboard',
+    budget: 'Budget',
+    settings: 'Settings',
+  },
+  comingSoon: {
+    transactions:
+      'Your accounts and transactions will live here, with the import of your history.',
+    dashboard: 'Your spending by category and by month will show here.',
+    budget: 'Your goals and your emergency fund will live here.',
+    settings: 'Accounts, categories and currencies will be added to this page.',
+  },
+  settings: {
+    signedInAs: 'Signed in as',
   },
 }

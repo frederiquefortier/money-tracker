@@ -2,12 +2,14 @@
 @plugin '@tailwindcss/typography';
 
 @import 'tw-animate-css';
+/* Nunito, self-hosted (Fontsource, SIL Open Font License): served from our origin, so no
+   request to Google and no CSP change. Upright only; split by unicode-range. */
+@import '@fontsource-variable/nunito/wght.css';
 
 @custom-variant dark (&:is(.dark *));
 
 /* Piggy-bank palette. Contrast checked (WCAG AA): white on primary 5.1:1, primary on the
-   cream background 4.8:1, muted text 5.3:1. No web font: ui-rounded is the system's
-   rounded face where one exists (Apple), the system sans elsewhere. */
+   cream background 4.8:1, muted text 5.3:1. */
 :root {
   --background: oklch(0.985 0.012 15);
   --foreground: oklch(0.3 0.045 10);
@@ -62,7 +64,7 @@
 
 @theme inline {
   --font-sans:
-    ui-rounded, 'SF Pro Rounded', system-ui, -apple-system, 'Segoe UI',
+    'Nunito Variable', ui-rounded, system-ui, -apple-system, 'Segoe UI',
     sans-serif;
   --color-background: var(--background);
   --color-foreground: var(--foreground);

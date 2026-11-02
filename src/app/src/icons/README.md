@@ -10,7 +10,7 @@ Every icon in the app comes from [coolicons](https://icon-sets.iconify.design/co
 To add an icon, find its name on the site, add it to the list, and regenerate the file:
 
 ```
-curl -sSf "https://api.iconify.design/coolicons.json?icons=pig-fill,circle-warning,circle-check,shield-check,log-out,arrow-left,eye,eye-off" -o src/icons/coolicons.json
+curl -sSf "https://api.iconify.design/coolicons.json?icons=pig-fill,circle-warning,circle-check,shield-check,log-out,arrow-left,eye,eye-off,receipt,receipt-fill,chart-pie,chart-pie-fill,target,target-fill,settings,settings-fill" -o src/icons/coolicons.json
 ```
 
 The `IconName` type follows the file, so a name that is not in it fails type-checking.

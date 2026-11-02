@@ -69,7 +69,7 @@ per ADR-008. User-owned rows (categories, merchants, notes) store one string, as
 
 | Table | Columns | Req |
 |---|---|---|
-| `categories` | `parent_id` (nullable, self), `name`, `kind` (`expense`/`income`/`investment`), `icon` (a coolicons name, ADR-020), `icon_is_auto`, `is_favourite`, `exclude_from_emergency_fund` | CAT-01, 02, 06, 07, 08 |
+| `categories` | `parent_id` (nullable, self), `name`, `kind` (`expense`/`income`/`investment`), `icon` (a coolicons name, ADR-020), `icon_is_auto`, `color` (from a fixed palette, for the icon circle and charts; designs/00-layout-reference.md), `is_favourite`, `exclude_from_emergency_fund` | CAT-01, 02, 06, 07, 08 |
 | `category_status_events` | `category_id`, `status` (`archived`/`active`), `effective_on` | CAT-03. Append-only. |
 | view `category_active_periods` | `category_id`, `active_from`, `active_to` | Derived from the events. Pickers (CAT-04) and charts (DSH-03) both read this, so they never disagree. |
 

@@ -44,7 +44,8 @@ Replace daily use of the spreadsheet.
   converted-amount markers. CUR-01..09 (ADR-009).
 - Bilingual reference labels. SET-06.
 - Screen specs in `docs/00_briefing/designs/` before each screen is built: what it shows,
-  why, and which requirement IDs it covers.
+  why, and which requirement IDs it covers. Mobile layout follows
+  [00-layout-reference.md](../00_briefing/designs/00-layout-reference.md) (TravelSpend patterns).
 - Demo-data generator (DEM-02), used by local and preview from here on.
 - Institutions and accounts. ACC-01..07.
 - Categories with archive history, favourites, coolicons icons. CAT-01..07.

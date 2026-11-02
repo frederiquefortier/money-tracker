@@ -15,6 +15,9 @@ import { Route as MfaRouteImport } from './routes/mfa'
 import { Route as SetPasswordRouteImport } from './routes/set-password'
 import { Route as SignInRouteImport } from './routes/sign-in'
 import { Route as AuthedIndexRouteImport } from './routes/_authed/index'
+import { Route as AuthedBudgetRouteImport } from './routes/_authed/budget'
+import { Route as AuthedDashboardRouteImport } from './routes/_authed/dashboard'
+import { Route as AuthedSettingsRouteImport } from './routes/_authed/settings'
 import { Route as AuthConfirmRouteImport } from './routes/auth/confirm'
 
 const AuthedRoute = AuthedRouteImport.update({
@@ -46,6 +49,21 @@ const AuthedIndexRoute = AuthedIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthedRoute,
 } as any)
+const AuthedBudgetRoute = AuthedBudgetRouteImport.update({
+  id: '/budget',
+  path: '/budget',
+  getParentRoute: () => AuthedRoute,
+} as any)
+const AuthedDashboardRoute = AuthedDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AuthedRoute,
+} as any)
+const AuthedSettingsRoute = AuthedSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AuthedRoute,
+} as any)
 const AuthConfirmRoute = AuthConfirmRouteImport.update({
   id: '/auth/confirm',
   path: '/auth/confirm',
@@ -58,6 +76,9 @@ export interface FileRoutesByFullPath {
   '/mfa': typeof MfaRoute
   '/set-password': typeof SetPasswordRoute
   '/sign-in': typeof SignInRoute
+  '/budget': typeof AuthedBudgetRoute
+  '/dashboard': typeof AuthedDashboardRoute
+  '/settings': typeof AuthedSettingsRoute
   '/auth/confirm': typeof AuthConfirmRoute
 }
 export interface FileRoutesByTo {
@@ -65,6 +86,9 @@ export interface FileRoutesByTo {
   '/mfa': typeof MfaRoute
   '/set-password': typeof SetPasswordRoute
   '/sign-in': typeof SignInRoute
+  '/budget': typeof AuthedBudgetRoute
+  '/dashboard': typeof AuthedDashboardRoute
+  '/settings': typeof AuthedSettingsRoute
   '/auth/confirm': typeof AuthConfirmRoute
   '/': typeof AuthedIndexRoute
 }
@@ -75,6 +99,9 @@ export interface FileRoutesById {
   '/mfa': typeof MfaRoute
   '/set-password': typeof SetPasswordRoute
   '/sign-in': typeof SignInRoute
+  '/_authed/budget': typeof AuthedBudgetRoute
+  '/_authed/dashboard': typeof AuthedDashboardRoute
+  '/_authed/settings': typeof AuthedSettingsRoute
   '/auth/confirm': typeof AuthConfirmRoute
   '/_authed/': typeof AuthedIndexRoute
 }
@@ -86,6 +113,9 @@ export interface FileRouteTypes {
     | '/mfa'
     | '/set-password'
     | '/sign-in'
+    | '/budget'
+    | '/dashboard'
+    | '/settings'
     | '/auth/confirm'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -93,6 +123,9 @@ export interface FileRouteTypes {
     | '/mfa'
     | '/set-password'
     | '/sign-in'
+    | '/budget'
+    | '/dashboard'
+    | '/settings'
     | '/auth/confirm'
     | '/'
   id:
@@ -102,6 +135,9 @@ export interface FileRouteTypes {
     | '/mfa'
     | '/set-password'
     | '/sign-in'
+    | '/_authed/budget'
+    | '/_authed/dashboard'
+    | '/_authed/settings'
     | '/auth/confirm'
     | '/_authed/'
   fileRoutesById: FileRoutesById
@@ -159,6 +195,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthedIndexRouteImport
       parentRoute: typeof AuthedRoute
     }
+    '/_authed/budget': {
+      id: '/_authed/budget'
+      path: '/budget'
+      fullPath: '/budget'
+      preLoaderRoute: typeof AuthedBudgetRouteImport
+      parentRoute: typeof AuthedRoute
+    }
+    '/_authed/dashboard': {
+      id: '/_authed/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AuthedDashboardRouteImport
+      parentRoute: typeof AuthedRoute
+    }
+    '/_authed/settings': {
+      id: '/_authed/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof AuthedSettingsRouteImport
+      parentRoute: typeof AuthedRoute
+    }
     '/auth/confirm': {
       id: '/auth/confirm'
       path: '/auth/confirm'
@@ -170,10 +227,16 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthedRouteChildren {
+  AuthedBudgetRoute: typeof AuthedBudgetRoute
+  AuthedDashboardRoute: typeof AuthedDashboardRoute
+  AuthedSettingsRoute: typeof AuthedSettingsRoute
   AuthedIndexRoute: typeof AuthedIndexRoute
 }
 
 const AuthedRouteChildren: AuthedRouteChildren = {
+  AuthedBudgetRoute: AuthedBudgetRoute,
+  AuthedDashboardRoute: AuthedDashboardRoute,
+  AuthedSettingsRoute: AuthedSettingsRoute,
   AuthedIndexRoute: AuthedIndexRoute,
 }
 

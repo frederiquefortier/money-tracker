@@ -1,15 +1,8 @@
-import {
-  Outlet,
-  createFileRoute,
-  redirect,
-  useRouter,
-} from '@tanstack/react-router'
+import { Outlet, createFileRoute, redirect } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
+import { AppNav } from '#/components/app-nav'
 import { LocaleSwitcher } from '#/components/locale-switcher'
 import { Logo } from '#/components/logo'
-import { Icon } from '#/components/icon'
-import { Button } from '#/components/ui/button'
-import { signOut } from '#/server/session'
 
 // The UI guard. The real one is RLS: an aal1 session reads nothing (security.md).
 export const Route = createFileRoute('/_authed')({
@@ -22,32 +15,24 @@ export const Route = createFileRoute('/_authed')({
 
 function AuthedLayout() {
   const { t } = useTranslation()
-  const router = useRouter()
-
-  async function leave() {
-    await signOut()
-    await router.invalidate()
-    await router.navigate({ to: '/sign-in' })
-  }
 
   return (
-    <div className="min-h-screen">
-      <header className="flex items-center justify-between gap-4 border-b bg-card/70 px-4 py-3 backdrop-blur">
-        <Logo name={t('app.name')} />
-        <div className="flex items-center gap-2">
+    <div className="min-h-dvh pb-[calc(4.5rem+env(safe-area-inset-bottom))] md:pb-0">
+      <header className="sticky top-0 z-20 border-b bg-card/80 pt-[env(safe-area-inset-top)] backdrop-blur">
+        <div className="flex items-center justify-between gap-4 px-4 py-3 md:px-6">
+          <Logo name={t('app.name')} />
+          <div className="hidden md:block">
+            <AppNav variant="top" />
+          </div>
           <LocaleSwitcher />
-          <Button
-            variant="outline"
-            size="sm"
-            className="rounded-full"
-            onClick={() => void leave()}
-          >
-            <Icon name="log-out" className="size-4" />
-            {t('common.signOut')}
-          </Button>
         </div>
       </header>
-      <Outlet />
+      <main className="px-4 py-6 md:px-6">
+        <Outlet />
+      </main>
+      <div className="fixed inset-x-0 bottom-0 z-20 border-t bg-card/95 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden">
+        <AppNav variant="bottom" />
+      </div>
     </div>
   )
 }

@@ -341,6 +341,7 @@ Document architectural choices with context, alternatives considered, and trade-
   | i18next, react-i18next | Plurals, interpolation and server-rendered language switching for FR and EN (ADR-008) |
   | Recharts (through shadcn charts) | Line, bar, area and donut charts with tooltips and responsive sizing |
   | @iconify/react (offline build) | coolicons for every icon, from a vendored file (ADR-020) |
+  | @fontsource-variable/nunito | Nunito, self-hosted: no request to Google Fonts, no CSP change |
 
 **Alternatives Considered:**
 - The full set from the correction prompts (TanStack Query, Zustand, react-hook-form,

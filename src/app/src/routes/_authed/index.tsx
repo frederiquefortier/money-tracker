@@ -1,18 +1,15 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
+import { ComingSoon } from '#/components/coming-soon'
 
-export const Route = createFileRoute('/_authed/')({ component: Home })
+export const Route = createFileRoute('/_authed/')({ component: Transactions })
 
-function Home() {
+function Transactions() {
   const { t } = useTranslation()
-  const { session } = Route.useRouteContext()
-
   return (
-    <main className="mx-auto max-w-3xl px-4 py-8">
-      <h1 className="text-2xl font-semibold">
-        {t('home.greeting', { email: session.user?.email ?? '' })}
-      </h1>
-      <p className="mt-2 text-muted-foreground">{t('home.intro')}</p>
-    </main>
+    <ComingSoon
+      title={t('nav.transactions')}
+      text={t('comingSoon.transactions')}
+    />
   )
 }

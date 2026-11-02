@@ -80,10 +80,22 @@ export const fr = {
     weakPassword: 'Ce mot de passe est trop faible.',
     samePassword: 'Choisissez un mot de passe différent de l’actuel.',
   },
-  home: {
-    greeting: 'Bonjour {{email}}',
-    intro:
-      'Phase 0 : la connexion, la double authentification et la sécurité des données sont en place. Le reste arrive.',
+  nav: {
+    label: 'Navigation principale',
+    transactions: 'Transactions',
+    dashboard: 'Dashboard',
+    budget: 'Budget',
+    settings: 'Réglages',
+  },
+  comingSoon: {
+    transactions:
+      'Vos comptes et vos transactions arrivent ici, avec l’import de votre historique.',
+    dashboard: 'Vos dépenses par catégorie et par mois s’afficheront ici.',
+    budget: 'Vos objectifs et votre fonds d’urgence vivront ici.',
+    settings: 'Comptes, catégories et devises s’ajouteront à cette page.',
+  },
+  settings: {
+    signedInAs: 'Connecté avec',
   },
 }
 

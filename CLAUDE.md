@@ -66,7 +66,8 @@ flags a session that touched `src/` without touching `docs/`.
 | ends a working session | an entry in [sessions.md](docs/01_building/sessions.md) |
 | changes what the project is or how to run it | [README.md](README.md) |
 
-Commit messages reference requirement IDs (`feat(TRX-04): ...`).
+Commit messages start with a plain type, `feat:`, `fix:`, `docs:`, `chore:`, `ci:`, `refactor:`,
+with no scope and no requirement ID in it.
 
 ## Conventions
 - Meta-documentation and code are in **English**. The **interface ships in French and

@@ -74,8 +74,8 @@ Two plan-level caveats:
    per-request nonce and `'strict-dynamic'`, HSTS, `frame-ancestors 'none'`,
    `Referrer-Policy: same-origin`, `Permissions-Policy` locking off camera, mic, geolocation.
    `netlify.toml` sets the same headers on static assets.
-5. **Third-party calls** (the rates API) happen server-side only. No web fonts, and icons
-   are bundled from a vendored file (ADR-020). The browser's CSP allows
+5. **Third-party calls** (the rates API) happen server-side only. The Nunito font is
+   self-hosted (Fontsource) and icons are bundled from a vendored file (ADR-020). The browser's CSP allows
    only our own origin and Supabase.
 6. **No financial data in logs or error messages**, and none in analytics. No third-party
    analytics at all while the app is private.
