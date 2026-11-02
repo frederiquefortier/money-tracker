@@ -4,6 +4,33 @@ Track future enhancements and feature ideas. Review this file during planning se
 
 <!-- Newest first: a new idea goes directly below this line. Template at the bottom. -->
 
+### 2026-11-02 - Keep pinned actions up to date
+
+**Description:**
+- Dependabot for GitHub Actions (`.github/dependabot.yml`, ecosystem `github-actions`),
+  which bumps SHA pins and keeps their version comments in step.
+
+**Motivation:**
+- Every action is pinned to a commit SHA since the audit, so a moved tag cannot run new code
+  with `SUPABASE_DB_URL`. Pins do not update themselves; security fixes would be missed.
+
+**Potential Approach:**
+- Weekly schedule, one grouped PR. The same file can cover npm in `src/app/`.
+
+**Priority:**
+- [ ] High - Critical improvement
+- [x] Medium - Nice to have
+- [ ] Low - Future consideration
+
+**Dependencies:**
+- None.
+
+**Status:**
+- [x] Proposed
+- [ ] In Progress
+- [ ] Completed
+- [ ] Deferred
+
 ### 2026-10-27 - Portfolio cut
 
 **Description:**

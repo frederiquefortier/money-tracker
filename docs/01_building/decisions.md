@@ -338,6 +338,8 @@ Document architectural choices with context, alternatives considered, and trade-
   | `@supabase/supabase-js`, `@supabase/ssr` | Auth sessions, MFA, and the database client |
   | Zod | Server input validation and the shared schema (ADR-003); hand-written validators for every server function would be the larger, riskier code |
   | shadcn/ui (Radix underneath) and Tailwind | Accessible combobox, dialog, popover, menu: focus management and keyboard handling that are hard to get right by hand. Components are added one at a time, only when a screen uses them. |
+  | class-variance-authority, clsx, tailwind-merge, tw-animate-css | What shadcn components are written with: variants, class merging (`cn` in `src/lib/utils.ts`), enter and exit animations |
+  | TanStack devtools (dev only) | Router inspector in `npm run dev`; the devtools Vite plugin strips it from the build |
   | i18next, react-i18next | Plurals, interpolation and server-rendered language switching for FR and EN (ADR-008) |
   | Recharts (through shadcn charts) | Line, bar, area and donut charts with tooltips and responsive sizing |
   | @iconify/react (offline build) | coolicons for every icon, from a vendored file (ADR-020) |

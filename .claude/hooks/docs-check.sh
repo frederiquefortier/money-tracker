@@ -1,6 +1,5 @@
 #!/bin/sh
-# Stop hook: if the session changed code under src/ but nothing under docs/, ask for one
-# pass over the definition of done. Runs at most once per stop (stop_hook_active guard).
+# Stop: code under src/ changed but no doc did. Asks once (stop_hook_active).
 input=$(cat)
 case "$input" in *'"stop_hook_active":true'*|*'"stop_hook_active": true'*) exit 0;; esac
 cd "$CLAUDE_PROJECT_DIR" 2>/dev/null || exit 0

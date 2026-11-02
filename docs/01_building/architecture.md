@@ -1,7 +1,7 @@
 # Architecture
 
 ```
-  Browser (React, shadcn/ui, TanStack Router + Query)
+  Browser (React, shadcn/ui, TanStack Router)
         │  server functions only (no direct DB access)
         ▼
   TanStack Start server (Node, on Netlify Functions)
@@ -44,18 +44,14 @@ Nothing writes from the browser.
 ## Derived values
 
 Balances, category totals and net worth are computed, never stored, until a measured
-performance problem says otherwise. A few thousand transactions a year is small for
-Postgres. When a view gets slow, the fix is an index or a materialized view refreshed by the
-write path, recorded as an ADR.
+performance problem says otherwise. Then an index or a materialized view, with an ADR.
 
 ## Currency conversion
 
-A transaction stores what happened: the amount that left the account in its currency, and
-the receipt price and currency when they differ. It never stores a display-currency amount.
-Display conversion joins `exchange_rates` on the transaction date at read time, so switching
-the display currency is a re-query, not a migration. An amount already in the display
-currency skips conversion, and every converted amount comes back flagged with its original
-amount and rate so the UI can mark it (CUR-09). See [database.md](database.md#money).
+A transaction stores the amount in its account's currency, and the receipt price when it
+differs, never a display-currency amount. Conversion joins `exchange_rates` on the
+transaction date at read time, and converted amounts come back flagged with their original
+amount and rate (CUR-09). See [database.md](database.md#money).
 
 ## Environments
 

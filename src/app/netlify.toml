@@ -11,8 +11,7 @@
   targetPort = 3000
   port = 8888
 
-# Static assets. HTML pages come from the server function, which sets its own headers
-# including the per-request CSP (src/server.ts).
+# Static assets only; pages get their headers from src/server.ts.
 [[headers]]
   for = "/*"
   [headers.values]

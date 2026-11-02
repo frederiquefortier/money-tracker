@@ -1,11 +1,8 @@
 # Setup
 
-From an empty Supabase project to a deployed app. Done once; kept so it can be redone
-(new machine, new project) and so a reader can see what the infrastructure is. Every
-terminal command runs from `src/app` unless it says otherwise.
-
-The order matters: the database tables exist only once CI has applied the migrations
-(ADR-017), and CI can only apply them once the repository and its secrets exist.
+From an empty Supabase project to a deployed app, in order: tables exist only once CI has
+applied the migrations (ADR-017), which needs the repository and its secrets. Commands run
+from `src/app` unless stated.
 
 ## 0. Prerequisites
 
@@ -20,19 +17,15 @@ Commit everything on `main`. Nothing is pushed yet.
 
 ## 2. GitHub repository, first CI run
 
-1. On github.com, **New repository**: name `money-tracker`, **Private**, no README, no
-   `.gitignore`, no licence (the repo already has them).
-2. Connect and push, the same way as other repositories on this machine:
+1. On github.com, **New repository**: `money-tracker`, **Private**, nothing generated.
+2. Connect and push:
    ```
    git remote add origin <the URL GitHub shows>
    git push -u origin main
    ```
-3. Open the **Actions** tab. The `ci` run starts on its own. Expected: `docs`, `app` and
-   `database` green; `backup` and `migrate` **skipped** (no secrets yet, by design).
-4. `database` is the first real run of the pgTAP tests. If it fails, the log of the
-   "pgTAP" step says which test.
-
-Nothing touches the Supabase project in this step.
+3. **Actions** tab: `docs`, `app` and `database` green, `backup` skipped, and `migrate`
+   red with "SUPABASE_DB_URL is not set". Expected until step 4.
+4. If `database` fails, the "pgTAP" step's log names the test.
 
 ## 3. Backup key
 
@@ -42,11 +35,10 @@ In a terminal, from the home folder (not the repo):
 age-keygen -o money-tracker-backup.key
 ```
 
-1. It prints `Public key: age1…`. Keep that value for step 4.
-2. Test the pair: `echo ok | age -r age1… | age -d -i money-tracker-backup.key` prints `ok`.
-3. Copy the whole file (three lines, the last starting `AGE-SECRET-KEY-1`) into the password
-   manager, and write a paper copy kept away from the backup drive.
-4. `rm money-tracker-backup.key`
+1. Keep the printed `age1…` public key for step 4.
+2. Test: `echo ok | age -r age1… | age -d -i money-tracker-backup.key` prints `ok`.
+3. Copy the whole file into the password manager, and make a paper copy kept away from the
+   backup drive. Then `rm money-tracker-backup.key`.
 
 The private key never goes into GitHub, the repo, or a conversation with the assistant.
 
@@ -70,8 +62,8 @@ change its meaning and the connection fails as "authentication failed"
 ([learnings.md](learnings.md)). Test the string locally first, from `src/app`:
 `npx supabase --workdir .. migration list --db-url "…"`.
 
-**Variables** tab, **New repository variable**: `BACKUP_ENABLED` = `true`. Add it last; it
-is the switch that lets `backup` and `migrate` run.
+**Variables** tab: `BACKUP_ENABLED` = `true`. Add it last; it lets `backup` run, and
+`migrate` applies migrations only after a backup.
 
 ## 5. First migration
 
@@ -90,30 +82,16 @@ characters in the password, `[YOUR-PASSWORD]` brackets left in, plain `postgres`
 
 ## 6. Link the CLI and push the auth settings
 
-The Supabase CLI is a dev dependency of `src/app`, run with `npx`. `--workdir ..` tells it
-the project folder is `src/supabase`.
+`--workdir ..` points the CLI at `src/supabase`.
 
 ```
-npx supabase login
+npx supabase login                       # once per machine, token in the keychain
+npx supabase --workdir .. link           # pick money-tracker; the password can stay blank
+npx supabase --workdir .. config push    # applies config.toml, shows the diff first
 ```
-Opens the browser to create a personal access token for the CLI, and stores it in the
-macOS keychain. Once per machine.
 
-```
-npx supabase --workdir .. link
-```
-Choose `money-tracker` from the list (or add `--project-ref <ref>`; the ref is the id in
-the dashboard URL, `supabase.com/dashboard/project/<ref>`). When it asks for the
-database password, it may be left blank: the commands used from the laptop go through the
-management API, not the database.
-
-```
-npx supabase --workdir .. config push
-```
-Applies `src/supabase/config.toml` to the project: sign-up off, passwords of 12+ characters
-with letters and digits, TOTP on, 15-minute tokens, one reset email per address per minute,
-the bilingual invite, recovery and password-changed templates, and the site URL. It shows
-the differences and asks for confirmation.
+`config push` sets sign-up off, the password rule, TOTP, 15-minute tokens, the reset email
+limit, the email templates and the site URL.
 
 ## 7. Local app
 
@@ -133,19 +111,13 @@ The app is at http://localhost:3000 and shows the sign-in page.
 
 ## 8. Accounts
 
-**Owner, by invitation.** Supabase dashboard, **Authentication → Users → Add user → Send
-invitation**, with the owner's email.
-1. Open the email, click the link: the app's "Bienvenue" page. Click **Continuer**.
-2. Choose a password (12+ characters, a letter and a digit).
-3. Two-factor setup: **Commencer**, then scan the QR code into two apps (phone and password
-   manager), then enter the six-digit code.
-4. The "Bonjour" page. Done.
+**Owner, by invitation.** Dashboard, **Authentication → Users → Add user → Send
+invitation**. Open the email's link, **Continuer**, choose a password, then scan the QR code
+into two apps (phone and password manager) and enter the code.
 
-**Demo account, without email.** Supabase's built-in email sender only delivers to members
-of the Supabase organization, so an invitation to a made-up address never arrives. Instead:
-**Authentication → Users → Add user → Create new user**, with an address on a domain you
-control or a `+demo` alias of your own, a password, and **Auto Confirm User** ticked. Then
-sign in with it in the app, which leads straight to two-factor setup.
+**Demo account, without email** (the built-in sender only reaches the organization's
+members): **Add user → Create new user** with a `+demo` alias of your own, a password, and
+**Auto Confirm User** ticked. Signing in leads to two-factor setup.
 
 ## 9. Netlify
 
@@ -158,13 +130,9 @@ sign in with it in the app, which leads straight to two-factor setup.
 4. Deploy. The site gets an address like `https://<name>.netlify.app`.
 5. **Deploy previews off** (ADR-017): Project configuration, Build & deploy, Branches and
    deploy contexts, Deploy previews: none.
-6. Point the auth emails at the live app: `site_url` in `src/supabase/config.toml` is the
-   Netlify address (`https://ff-money-tracker.netlify.app`); run
-   `npx supabase --workdir .. config push` after changing it. Invitation and reset links
-   then open the deployed app, not localhost.
-7. Turn off the Netlify toolbar for the project (project configuration, under the
-   collaboration or toolbar settings). Netlify injects its script into every page after the
-   server renders it, so it has no CSP nonce: the browser blocks it and logs a CSP error.
+6. `site_url` in `config.toml` is the Netlify address; `config push` after changing it, so
+   email links open the deployed app.
+7. Turn off the Netlify toolbar: its injected script has no nonce, so the CSP blocks it.
 
 ## 10. After setup
 

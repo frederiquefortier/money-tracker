@@ -1,5 +1,4 @@
 @import 'tailwindcss';
-@plugin '@tailwindcss/typography';
 
 @import 'tw-animate-css';
 /* Nunito, self-hosted (Fontsource, SIL Open Font License): served from our origin, so no

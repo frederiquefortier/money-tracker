@@ -13,14 +13,34 @@ export default [
       '@typescript-eslint/array-type': 'off',
       '@typescript-eslint/require-await': 'off',
       'pnpm/json-enforce-catalog': 'off',
-      // shadcn 4 imports cn from its own 0.x package; we keep src/lib/utils (ADR-011).
+      // shadcn 4 imports cn from its own package; we keep src/lib/utils (ADR-011).
       'no-restricted-imports': [
         'error',
         { paths: [{ name: 'cn', message: "Use cn from '#/lib/utils'." }] },
       ],
     },
   },
-  // Every visible string goes through t() (ADR-008). shadcn primitives hold no copy.
+  // Size limits keep files readable; split a component rather than raise them.
+  {
+    files: ['src/**/*.{ts,tsx}'],
+    ignores: ['src/routeTree.gen.ts', 'src/components/ui/**'],
+    rules: {
+      complexity: ['error', 15],
+      'max-depth': ['error', 3],
+      'max-params': ['error', 3],
+      'max-lines': [
+        'error',
+        { max: 250, skipBlankLines: true, skipComments: true },
+      ],
+      'max-lines-per-function': [
+        'error',
+        { max: 80, skipBlankLines: true, skipComments: true },
+      ],
+      'no-nested-ternary': 'error',
+      'no-console': ['error', { allow: ['error'] }],
+    },
+  },
+  // Every visible string goes through t() (ADR-008).
   {
     files: ['src/**/*.tsx'],
     ignores: ['src/components/ui/**'],

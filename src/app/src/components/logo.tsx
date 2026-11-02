@@ -1,18 +1,17 @@
+import { useTranslation } from 'react-i18next'
 import { Icon } from '#/components/icon'
 import { cn } from '#/lib/utils'
 
-/** The pig in a blush badge. The name is visible beside it, or read only by screen readers. */
 export function Logo({
-  name,
   showName = true,
   size = 'md',
   className,
 }: {
-  name: string
   showName?: boolean
   size?: 'md' | 'lg'
   className?: string
 }) {
+  const { t } = useTranslation()
   return (
     <span className={cn('inline-flex items-center gap-2.5', className)}>
       <span
@@ -32,7 +31,7 @@ export function Logo({
           !showName && 'sr-only',
         )}
       >
-        {name}
+        {t('app.name')}
       </span>
     </span>
   )

@@ -5,8 +5,7 @@ import { getSupabase } from '#/lib/supabase.server'
 
 export const EMAIL_LINK_TYPES = ['invite', 'recovery'] as const
 
-/** Spends an invitation or reset token and opens an aal1 session. POST only: email link
- *  scanners follow GET links and would consume the token before the person clicks. */
+// POST: email scanners follow GET links and would spend the token.
 export const verifyEmailLink = createServerFn({ method: 'POST' })
   .validator(
     z.object({
@@ -22,12 +21,10 @@ export const verifyEmailLink = createServerFn({ method: 'POST' })
     return error ? { ok: false as const } : { ok: true as const }
   })
 
-/** Sends the reset email. Always reports success, so the form never reveals which
- *  addresses have an account. */
+// Always succeeds, so the form never reveals which addresses have an account.
 export const requestPasswordReset = createServerFn({ method: 'POST' })
   .validator(forgotPasswordSchema)
   .handler(async ({ data }) => {
-    // The link is built by the recovery template from the project's site URL.
     await getSupabase().auth.resetPasswordForEmail(data.email)
   })
 
@@ -39,8 +36,7 @@ export const setPassword = createServerFn({ method: 'POST' })
     if (!auth.user)
       return { ok: false as const, error: 'genericError' as const }
 
-    // Once a second factor exists, changing the password needs it, including after a reset
-    // link: a stolen inbox alone is not enough to take the account.
+    // Once a factor exists, aal2 is required, even after a reset link.
     const [{ data: level }, { data: factors }] = await Promise.all([
       supabase.auth.mfa.getAuthenticatorAssuranceLevel(),
       supabase.auth.mfa.listFactors(),

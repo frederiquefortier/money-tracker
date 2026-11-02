@@ -14,12 +14,9 @@ Each phase ends with something usable on real data. No dates: this is a personal
 ## Phase 0: Foundation
 Nothing financial yet; the walls go up first.
 
-**Status (2026-10-27):** code done and checked locally; waiting on accounts.
-Done: scaffold, Supabase config and first migration with tests, auth with TOTP, invitation
-and set-password pages with bilingual email templates, FR/EN,
-CSP and headers, CI and backup workflows. Open: the project (CLI `link`, `config push`,
-first CI run applying migrations, first sign-in; JWT signing key confirmed ECC), the first CI run (pgTAP has not run yet), the Netlify
-site, production and its backup secrets, the owner's two authenticators.
+**Status (2026-11-02):** deployed; sign-in, MFA, invitations, reset and FR/EN work.
+Open: backups running on `main` (`BACKUP_ENABLED` and secrets) with one restore tested, and
+the contract migration for `profiles.locale` (ADR-019).
 
 - Scaffold TanStack Start in `src/app`, shadcn/ui, Tailwind, strict TypeScript, Vitest.
 - `src/supabase`: first migration with `profiles`, the RLS and MFA policy pattern, a

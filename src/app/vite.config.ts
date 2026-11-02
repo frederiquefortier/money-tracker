@@ -12,8 +12,7 @@ const config = defineConfig({
   plugins: [
     devtools(),
     netlify({
-      // The app has no edge functions. Emulating them in dev starts a Deno server, which
-      // fails with the Deno build Netlify's tooling finds on this machine.
+      // No edge functions; emulating them needs a Deno that fails on this machine.
       dev: { edgeFunctions: { enabled: false } },
     }),
     tailwindcss(),

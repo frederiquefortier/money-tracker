@@ -1,20 +1,13 @@
 import { useActionState } from 'react'
 import { createFileRoute, useRouter } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
+import { z } from 'zod'
 import { AuthShell } from '#/components/auth-shell'
 import { FormAlert } from '#/components/form-field'
-import { z } from 'zod'
 import { Button } from '#/components/ui/button'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '#/components/ui/card'
 import { EMAIL_LINK_TYPES, verifyEmailLink } from '#/server/password'
 
-// Landing page for the invitation and reset emails (src/supabase/templates/).
+// Invitation and reset email links land here.
 export const Route = createFileRoute('/auth/confirm')({
   validateSearch: z.object({
     token_hash: z.string().min(1).max(256).catch(''),
@@ -39,25 +32,20 @@ function Confirm() {
   }, null)
 
   return (
-    <AuthShell>
-      <Card>
-        <CardHeader>
-          <CardTitle>{t(`emailLink.${type}.title`)}</CardTitle>
-          <CardDescription>{t(`emailLink.${type}.intro`)}</CardDescription>
-        </CardHeader>
-        <CardContent className="flex flex-col gap-4">
-          {token_hash ? (
-            <form action={accept}>
-              <Button type="submit" className="w-full" disabled={pending}>
-                {pending ? t('emailLink.pending') : t('emailLink.continue')}
-              </Button>
-            </form>
-          ) : null}
-          {(error ?? !token_hash) && (
-            <FormAlert>{error ?? t(`emailLink.${type}.invalid`)}</FormAlert>
-          )}
-        </CardContent>
-      </Card>
+    <AuthShell
+      title={t(`emailLink.${type}.title`)}
+      description={t(`emailLink.${type}.intro`)}
+    >
+      {token_hash ? (
+        <form action={accept}>
+          <Button type="submit" className="w-full" disabled={pending}>
+            {pending ? t('emailLink.pending') : t('emailLink.continue')}
+          </Button>
+        </form>
+      ) : null}
+      {(error ?? !token_hash) && (
+        <FormAlert>{error ?? t(`emailLink.${type}.invalid`)}</FormAlert>
+      )}
     </AuthShell>
   )
 }

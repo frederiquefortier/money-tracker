@@ -2,12 +2,12 @@ import { Icon as Iconify, addCollection } from '@iconify/react/offline'
 import { cn } from '#/lib/utils'
 import coolicons from '#/icons/coolicons.json'
 
-// Offline build: icons come only from the vendored file, never from the Iconify API.
+// Offline: icons come only from the vendored file, never the Iconify API.
 addCollection(coolicons)
 
 export type IconName = keyof typeof coolicons.icons
 
-/** A coolicons icon (ADR-020). Decorative by default; pass a label when it carries meaning. */
+/** Decorative unless `label` is set. */
 export function Icon({
   name,
   label,

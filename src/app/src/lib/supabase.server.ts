@@ -3,7 +3,7 @@ import { createServerClient } from '@supabase/ssr'
 import { getCookies, setCookie } from '@tanstack/react-start/server'
 import { serverEnv } from './env.server'
 
-// The browser never talks to Supabase (ADR-006), so the session cookies can be httpOnly.
+// httpOnly: the browser never talks to Supabase (ADR-006).
 export function getSupabase() {
   const { SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY } = serverEnv()
   return createServerClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {

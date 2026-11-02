@@ -1,8 +1,7 @@
 import { FORMAT_LOCALE } from '#/i18n/locales'
 import type { Locale } from '#/i18n/locales'
 
-// Amounts travel as strings (ADR-004). Intl formats a decimal string exactly, with no
-// detour through a float.
+// Amounts are decimal strings (ADR-004); Intl formats them without a float.
 export function formatMoney(
   amount: string,
   currency: string,
@@ -14,7 +13,7 @@ export function formatMoney(
   }).format(amount as Intl.StringNumericLiteral)
 }
 
-/** Formats a `YYYY-MM-DD` date. Read as UTC so it never shifts a day in another time zone. */
+/** Read as UTC so a `YYYY-MM-DD` date never shifts a day. */
 export function formatDate(
   isoDate: string,
   locale: Locale,

@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { Icon } from '#/components/icon'
 import { Input } from '#/components/ui/input'
 import { Label } from '#/components/ui/label'
-import { cn } from '#/lib/utils'
+import { cn, focusRing } from '#/lib/utils'
 
 type FormFieldProps = Omit<React.ComponentProps<typeof Input>, 'id'> & {
   name: string
@@ -12,10 +12,6 @@ type FormFieldProps = Omit<React.ComponentProps<typeof Input>, 'id'> & {
   description?: string
 }
 
-/**
- * Label, input and its message, wired for screen readers (aria-invalid, aria-describedby).
- * A password field gets a show/hide button.
- */
 export function FormField({
   name,
   label,
@@ -31,6 +27,9 @@ export function FormField({
   const message = error ?? description
   const isPassword = type === 'password'
   const [revealed, setRevealed] = useState(false)
+  const toggleLabel = revealed
+    ? t('common.hidePassword')
+    : t('common.showPassword')
 
   return (
     <div className="flex flex-col gap-2">
@@ -51,13 +50,12 @@ export function FormField({
             onClick={() => setRevealed((r) => !r)}
             aria-pressed={revealed}
             aria-controls={id}
-            aria-label={
-              revealed ? t('common.hidePassword') : t('common.showPassword')
-            }
-            title={
-              revealed ? t('common.hidePassword') : t('common.showPassword')
-            }
-            className="absolute inset-y-0 right-0 grid w-10 place-items-center rounded-r-md text-muted-foreground hover:text-primary focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+            aria-label={toggleLabel}
+            title={toggleLabel}
+            className={cn(
+              'absolute inset-y-0 right-0 grid w-10 place-items-center rounded-r-md text-muted-foreground hover:text-primary',
+              focusRing,
+            )}
           >
             <Icon name={revealed ? 'eye-off' : 'eye'} className="size-4" />
           </button>
@@ -79,14 +77,28 @@ export function FormField({
   )
 }
 
-/** A message about the whole form (wrong credentials, expired link). */
-export function FormAlert({ children }: { children: React.ReactNode }) {
+export function FormAlert({
+  tone = 'error',
+  children,
+}: {
+  tone?: 'error' | 'success'
+  children: React.ReactNode
+}) {
+  const error = tone === 'error'
   return (
     <p
-      role="alert"
-      className="flex items-start gap-2 rounded-lg bg-destructive/10 px-3 py-2 text-sm text-destructive"
+      role={error ? 'alert' : 'status'}
+      className={cn(
+        'flex items-start gap-2 rounded-lg px-3 py-2 text-sm',
+        error
+          ? 'bg-destructive/10 text-destructive'
+          : 'bg-secondary text-secondary-foreground',
+      )}
     >
-      <Icon name="circle-warning" className="mt-0.5 size-4" />
+      <Icon
+        name={error ? 'circle-warning' : 'circle-check'}
+        className="mt-0.5 size-4"
+      />
       {children}
     </p>
   )

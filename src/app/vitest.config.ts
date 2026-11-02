@@ -1,7 +1,6 @@
 import { defineConfig } from 'vitest/config'
 
-// Kept apart from vite.config.ts: the Start and Netlify plugins are not needed to test
-// plain modules.
+// Without the Start and Netlify plugins, which plain modules do not need.
 export default defineConfig({
   resolve: { tsconfigPaths: true },
   test: { include: ['src/**/*.test.ts'] },

@@ -9,7 +9,6 @@ import { useTranslation } from 'react-i18next'
 import { AuthShell } from '#/components/auth-shell'
 import { FormAlert, FormField } from '#/components/form-field'
 import { Button } from '#/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '#/components/ui/card'
 import { formValues, useFieldValidation, validate } from '#/lib/form'
 import type { FieldErrors } from '#/lib/form'
 import { signInSchema } from '#/lib/schemas'
@@ -23,7 +22,7 @@ export const Route = createFileRoute('/sign-in')({
   component: SignIn,
 })
 
-// The email survives React's form reset after a failed attempt; the password does not.
+// The email survives React's form reset; the password does not.
 type Failure = 'invalidCredentials' | 'tooManyAttempts' | 'genericError'
 type State = { email: string; errors: FieldErrors; failure: Failure | null }
 const initial: State = { email: '', errors: {}, failure: null }
@@ -50,53 +49,47 @@ function SignIn() {
   const fields = useFieldValidation(signInSchema, state.errors)
 
   return (
-    <AuthShell>
-      <Card>
-        <CardHeader>
-          <CardTitle>{t('signIn.title')}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form action={submit} noValidate className="flex flex-col gap-4">
-            <FormField
-              name="email"
-              type="email"
-              autoComplete="username"
-              required
-              label={t('signIn.email')}
-              defaultValue={state.email}
-              error={fields.error('email')}
-              onBlur={fields.onBlur}
-              onChange={fields.onChange}
-            />
-            <FormField
-              name="password"
-              type="password"
-              autoComplete="current-password"
-              required
-              label={t('signIn.password')}
-              error={fields.error('password')}
-              onBlur={fields.onBlur}
-              onChange={fields.onChange}
-            />
-            {state.failure && (
-              <FormAlert>
-                {state.failure === 'genericError'
-                  ? t('common.genericError')
-                  : t(`signIn.${state.failure}`)}
-              </FormAlert>
-            )}
-            <Button type="submit" disabled={pending}>
-              {pending ? t('signIn.pending') : t('signIn.submit')}
-            </Button>
-          </form>
-          <Link
-            to="/forgot-password"
-            className="mt-4 block text-center text-sm text-muted-foreground underline-offset-4 hover:text-primary hover:underline"
-          >
-            {t('signIn.forgot')}
-          </Link>
-        </CardContent>
-      </Card>
+    <AuthShell title={t('signIn.title')}>
+      <form action={submit} noValidate className="flex flex-col gap-4">
+        <FormField
+          name="email"
+          type="email"
+          autoComplete="username"
+          required
+          label={t('signIn.email')}
+          defaultValue={state.email}
+          error={fields.error('email')}
+          onBlur={fields.onBlur}
+          onChange={fields.onChange}
+        />
+        <FormField
+          name="password"
+          type="password"
+          autoComplete="current-password"
+          required
+          label={t('signIn.password')}
+          error={fields.error('password')}
+          onBlur={fields.onBlur}
+          onChange={fields.onChange}
+        />
+        {state.failure && (
+          <FormAlert>
+            {state.failure === 'genericError'
+              ? t('common.genericError')
+              : t(`signIn.${state.failure}`)}
+          </FormAlert>
+        )}
+        <Button type="submit" disabled={pending}>
+          {pending ? t('signIn.pending') : t('signIn.submit')}
+        </Button>
+      </form>
+      <Button
+        variant="link"
+        asChild
+        className="text-muted-foreground hover:text-primary"
+      >
+        <Link to="/forgot-password">{t('signIn.forgot')}</Link>
+      </Button>
     </AuthShell>
   )
 }

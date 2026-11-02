@@ -1,7 +1,7 @@
 begin;
 create extension if not exists pgtap with schema extensions;
 
-select plan(10);
+select plan(11);
 
 insert into auth.users (id, email, raw_user_meta_data) values
   ('11111111-1111-1111-1111-111111111111', 'alice@example.test', '{"locale": "en-CA"}'),
@@ -48,6 +48,11 @@ select lives_ok(
 select throws_ok(
   $$ insert into public.profiles (user_id) values ('33333333-3333-3333-3333-333333333333') $$,
   '42501', null, 'a user cannot insert profiles'
+);
+
+select throws_ok(
+  $$ update public.profiles set created_at = now() where user_id = '11111111-1111-1111-1111-111111111111' $$,
+  '42501', null, 'a user can change the locale only'
 );
 
 -- Alice without the second factor

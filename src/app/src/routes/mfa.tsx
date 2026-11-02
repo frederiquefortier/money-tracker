@@ -1,4 +1,4 @@
-import { useActionState, useState } from 'react'
+import { useActionState, useState, useTransition } from 'react'
 import { createFileRoute, redirect, useRouter } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { z } from 'zod'
@@ -6,19 +6,12 @@ import { AuthShell } from '#/components/auth-shell'
 import { FormAlert, FormField } from '#/components/form-field'
 import { Icon } from '#/components/icon'
 import { Button } from '#/components/ui/button'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '#/components/ui/card'
 import { formValues, useFieldValidation, validate } from '#/lib/form'
 import type { FieldErrors } from '#/lib/form'
 import { totpFormSchema } from '#/lib/schemas'
 import { startTotpEnrollment, verifyTotp } from '#/server/session'
 
-// Where to go once verified. An allowlist, so the parameter cannot become an open redirect.
+// An allowlist: `next` cannot become an open redirect.
 const NEXT = ['/', '/set-password'] as const
 
 export const Route = createFileRoute('/mfa')({
@@ -42,12 +35,16 @@ function Mfa() {
   const { next } = Route.useSearch()
   const [enrollment, setEnrollment] = useState<Enrollment | null>(null)
   const [startError, setStartError] = useState(false)
+  // A second click would replace the factor being enrolled.
+  const [starting, startTransition] = useTransition()
   const enrolling = !session.hasTotp
 
-  async function start() {
-    const result = await startTotpEnrollment()
-    setStartError(!result.ok)
-    if (result.ok) setEnrollment(result)
+  function start() {
+    startTransition(async () => {
+      const result = await startTotpEnrollment()
+      setStartError(!result.ok)
+      if (result.ok) setEnrollment(result)
+    })
   }
 
   const [state, verify, pending] = useActionState(
@@ -71,64 +68,64 @@ function Mfa() {
   const fields = useFieldValidation(totpFormSchema, state.errors)
 
   return (
-    <AuthShell>
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Icon name="shield-check" className="text-primary" />
-            {enrolling ? t('mfa.enrollTitle') : t('mfa.challengeTitle')}
-          </CardTitle>
-          <CardDescription>
-            {enrolling ? t('mfa.enrollIntro') : t('mfa.challengeIntro')}
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="flex flex-col gap-4">
-          {enrolling && !enrollment && (
-            <>
-              <Button onClick={() => void start()}>{t('mfa.start')}</Button>
-              {startError && <FormAlert>{t('common.genericError')}</FormAlert>}
-            </>
-          )}
+    <AuthShell
+      title={
+        <>
+          <Icon name="shield-check" className="text-primary" />
+          {enrolling ? t('mfa.enrollTitle') : t('mfa.challengeTitle')}
+        </>
+      }
+      description={enrolling ? t('mfa.enrollIntro') : t('mfa.challengeIntro')}
+    >
+      {enrolling && !enrollment && (
+        <>
+          <Button onClick={start} disabled={starting}>
+            {t('mfa.start')}
+          </Button>
+          {startError && <FormAlert>{t('common.genericError')}</FormAlert>}
+        </>
+      )}
 
-          {enrollment && (
-            <div className="flex flex-col items-center gap-2">
-              <img
-                src={enrollment.qrCode}
-                alt={t('mfa.qrAlt')}
-                className="size-48 rounded-xl bg-white p-2 ring-1 ring-border"
-              />
-              <p className="text-sm text-muted-foreground">
-                {t('mfa.secretLabel')}
-              </p>
-              <code className="rounded-lg bg-muted px-2 py-1 font-mono text-sm break-all">
-                {enrollment.secret}
-              </code>
-            </div>
-          )}
+      {enrollment && <EnrollmentKey enrollment={enrollment} />}
 
-          {(!enrolling || enrollment) && (
-            <form action={verify} noValidate className="flex flex-col gap-4">
-              <FormField
-                name="code"
-                inputMode="numeric"
-                autoComplete="one-time-code"
-                maxLength={6}
-                required
-                autoFocus
-                label={t('mfa.code')}
-                className="text-center font-mono text-lg tracking-[0.4em]"
-                error={fields.error('code')}
-                onBlur={fields.onBlur}
-                onChange={fields.onChange}
-              />
-              {state.rejected && <FormAlert>{t('mfa.invalidCode')}</FormAlert>}
-              <Button type="submit" disabled={pending}>
-                {pending ? t('mfa.pending') : t('mfa.verify')}
-              </Button>
-            </form>
-          )}
-        </CardContent>
-      </Card>
+      {(!enrolling || enrollment) && (
+        <form action={verify} noValidate className="flex flex-col gap-4">
+          <FormField
+            name="code"
+            inputMode="numeric"
+            autoComplete="one-time-code"
+            maxLength={6}
+            required
+            autoFocus
+            label={t('mfa.code')}
+            className="text-center font-mono text-lg tracking-[0.4em]"
+            error={fields.error('code')}
+            onBlur={fields.onBlur}
+            onChange={fields.onChange}
+          />
+          {state.rejected && <FormAlert>{t('mfa.invalidCode')}</FormAlert>}
+          <Button type="submit" disabled={pending}>
+            {pending ? t('mfa.pending') : t('mfa.verify')}
+          </Button>
+        </form>
+      )}
     </AuthShell>
+  )
+}
+
+function EnrollmentKey({ enrollment }: { enrollment: Enrollment }) {
+  const { t } = useTranslation()
+  return (
+    <div className="flex flex-col items-center gap-2">
+      <img
+        src={enrollment.qrCode}
+        alt={t('mfa.qrAlt')}
+        className="size-48 rounded-xl bg-white p-2 ring-1 ring-border"
+      />
+      <p className="text-sm text-muted-foreground">{t('mfa.secretLabel')}</p>
+      <code className="rounded-lg bg-muted px-2 py-1 font-mono text-sm break-all">
+        {enrollment.secret}
+      </code>
+    </div>
   )
 }

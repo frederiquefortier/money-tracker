@@ -25,13 +25,11 @@ function Settings() {
       <h1 className="text-2xl font-bold">{t('nav.settings')}</h1>
       <Card>
         <CardContent className="flex flex-col divide-y">
-          <div className="flex items-center justify-between gap-4 pb-4">
-            <div>
-              <p className="text-sm text-muted-foreground">
-                {t('settings.signedInAs')}
-              </p>
-              <p className="font-semibold break-all">{session.user?.email}</p>
-            </div>
+          <div className="pb-4">
+            <p className="text-sm text-muted-foreground">
+              {t('settings.signedInAs')}
+            </p>
+            <p className="font-semibold break-all">{session.user?.email}</p>
           </div>
           <div className="pt-4">
             <Button

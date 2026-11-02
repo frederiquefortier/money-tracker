@@ -1,10 +1,9 @@
 import { Outlet, createFileRoute, redirect } from '@tanstack/react-router'
-import { useTranslation } from 'react-i18next'
 import { AppNav } from '#/components/app-nav'
 import { LocaleSwitcher } from '#/components/locale-switcher'
 import { Logo } from '#/components/logo'
 
-// The UI guard. The real one is RLS: an aal1 session reads nothing (security.md).
+// UI guard only; RLS is the real one.
 export const Route = createFileRoute('/_authed')({
   beforeLoad: ({ context }) => {
     if (!context.session.user) throw redirect({ to: '/sign-in' })
@@ -14,13 +13,11 @@ export const Route = createFileRoute('/_authed')({
 })
 
 function AuthedLayout() {
-  const { t } = useTranslation()
-
   return (
     <div className="min-h-dvh pb-[calc(4.5rem+env(safe-area-inset-bottom))] md:pb-0">
       <header className="sticky top-0 z-20 border-b bg-card/80 pt-[env(safe-area-inset-top)] backdrop-blur">
         <div className="flex items-center justify-between gap-4 px-4 py-3 md:px-6">
-          <Logo name={t('app.name')} />
+          <Logo />
           <div className="hidden md:block">
             <AppNav variant="top" />
           </div>

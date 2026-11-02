@@ -16,11 +16,12 @@ First-time setup of the whole project (GitHub, secrets, Supabase, Netlify) is in
 
 ## Scripts
 
-| Script                      | What it does                                              |
-| --------------------------- | --------------------------------------------------------- |
-| `dev`, `build`, `preview`   | Vite dev server, production build, run the build locally  |
-| `typecheck`, `lint`, `test` | `tsc`, ESLint (with the i18n literal-string rule), Vitest |
-| `format`                    | Prettier, then ESLint fixes                               |
+| Script                      | What it does                                             |
+| --------------------------- | -------------------------------------------------------- |
+| `dev`, `build`, `preview`   | Vite dev server, production build, run the build locally |
+| `typecheck`, `lint`, `test` | `tsc`, ESLint (i18n and size rules), Vitest              |
+| `check`, `format`           | Prettier check; Prettier then ESLint fixes               |
+| `verify`                    | Everything CI checks on the app, before a commit         |
 
 The Supabase CLI has no script: `npx supabase --workdir .. <command>` (see
 [src/supabase/README.md](../supabase/README.md)). Migrations are applied by CI, not from

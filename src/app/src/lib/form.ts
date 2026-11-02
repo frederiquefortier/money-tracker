@@ -4,13 +4,12 @@ import type { z } from 'zod'
 import { PASSWORD_MIN_LENGTH, VALIDATION_IDS } from '#/lib/schemas'
 import type { ValidationId } from '#/lib/schemas'
 
-/** Field name to message id. `null` means "checked again since, and now valid". */
+/** Field name to message id. `null`: rechecked since the submit and now valid. */
 export type FieldErrors = Partial<Record<string, string | null>>
 
 type Validated<T> =
   { data: T; errors: null } | { data: null; errors: FieldErrors }
 
-/** Parses form values; returns the data, or the first message id per field. */
 export function validate<TSchema extends z.ZodType>(
   schema: TSchema,
   values: unknown,
@@ -38,10 +37,7 @@ function isValidationId(value: string): value is ValidationId {
   return (VALIDATION_IDS as ReadonlyArray<string>).includes(value)
 }
 
-/**
- * Errors from the last submit, refined field by field: a field is checked again when it
- * loses focus, and while the user corrects a field that has an error.
- */
+/** Submit errors, rechecked per field on blur and while the user corrects one. */
 export function useFieldValidation(
   schema: z.ZodObject,
   submitted: FieldErrors,
@@ -49,7 +45,7 @@ export function useFieldValidation(
   const { t } = useTranslation()
   const [live, setLive] = useState<FieldErrors>({})
   const [lastSubmitted, setLastSubmitted] = useState(submitted)
-  // A new submit replaces the field-by-field results (state adjusted during render).
+  // A new submit drops the per-field results (state adjusted during render).
   if (lastSubmitted !== submitted) {
     setLastSubmitted(submitted)
     setLive({})
@@ -80,7 +76,7 @@ export function useFieldValidation(
       })
     },
     onBlur(event: React.FocusEvent<HTMLInputElement>) {
-      // An empty field the user only tabbed through is left alone until submit.
+      // Not an empty field the user only tabbed through.
       if (event.target.value) check(event.target.name, event.target.value)
     },
     onChange(event: React.ChangeEvent<HTMLInputElement>) {

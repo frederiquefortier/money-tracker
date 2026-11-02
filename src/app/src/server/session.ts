@@ -37,17 +37,14 @@ export const getSession = createServerFn({ method: 'GET' }).handler(
     )
     const supabase = getSupabase()
 
-    // Verified locally against the project's public signing key (cached JWKS), so a page
-    // load costs no Auth request. RLS trusts the same token the same way, so this check is
-    // no weaker than the one guarding the data. A session revoked elsewhere stays valid
-    // here until the token expires (jwt_expiry in config.toml).
+    // Checked locally against the JWKS (ADR-018). A session revoked elsewhere stays valid
+    // until jwt_expiry.
     const { data } = await supabase.auth.getClaims()
     const claims = data?.claims
     if (!claims) return { locale, user: null, aal: null, hasTotp: false }
 
     const aal = claims.aal === 'aal2' ? 'aal2' : 'aal1'
-    // aal2 proves a verified factor (TOTP is the only one enabled). Only an aal1 session,
-    // on the MFA and set-password pages, needs Auth to say whether one exists.
+    // aal2 implies a verified TOTP; only aal1 has to ask Auth.
     const hasTotp =
       aal === 'aal2' ||
       ((await supabase.auth.mfa.listFactors()).data?.totp.length ?? 0) > 0
@@ -62,12 +59,13 @@ export const setLocale = createServerFn({ method: 'POST' })
     writeLocaleCookie(data.locale)
     const supabase = getSupabase()
     const { data: auth } = await supabase.auth.getClaims()
-    // An aal1 session cannot write its profile (MFA policy); the cookie still applies.
+    // aal1 cannot write the profile (MFA policy); the cookie still applies.
     if (auth?.claims) {
-      await supabase
+      const { error } = await supabase
         .from('profiles')
         .update({ locale: data.locale })
         .eq('user_id', auth.claims.sub)
+      if (error) console.error('[profile] locale not saved:', error.code)
     }
   })
 
@@ -76,9 +74,8 @@ export const signIn = createServerFn({ method: 'POST' })
   .handler(async ({ data }) => {
     const { error } = await getSupabase().auth.signInWithPassword(data)
     if (!error) return { ok: true as const }
-    // Wrong password and unknown email share one code, so the form still does not reveal
-    // which accounts exist. Anything else is not the user's fault and must not read as
-    // "wrong password". Logged as a code only, never the email or the password.
+    // One code for wrong password and unknown email: accounts cannot be enumerated.
+    // Other failures are logged as a code, never with the email.
     if (error.code === 'invalid_credentials') {
       return { ok: false as const, error: 'invalidCredentials' as const }
     }
@@ -97,7 +94,6 @@ export const signOut = createServerFn({ method: 'POST' }).handler(async () => {
   await getSupabase().auth.signOut()
 })
 
-/** Starts a TOTP enrolment. Only for a signed-in user with no verified factor yet. */
 export const startTotpEnrollment = createServerFn({ method: 'POST' }).handler(
   async () => {
     const supabase = getSupabase()
@@ -107,7 +103,7 @@ export const startTotpEnrollment = createServerFn({ method: 'POST' }).handler(
     const { data: factors } = await supabase.auth.mfa.listFactors()
     if (!factors || factors.totp.length > 0) return { ok: false as const }
 
-    // An abandoned enrolment leaves an unverified factor behind; clear it before starting over.
+    // An abandoned enrolment leaves an unverified factor.
     for (const factor of factors.all) {
       if (factor.factor_type === 'totp' && factor.status === 'unverified') {
         await supabase.auth.mfa.unenroll({ factorId: factor.id })
@@ -127,7 +123,7 @@ export const startTotpEnrollment = createServerFn({ method: 'POST' }).handler(
   },
 )
 
-/** Verifies a code, either finishing an enrolment (factorId given) or as the sign-in challenge. */
+/** With a factorId, finishes an enrolment; without, answers the sign-in challenge. */
 export const verifyTotp = createServerFn({ method: 'POST' })
   .validator(
     z.object({
@@ -147,7 +143,7 @@ export const verifyTotp = createServerFn({ method: 'POST' })
     })
     if (error) return { ok: false as const }
 
-    // Now at aal2, the profile is readable: its locale wins over the browser's.
+    // Now aal2: the saved locale wins over the browser's.
     const { data: profile } = await supabase
       .from('profiles')
       .select('locale')

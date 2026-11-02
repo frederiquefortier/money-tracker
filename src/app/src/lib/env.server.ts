@@ -3,7 +3,7 @@ import { z } from 'zod'
 
 const schema = z.object({
   SUPABASE_URL: z.url(),
-  // The new publishable key. The secret key is never read here (security.md).
+  // The secret key is never read here (security.md).
   SUPABASE_PUBLISHABLE_KEY: z.string().startsWith('sb_publishable_'),
 })
 

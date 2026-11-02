@@ -1,12 +1,21 @@
 {
+  "permissions": {
+    "deny": [
+      "Read(./src/data/local/**)",
+      "Read(**/.env)",
+      "Read(**/.env.*)",
+      "Read(**/*.dump)",
+      "Read(**/*.age)"
+    ]
+  },
   "hooks": {
     "PreToolUse": [
       {
-        "matcher": "Read|Edit|Write|NotebookEdit",
+        "matcher": "Read|Edit|Write|NotebookEdit|Grep|Glob|Bash",
         "hooks": [
           {
             "type": "command",
-            "command": "f=$(sed -n 's/.*\"file_path\"[[:space:]]*:[[:space:]]*\"\\([^\"]*\\)\".*/\\1/p'); case \"$f\" in *.env.example) ;; *data*local*|*.env|*.env.*|*.dump|*.age) printf '%s' '{\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"permissionDecision\":\"deny\",\"permissionDecisionReason\":\"src/data/local, .env files and dumps hold real financial data or secrets. They are never read into a transcript.\"}}';; esac",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/private-data.sh",
             "statusMessage": "Checking for private data"
           }
         ]
@@ -18,7 +27,17 @@
         "hooks": [
           {
             "type": "command",
-            "command": "f=$(sed -n 's/.*\"file_path\"[[:space:]]*:[[:space:]]*\"\\([^\"]*\\)\".*/\\1/p'); case \"$f\" in *supabase*migrations*.sql) printf '%s' '{\"hookSpecificOutput\":{\"hookEventName\":\"PostToolUse\",\"additionalContext\":\"Migration checklist: RLS enabled on every new table in this same migration, user_id default auth.uid(), unique (user_id, id), composite FKs to other user tables, the aal2 restrictive policy, and a pgTAP test in src/supabase/tests proving another user sees zero rows. Run from src/: supabase db reset && supabase test db && supabase db lint. Update docs/01_building/database.md.\"}}';; esac"
+            "command": "f=$(sed -n 's/.*\"file_path\"[[:space:]]*:[[:space:]]*\"\\([^\"]*\\)\".*/\\1/p'); case \"$f\" in *supabase*migrations*.sql) printf '%s' '{\"hookSpecificOutput\":{\"hookEventName\":\"PostToolUse\",\"additionalContext\":\"Migration checklist: RLS enabled on every new table in this same migration, user_id default auth.uid(), unique (user_id, id), composite FKs to other user tables, the aal2 restrictive policy, and a pgTAP test in src/supabase/tests proving another user sees zero rows. There is no local stack (ADR-014): CI runs the pgTAP tests and db lint on a fresh database. Update docs/01_building/database.md.\"}}';; esac"
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/format.sh",
+            "statusMessage": "Formatting and linting"
           }
         ]
       }

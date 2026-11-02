@@ -1,10 +1,8 @@
 import { z } from 'zod'
 
-// Shared by the forms and the server functions, so both apply the same rules. Messages
-// are ids under `validation.` in the translation files.
+// Shared by forms and server functions. Messages are ids under `validation.`.
 
-// Mirrors [auth] in src/supabase/config.toml: minimum_password_length = 12,
-// password_requirements = "letters_digits". 72 is bcrypt's input limit.
+// Mirrors [auth] in config.toml. 72 is bcrypt's input limit.
 export const PASSWORD_MIN_LENGTH = 12
 
 export const VALIDATION_IDS = [

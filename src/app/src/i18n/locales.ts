@@ -5,8 +5,7 @@ export type Locale = (typeof LOCALES)[number]
 export const DEFAULT_LOCALE: Locale = 'fr'
 export const LOCALE_COOKIE = 'locale'
 
-// The interface offers two languages; numbers and dates still need a region. Canadian
-// conventions match the home currency (ADR-019).
+// Intl needs a region; Canadian conventions match the home currency (ADR-019).
 export const FORMAT_LOCALE: Record<Locale, string> = {
   fr: 'fr-CA',
   en: 'en-CA',
@@ -19,14 +18,13 @@ export function isLocale(value: unknown): value is Locale {
   )
 }
 
-/** Reads a stored value, including the regional tags (`fr-CH`, `en-GB`) used before ADR-019. */
+/** Also reads the regional tags stored before ADR-019 (`fr-CH`). */
 export function toLocale(value: unknown): Locale | undefined {
   if (typeof value !== 'string') return undefined
   const language = value.trim().toLowerCase().split('-')[0]
   return isLocale(language) ? language : undefined
 }
 
-/** Cookie first, then the browser's Accept-Language, then the default. */
 export function resolveLocale(
   cookie: string | undefined,
   acceptLanguage: string | undefined,

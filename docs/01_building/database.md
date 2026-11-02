@@ -1,8 +1,7 @@
 # Database
 
-Design draft. No migration exists yet; when the first one lands, this file describes what
-the migrations do and is updated with every schema change. Requirement IDs refer to
-[requirements.md](../00_briefing/requirements.md).
+The schema, updated with every migration. Only `profiles` exists so far; the rest is the
+design. IDs refer to [requirements.md](../00_briefing/requirements.md).
 
 ## Conventions
 
@@ -18,6 +17,9 @@ unique (user_id, id)                              -- target for composite FKs (A
 
 and the RLS policies from [security.md](security.md#database). Foreign keys to other user
 tables are composite: `foreign key (user_id, account_id) references accounts (user_id, id)`.
+
+Grants follow [security.md](security.md#database), rule 8. `profiles` grants `select` and
+`update (locale)`: a new user-editable profile column joins that grant in its migration.
 
 Soft states are dates, not booleans, wherever the date matters: `closed_on`, `archived_at`,
 `ends_on`. History that the user can view is its own table of events, never an overwritten
@@ -35,8 +37,8 @@ column.
   `currency` column.
 - Sign convention: an amount is signed from the account's point of view. Expenses and
   outgoing transfer legs are negative, income and incoming legs positive.
-- Over the wire amounts are strings; sums and conversions happen in SQL. The few TypeScript calculations
-  (form previews) use integer minor units with `BigInt` (ADR-011).
+- Over the wire amounts are strings; sums and conversions happen in SQL. TypeScript
+  previews use integer minor units with `BigInt` (ADR-011).
 
 ## Tables
 

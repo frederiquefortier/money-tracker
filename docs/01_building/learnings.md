@@ -4,6 +4,33 @@ Document new concepts, techniques, and knowledge gained. Reference this file to 
 
 <!-- Newest first: a new entry goes directly below this line. Template at the bottom. -->
 
+### 2026-11-02 - Sec-Fetch-Site, and what SameSite=lax leaves open
+
+**What Was New:**
+- SameSite=lax cookies stop another site from sending a write with the user's session. They
+  do not stop login CSRF: a forged sign-in needs no cookie, it sets one (the attacker's).
+
+**Key Points:**
+- Browsers send `Sec-Fetch-Site` on every request: `same-origin`, `same-site`, `cross-site`
+  or `none` (typed URL, bookmark). Pages cannot set or forge it.
+- Refusing writes (anything but GET and HEAD) marked `cross-site` or `same-site` closes login
+  CSRF and every other forged write in a few lines. GET stays open, so links from emails
+  still land.
+- `netlify.app` is on the public suffix list, so another Netlify site is `cross-site`, not
+  `same-site`; refusing `same-site` too costs nothing here.
+- A request without the header (old browsers, curl) is let through: it is not a browser
+  carrying someone else's cookies.
+
+**Sources:**
+- MDN, "Sec-Fetch-Site"
+- OWASP Cheat Sheet, "Cross-Site Request Forgery Prevention" (Fetch Metadata headers)
+
+**Where to Learn More:**
+- web.dev, "Protect your resources from web attacks with Fetch Metadata"
+
+**Applied In:**
+- `src/app/src/server.ts`, security.md (App and server, rule 7).
+
 ### 2026-11-02 - A password inside a connection string is part of a URL
 
 **What Was New:**
