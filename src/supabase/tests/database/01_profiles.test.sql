@@ -1,7 +1,7 @@
 begin;
 create extension if not exists pgtap with schema extensions;
 
-select plan(9);
+select plan(10);
 
 insert into auth.users (id, email, raw_user_meta_data) values
   ('11111111-1111-1111-1111-111111111111', 'alice@example.test', '{"locale": "en-CA"}'),
@@ -10,11 +10,15 @@ insert into auth.users (id, email, raw_user_meta_data) values
 -- Sign-up trigger
 select is(
   (select locale from public.profiles where user_id = '11111111-1111-1111-1111-111111111111'),
-  'en-CA', 'sign-up creates a profile with the requested locale'
+  'en', 'sign-up keeps the language of the requested locale'
 );
 select is(
   (select locale from public.profiles where user_id = '22222222-2222-2222-2222-222222222222'),
-  'fr-CA', 'an invalid locale falls back to fr-CA'
+  'fr', 'an unsupported locale falls back to fr'
+);
+select throws_ok(
+  $$ update public.profiles set locale = 'de' where user_id = '22222222-2222-2222-2222-222222222222' $$,
+  '23514', null, 'the constraint rejects other languages'
 );
 
 -- Alice with MFA passed
@@ -28,14 +32,16 @@ select results_eq(
   'a user sees only their own profile'
 );
 
-update public.profiles set locale = 'fr-CH' where user_id = '22222222-2222-2222-2222-222222222222';
+update public.profiles set locale = 'en' where user_id = '22222222-2222-2222-2222-222222222222';
+reset role;
 select is(
-  (select count(*)::int from public.profiles where locale = 'fr-CH'), 0,
-  'a user cannot update another user''s profile'
+  (select locale from public.profiles where user_id = '22222222-2222-2222-2222-222222222222'),
+  'fr', 'a user cannot update another user''s profile'
 );
+set local role authenticated;
 
 select lives_ok(
-  $$ update public.profiles set locale = 'fr-CH' where user_id = '11111111-1111-1111-1111-111111111111' $$,
+  $$ update public.profiles set locale = 'fr' where user_id = '11111111-1111-1111-1111-111111111111' $$,
   'a user can update their own profile'
 );
 
@@ -50,11 +56,11 @@ select set_config('request.jwt.claims',
 
 select is_empty('select 1 from public.profiles', 'an aal1 session sees nothing');
 
-update public.profiles set locale = 'en-US' where user_id = '11111111-1111-1111-1111-111111111111';
+update public.profiles set locale = 'en' where user_id = '11111111-1111-1111-1111-111111111111';
 reset role;
 select is(
   (select locale from public.profiles where user_id = '11111111-1111-1111-1111-111111111111'),
-  'fr-CH', 'an aal1 session cannot update its own profile'
+  'fr', 'an aal1 session cannot update its own profile'
 );
 
 -- Anonymous

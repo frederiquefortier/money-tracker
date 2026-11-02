@@ -1,34 +1,52 @@
 import { useRouteContext, useRouter } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
-import { LOCALES, isLocale } from '#/i18n/locales'
-import { localeName } from '#/lib/format'
+import { LOCALES } from '#/i18n/locales'
+import type { Locale } from '#/i18n/locales'
+import { cn } from '#/lib/utils'
 import { setLocale } from '#/server/session'
+
+// Each language labelled in itself, as language pickers usually are.
+const LABELS: Record<Locale, { short: string; name: string }> = {
+  fr: { short: 'FR', name: 'Français' },
+  en: { short: 'EN', name: 'English' },
+}
 
 export function LocaleSwitcher() {
   const { t } = useTranslation()
   const router = useRouter()
   const { session } = useRouteContext({ from: '__root__' })
 
-  async function change(value: string) {
-    if (!isLocale(value)) return
-    await setLocale({ data: { locale: value } })
+  async function change(locale: Locale) {
+    if (locale === session.locale) return
+    await setLocale({ data: { locale } })
     await router.invalidate()
   }
 
   return (
-    <label className="flex items-center gap-2 text-sm text-muted-foreground">
-      <span className="sr-only">{t('common.language')}</span>
-      <select
-        className="h-9 rounded-md border border-input bg-background px-2 text-sm text-foreground"
-        value={session.locale}
-        onChange={(event) => void change(event.target.value)}
-      >
-        {LOCALES.map((locale) => (
-          <option key={locale} value={locale} lang={locale}>
-            {localeName(locale)}
-          </option>
-        ))}
-      </select>
-    </label>
+    <div
+      role="group"
+      aria-label={t('common.language')}
+      className="inline-flex rounded-full bg-secondary p-1"
+    >
+      {LOCALES.map((locale) => (
+        <button
+          key={locale}
+          type="button"
+          lang={locale}
+          title={LABELS[locale].name}
+          aria-label={LABELS[locale].name}
+          aria-pressed={locale === session.locale}
+          onClick={() => void change(locale)}
+          className={cn(
+            'rounded-full px-3 py-1 text-xs font-semibold transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none',
+            locale === session.locale
+              ? 'bg-card text-primary shadow-sm'
+              : 'text-secondary-foreground/70 hover:text-secondary-foreground',
+          )}
+        >
+          {LABELS[locale].short}
+        </button>
+      ))}
+    </div>
   )
 }

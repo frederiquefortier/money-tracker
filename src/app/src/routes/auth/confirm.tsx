@@ -1,8 +1,9 @@
 import { useActionState } from 'react'
 import { createFileRoute, useRouter } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
+import { AuthShell } from '#/components/auth-shell'
+import { FormAlert } from '#/components/form-field'
 import { z } from 'zod'
-import { LocaleSwitcher } from '#/components/locale-switcher'
 import { Button } from '#/components/ui/button'
 import {
   Card,
@@ -38,10 +39,7 @@ function Confirm() {
   }, null)
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-sm flex-col justify-center gap-4 px-4">
-      <div className="flex justify-end">
-        <LocaleSwitcher />
-      </div>
+    <AuthShell>
       <Card>
         <CardHeader>
           <CardTitle>{t(`emailLink.${type}.title`)}</CardTitle>
@@ -56,12 +54,10 @@ function Confirm() {
             </form>
           ) : null}
           {(error ?? !token_hash) && (
-            <p role="alert" className="text-sm text-destructive">
-              {error ?? t(`emailLink.${type}.invalid`)}
-            </p>
+            <FormAlert>{error ?? t(`emailLink.${type}.invalid`)}</FormAlert>
           )}
         </CardContent>
       </Card>
-    </main>
+    </AuthShell>
   )
 }

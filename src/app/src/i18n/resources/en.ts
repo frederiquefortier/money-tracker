@@ -5,9 +5,20 @@ export const en: Messages = {
     name: 'Money Tracker',
   },
   common: {
+    showPassword: 'Show password',
+    hidePassword: 'Hide password',
     signOut: 'Sign out',
     language: 'Language',
     genericError: 'Something went wrong. Try again.',
+  },
+  validation: {
+    required: 'This field is required.',
+    email: 'Enter a valid email address.',
+    passwordRule:
+      'At least {{min}} characters, with at least one letter and one digit.',
+    mismatch: 'The two passwords do not match.',
+    code: 'The code has six digits.',
+    invalid: 'This value is not valid.',
   },
   signIn: {
     title: 'Sign in',
@@ -16,8 +27,8 @@ export const en: Messages = {
     submit: 'Sign in',
     pending: 'Signing in…',
     invalidCredentials: 'Invalid email or password.',
+    tooManyAttempts: 'Too many attempts. Wait a few minutes.',
     forgot: 'Forgot your password?',
-    inviteOnly: 'Accounts are created by invitation.',
   },
   mfa: {
     enrollTitle: 'Turn on two-factor authentication',
@@ -65,7 +76,6 @@ export const en: Messages = {
     confirm: 'Confirm password',
     submit: 'Save',
     pending: 'Saving…',
-    mismatch: 'The two passwords do not match.',
     weakPassword: 'This password is too weak.',
     samePassword: 'Choose a password different from the current one.',
   },

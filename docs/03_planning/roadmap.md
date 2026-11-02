@@ -47,12 +47,13 @@ Replace daily use of the spreadsheet.
   why, and which requirement IDs it covers.
 - Demo-data generator (DEM-02), used by local and preview from here on.
 - Institutions and accounts. ACC-01..07.
-- Categories with archive history, favourites, emoji. CAT-01..07.
+- Categories with archive history, favourites, coolicons icons. CAT-01..07.
 - Merchants with default category. MER-01.
 - Transactions: expense, income, adjustment, transfer with fee (including between
   currencies), splits, status, notes. TRX-01..06, 09..11. Multi-row writes as SQL functions
   with pgTAP tests (ADR-012).
-- Emoji picker in native mode with the self-hosted Noto Color Emoji font. CAT-07 (ADR-013).
+- Category icon picker over a curated, vendored subset of coolicons. CAT-07 (ADR-020).
+- Contract migration for ADR-019: drop the regional values from `profiles.locale`.
 - **Gate before the spreadsheet is retired:** backup workflow enabled, one restore tested,
   the first monthly copy on the offline drive, and the private key in the password manager
   and on paper (security.md, Backups).
@@ -88,6 +89,18 @@ Replace daily use of the spreadsheet.
 - Yearly review, money and social views, export. YR-01..07.
 - Region packs, merchant countries, local-purchase share. LOC-01, 02, MER-03, SET-02, 03.
 - The goal-reached celebration. BUD-05.
+
+## Before a second real user
+Not tied to a phase: the app works for its owner without these, and nobody else can use it
+safely until both exist.
+
+- **Custom SMTP.** Supabase's built-in sender only emails members of the Supabase
+  organization, a few times an hour. A transactional provider with a free tier (Resend,
+  Brevo or Amazon SES) and a domain we own (the one real cost, about 10 to 15 dollars a
+  year), configured in `[auth.email.smtp]` with the password as an environment variable.
+- **Sign-in throttle.** Supabase rate-limits by IP, but every auth call comes from our
+  server, so it sees Netlify's IP (security.md, Auth). A per-IP and per-email throttle in
+  Postgres.
 
 ## Later (not v1)
 Tracked in [improvements.md](improvements.md).

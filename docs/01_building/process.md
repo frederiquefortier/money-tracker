@@ -61,6 +61,9 @@ without touching `docs/`.
 
 | Date | Topic | Assistant proposed | Author decided | Where |
 |---|---|---|---|---|
+| 2026-11-02 | Sign-in screen | Logo with name, field icons, title removed, invitation note as subtitle | Logo alone, no field icons, title kept, invitation note dropped; show/hide password; language toggle top right | SET-07 |
+| 2026-11-02 | Category icons | Emoji with a Google-style picker and font (ADR-013) | coolicons, the logo's set, for every icon including categories | ADR-020 |
+| 2026-11-02 | Languages | Six regional locales | French and English only | ADR-019 |
 | 2026-10-27 | Backup location | Options: GitHub artifacts only, plus a monthly offline copy, or object storage (R2/B2) | Monthly offline copy of the dump plus the app's CSV export; object storage only if that becomes a chore | security.md |
 | 2026-10-27 | Environments | Separate dev and production projects | One project with a demo account; migrations only from CI after a backup; previews off | ADR-017 |
 | 2026-10-27 | Hosting plan | Supabase Pro for backups and no pausing | Free plans until a real limit is hit; our dump is the only backup | ADR-016 |

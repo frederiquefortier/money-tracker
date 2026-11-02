@@ -2,6 +2,9 @@ import { useActionState, useState } from 'react'
 import { createFileRoute, redirect, useRouter } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { z } from 'zod'
+import { AuthShell } from '#/components/auth-shell'
+import { FormAlert, FormField } from '#/components/form-field'
+import { Icon } from '#/components/icon'
 import { Button } from '#/components/ui/button'
 import {
   Card,
@@ -10,8 +13,9 @@ import {
   CardHeader,
   CardTitle,
 } from '#/components/ui/card'
-import { Input } from '#/components/ui/input'
-import { Label } from '#/components/ui/label'
+import { formValues, useFieldValidation, validate } from '#/lib/form'
+import type { FieldErrors } from '#/lib/form'
+import { totpFormSchema } from '#/lib/schemas'
 import { startTotpEnrollment, verifyTotp } from '#/server/session'
 
 // Where to go once verified. An allowlist, so the parameter cannot become an open redirect.
@@ -28,6 +32,8 @@ export const Route = createFileRoute('/mfa')({
 })
 
 type Enrollment = { factorId: string; qrCode: string; secret: string }
+type State = { errors: FieldErrors; rejected: boolean }
+const initial: State = { errors: {}, rejected: false }
 
 function Mfa() {
   const { t } = useTranslation()
@@ -44,27 +50,32 @@ function Mfa() {
     if (result.ok) setEnrollment(result)
   }
 
-  const [error, verify, pending] = useActionState(
-    async (_: string | null, form: FormData) => {
+  const [state, verify, pending] = useActionState(
+    async (_: State, form: FormData): Promise<State> => {
+      const { data, errors } = validate(
+        totpFormSchema,
+        formValues(form, ['code']),
+      )
+      if (!data) return { errors, rejected: false }
+
       const result = await verifyTotp({
-        data: {
-          factorId: enrollment?.factorId,
-          code: String(form.get('code') ?? '').trim(),
-        },
+        data: { factorId: enrollment?.factorId, code: data.code },
       })
-      if (!result.ok) return t('mfa.invalidCode')
+      if (!result.ok) return { errors: {}, rejected: true }
       await router.invalidate()
       await router.navigate({ to: next ?? '/' })
-      return null
+      return initial
     },
-    null,
+    initial,
   )
+  const fields = useFieldValidation(totpFormSchema, state.errors)
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-sm flex-col justify-center px-4">
+    <AuthShell>
       <Card>
         <CardHeader>
-          <CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            <Icon name="shield-check" className="text-primary" />
             {enrolling ? t('mfa.enrollTitle') : t('mfa.challengeTitle')}
           </CardTitle>
           <CardDescription>
@@ -75,11 +86,7 @@ function Mfa() {
           {enrolling && !enrollment && (
             <>
               <Button onClick={() => void start()}>{t('mfa.start')}</Button>
-              {startError && (
-                <p role="alert" className="text-sm text-destructive">
-                  {t('common.genericError')}
-                </p>
-              )}
+              {startError && <FormAlert>{t('common.genericError')}</FormAlert>}
             </>
           )}
 
@@ -88,37 +95,33 @@ function Mfa() {
               <img
                 src={enrollment.qrCode}
                 alt={t('mfa.qrAlt')}
-                className="size-48 bg-white p-2"
+                className="size-48 rounded-xl bg-white p-2 ring-1 ring-border"
               />
               <p className="text-sm text-muted-foreground">
                 {t('mfa.secretLabel')}
               </p>
-              <code className="rounded bg-muted px-2 py-1 font-mono text-sm break-all">
+              <code className="rounded-lg bg-muted px-2 py-1 font-mono text-sm break-all">
                 {enrollment.secret}
               </code>
             </div>
           )}
 
           {(!enrolling || enrollment) && (
-            <form action={verify} className="flex flex-col gap-4">
-              <div className="flex flex-col gap-2">
-                <Label htmlFor="code">{t('mfa.code')}</Label>
-                <Input
-                  id="code"
-                  name="code"
-                  inputMode="numeric"
-                  autoComplete="one-time-code"
-                  pattern="\d{6}"
-                  maxLength={6}
-                  required
-                  autoFocus
-                />
-              </div>
-              {error && (
-                <p role="alert" className="text-sm text-destructive">
-                  {error}
-                </p>
-              )}
+            <form action={verify} noValidate className="flex flex-col gap-4">
+              <FormField
+                name="code"
+                inputMode="numeric"
+                autoComplete="one-time-code"
+                maxLength={6}
+                required
+                autoFocus
+                label={t('mfa.code')}
+                className="text-center font-mono text-lg tracking-[0.4em]"
+                error={fields.error('code')}
+                onBlur={fields.onBlur}
+                onChange={fields.onChange}
+              />
+              {state.rejected && <FormAlert>{t('mfa.invalidCode')}</FormAlert>}
               <Button type="submit" disabled={pending}>
                 {pending ? t('mfa.pending') : t('mfa.verify')}
               </Button>
@@ -126,6 +129,6 @@ function Mfa() {
           )}
         </CardContent>
       </Card>
-    </main>
+    </AuthShell>
   )
 }

@@ -6,17 +6,13 @@ import {
   useRouter,
 } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
-import { LocaleSwitcher } from '#/components/locale-switcher'
+import { AuthShell } from '#/components/auth-shell'
+import { FormAlert, FormField } from '#/components/form-field'
 import { Button } from '#/components/ui/button'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '#/components/ui/card'
-import { Input } from '#/components/ui/input'
-import { Label } from '#/components/ui/label'
+import { Card, CardContent, CardHeader, CardTitle } from '#/components/ui/card'
+import { formValues, useFieldValidation, validate } from '#/lib/form'
+import type { FieldErrors } from '#/lib/form'
+import { signInSchema } from '#/lib/schemas'
 import { signIn } from '#/server/session'
 
 export const Route = createFileRoute('/sign-in')({
@@ -27,62 +23,67 @@ export const Route = createFileRoute('/sign-in')({
   component: SignIn,
 })
 
+// The email survives React's form reset after a failed attempt; the password does not.
+type Failure = 'invalidCredentials' | 'tooManyAttempts' | 'genericError'
+type State = { email: string; errors: FieldErrors; failure: Failure | null }
+const initial: State = { email: '', errors: {}, failure: null }
+
 function SignIn() {
   const { t } = useTranslation()
   const router = useRouter()
 
-  const [error, submit, pending] = useActionState(
-    async (_: string | null, form: FormData) => {
-      const result = await signIn({
-        data: {
-          email: String(form.get('email') ?? ''),
-          password: String(form.get('password') ?? ''),
-        },
-      })
-      if (!result.ok) return t('signIn.invalidCredentials')
+  const [state, submit, pending] = useActionState(
+    async (_: State, form: FormData): Promise<State> => {
+      const values = formValues(form, ['email', 'password'])
+      const { data, errors } = validate(signInSchema, values)
+      if (!data) return { email: values.email, errors, failure: null }
+
+      const result = await signIn({ data })
+      if (!result.ok)
+        return { email: values.email, errors: {}, failure: result.error }
       await router.invalidate()
       await router.navigate({ to: '/mfa' })
-      return null
+      return initial
     },
-    null,
+    initial,
   )
+  const fields = useFieldValidation(signInSchema, state.errors)
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-sm flex-col justify-center gap-4 px-4">
-      <div className="flex justify-end">
-        <LocaleSwitcher />
-      </div>
+    <AuthShell>
       <Card>
         <CardHeader>
           <CardTitle>{t('signIn.title')}</CardTitle>
-          <CardDescription>{t('signIn.inviteOnly')}</CardDescription>
         </CardHeader>
         <CardContent>
-          <form action={submit} className="flex flex-col gap-4">
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="email">{t('signIn.email')}</Label>
-              <Input
-                id="email"
-                name="email"
-                type="email"
-                autoComplete="username"
-                required
-              />
-            </div>
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="password">{t('signIn.password')}</Label>
-              <Input
-                id="password"
-                name="password"
-                type="password"
-                autoComplete="current-password"
-                required
-              />
-            </div>
-            {error && (
-              <p role="alert" className="text-sm text-destructive">
-                {error}
-              </p>
+          <form action={submit} noValidate className="flex flex-col gap-4">
+            <FormField
+              name="email"
+              type="email"
+              autoComplete="username"
+              required
+              label={t('signIn.email')}
+              defaultValue={state.email}
+              error={fields.error('email')}
+              onBlur={fields.onBlur}
+              onChange={fields.onChange}
+            />
+            <FormField
+              name="password"
+              type="password"
+              autoComplete="current-password"
+              required
+              label={t('signIn.password')}
+              error={fields.error('password')}
+              onBlur={fields.onBlur}
+              onChange={fields.onChange}
+            />
+            {state.failure && (
+              <FormAlert>
+                {state.failure === 'genericError'
+                  ? t('common.genericError')
+                  : t(`signIn.${state.failure}`)}
+              </FormAlert>
             )}
             <Button type="submit" disabled={pending}>
               {pending ? t('signIn.pending') : t('signIn.submit')}
@@ -90,12 +91,12 @@ function SignIn() {
           </form>
           <Link
             to="/forgot-password"
-            className="mt-4 block text-sm text-muted-foreground underline underline-offset-4"
+            className="mt-4 block text-center text-sm text-muted-foreground underline-offset-4 hover:text-primary hover:underline"
           >
             {t('signIn.forgot')}
           </Link>
         </CardContent>
       </Card>
-    </main>
+    </AuthShell>
   )
 }

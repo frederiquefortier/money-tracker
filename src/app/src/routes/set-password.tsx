@@ -1,6 +1,8 @@
 import { useActionState } from 'react'
 import { createFileRoute, redirect, useRouter } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
+import { AuthShell } from '#/components/auth-shell'
+import { FormAlert, FormField } from '#/components/form-field'
 import { Button } from '#/components/ui/button'
 import {
   Card,
@@ -9,9 +11,9 @@ import {
   CardHeader,
   CardTitle,
 } from '#/components/ui/card'
-import { Input } from '#/components/ui/input'
-import { Label } from '#/components/ui/label'
-import { PASSWORD_MIN_LENGTH, passwordSchema } from '#/lib/password'
+import { formValues, useFieldValidation, validate } from '#/lib/form'
+import type { FieldErrors } from '#/lib/form'
+import { PASSWORD_MIN_LENGTH, newPasswordSchema } from '#/lib/schemas'
 import { setPassword } from '#/server/password'
 
 export const Route = createFileRoute('/set-password')({
@@ -27,34 +29,35 @@ export const Route = createFileRoute('/set-password')({
   component: SetPassword,
 })
 
+type ServerError = 'weakPassword' | 'samePassword' | 'genericError'
+type State = { errors: FieldErrors; serverError: ServerError | null }
+const initial: State = { errors: {}, serverError: null }
+
 function SetPassword() {
   const { t } = useTranslation()
   const router = useRouter()
   const { session } = Route.useRouteContext()
 
-  const [error, submit, pending] = useActionState(
-    async (_: string | null, form: FormData) => {
-      const password = String(form.get('password') ?? '')
-      if (password !== String(form.get('confirm') ?? ''))
-        return t('setPassword.mismatch')
-      if (!passwordSchema.safeParse(password).success)
-        return t('setPassword.rule', { min: PASSWORD_MIN_LENGTH })
+  const [state, submit, pending] = useActionState(
+    async (_: State, form: FormData): Promise<State> => {
+      const { data, errors } = validate(
+        newPasswordSchema,
+        formValues(form, ['password', 'confirm']),
+      )
+      if (!data) return { errors, serverError: null }
 
-      const result = await setPassword({ data: { password } })
-      if (!result.ok) {
-        return result.error === 'genericError'
-          ? t('common.genericError')
-          : t(`setPassword.${result.error}`)
-      }
+      const result = await setPassword({ data: { password: data.password } })
+      if (!result.ok) return { errors: {}, serverError: result.error }
       await router.invalidate()
       await router.navigate({ to: session.hasTotp ? '/' : '/mfa' })
-      return null
+      return initial
     },
-    null,
+    initial,
   )
+  const fields = useFieldValidation(newPasswordSchema, state.errors)
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-sm flex-col justify-center px-4">
+    <AuthShell>
       <Card>
         <CardHeader>
           <CardTitle>{t('setPassword.title')}</CardTitle>
@@ -63,7 +66,7 @@ function SetPassword() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form action={submit} className="flex flex-col gap-4">
+          <form action={submit} noValidate className="flex flex-col gap-4">
             {/* Lets password managers attach the new password to the right account. */}
             <input
               type="email"
@@ -73,32 +76,32 @@ function SetPassword() {
               readOnly
               hidden
             />
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="password">{t('setPassword.password')}</Label>
-              <Input
-                id="password"
-                name="password"
-                type="password"
-                autoComplete="new-password"
-                minLength={PASSWORD_MIN_LENGTH}
-                maxLength={72}
-                required
-              />
-            </div>
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="confirm">{t('setPassword.confirm')}</Label>
-              <Input
-                id="confirm"
-                name="confirm"
-                type="password"
-                autoComplete="new-password"
-                required
-              />
-            </div>
-            {error && (
-              <p role="alert" className="text-sm text-destructive">
-                {error}
-              </p>
+            <FormField
+              name="password"
+              type="password"
+              autoComplete="new-password"
+              required
+              label={t('setPassword.password')}
+              error={fields.error('password')}
+              onBlur={fields.onBlur}
+              onChange={fields.onChange}
+            />
+            <FormField
+              name="confirm"
+              type="password"
+              autoComplete="new-password"
+              required
+              label={t('setPassword.confirm')}
+              error={fields.error('confirm')}
+              onBlur={fields.onBlur}
+              onChange={fields.onChange}
+            />
+            {state.serverError && (
+              <FormAlert>
+                {state.serverError === 'genericError'
+                  ? t('common.genericError')
+                  : t(`setPassword.${state.serverError}`)}
+              </FormAlert>
             )}
             <Button type="submit" disabled={pending}>
               {pending ? t('setPassword.pending') : t('setPassword.submit')}
@@ -106,6 +109,6 @@ function SetPassword() {
           </form>
         </CardContent>
       </Card>
-    </main>
+    </AuthShell>
   )
 }

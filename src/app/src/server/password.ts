@@ -1,6 +1,6 @@
 import { createServerFn } from '@tanstack/react-start'
 import { z } from 'zod'
-import { passwordSchema } from '#/lib/password'
+import { forgotPasswordSchema, passwordSchema } from '#/lib/schemas'
 import { getSupabase } from '#/lib/supabase.server'
 
 export const EMAIL_LINK_TYPES = ['invite', 'recovery'] as const
@@ -25,7 +25,7 @@ export const verifyEmailLink = createServerFn({ method: 'POST' })
 /** Sends the reset email. Always reports success, so the form never reveals which
  *  addresses have an account. */
 export const requestPasswordReset = createServerFn({ method: 'POST' })
-  .validator(z.object({ email: z.email() }))
+  .validator(forgotPasswordSchema)
   .handler(async ({ data }) => {
     // The link is built by the recovery template from the project's site URL.
     await getSupabase().auth.resetPasswordForEmail(data.email)

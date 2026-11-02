@@ -25,9 +25,10 @@ English; this file is in English like every other meta-doc.
 | SET-01 | A new user is walked through choosing a language, a default currency, and creating their first categories. No starter category set in v1. | v1 | 1 |
 | SET-02 | Birth date (drives the age-based account recommendations in `LOC`). | v1 | 5 |
 | SET-03 | Home country, used for "local purchase" stats and for which region pack applies. | v1, inferred | 5 |
-| SET-04 | The interface is available in French and English. Dates and amounts follow the chosen locale ("15 janvier 2024", "1 234,50 $" / "January 15, 2024", "$1,234.50"). | C10, brief | 0 |
+| SET-04 | The interface is available in French and English, nothing regional (ADR-019). Dates and amounts use Canadian conventions in either language ("15 janvier 2024", "1 234,50 $" / "January 15, 2024", "$1,234.50"). | C10, brief | 0 |
 | SET-05 | The language is chosen at onboarding (defaulting to the browser's), saved on the profile, and switchable from any page. | brief | 0 |
 | SET-06 | Reference labels (account and holding types, currency names) exist in both languages. What the user types (their own category names, merchants, notes) is stored as typed and never translated. | brief | 1 |
+| SET-07 | Forms validate in the interface language: inline messages under each field on submit and when leaving a field, shared rules with the server (one Zod schema each), and typed values kept after a failed submit. Password fields have a show/hide button. | author | 0 |
 
 ## 2. Accounts and institutions (`ACC`)
 
@@ -82,7 +83,7 @@ English; this file is in English like every other meta-doc.
 | CAT-04 | Archived categories are absent from every picker. Editing an old transaction still shows its archived category with a badge and lets you change it. | add, C8 | 1 |
 | CAT-05 | The category page shows active categories first and archived ones in a collapsed section with a count and "archivée depuis [date]". | add, C9 | 1 |
 | CAT-06 | Favourite categories sit in a "Favoris" group at the top of the picker, shown as "Parent > Enfant", toggled with a star inside the picker. They are not repeated below. | v1, ai, add, C7 | 1 |
-| CAT-07 | A category has an emoji icon, chosen from the full emoji set (emoji-picker-react), shown in the Google style everywhere through a self-hosted Noto Color Emoji font (ADR-013). A default is suggested from the name; "Réinitialiser" returns to it. | v1, ai, add, C11 | 1 |
+| CAT-07 | A category has a coolicons icon, chosen in a searchable picker of a curated subset of the set (ADR-020). A default is suggested from the name; "Réinitialiser" returns to it. | v1, ai, add, C11 | 1 |
 | CAT-08 | A category can be excluded from the emergency-fund calculation. | v1, ai | 2 |
 
 ## 6. Merchants (`MER`)
@@ -229,8 +230,8 @@ Not in the notes, required by the brief. Details in [security.md](../01_building
   See [database.md](../01_building/database.md).
 - **Transfer fee category.** C5 auto-created "Frais bancaires". With categories built by the
   user, the fee category is a setting instead (`profiles.transfer_fee_category_id`).
-- **Emoji style.** C11 asks for the picker's Google theme, which loads images from a CDN.
-  The Google look is kept through a self-hosted font instead (ADR-013).
+- **Category icons.** C11 asks for an emoji picker in Google's style. Replaced by coolicons,
+  the set the logo comes from, so the interface has one visual language (ADR-020).
 - **"Canada"** became region packs (`LOC`), since 2026 data is Swiss.
 - **v1 "account hidden for future transactions"** was dropped from `ai`, probably by
   accident. Kept as ACC-04; delete it if the drop was deliberate.

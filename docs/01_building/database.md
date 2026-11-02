@@ -52,7 +52,7 @@ column.
 
 | Table | Columns | Req |
 |---|---|---|
-| `profiles` | `user_id` (PK), `locale` (BCP 47, e.g. `fr-CH`), `default_currency`, `display_currency`, `transfer_fee_category_id`, `birth_date`, `home_country`, `show_budget_tooltips` | SET, CUR-05/06, BUD-06, TRX-04 |
+| `profiles` | `user_id` (PK), `locale` (`fr` or `en`, ADR-019; old regional values accepted until the contract migration), `default_currency`, `display_currency`, `transfer_fee_category_id`, `birth_date`, `home_country`, `show_budget_tooltips` | SET, CUR-05/06, BUD-06, TRX-04 |
 | `user_currencies` | `code`, `is_default`, `is_favourite`, `display_order` | CUR-01..04. Five rows inserted by a trigger on sign-up. |
 
 Labels in reference tables come in pairs (`label_fr`, `label_en`; `name_fr`, `name_en`)
@@ -69,7 +69,7 @@ per ADR-008. User-owned rows (categories, merchants, notes) store one string, as
 
 | Table | Columns | Req |
 |---|---|---|
-| `categories` | `parent_id` (nullable, self), `name`, `kind` (`expense`/`income`/`investment`), `icon` (emoji), `icon_is_auto`, `is_favourite`, `exclude_from_emergency_fund` | CAT-01, 02, 06, 07, 08 |
+| `categories` | `parent_id` (nullable, self), `name`, `kind` (`expense`/`income`/`investment`), `icon` (a coolicons name, ADR-020), `icon_is_auto`, `is_favourite`, `exclude_from_emergency_fund` | CAT-01, 02, 06, 07, 08 |
 | `category_status_events` | `category_id`, `status` (`archived`/`active`), `effective_on` | CAT-03. Append-only. |
 | view `category_active_periods` | `category_id`, `active_from`, `active_to` | Derived from the events. Pickers (CAT-04) and charts (DSH-03) both read this, so they never disagree. |
 

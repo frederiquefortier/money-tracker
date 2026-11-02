@@ -5,7 +5,8 @@ import {
   setCookie,
 } from '@tanstack/react-start/server'
 import { z } from 'zod'
-import { LOCALES, LOCALE_COOKIE, isLocale, resolveLocale } from '#/i18n/locales'
+import { signInSchema, totpCodeSchema } from '#/lib/schemas'
+import { LOCALES, LOCALE_COOKIE, resolveLocale, toLocale } from '#/i18n/locales'
 import type { Locale } from '#/i18n/locales'
 import { getSupabase } from '#/lib/supabase.server'
 
@@ -71,15 +72,25 @@ export const setLocale = createServerFn({ method: 'POST' })
   })
 
 export const signIn = createServerFn({ method: 'POST' })
-  .validator(
-    z.object({ email: z.email(), password: z.string().min(1).max(256) }),
-  )
+  .validator(signInSchema)
   .handler(async ({ data }) => {
     const { error } = await getSupabase().auth.signInWithPassword(data)
-    // One message for every failure, so the form does not reveal which accounts exist.
-    return error
-      ? { ok: false as const, error: 'invalidCredentials' as const }
-      : { ok: true as const }
+    if (!error) return { ok: true as const }
+    // Wrong password and unknown email share one code, so the form still does not reveal
+    // which accounts exist. Anything else is not the user's fault and must not read as
+    // "wrong password". Logged as a code only, never the email or the password.
+    if (error.code === 'invalid_credentials') {
+      return { ok: false as const, error: 'invalidCredentials' as const }
+    }
+    console.error(
+      '[auth] sign-in failed:',
+      error.code ?? error.name,
+      error.status ?? '',
+    )
+    if (error.code === 'over_request_rate_limit') {
+      return { ok: false as const, error: 'tooManyAttempts' as const }
+    }
+    return { ok: false as const, error: 'genericError' as const }
   })
 
 export const signOut = createServerFn({ method: 'POST' }).handler(async () => {
@@ -121,7 +132,7 @@ export const verifyTotp = createServerFn({ method: 'POST' })
   .validator(
     z.object({
       factorId: z.uuid().optional(),
-      code: z.string().regex(/^\d{6}$/),
+      code: totpCodeSchema,
     }),
   )
   .handler(async ({ data }) => {
@@ -141,6 +152,7 @@ export const verifyTotp = createServerFn({ method: 'POST' })
       .from('profiles')
       .select('locale')
       .single()
-    if (isLocale(profile?.locale)) writeLocaleCookie(profile.locale)
+    const saved = toLocale(profile?.locale)
+    if (saved) writeLocaleCookie(saved)
     return { ok: true as const }
   })

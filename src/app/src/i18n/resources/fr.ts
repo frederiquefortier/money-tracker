@@ -4,9 +4,20 @@ export const fr = {
     name: 'Money Tracker',
   },
   common: {
+    showPassword: 'Afficher le mot de passe',
+    hidePassword: 'Masquer le mot de passe',
     signOut: 'Se déconnecter',
     language: 'Langue',
     genericError: 'Une erreur est survenue. Réessayez.',
+  },
+  validation: {
+    required: 'Ce champ est requis.',
+    email: 'Entrez une adresse courriel valide.',
+    passwordRule:
+      'Au moins {{min}} caractères, avec au moins une lettre et un chiffre.',
+    mismatch: 'Les deux mots de passe ne correspondent pas.',
+    code: 'Le code compte six chiffres.',
+    invalid: 'Cette valeur n’est pas valide.',
   },
   signIn: {
     title: 'Connexion',
@@ -15,8 +26,8 @@ export const fr = {
     submit: 'Se connecter',
     pending: 'Connexion…',
     invalidCredentials: 'Courriel ou mot de passe invalide.',
+    tooManyAttempts: 'Trop de tentatives. Patientez quelques minutes.',
     forgot: 'Mot de passe oublié ?',
-    inviteOnly: 'Les comptes sont créés sur invitation.',
   },
   mfa: {
     enrollTitle: 'Activer la double authentification',
@@ -66,7 +77,6 @@ export const fr = {
     confirm: 'Confirmer le mot de passe',
     submit: 'Enregistrer',
     pending: 'Enregistrement…',
-    mismatch: 'Les deux mots de passe ne correspondent pas.',
     weakPassword: 'Ce mot de passe est trop faible.',
     samePassword: 'Choisissez un mot de passe différent de l’actuel.',
   },

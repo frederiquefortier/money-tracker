@@ -6,6 +6,8 @@ import {
 } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { LocaleSwitcher } from '#/components/locale-switcher'
+import { Logo } from '#/components/logo'
+import { Icon } from '#/components/icon'
 import { Button } from '#/components/ui/button'
 import { signOut } from '#/server/session'
 
@@ -30,11 +32,17 @@ function AuthedLayout() {
 
   return (
     <div className="min-h-screen">
-      <header className="flex items-center justify-between gap-4 border-b px-4 py-3">
-        <span className="font-semibold">{t('app.name')}</span>
+      <header className="flex items-center justify-between gap-4 border-b bg-card/70 px-4 py-3 backdrop-blur">
+        <Logo name={t('app.name')} />
         <div className="flex items-center gap-2">
           <LocaleSwitcher />
-          <Button variant="outline" size="sm" onClick={() => void leave()}>
+          <Button
+            variant="outline"
+            size="sm"
+            className="rounded-full"
+            onClick={() => void leave()}
+          >
+            <Icon name="log-out" className="size-4" />
             {t('common.signOut')}
           </Button>
         </div>

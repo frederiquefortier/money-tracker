@@ -17,7 +17,10 @@ export const Route = createRootRoute({
       { name: 'robots', content: 'noindex, nofollow' },
       { title: 'Money Tracker' },
     ],
-    links: [{ rel: 'stylesheet', href: appCss }],
+    links: [
+      { rel: 'stylesheet', href: appCss },
+      { rel: 'icon', href: '/favicon.svg', type: 'image/svg+xml' },
+    ],
   }),
   shellComponent: RootDocument,
 })
