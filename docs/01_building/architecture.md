@@ -57,6 +57,6 @@ amount and rate (CUR-09). See [database.md](database.md#money).
 
 | Environment | Supabase project | Netlify |
 |---|---|---|
-| Local | `money-tracker` (`ca-central-1`, free plan), signed in as the demo account | `vite dev` |
+| Local | `money-tracker` (`ca-central-1`, free plan), signed in as the owner (ADR-021) | `vite dev` |
 | CI | A throwaway local stack inside GitHub Actions, for lint and pgTAP | |
 | Production | `money-tracker`, the owner's account. Migrations applied by CI after a backup (ADR-017) | Main branch; deploy previews off |

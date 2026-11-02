@@ -18,6 +18,7 @@
     "generate-routes": "tsr generate"
   },
   "dependencies": {
+    "@fontsource-variable/inconsolata": "5.3.0",
     "@fontsource-variable/nunito": "5.3.0",
     "@iconify/react": "6.0.2",
     "@supabase/ssr": "^0.12.7",

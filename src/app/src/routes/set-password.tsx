@@ -50,6 +50,7 @@ function SetPassword() {
 
   return (
     <AuthShell
+      icon="lock"
       title={t('setPassword.title')}
       description={t('setPassword.rule', { min: PASSWORD_MIN_LENGTH })}
     >

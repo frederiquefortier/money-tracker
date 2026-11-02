@@ -4,6 +4,26 @@ Document architectural choices with context, alternatives considered, and trade-
 
 <!-- Newest first: a new ADR goes directly below this line. Template at the bottom. -->
 
+### ADR-021: One account; unfinished work is tried in it (2026-11-02)
+
+**Context:**
+- ADR-017 planned a demo account with generated data (DEM-02) for trying features. The
+  account was never created, and the demo work is deferred: the app stays private.
+
+**Decision:**
+- The owner's account is the only one. Unfinished screens are tried there.
+- Migrations still run only from CI, after a backup (ADR-017).
+
+**Alternatives Considered:**
+- A demo account typed in by hand -> A second sign-in and second MFA setup to maintain
+  for no gain while the owner is the only user.
+
+**Consequences:**
+- Supersedes the demo account in ADR-017; the rest of ADR-017 stands.
+- Test entries land among real data. Delete them after trying a feature, or undo the
+  import batch (IMP-05).
+- The other-user isolation is proven by pgTAP only, not by a second live account.
+
 ### ADR-020: coolicons for every icon, categories included; no emoji (2026-11-02)
 
 **Context:**
@@ -99,6 +119,8 @@ Document architectural choices with context, alternatives considered, and trade-
 - Tokens refresh four times as often while the app is open; each refresh is one request.
 
 ### ADR-017: One Supabase project for development and real use (2026-10-27)
+
+*The demo account is superseded by ADR-021 (one account).*
 
 **Context:**
 - The owner is the only user, the project is in Canada (`ca-central-1`, close to the Ohio
@@ -344,6 +366,7 @@ Document architectural choices with context, alternatives considered, and trade-
   | Recharts (through shadcn charts) | Line, bar, area and donut charts with tooltips and responsive sizing |
   | @iconify/react (offline build) | coolicons for every icon, from a vendored file (ADR-020) |
   | @fontsource-variable/nunito | Nunito, self-hosted: no request to Google Fonts, no CSP change |
+  | @fontsource-variable/inconsolata | Inconsolata, the accent font, self-hosted the same way |
 
 **Alternatives Considered:**
 - The full set from the correction prompts (TanStack Query, Zustand, react-hook-form,

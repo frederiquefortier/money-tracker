@@ -18,7 +18,7 @@ export function isLocale(value: unknown): value is Locale {
   )
 }
 
-/** Also reads the regional tags stored before ADR-019 (`fr-CH`). */
+/** Reads a cookie or Accept-Language tag, regional ones included (`fr-CH`). */
 export function toLocale(value: unknown): Locale | undefined {
   if (typeof value !== 'string') return undefined
   const language = value.trim().toLowerCase().split('-')[0]

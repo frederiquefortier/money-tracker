@@ -1,7 +1,7 @@
 begin;
 create extension if not exists pgtap with schema extensions;
 
-select plan(11);
+select plan(12);
 
 insert into auth.users (id, email, raw_user_meta_data) values
   ('11111111-1111-1111-1111-111111111111', 'alice@example.test', '{"locale": "en-CA"}'),
@@ -19,6 +19,10 @@ select is(
 select throws_ok(
   $$ update public.profiles set locale = 'de' where user_id = '22222222-2222-2222-2222-222222222222' $$,
   '23514', null, 'the constraint rejects other languages'
+);
+select throws_ok(
+  $$ update public.profiles set locale = 'fr-CA' where user_id = '22222222-2222-2222-2222-222222222222' $$,
+  '23514', null, 'the constraint rejects regional tags'
 );
 
 -- Alice with MFA passed

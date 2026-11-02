@@ -196,10 +196,12 @@ The "Canada" section, generalised because the data already spans Canada and Swit
 
 ## 16. Demo and portfolio (`DEM`)
 
+Deferred: the app stays private, and a demo matters only if another user joins.
+
 | ID | Requirement | Source | Phase |
 |---|---|---|---|
-| DEM-01 | A public demo deployment on its own Supabase project, holding invented data only. MFA is relaxed there and only there, by a separate policy migration, and the demo banner says so. | portfolio | 2 |
-| DEM-02 | A demo-data generator: a fictional person with several years of multi-currency spending (one move between countries), transfers, splits, budgets. Deterministic, so screenshots are reproducible. It writes files in the import format, loaded into the demo account used for development (ADR-017). | portfolio | 1 |
+| DEM-01 | A public demo deployment on its own Supabase project, holding invented data only. MFA is relaxed there and only there, by a separate policy migration, and the demo banner says so. | portfolio | later |
+| DEM-02 | A demo-data generator: a fictional person with several years of multi-currency spending (one move between countries), transfers, splits, budgets. Deterministic, so screenshots are reproducible. It writes files in the import format, loaded into a demo account. | portfolio | later |
 
 ## 17. Security and accounts (`SEC`)
 

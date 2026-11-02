@@ -33,6 +33,7 @@ function Confirm() {
 
   return (
     <AuthShell
+      icon="mail"
       title={t(`emailLink.${type}.title`)}
       description={t(`emailLink.${type}.intro`)}
     >

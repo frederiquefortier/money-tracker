@@ -41,7 +41,7 @@ export function LocaleSwitcher() {
             'rounded-full px-3 py-1 text-xs font-semibold transition-colors',
             focusRing,
             locale === session.locale
-              ? 'bg-card text-primary shadow-sm'
+              ? 'bg-card text-primary'
               : 'text-secondary-foreground/70 hover:text-secondary-foreground',
           )}
         >

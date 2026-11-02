@@ -37,6 +37,7 @@ function ForgotPassword() {
 
   return (
     <AuthShell
+      icon="key"
       title={t('forgotPassword.title')}
       description={t('forgotPassword.intro')}
     >

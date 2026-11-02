@@ -1,7 +1,7 @@
 # src/supabase
 
-Supabase CLI project: `config.toml`, `migrations/`, `tests/database/` (pgTAP), `seed.sql`
-(demo data, not written yet: DEM-02).
+Supabase CLI project: `config.toml`, `migrations/`, `tests/database/` (pgTAP). No
+`seed.sql`: the demo-data generator (DEM-02) is deferred.
 
 The CLI is a dev dependency of `src/app`. Run it from there as
 `npx supabase --workdir .. <command>`; `--workdir ..` points it at this folder. There is no local stack on the development machine (ADR-014), and one

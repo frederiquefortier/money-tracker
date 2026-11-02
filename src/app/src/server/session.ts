@@ -6,7 +6,7 @@ import {
 } from '@tanstack/react-start/server'
 import { z } from 'zod'
 import { signInSchema, totpCodeSchema } from '#/lib/schemas'
-import { LOCALES, LOCALE_COOKIE, resolveLocale, toLocale } from '#/i18n/locales'
+import { LOCALES, LOCALE_COOKIE, isLocale, resolveLocale } from '#/i18n/locales'
 import type { Locale } from '#/i18n/locales'
 import { getSupabase } from '#/lib/supabase.server'
 
@@ -148,7 +148,7 @@ export const verifyTotp = createServerFn({ method: 'POST' })
       .from('profiles')
       .select('locale')
       .single()
-    const saved = toLocale(profile?.locale)
+    const saved = isLocale(profile?.locale) ? profile.locale : undefined
     if (saved) writeLocaleCookie(saved)
     return { ok: true as const }
   })

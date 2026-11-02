@@ -115,10 +115,6 @@ The app is at http://localhost:3000 and shows the sign-in page.
 invitation**. Open the email's link, **Continuer**, choose a password, then scan the QR code
 into two apps (phone and password manager) and enter the code.
 
-**Demo account, without email** (the built-in sender only reaches the organization's
-members): **Add user → Create new user** with a `+demo` alias of your own, a password, and
-**Auto Confirm User** ticked. Signing in leads to two-factor setup.
-
 ## 9. Netlify
 
 1. app.netlify.com, **Add new project → Import an existing project → GitHub**, authorize,

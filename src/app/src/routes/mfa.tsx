@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next'
 import { z } from 'zod'
 import { AuthShell } from '#/components/auth-shell'
 import { FormAlert, FormField } from '#/components/form-field'
-import { Icon } from '#/components/icon'
 import { Button } from '#/components/ui/button'
 import { formValues, useFieldValidation, validate } from '#/lib/form'
 import type { FieldErrors } from '#/lib/form'
@@ -69,12 +68,8 @@ function Mfa() {
 
   return (
     <AuthShell
-      title={
-        <>
-          <Icon name="shield-check" className="text-primary" />
-          {enrolling ? t('mfa.enrollTitle') : t('mfa.challengeTitle')}
-        </>
-      }
+      icon="shield-check"
+      title={enrolling ? t('mfa.enrollTitle') : t('mfa.challengeTitle')}
       description={enrolling ? t('mfa.enrollIntro') : t('mfa.challengeIntro')}
     >
       {enrolling && !enrollment && (

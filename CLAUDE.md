@@ -36,7 +36,7 @@ root keeps only `README.md`, `CLAUDE.md`, `.gitignore`, `.github/`, `.claude/` a
 
 **Every command runs from `src/app/`**, including the Supabase CLI:
 `npx supabase --workdir .. <command>` (`--workdir ..` points it at `src/supabase/`). Migrations are never pushed from a laptop: CI applies them on `main` after a backup
-(ADR-017). Try unfinished work in the demo account, never the owner's.
+(ADR-017). There is one account, the owner's; unfinished work is tried there (ADR-021).
 
 ## Working in the docs (dev journal)
 - Before changing direction, check [decisions.md](docs/01_building/decisions.md) (ADRs).

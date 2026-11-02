@@ -38,7 +38,7 @@ describe('isLocale / toLocale', () => {
     expect(isLocale('fr-CA')).toBe(false)
   })
 
-  it('normalises stored values', () => {
+  it('reduces tags to their language', () => {
     expect(toLocale('fr-CH')).toBe('fr')
     expect(toLocale('EN')).toBe('en')
     expect(toLocale('de-DE')).toBeUndefined()

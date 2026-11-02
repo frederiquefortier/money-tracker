@@ -16,7 +16,7 @@ export function Logo({
     <span className={cn('inline-flex items-center gap-2.5', className)}>
       <span
         className={cn(
-          'grid place-items-center rounded-full bg-secondary text-primary shadow-sm ring-1 ring-primary/10',
+          'grid place-items-center rounded-full bg-secondary text-primary ring-1 ring-primary/10',
           size === 'lg' ? 'size-20' : 'size-9',
         )}
       >
@@ -27,7 +27,7 @@ export function Logo({
       </span>
       <span
         className={cn(
-          'text-lg font-bold tracking-tight',
+          'font-mono text-lg font-bold tracking-wide uppercase',
           !showName && 'sr-only',
         )}
       >

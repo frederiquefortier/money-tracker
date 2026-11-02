@@ -61,6 +61,9 @@ without touching `docs/`.
 
 | Date | Topic | Assistant proposed | Author decided | Where |
 |---|---|---|---|---|
+| 2026-11-02 | Visual feel | Piggy-bank palette: rose and cream, soft blush glows, light shadows | Grainy sunset gradients, sparkles, flat surfaces with no shadows, Inconsolata as accent | designs/01-visual-direction.md |
+| 2026-11-02 | Demo account | Create the demo account before phase 1, for trying unfinished screens | No demo account; unfinished work is tried in the owner's | ADR-021 |
+| 2026-11-02 | Demo | Demo-data generator in phase 1, public demo in phase 2 | Both deferred: the app stays private, a demo matters only if another user joins | DEM-01..02 |
 | 2026-11-02 | Docs cleanup | Condense every doc, the journal files and their templates included | Leave the dev-journal skill's files and formats alone; trim the rest | sessions.md |
 | 2026-11-02 | Focus styles | A 2px ring on hand-built controls, shadcn's 3px ring on its components | One ring everywhere, shadcn's (`focusRing`) | src/app/src/lib/utils.ts |
 | 2026-11-02 | Font and layout | System rounded font; Google Fonts loaded from Google were blocked | Nunito, self-hosted; TravelSpend as the mobile layout reference | designs/00-layout-reference.md |

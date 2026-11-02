@@ -49,7 +49,7 @@ function SignIn() {
   const fields = useFieldValidation(signInSchema, state.errors)
 
   return (
-    <AuthShell title={t('signIn.title')}>
+    <AuthShell icon="log-in" title={t('signIn.title')}>
       <form action={submit} noValidate className="flex flex-col gap-4">
         <FormField
           name="email"

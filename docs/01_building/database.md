@@ -54,7 +54,7 @@ column.
 
 | Table | Columns | Req |
 |---|---|---|
-| `profiles` | `user_id` (PK), `locale` (`fr` or `en`, ADR-019; old regional values accepted until the contract migration), `default_currency`, `display_currency`, `transfer_fee_category_id`, `birth_date`, `home_country`, `show_budget_tooltips` | SET, CUR-05/06, BUD-06, TRX-04 |
+| `profiles` | `user_id` (PK), `locale` (`fr` or `en`, ADR-019), `default_currency`, `display_currency`, `transfer_fee_category_id`, `birth_date`, `home_country`, `show_budget_tooltips` | SET, CUR-05/06, BUD-06, TRX-04 |
 | `user_currencies` | `code`, `is_default`, `is_favourite`, `display_order` | CUR-01..04. Five rows inserted by a trigger on sign-up. |
 
 Labels in reference tables come in pairs (`label_fr`, `label_en`; `name_fr`, `name_en`)

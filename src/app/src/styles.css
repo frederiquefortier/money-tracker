@@ -1,70 +1,83 @@
 @import 'tailwindcss';
 
 @import 'tw-animate-css';
-/* Nunito, self-hosted (Fontsource, SIL Open Font License): served from our origin, so no
-   request to Google and no CSP change. Upright only; split by unicode-range. */
+/* Nunito and Inconsolata, self-hosted (Fontsource, SIL Open Font License): served from
+   our origin, so no request to Google and no CSP change. Split by unicode-range. */
 @import '@fontsource-variable/nunito/wght.css';
+@import '@fontsource-variable/inconsolata/wght.css';
 
 @custom-variant dark (&:is(.dark *));
 
-/* Piggy-bank palette. Contrast checked (WCAG AA): white on primary 5.1:1, primary on the
-   cream background 4.8:1, muted text 5.3:1. */
+/* Warm grain palette (sunset gradient, red sparkles). Contrast checked (WCAG AA): white on
+   primary 5.4:1, primary on card 5.2:1, on background 4.7:1, on secondary 4.6:1, muted
+   text 5.4:1, input borders 3:1. */
 :root {
-  --background: oklch(0.985 0.012 15);
-  --foreground: oklch(0.3 0.045 10);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.3 0.045 10);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.3 0.045 10);
-  --primary: oklch(0.56 0.17 5);
+  --background: oklch(0.955 0.025 20);
+  --foreground: oklch(0.3 0.06 15);
+  --card: oklch(0.99 0.01 40);
+  --card-foreground: oklch(0.3 0.06 15);
+  --popover: oklch(0.99 0.01 40);
+  --popover-foreground: oklch(0.3 0.06 15);
+  --primary: oklch(0.55 0.2 18);
   --primary-foreground: oklch(1 0 0);
-  --secondary: oklch(0.95 0.035 5);
-  --secondary-foreground: oklch(0.38 0.1 5);
-  --muted: oklch(0.96 0.015 15);
-  --muted-foreground: oklch(0.52 0.04 10);
-  --accent: oklch(0.95 0.035 5);
-  --accent-foreground: oklch(0.38 0.1 5);
-  --destructive: oklch(0.55 0.2 27);
-  --destructive-foreground: oklch(0.55 0.2 27);
-  --border: oklch(0.9 0.025 10);
-  --input: oklch(0.88 0.03 10);
-  --ring: oklch(0.7 0.13 5);
-  --chart-1: oklch(0.56 0.17 5);
-  --chart-2: oklch(0.65 0.12 160);
-  --chart-3: oklch(0.7 0.13 70);
-  --chart-4: oklch(0.6 0.13 260);
-  --chart-5: oklch(0.72 0.1 330);
+  --secondary: oklch(0.95 0.03 10);
+  --secondary-foreground: oklch(0.42 0.14 15);
+  --muted: oklch(0.95 0.02 20);
+  --muted-foreground: oklch(0.5 0.06 15);
+  --accent: oklch(0.95 0.03 10);
+  --accent-foreground: oklch(0.42 0.14 15);
+  --destructive: oklch(0.52 0.19 30);
+  --destructive-foreground: oklch(0.52 0.19 30);
+  --border: oklch(0.88 0.04 15);
+  --input: oklch(0.65 0.08 15);
+  --ring: oklch(0.7 0.15 18);
+  --chart-1: oklch(0.55 0.2 18);
+  --chart-2: oklch(0.72 0.16 50);
+  --chart-3: oklch(0.85 0.14 90);
+  --chart-4: oklch(0.68 0.17 340);
+  --chart-5: oklch(0.62 0.15 310);
   --radius: 1rem;
-  --blush: oklch(0.93 0.05 5 / 0.7);
+  --sun-yellow: oklch(0.9 0.13 95);
+  --sun-orange: oklch(0.76 0.16 55);
+  --sun-coral: oklch(0.68 0.19 25);
+  --sun-pink: oklch(0.73 0.16 355);
+  --sun-violet: oklch(0.72 0.14 320);
+  /* Grey fractal noise, blended with overlay so it speckles without greying the colors. */
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 0 1'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
 .dark {
-  --background: oklch(0.2 0.025 10);
-  --foreground: oklch(0.96 0.012 15);
-  --card: oklch(0.24 0.03 10);
-  --card-foreground: oklch(0.96 0.012 15);
-  --popover: oklch(0.24 0.03 10);
-  --popover-foreground: oklch(0.96 0.012 15);
-  --primary: oklch(0.78 0.12 5);
-  --primary-foreground: oklch(0.2 0.025 10);
-  --secondary: oklch(0.3 0.05 5);
-  --secondary-foreground: oklch(0.92 0.04 5);
-  --muted: oklch(0.27 0.03 10);
-  --muted-foreground: oklch(0.75 0.03 10);
-  --accent: oklch(0.3 0.05 5);
-  --accent-foreground: oklch(0.92 0.04 5);
+  --background: oklch(0.2 0.03 15);
+  --foreground: oklch(0.96 0.012 20);
+  --card: oklch(0.25 0.035 15);
+  --card-foreground: oklch(0.96 0.012 20);
+  --popover: oklch(0.25 0.035 15);
+  --popover-foreground: oklch(0.96 0.012 20);
+  --primary: oklch(0.76 0.14 15);
+  --primary-foreground: oklch(0.2 0.03 15);
+  --secondary: oklch(0.3 0.06 15);
+  --secondary-foreground: oklch(0.92 0.04 15);
+  --muted: oklch(0.27 0.03 15);
+  --muted-foreground: oklch(0.75 0.03 15);
+  --accent: oklch(0.3 0.06 15);
+  --accent-foreground: oklch(0.92 0.04 15);
   --destructive: oklch(0.7 0.17 27);
   --destructive-foreground: oklch(0.7 0.17 27);
-  --border: oklch(0.32 0.035 10);
-  --input: oklch(0.36 0.04 10);
-  --ring: oklch(0.78 0.12 5);
-  --blush: oklch(0.35 0.06 5 / 0.5);
+  --border: oklch(0.34 0.04 15);
+  --input: oklch(0.5 0.06 15);
+  --ring: oklch(0.76 0.14 15);
 }
 
 @theme inline {
   --font-sans:
     'Nunito Variable', ui-rounded, system-ui, -apple-system, 'Segoe UI',
     sans-serif;
+  --font-mono: 'Inconsolata Variable', ui-monospace, monospace;
+  /* No shadows anywhere, including in shadcn components added later. */
+  --shadow-*: initial;
+  --inset-shadow-*: initial;
+  --drop-shadow-*: initial;
+  --text-shadow-*: initial;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -102,10 +115,32 @@
 
   body {
     @apply bg-background font-sans text-foreground antialiased;
-    /* Two soft blush glows, top corners. */
     background-image:
-      radial-gradient(40rem 26rem at 0% 0%, var(--blush), transparent 70%),
-      radial-gradient(34rem 22rem at 100% 0%, var(--blush), transparent 70%);
+      var(--grain),
+      radial-gradient(
+        38rem 24rem at 0% 0%,
+        color-mix(in oklch, var(--sun-yellow) 35%, transparent),
+        transparent 70%
+      ),
+      radial-gradient(
+        40rem 26rem at 100% 0%,
+        color-mix(in oklch, var(--sun-pink) 30%, transparent),
+        transparent 70%
+      );
+    background-blend-mode: overlay, normal, normal;
     background-attachment: fixed;
   }
+}
+
+/* The sign-in screens: the full sunset, grainy. */
+@utility bg-sunset {
+  background-color: var(--sun-coral);
+  background-image:
+    var(--grain),
+    radial-gradient(60% 45% at 0% 45%, var(--sun-yellow), transparent 75%),
+    radial-gradient(50% 35% at 100% 5%, var(--sun-yellow), transparent 75%),
+    radial-gradient(70% 45% at 0% 85%, var(--sun-violet), transparent 75%),
+    radial-gradient(60% 40% at 100% 100%, var(--sun-orange), transparent 75%),
+    radial-gradient(70% 50% at 60% 55%, var(--sun-pink), transparent 80%);
+  background-blend-mode: overlay, normal, normal, normal, normal, normal;
 }
