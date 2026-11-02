@@ -5,6 +5,9 @@ the backend. Every command runs from this folder. Netlify's base directory point
 
 ## Setup
 
+First-time setup of the whole project (GitHub, secrets, Supabase, Netlify) is in
+[setup.md](../../docs/01_building/setup.md). Day to day:
+
 1. Node 24: `nvm use` reads `.nvmrc`.
 2. `npm ci`
 3. Copy `.env.example` to `.env.local` and fill in the project's URL and publishable key.
@@ -13,12 +16,15 @@ the backend. Every command runs from this folder. Netlify's base directory point
 
 ## Scripts
 
-| Script                                  | What it does                                                                               |
-| --------------------------------------- | ------------------------------------------------------------------------------------------ |
-| `dev`, `build`, `preview`               | Vite dev server, production build, run the build locally                                   |
-| `typecheck`, `lint`, `test`             | `tsc`, ESLint (with the i18n literal-string rule), Vitest                                  |
-| `format`                                | Prettier, then ESLint fixes                                                                |
-| `db:link`, `db:config-push`, `db:types` | Supabase CLI against `../supabase`. Migrations are applied by CI, not from here (ADR-017). |
+| Script                      | What it does                                              |
+| --------------------------- | --------------------------------------------------------- |
+| `dev`, `build`, `preview`   | Vite dev server, production build, run the build locally  |
+| `typecheck`, `lint`, `test` | `tsc`, ESLint (with the i18n literal-string rule), Vitest |
+| `format`                    | Prettier, then ESLint fixes                               |
+
+The Supabase CLI has no script: `npx supabase --workdir .. <command>` (see
+[src/supabase/README.md](../supabase/README.md)). Migrations are applied by CI, not from
+here (ADR-017).
 
 ## Layout
 

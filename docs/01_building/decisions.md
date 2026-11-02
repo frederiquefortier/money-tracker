@@ -412,7 +412,7 @@ repo/  README.md  CLAUDE.md  .gitignore  .github/  .claude/  docs/
        src/data/       reference/ (Git: lookup CSVs) + local/ (gitignored: real data)
 ```
 - **Every command runs from `src/app/`.** The Supabase CLI is a dev dependency there, and
-  the `db:*` npm scripts call it with `--workdir ..` so it finds `src/supabase/`.
+  it runs as `npx supabase --workdir .. <command>` so it finds `src/supabase/`.
 
 **Alternatives Considered:**
 - `supabase/` at the repo root -> The CLI default, but it puts a sub-project at the root,

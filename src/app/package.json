@@ -14,10 +14,7 @@
     "test": "vitest run",
     "format": "prettier --write . && eslint --fix .",
     "check": "prettier --check .",
-    "generate-routes": "tsr generate",
-    "db:link": "supabase --workdir .. link",
-    "db:config-push": "supabase --workdir .. config push",
-    "db:types": "supabase --workdir .. gen types typescript --linked --schema public > src/lib/database.types.ts"
+    "generate-routes": "tsr generate"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",

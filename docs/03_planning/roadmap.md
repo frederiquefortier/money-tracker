@@ -17,7 +17,7 @@ Nothing financial yet; the walls go up first.
 **Status (2026-10-27):** code done and checked locally; waiting on accounts.
 Done: scaffold, Supabase config and first migration with tests, auth with TOTP, invitation
 and set-password pages with bilingual email templates, FR/EN,
-CSP and headers, CI and backup workflows. Open: the project (`db:link`, `db:config-push`,
+CSP and headers, CI and backup workflows. Open: the project (CLI `link`, `config push`,
 first CI run applying migrations, first sign-in; JWT signing key confirmed ECC), the first CI run (pgTAP has not run yet), the Netlify
 site, production and its backup secrets, the owner's two authenticators.
 

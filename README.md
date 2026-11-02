@@ -1,5 +1,7 @@
 # Money Tracker
 
+[![Netlify Status](https://api.netlify.com/api/v1/badges/aa42b944-4059-4292-b1cb-7d800a522410/deploy-status)](https://app.netlify.com/projects/ff-money-tracker/deploys)
+
 **A private web app for personal finances across currencies: every transaction at that
 day's exchange rate, budgets, the people and events money was spent on, and net worth over
 time.**
@@ -7,6 +9,8 @@ time.**
 It replaces an eight-year budgeting spreadsheet and is built to import all of it.
 
 ## Status
+
+Live at https://ff-money-tracker.netlify.app (invite-only).
 
 Planning. The requirements, schema design, security model and first decisions are written;
 no code yet. v1 is roadmap phases 0 to 2, the point where the spreadsheet can be retired.
@@ -39,6 +43,7 @@ database directly. Full model: [security.md](docs/01_building/security.md).
 | [architecture.md](docs/01_building/architecture.md) | How the pieces fit |
 | [database.md](docs/01_building/database.md) | Schema design |
 | [security.md](docs/01_building/security.md) | Threat model and rules |
+| [setup.md](docs/01_building/setup.md) | From an empty Supabase project to a deployed app, step by step |
 | [roadmap.md](docs/03_planning/roadmap.md) | Phases |
 | [process.md](docs/01_building/process.md) | How it is built with an AI assistant, and who decided what |
 

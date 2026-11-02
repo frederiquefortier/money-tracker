@@ -82,8 +82,8 @@ Two plan-level caveats:
 
 ### Auth
 
-- Email and password plus TOTP. Sign-up disabled (`config.toml`, pushed with
-  `db:config-push`); new users by invitation from the dashboard.
+- Email and password plus TOTP. Sign-up disabled (`config.toml`, applied with
+  `npx supabase --workdir .. config push`); new users by invitation from the dashboard.
 - **Invitation flow:** the email links to `/auth/confirm`, which only shows a button. The
   one-time token is spent by that button's POST, never by the GET, because email security
   scanners open links before the person does. The invitee then sets a password (same rule as
