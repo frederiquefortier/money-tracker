@@ -1,6 +1,7 @@
 # Import and export
 
-**Status:** reviewed 2026-11-03.
+**Status:** reviewed 2026-11-03; aligned with the built screens 2026-11-03. Shared rules:
+[02-screens.md](02-screens.md#shared-patterns).
 
 ## Purpose
 
@@ -20,12 +21,12 @@ Reached from Réglages, and from the empty transactions list (spec 14).
 
 ```
 ┌──────────────────────────────┐
-│ ‹ Réglages                   │
+│ ← Réglages                   │
 │ IMPORTER ET EXPORTER         │
 │ ┌──────────────────────────┐ │
 │ │ IMPORTER                 │ │
 │ │ [ Choisir les fichiers ] │ │
-│ │ Modèles : accounts.csv · │ │
+│ │ Modèles: accounts.csv ·  │ │
 │ │ transactions.csv ·       │ │
 │ │ splits.csv               │ │
 │ │ ▸ Règles du format       │ │
@@ -36,8 +37,8 @@ Reached from Réglages, and from the empty transactions list (spec 14).
 │ └──────────────────────────┘ │
 │ ┌──────────────────────────┐ │
 │ │ IMPORTS                  │ │
-│ │ 3 nov. 2026 · 9 812 tr.  │ │
-│ │           Annuler l'import│ │
+│ │ 3 nov. 2026            ↶ │ │
+│ │ 9 812 transactions       │ │
 │ └──────────────────────────┘ │
 └──────────────────────────────┘
 ```
@@ -50,9 +51,8 @@ Reached from Réglages, and from the empty transactions list (spec 14).
   on the card works too on desktop.
 - Files are recognised by name: `accounts.csv`, `transactions.csv`, `splits.csv`. Each
   shows as a chip with its row count; an unknown name is refused with "Fichier non
-  reconnu : {name}". `transactions.csv` is required, the other two optional.
-- Files are read in the browser and never uploaded or stored (import.md). A line says so:
-  "Vos fichiers restent sur cet appareil ; seules les lignes lues sont envoyées."
+  reconnu: {name}". `transactions.csv` is required, the other two optional.
+- Files are read in the browser and never uploaded or stored (import.md).
 - Template links download the example files. "Règles du format" opens a short summary of
   import.md's rules (dates, decimals, signs, category paths) in place.
 - "Vérifier" starts step 2.
@@ -62,7 +62,7 @@ Reached from Réglages, and from the empty transactions list (spec 14).
 - Every row is validated in the browser first, then again on the server. Nothing is
   written.
 - **Errors:** grouped by file, one line each: line number, column, the problem, in plain
-  words ("ligne 214, amount : « 12,50 » utilise une virgule ; le format attend un
+  words ("ligne 214, amount: « 12,50 » utilise une virgule; le format attend un
   point"). The first 100 show, with the total count; "Copier les erreurs" copies them
   all as text for fixing the file.
 - Any error blocks the import (import.md: all or nothing). "Choisir d'autres fichiers"
@@ -76,9 +76,9 @@ Reached from Réglages, and from the empty transactions list (spec 14).
 │ 7 104 dépenses · 1 290 revenus     │
 │ 1 401 transferts · 17 ajustements  │
 │ 212 déjà importées, ignorées       │
-│ Comptes : 6 existants, 1 nouveau ▸ │
-│ Catégories : 3 nouvelles ▸         │
-│ Marchands : 418 nouveaux ▸         │
+│ Comptes: 6 existants, 1 nouveau ▸  │
+│ Catégories: 3 nouvelles ▸          │
+│ Marchands: 418 nouveaux ▸          │
 │ [ Importer 9 600 transactions ]    │
 ```
 
@@ -114,7 +114,7 @@ Reached from Réglages, and from the empty transactions list (spec 14).
   transactions and splits using it. Parents that would be created only as part of a path
   are not listed on their own.
 - **Créer**: created as written, with a suggested icon and colour (spec 12).
-- **Fusionner avec…**: the category picker (spec 12), showing existing categories, the
+- **Fusionner avec…**: the category picker (spec 15), showing existing categories, the
   ones this import will create, and "Créer « {texte} »" for a new category under another
   name. Its rows are booked to the chosen category instead. This catches a typo
   ("Alimantation"), regroups old names ("Taxi" into "Transport"), and folds several
@@ -130,20 +130,22 @@ Reached from Réglages, and from the empty transactions list (spec 14).
 - "Importer {n} transactions" sends everything in one request; one SQL call commits or
   rolls back as a whole (import.md, ADR-012).
 - While it runs: a progress line, and leaving the page is guarded.
-- Done: "Import terminé : {n} transactions." with "Voir les transactions" (opens the
+- Done: "Import terminé: {n} transactions." with "Voir les transactions" (opens the
   month of the newest row). The batch appears under Imports.
 - Failed: "L'import n'a rien écrit." and the reason; the files are still loaded, so it
   can be retried.
 
 ## Imports and undo (IMP-05)
 
-- One line per batch, newest first: date, transaction count, what it created ("1 compte,
-  3 catégories, 418 marchands").
-- **Annuler l'import:** a confirmation says what goes: "9 600 transactions seront
+- One row per batch, newest first: the date, then the transaction count and what it
+  created ("1 compte, 3 catégories, 418 marchands") on the second line.
+- **Annuler l'import** is the undo icon in the row's action slot. The confirmation says
+  what goes: "9 600 transactions seront
   supprimées, ainsi que les comptes, catégories et marchands créés par cet import qui ne
   servent plus ailleurs." If some of its transactions were edited since, it adds "dont
   {n} modifiées depuis".
-- An undone batch stays in the list, muted, "Annulé le {date}". Its `ref`s are free
+- An undone batch stays in the list, muted, with "Annulé le {date}" on the first line and
+  no action. Its `ref`s are free
   again, so the same file can be imported again after fixing.
 
 ## Export (IMP-04, SEC-04)
@@ -175,13 +177,12 @@ Reached from Réglages, and from the empty transactions list (spec 14).
 |---|---|
 | Screen title | Importer et exporter |
 | Cards | Importer, Exporter, Imports |
-| Files | Choisir les fichiers, Fichier non reconnu : {name}, Vérifier |
-| Privacy line | Vos fichiers restent sur cet appareil ; seules les lignes lues sont envoyées. |
+| Files | Choisir les fichiers, Fichier non reconnu: {name}, Vérifier |
 | Templates | Modèles, Règles du format |
 | Errors | {count} erreurs, Copier les erreurs, Choisir d'autres fichiers |
 | Summary | déjà importées, ignorées; existants; nouveaux |
 | New categories | Catégories à décider ({count}), Créer, Fusionner avec…, Tout créer, {count} tr., nouv. |
-| Commit | Importer {count} transactions, Import terminé : {count} transactions., Voir les transactions, L'import n'a rien écrit. |
-| Undo | Annuler l'import, Annulé le {date}, dont {count} modifiées depuis |
+| Commit | Importer {count} transactions, Import terminé: {count} transactions., Voir les transactions, L'import n'a rien écrit. |
+| Undo | Annuler l'import du {date}, Annulé le {date}, dont {count} modifiées depuis |
 | Export | Exporter mes données |
 | Empty | Aucun import pour l'instant. |

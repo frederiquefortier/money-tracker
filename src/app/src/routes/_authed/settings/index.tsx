@@ -14,6 +14,7 @@ export const Route = createFileRoute('/_authed/settings/')({
 // A row appears once its screen exists (spec 10).
 const SCREENS = [
   { to: '/settings/accounts', label: 'settings.accounts', icon: 'bank' },
+  { to: '/settings/categories', label: 'settings.categories', icon: 'tags' },
   { to: '/settings/currencies', label: 'settings.currencies', icon: 'coins' },
 ] as const satisfies ReadonlyArray<{
   to: string

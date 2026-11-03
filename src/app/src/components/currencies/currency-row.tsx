@@ -92,7 +92,7 @@ export function CurrencyRow({
             onClick={isDefault ? undefined : onMakeDefault}
           />
           <IconButton
-            icon="trash"
+            icon="trash-full"
             label={removeHint ?? t('currencies.removeCode', { code })}
             muted={removeHint !== null}
             onClick={onRemove}

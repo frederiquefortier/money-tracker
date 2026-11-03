@@ -4,6 +4,31 @@ Document new concepts, techniques, and knowledge gained. Reference this file to 
 
 <!-- Newest first: a new entry goes directly below this line. Template at the bottom. -->
 
+### 2026-11-03 - OKLCH for colour variations, WCAG contrast for icons
+
+**What Was New:**
+- Category colours are stored as hex but varied in OKLCH (lightness, chroma, hue). A
+  sub-category's automatic colour keeps its parent's hue and steps the lightness.
+- Whether the icon is white or dark is computed from contrast, not chosen by hand.
+
+**Key Points:**
+- OKLCH is perceptually even: the same lightness step looks like the same change on red
+  and on blue, which HSL does not give.
+- Not every OKLCH colour exists in sRGB. Lowering the chroma until it fits keeps the
+  lightness and hue.
+- WCAG 1.4.11 asks 3:1 for non-text content. Contrast is
+  `(L1 + 0.05) / (L2 + 0.05)` on relative luminance, from linearised sRGB.
+
+**Sources:**
+- Björn Ottosson, "A perceptual color space for image processing" (the OKLab matrices)
+- WCAG 2.2, Understanding 1.4.11 Non-text Contrast
+
+**Where to Learn More:**
+- CSS Color 4, gamut mapping in `oklch()`
+
+**Applied In:**
+- `src/app/src/lib/color.ts` and its tests; the twenty quick picks in spec 12.
+
 ### 2026-11-03 - Sheet animations and TanStack Router loading
 
 **What Was New:**

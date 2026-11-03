@@ -44,6 +44,7 @@ function ComboboxList({
         >
           {row.kind === 'option' ? (
             <>
+              {row.option.icon}
               <span className="flex-1 truncate">{row.option.label}</span>
               {row.option.value === value && (
                 <Icon name="check" className="size-4 text-primary" />

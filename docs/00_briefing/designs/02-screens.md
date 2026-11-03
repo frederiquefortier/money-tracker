@@ -14,13 +14,61 @@ onto them.
 |---|---|---|---|---|
 | 10 | [Settings and currencies](10-settings-currencies.md) | Réglages hub, Devises, display currency switcher in the header | CUR-01..07, SET-06 | Built |
 | 11 | [Accounts](11-accounts.md) | Accounts by institution, account form, institution form | ACC-01..07 | Built |
-| 12 | [Categories](12-categories.md) | Category tree, category form, icon picker, category picker | CAT-01..07 | Reviewed |
+| 12 | [Categories](12-categories.md) | Category tree, category form, icon picker | CAT-01..03, 05, 07 | Built |
 | 13 | [Merchants](13-merchants.md) | Merchant list and form, merchant picker | MER-01, 05, TRX-05 | Reviewed |
 | 14 | [Transactions](14-transactions.md) | The list (home tab), day groups, converted-amount marker | TRX-04, 09, CUR-06, 07, 09 | Reviewed |
-| 15 | [Transaction form](15-transaction-form.md) | Expense and income, splits, foreign currency, the add button | TRX-01, 02, 05, 06, 09, 10, CUR-08, CAT-04, 06, MER-01 | Reviewed |
+| 15 | [Transaction form](15-transaction-form.md) | Expense and income, splits, foreign currency, the add button, the category picker | TRX-01, 02, 05, 06, 09, 10, CUR-08, CAT-04, 06, MER-01 | Reviewed |
 | 16 | [Transfer and adjustment](16-transfer-adjustment.md) | Transfer form (fee, two currencies), balance adjustment | TRX-03, 04, 11 | Reviewed |
 | 17 | [First run](17-first-run.md) | Language, currencies, first accounts and categories | SET-01 | Reviewed |
 | 18 | [Import and export](18-import-export.md) | File check, summary, commit, undo, export | IMP-01, 04, 05, 06, SEC-04 | Reviewed |
+
+## Shared patterns
+
+Decided on Devises and Comptes (process.md, "Who decided what"); every spec follows them,
+and a spec that disagrees is wrong until the author says otherwise. Each names the shared
+component to use, so a screen is assembled, not redrawn.
+
+- **Page:** `SettingsPage` (or the tab's own page): "← Réglages" top left, the title with
+  its buttons beside it, never a button under the list: expand all, "Trier: …"
+  (`SortMenu`, an outline button with a chevron, like a select; kept per browser), then
+  "Ajouter…". A menu opens at least as wide as its button, aligned to it, and grows
+  to fit its labels rather than cutting them.
+- **Lists:** cards (`ListCard`), one line per item where it fits. Tapping an item opens
+  its form. A card header (an institution) toggles with `CollapseToggle` and edits with a
+  pencil. In a tree, every row opens its form; a parent's chevron alone toggles its
+  branch, and children are joined to it by elbow connectors, as in a tree diagram. A list
+  that collapses has an icon button beside the title to open or close everything, in
+  every tab (`ExpandAllButton`, "Tout déplier", "Tout replier"). Collapsed state is remembered per
+  browser (`useStoredState`).
+- **Row actions:** icons in a fixed slot at the end of the row (`IconActions`,
+  `IconButton`): add (a child, in a tree), star, archive or reactivate, trash, in that
+  order. Delete is always the `trash-full` icon. A change shows at once and
+  stays until the saved data comes back. An action that cannot apply is muted, and a tap
+  says why in a toast. Any failure is a toast.
+- **Archive:** the interface word is "Archiver"; a dialog asks the date (default today).
+  Archived items sit in a collapsed "… archivé(e)s ({count})" section under the list, flat
+  and muted, with "Archivé(e) le …" and the actions on the first line.
+- **Confirmations:** `ConfirmDialog`, red title and button: "Supprimer “{name}”" and
+  "Cette action est irréversible.", or a sentence naming what else is affected.
+- **Forms:** a route sheet over the list (`RouteSheet`, `SheetForm`) with its own URL:
+  full screen on a phone, a panel from the right from `md` up. It only edits: no archive
+  or delete buttons inside. Annuler and one "Enregistrer" in the footer; saving closes it
+  with a toast. Errors from the server show in the sheet above the buttons; validation
+  stays under each field, and focus moves to the first one (SET-07).
+- **Fields:** the shared ones (`FormField`, `SelectField`, `CheckboxField`,
+  `LinkedFields`). Required fields carry an asterisk, no legend, no "(facultatif)".
+- **Choosing from the user's own items:** `Combobox`, typed into the field: it filters,
+  offers "Créer « … »" when that makes sense, and a × clears it. Nothing chosen is an
+  empty field, never "Aucun(e)".
+- **No helper text:** no hints under fields, legends or explanatory sentences. If a field
+  needs explaining, fix its label or the layout. A reason for something unavailable goes
+  in the toast on tap.
+- **Action words** come from the shared `common` keys, the same everywhere: Ajouter,
+  Modifier, Réinitialiser, Retirer, Archiver, Réactiver, Supprimer, and "{verb} “{name}”"
+  for icon labels and dialog titles. A button reads "Supprimer", never "Supprimer la
+  catégorie".
+- **Copy:** names quoted as “{name}” in titles and labels; "Créer « {text} »"; no space
+  before `: ; ? !` in French; empty states read "Aucun … pour l'instant.".
 
 ## Format of a spec
 

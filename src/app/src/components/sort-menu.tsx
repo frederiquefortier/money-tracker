@@ -8,34 +8,40 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
 } from '#/components/ui/dropdown-menu'
-import { SORTS } from '#/lib/accounts'
-import type { Sort } from '#/lib/accounts'
 
-/** ACC-07: sorts the rows inside each group; groups stay alphabetical. */
-export function SortMenu({
+/** "Trier: …" beside a list's title: an outline button with a chevron, like a select. */
+export function SortMenu<TSort extends string>({
   sort,
+  options,
+  labelOf,
   onChange,
 }: {
-  sort: Sort
-  onChange: (sort: Sort) => void
+  sort: TSort
+  options: ReadonlyArray<TSort>
+  labelOf: (sort: TSort) => string
+  onChange: (sort: TSort) => void
 }) {
   const { t } = useTranslation()
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="sm">
+        <Button variant="outline">
           <Icon name="sort-ascending" className="size-4" />
-          {t('accounts.sortLabel', { sort: t(`accounts.sort.${sort}`) })}
+          {t('common.sortLabel', { sort: labelOf(sort) })}
+          <Icon name="chevron-down" className="size-4" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuRadioGroup
           value={sort}
-          onValueChange={(value) => onChange(value as Sort)}
+          onValueChange={(value) => {
+            const next = options.find((option) => option === value)
+            if (next) onChange(next)
+          }}
         >
-          {SORTS.map((option) => (
+          {options.map((option) => (
             <DropdownMenuRadioItem key={option} value={option}>
-              {t(`accounts.sort.${option}`)}
+              {labelOf(option)}
             </DropdownMenuRadioItem>
           ))}
         </DropdownMenuRadioGroup>

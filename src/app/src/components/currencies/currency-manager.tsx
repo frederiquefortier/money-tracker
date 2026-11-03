@@ -73,7 +73,7 @@ export function CurrencyManager({
       <ConfirmDialog
         open={removing !== null}
         title={t('currencies.removeConfirm', { code: removing ?? '' })}
-        confirmLabel={t('currencies.remove')}
+        confirmLabel={t('common.remove')}
         irreversible={false}
         onCancel={() => setRemoving(null)}
         onConfirm={() => {

@@ -13,7 +13,7 @@ copyrighted images, never committed).
 
 | Pattern | In TravelSpend | Here |
 |---|---|---|
-| **Bottom tab bar** (mobile) | Entries, Stats, Search, Map, Settings; icon over a short label; active tab in the accent colour | The main sections of v1, coolicons icons, rose for the active tab. On wide screens the same items become a side or top bar. |
+| **Bottom tab bar** (mobile) | Entries, Stats, Search, Map, Settings; icon over a short label; active tab in the accent colour | The main sections of v1, coolicons icons, the primary plum for the active tab. On wide screens the same items become a side or top bar. |
 | **Floating add button** | Round accent "+" bottom right, above the tab bar | Same, on the Transactions tab only |
 | **Top bar** | Menu left, context name centred (the trip), people icon right | Period or account in the centre (the "trip" equivalent is a date range), FR/EN and profile on the right |
 | **Summary tiles** | Two cards side by side: Total and Daily average, each with a thin progress bar against the budget (`$3,748/30,000`) | Spent this period and a second figure (daily average, or remaining budget), with a progress bar when a budget exists (BUD-01) |
@@ -23,9 +23,9 @@ copyrighted images, never committed).
 | **Donut chart** | Category shares with icon badges and percentages around the ring, a list of categories with totals below | Dashboard (DSH-04), coolicons badges |
 | **Trend card** | Bar chart by month in a card, a dropdown filter, the selected month's total below, "Show more" | Dashboard trend (DSH-01, DSH-04) |
 | **Ranked list with bars** | Countries, each with a thin bar proportional to its share | Merchants or categories ranked by spend (DSH-07) |
-| **Expense form** | Back and Save in the header; big amount with a currency chip showing the rate (`VND $1 = ₫23,449`); then one row per detail, each with an icon: description, date, payment method, country, paid by and for, location, photo | Same structure: amount and currency chip first (CUR-08), then rows for note, date and time, account, merchant, category (splits), people (PPL-03), event, tags |
+| **Expense form** | Back and Save in the header; big amount with a currency chip showing the rate (`VND $1 = ₫23,449`); then one row per detail, each with an icon: description, date, payment method, country, paid by and for, location, photo | Amount and currency chip first (CUR-08), then the details. The details are our shared labelled fields with Annuler and Enregistrer at the bottom (spec 15) |
 | **Group balance** | People with round initial avatars, who owes whom | People and balances (PPL, YR-05) |
-| **Cards** | White, generous radius, soft shadow, on a warm off-white ground | Already our style: white cards, 1 rem radius, cream ground |
+| **Cards** | White, generous radius, soft shadow, on a warm off-white ground | Our own: flat plum-cream cards with no shadow ([01-visual-direction.md](01-visual-direction.md)) |
 
 ## Decisions on top of the reference
 

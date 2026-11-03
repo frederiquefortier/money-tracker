@@ -3,9 +3,10 @@ import { useTranslation } from 'react-i18next'
 import { AccountGroup } from '#/components/accounts/account-group'
 import type { ListedAccount } from '#/components/accounts/account-row'
 import { ClosedAccounts } from '#/components/accounts/closed-accounts'
-import { SortMenu } from '#/components/accounts/sort-menu'
+import { ExpandAllButton } from '#/components/expand-all-button'
 import { Icon } from '#/components/icon'
 import { SettingsPage } from '#/components/settings-page'
+import { SortMenu } from '#/components/sort-menu'
 import { Button } from '#/components/ui/button'
 import {
   DropdownMenu,
@@ -106,6 +107,13 @@ function Accounts() {
 
   const { listed, open, groups, used } = shape(page, locale, sort)
 
+  const keys = groups.map((group) => group.key)
+  const allExpanded = keys.every((key) => !collapsed.includes(key))
+
+  function toggleAll() {
+    setCollapsed(allExpanded ? keys : [])
+  }
+
   function toggle(key: string) {
     setCollapsed(
       collapsed.includes(key)
@@ -119,7 +127,15 @@ function Accounts() {
       title={t('accounts.title')}
       actions={
         <>
-          <SortMenu sort={sort} onChange={setSort} />
+          {keys.length > 0 && (
+            <ExpandAllButton allExpanded={allExpanded} onToggle={toggleAll} />
+          )}
+          <SortMenu
+            sort={sort}
+            options={SORTS}
+            labelOf={(option) => t(`accounts.sort.${option}`)}
+            onChange={setSort}
+          />
           <AddMenu />
         </>
       }

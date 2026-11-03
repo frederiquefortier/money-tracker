@@ -49,7 +49,10 @@ export function IconLink({
   icon,
   label,
   ...link
-}: { icon: IconName; label: string } & Pick<LinkProps, 'to' | 'params'>) {
+}: { icon: IconName; label: string; onClick?: () => void } & Pick<
+  LinkProps,
+  'to' | 'params' | 'search'
+>) {
   return (
     <Link {...link} title={label} className={iconAction()}>
       <Icon name={icon} label={label} />
@@ -80,9 +83,9 @@ export function IconAnchor({
   )
 }
 
-// Width of 1, 2 or 3 icon actions plus the 12px gap before them, so the amounts in one
+// Width of 1 to 4 icon actions plus the 12px gap before them, so the amounts in one
 // list line up whatever actions each row has.
-const SLOT_WIDTH = { 1: 'w-11', 2: 'w-19', 3: 'w-27' } as const
+const SLOT_WIDTH = { 1: 'w-11', 2: 'w-19', 3: 'w-27', 4: 'w-35' } as const
 
 /** A row's icon actions, right-aligned in a slot of fixed width. */
 export function IconActions({

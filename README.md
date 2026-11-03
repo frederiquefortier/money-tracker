@@ -6,6 +6,10 @@ A private web app for personal finances across currencies: transactions at the d
 exchange rate, budgets, the people and events money went to, and net worth over time. It
 replaces an eight-year budgeting spreadsheet.
 
+Built with Claude for my own use. The ideas, requirements and decisions are mine; how the
+work is split, and where I changed the assistant's proposals, is in
+[process.md](docs/01_building/process.md).
+
 ## Status
 
 Live at https://ff-money-tracker.netlify.app (invite-only). Phase 0 is in place: sign-in

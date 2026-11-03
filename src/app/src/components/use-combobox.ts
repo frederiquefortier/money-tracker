@@ -1,8 +1,16 @@
 import { useState } from 'react'
 import { foldForSearch } from '#/lib/utils'
 
-/** `keywords` are matched too, for what the label does not show (another language). */
-export type ComboboxOption = { value: string; label: string; keywords?: string }
+/**
+ * `keywords` are matched too, for what the label does not show (another language).
+ * `icon` shows before the label in the list.
+ */
+export type ComboboxOption = {
+  value: string
+  label: string
+  keywords?: string
+  icon?: React.ReactNode
+}
 
 export type Row =
   { kind: 'option'; option: ComboboxOption } | { kind: 'create' }

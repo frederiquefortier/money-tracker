@@ -99,6 +99,94 @@ export type Database = {
           },
         ]
       }
+      categories: {
+        Row: {
+          color: string
+          color_is_auto: boolean
+          created_at: string
+          icon: string
+          icon_is_auto: boolean
+          id: string
+          is_favourite: boolean
+          kind: string
+          name: string
+          parent_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          color: string
+          color_is_auto?: boolean
+          created_at?: string
+          icon?: string
+          icon_is_auto?: boolean
+          id?: string
+          is_favourite?: boolean
+          kind?: string
+          name: string
+          parent_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Update: {
+          color?: string
+          color_is_auto?: boolean
+          created_at?: string
+          icon?: string
+          icon_is_auto?: boolean
+          id?: string
+          is_favourite?: boolean
+          kind?: string
+          name?: string
+          parent_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "categories_user_id_parent_id_fkey"
+            columns: ["user_id", "parent_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["user_id", "id"]
+          },
+        ]
+      }
+      category_status_events: {
+        Row: {
+          category_id: string
+          created_at: string
+          effective_on: string
+          id: number
+          status: string
+          user_id: string
+        }
+        Insert: {
+          category_id: string
+          created_at?: string
+          effective_on: string
+          id?: never
+          status: string
+          user_id?: string
+        }
+        Update: {
+          category_id?: string
+          created_at?: string
+          effective_on?: string
+          id?: never
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "category_status_events_user_id_category_id_fkey"
+            columns: ["user_id", "category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["user_id", "id"]
+          },
+        ]
+      }
       currencies: {
         Row: {
           code: string
@@ -282,6 +370,14 @@ export type Database = {
         }
         Relationships: []
       }
+      category_active_periods: {
+        Row: {
+          active_from: string | null
+          active_to: string | null
+          category_id: string | null
+        }
+        Relationships: []
+      }
       institution_totals: {
         Row: {
           converted: boolean | null
@@ -293,10 +389,16 @@ export type Database = {
       }
     }
     Functions: {
+      archive_category: {
+        Args: { archive_from: string; category: string }
+        Returns: number
+      }
+      category_status: { Args: { category: string }; Returns: string }
       exchange_rate: {
         Args: { from_currency: string; on_date: string; to_currency: string }
         Returns: number
       }
+      recolor_categories: { Args: { colors: Json }; Returns: undefined }
     }
     Enums: {
       [_ in never]: never

@@ -50,7 +50,7 @@ English; this file is in English like every other meta-doc.
 | TRX-01 | Add an expense or an income, with a date and an optional time. | v1, ai, misc | 1 |
 | TRX-02 | Currency is required on every transaction, prefilled from the account. The amount booked is always in the account's currency; choosing another currency records it as the original price (CUR-08). | add, C6 | 1 |
 | TRX-03 | Balance adjustment: set an account to a known balance; the app records the difference. | v1, ai | 1 |
-| TRX-04 | Transfer between two accounts. Optional fee, recorded as an expense on the source account in the category chosen once in settings. Edit and delete act on all legs together, with a confirmation before delete. List shows "Transfert : A → B". | add, C5 | 1 |
+| TRX-04 | Transfer between two accounts. Optional fee, recorded as an expense on the source account in the category chosen once in settings. Edit and delete act on all legs together, with a confirmation before delete. List shows "Transfert: A → B". | add, C5 | 1 |
 | TRX-05 | A transaction can be linked to a merchant. | v1, ai | 1 |
 | TRX-06 | Split a transaction across several categories by amount, share or percentage. | v1, ai | 1 |
 | TRX-07 | Link an income to an expense as its reimbursement. | v1, ai | 3 |
@@ -84,8 +84,9 @@ English; this file is in English like every other meta-doc.
 | CAT-04 | Archived categories are absent from every picker. Editing an old transaction still shows its archived category with a badge and lets you change it. | add, C8 | 1 |
 | CAT-05 | The category page shows active categories first and archived ones in a collapsed section with a count and "archivée depuis [date]". | add, C9 | 1 |
 | CAT-06 | Favourite categories sit in a "Favoris" group at the top of the picker, shown as "Parent > Enfant", toggled with a star inside the picker. They are not repeated below. | v1, ai, add, C7 | 1 |
-| CAT-07 | A category has a coolicons icon, chosen in a searchable picker of a curated subset of the set (ADR-020). A default is suggested from the name; "Réinitialiser" returns to it. Each category has its own colour, chosen freely; a sub-category starts from a variation of its parent's colour. | v1, ai, add, C11 | 1 |
+| CAT-07 | A category has a coolicons icon, chosen in a searchable picker of a curated subset of the set (ADR-020). A default is suggested from the name; picking the suggested icon returns to it. Each category has its own colour, chosen freely; a sub-category starts from a variation of its parent's colour. | v1, ai, add, C11 | 1 |
 | CAT-08 | A category can be excluded from the emergency-fund calculation. | v1, ai | 2 |
+| CAT-09 | The category tree sorts by name or by colour (rainbow order), kept per browser. One button opens or closes every branch, in every tab. | author | 1 |
 
 ## 6. Merchants (`MER`)
 

@@ -1,3 +1,4 @@
+import { categoriesEn } from './en-categories'
 import type { Messages } from './fr'
 
 export const en: Messages = {
@@ -19,6 +20,20 @@ export const en: Messages = {
     loading: 'Loading…',
     clear: 'Clear',
     irreversible: 'This cannot be undone.',
+    add: 'Add',
+    edit: 'Edit',
+    editName: 'Edit “{{name}}”',
+    reset: 'Reset',
+    remove: 'Remove',
+    archive: 'Archive',
+    archiveName: 'Archive “{{name}}”',
+    reactivate: 'Reactivate',
+    reactivateName: 'Reactivate “{{name}}”',
+    delete: 'Delete',
+    deleteName: 'Delete “{{name}}”',
+    expandAll: 'Expand all',
+    collapseAll: 'Collapse all',
+    sortLabel: 'Sort: {{sort}}',
   },
   displayCurrency: {
     label: 'Display currency: {{code}}',
@@ -106,6 +121,7 @@ export const en: Messages = {
   settings: {
     title: 'Settings',
     accounts: 'Accounts',
+    categories: 'Categories',
     currencies: 'Currencies',
     back: 'Settings',
   },
@@ -118,7 +134,6 @@ export const en: Messages = {
     title: 'Accounts',
     empty: 'No accounts yet.',
     noInstitution: 'No institution',
-    sortLabel: 'Sort: {{sort}}',
     sort: {
       name: 'Name',
       type: 'Type',
@@ -127,7 +142,6 @@ export const en: Messages = {
       balanceDesc: 'Balance, highest first',
     },
     website: '{{name}} website',
-    editInstitution: 'Edit “{{name}}”',
     addMenu: 'Add',
     addAccount: 'An account',
     addInstitution: 'An institution',
@@ -148,15 +162,10 @@ export const en: Messages = {
     openingBalance: 'Balance at opening',
     openedOn: 'Opening date',
     hideFromNew: 'Hide from new transactions',
-    close: 'Archive',
-    closeName: 'Archive “{{name}}”',
-    reopenName: 'Reopen “{{name}}”',
     closedOnField: 'Archive date',
-    delete: 'Delete account',
-    deleteConfirm: 'Delete “{{name}}”',
     createInstitution: 'Create “{{text}}”',
     currencyRemoved:
-      'Add {{code}} back to your currencies to reopen this account.',
+      'Add {{code}} back to your currencies to reactivate this account.',
   },
   institutions: {
     newTitle: 'New institution',
@@ -164,17 +173,15 @@ export const en: Messages = {
     name: 'Name',
     website: 'Website',
     saved: 'Institution saved.',
-    delete: 'Delete institution',
-    deleteConfirm: 'Delete “{{name}}”',
     inUse: 'Accounts still use this institution.',
   },
+  categories: categoriesEn,
   currencies: {
     title: 'Currencies',
     defaultBadge: 'Default',
     add: 'Add a currency',
     makeDefaultFor: 'Use {{code}} as default',
     isDefault: '{{code}} is the default currency',
-    remove: 'Remove',
     removeCode: 'Remove {{code}}',
     defaultCannotBeRemoved: 'Choose another default currency first.',
     usedByAccount_zero: 'The account {{name}} is in {{code}}.',
@@ -189,7 +196,6 @@ export const en: Messages = {
     ratesPending: 'Rates available after the next daily update.',
     removeConfirm: 'Remove {{code}}',
     currency: 'Currency',
-    addShort: 'Add',
     added: '{{code}} added.',
   },
 }

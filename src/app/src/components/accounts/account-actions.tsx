@@ -44,26 +44,26 @@ export function AccountActions({
       {account.closedOn ? (
         <IconButton
           icon="undo"
-          label={t('accounts.reopenName', { name })}
+          label={t('common.reactivateName', { name })}
           onClick={() => save(() => reopenAccount({ data: { id } }))}
         />
       ) : (
         <IconButton
           icon="archive"
-          label={t('accounts.closeName', { name })}
+          label={t('common.archiveName', { name })}
           onClick={startClosing}
         />
       )}
       <IconButton
-        icon="trash"
-        label={t('accounts.deleteConfirm', { name })}
+        icon="trash-full"
+        label={t('common.deleteName', { name })}
         onClick={() => setDialog('delete')}
       />
       <ConfirmDialog
         open={dialog === 'close'}
         tone="default"
-        title={t('accounts.closeName', { name })}
-        confirmLabel={t('accounts.close')}
+        title={t('common.archiveName', { name })}
+        confirmLabel={t('common.archive')}
         busy={busy}
         canConfirm={closedOn !== ''}
         onCancel={() => setDialog(null)}
@@ -80,8 +80,8 @@ export function AccountActions({
       </ConfirmDialog>
       <ConfirmDialog
         open={dialog === 'delete'}
-        title={t('accounts.deleteConfirm', { name })}
-        confirmLabel={t('accounts.delete')}
+        title={t('common.deleteName', { name })}
+        confirmLabel={t('common.delete')}
         busy={busy}
         onCancel={() => setDialog(null)}
         onConfirm={() => save(() => deleteAccount({ data: { id } }))}

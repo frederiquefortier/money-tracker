@@ -1,0 +1,1256 @@
+[
+  {
+    "name": "shopping-cart",
+    "words": [
+      "shopping-cart",
+      "épicerie",
+      "courses",
+      "supermarché",
+      "marché",
+      "groceries",
+      "grocery",
+      "supermarket"
+    ]
+  },
+  {
+    "name": "shopping-basket",
+    "words": ["shopping-basket", "panier", "dépanneur", "basket", "convenience"]
+  },
+  {
+    "name": "coffee",
+    "words": ["café", "thé", "coffee", "tea", "latte"]
+  },
+  {
+    "name": "coffee-to-go",
+    "words": ["coffee-to-go", "à emporter", "takeout", "take away", "to go"]
+  },
+  {
+    "name": "croissant",
+    "words": [
+      "croissant",
+      "boulangerie",
+      "pâtisserie",
+      "déjeuner",
+      "bakery",
+      "pastry",
+      "breakfast"
+    ]
+  },
+  {
+    "name": "pizza",
+    "words": ["pizza", "livraison", "delivery"]
+  },
+  {
+    "name": "burger",
+    "words": ["fast food", "restauration rapide", "burger", "casse-croûte"]
+  },
+  {
+    "name": "utensils",
+    "words": [
+      "utensils",
+      "restaurant",
+      "resto",
+      "repas",
+      "souper",
+      "dîner",
+      "meal",
+      "dinner",
+      "lunch",
+      "dining"
+    ]
+  },
+  {
+    "name": "chef-hat",
+    "words": ["chef-hat", "cuisine", "traiteur", "cooking", "catering"]
+  },
+  {
+    "name": "wine",
+    "words": ["vin", "saq", "wine"]
+  },
+  {
+    "name": "beer",
+    "words": ["bière", "bar", "pub", "beer"]
+  },
+  {
+    "name": "martini",
+    "words": [
+      "martini",
+      "alcool",
+      "cocktail",
+      "sortie",
+      "alcohol",
+      "drinks",
+      "nightlife"
+    ]
+  },
+  {
+    "name": "ice-cream",
+    "words": ["ice-cream", "crème glacée", "dessert", "ice cream"]
+  },
+  {
+    "name": "cake",
+    "words": ["gâteau", "anniversaire", "fête", "cake", "birthday", "party"]
+  },
+  {
+    "name": "cookie",
+    "words": ["collation", "grignotines", "snack", "snacks", "cookie"]
+  },
+  {
+    "name": "apple",
+    "words": ["apple", "fruits", "légumes", "fruit", "vegetables", "produce"]
+  },
+  {
+    "name": "soup",
+    "words": ["soup", "nourriture", "alimentation", "food"]
+  },
+  {
+    "name": "key",
+    "words": ["key", "loyer", "clés", "clé", "rent", "keys"]
+  },
+  {
+    "name": "house-alt-1",
+    "words": ["house-alt-1", "logement", "maison", "housing", "home", "house"]
+  },
+  {
+    "name": "bank",
+    "words": [
+      "bank",
+      "hypothèque",
+      "prêt",
+      "mortgage",
+      "loan",
+      "banque",
+      "banking"
+    ]
+  },
+  {
+    "name": "building-2",
+    "words": [
+      "building-2",
+      "condo",
+      "appartement",
+      "copropriété",
+      "apartment",
+      "strata"
+    ]
+  },
+  {
+    "name": "zap",
+    "words": [
+      "zap",
+      "électricité",
+      "hydro",
+      "énergie",
+      "electricity",
+      "power",
+      "energy"
+    ]
+  },
+  {
+    "name": "flame",
+    "words": ["flame", "chauffage", "gaz", "heating"]
+  },
+  {
+    "name": "droplet",
+    "words": [
+      "droplet",
+      "eau",
+      "peau",
+      "soins de la peau",
+      "crème",
+      "water",
+      "skin",
+      "skincare"
+    ]
+  },
+  {
+    "name": "broom",
+    "words": [
+      "broom",
+      "ménage",
+      "entretien",
+      "nettoyage",
+      "cleaning",
+      "housekeeping"
+    ]
+  },
+  {
+    "name": "wrench",
+    "words": [
+      "wrench",
+      "réparation",
+      "rénovation",
+      "travaux",
+      "repair",
+      "renovation",
+      "maintenance",
+      "garage",
+      "mécanique",
+      "mechanic"
+    ]
+  },
+  {
+    "name": "toolbox",
+    "words": ["toolbox", "quincaillerie", "outils", "hardware", "tools"]
+  },
+  {
+    "name": "sofa",
+    "words": ["sofa", "meubles", "mobilier", "furniture"]
+  },
+  {
+    "name": "lamp",
+    "words": ["lamp", "décoration", "déco", "decor"]
+  },
+  {
+    "name": "washing-machine",
+    "words": [
+      "washing-machine",
+      "électroménager",
+      "buanderie",
+      "lavage",
+      "appliances",
+      "laundry"
+    ]
+  },
+  {
+    "name": "potted-plant",
+    "words": [
+      "potted-plant",
+      "plantes",
+      "jardin",
+      "jardinage",
+      "plants",
+      "garden",
+      "gardening",
+      "poterie",
+      "céramique",
+      "pottery",
+      "ceramics"
+    ]
+  },
+  {
+    "name": "shovel",
+    "words": [
+      "shovel",
+      "déneigement",
+      "terrassement",
+      "snow removal",
+      "landscaping"
+    ]
+  },
+  {
+    "name": "bed",
+    "words": ["bed", "chambre", "literie", "bedroom", "bedding"]
+  },
+  {
+    "name": "sim-card",
+    "words": [
+      "sim-card",
+      "données mobiles",
+      "forfait",
+      "sim",
+      "esim",
+      "itinérance",
+      "mobile data",
+      "data plan",
+      "roaming"
+    ]
+  },
+  {
+    "name": "mobile",
+    "words": ["cellulaire", "téléphone", "cell", "phone", "mobile"]
+  },
+  {
+    "name": "tv",
+    "words": ["télé", "télévision", "câble", "streaming", "tv", "cable"]
+  },
+  {
+    "name": "router",
+    "words": ["router", "internet", "wifi", "wi-fi", "routeur", "modem"]
+  },
+  {
+    "name": "cloud",
+    "words": ["cloud", "stockage", "nuage", "storage"]
+  },
+  {
+    "name": "laptop",
+    "words": [
+      "laptop",
+      "informatique",
+      "ordinateur",
+      "logiciel",
+      "computer",
+      "software",
+      "tech"
+    ]
+  },
+  {
+    "name": "monitor-play",
+    "words": [
+      "monitor-play",
+      "abonnement",
+      "abonnements",
+      "subscription",
+      "subscriptions"
+    ]
+  },
+  {
+    "name": "mailbox",
+    "words": ["mailbox", "poste", "courrier", "postage", "mail"]
+  },
+  {
+    "name": "fuel",
+    "words": ["essence", "carburant", "gas", "fuel", "petrol"]
+  },
+  {
+    "name": "charging-station",
+    "words": ["charging-station", "recharge", "borne", "charging"]
+  },
+  {
+    "name": "square-parking",
+    "words": ["square-parking", "stationnement", "parking", "parcomètre"]
+  },
+  {
+    "name": "taxi",
+    "words": ["taxi", "uber", "lyft", "covoiturage", "rideshare"]
+  },
+  {
+    "name": "bus",
+    "words": [
+      "autobus",
+      "bus",
+      "transport en commun",
+      "stm",
+      "transit",
+      "public transport"
+    ]
+  },
+  {
+    "name": "subway",
+    "words": ["métro", "subway", "metro"]
+  },
+  {
+    "name": "train",
+    "words": ["train", "via rail", "rail"]
+  },
+  {
+    "name": "bike",
+    "words": ["vélo", "bixi", "bike", "bicycle", "cycling"]
+  },
+  {
+    "name": "car",
+    "words": ["auto", "voiture", "transport", "car", "vehicle"]
+  },
+  {
+    "name": "car-electric",
+    "words": ["car-electric", "véhicule électrique", "electric car", "ev"]
+  },
+  {
+    "name": "truck",
+    "words": ["truck", "déménagement", "location de camion", "moving"]
+  },
+  {
+    "name": "plane",
+    "words": [
+      "plane",
+      "avion",
+      "vol",
+      "vols",
+      "billet d’avion",
+      "flight",
+      "flights",
+      "airfare"
+    ]
+  },
+  {
+    "name": "hotel",
+    "words": [
+      "hôtel",
+      "hébergement",
+      "airbnb",
+      "hotel",
+      "lodging",
+      "accommodation"
+    ]
+  },
+  {
+    "name": "luggage",
+    "words": [
+      "luggage",
+      "voyage",
+      "voyages",
+      "vacances",
+      "travel",
+      "trip",
+      "vacation"
+    ]
+  },
+  {
+    "name": "id-card",
+    "words": [
+      "id-card",
+      "immatriculation",
+      "permis",
+      "permis de conduire",
+      "licence",
+      "pièce d'identité",
+      "carte d’identité",
+      "registration",
+      "license",
+      "permit",
+      "id"
+    ]
+  },
+  {
+    "name": "file-text",
+    "words": [
+      "file-text",
+      "document",
+      "documents",
+      "papiers",
+      "paperasse",
+      "formulaire",
+      "contrat",
+      "paper",
+      "paperwork",
+      "form",
+      "contract"
+    ]
+  },
+  {
+    "name": "passport",
+    "words": ["passeport", "visa", "passport"]
+  },
+  {
+    "name": "tent",
+    "words": ["tent", "camping", "plein air", "outdoors"]
+  },
+  {
+    "name": "parasol",
+    "words": ["parasol", "plage", "beach"]
+  },
+  {
+    "name": "mountain",
+    "words": ["randonnée", "montagne", "ski", "hiking", "mountain"]
+  },
+  {
+    "name": "ship",
+    "words": ["ship", "croisière", "traversier", "cruise", "ferry"]
+  },
+  {
+    "name": "pill",
+    "words": [
+      "pill",
+      "pharmacie",
+      "médicaments",
+      "pharmacy",
+      "medication",
+      "prescription"
+    ]
+  },
+  {
+    "name": "tooth",
+    "words": [
+      "tooth",
+      "dentiste",
+      "dentaire",
+      "dentist",
+      "dental",
+      "dentisterie",
+      "dentistry"
+    ]
+  },
+  {
+    "name": "stethoscope",
+    "words": ["stethoscope", "médecin", "clinique", "doctor", "clinic"]
+  },
+  {
+    "name": "first-aid",
+    "words": ["first-aid", "santé", "soins", "health", "care", "medical"]
+  },
+  {
+    "name": "hand",
+    "words": [
+      "hand",
+      "massage",
+      "massothérapie",
+      "massothérapeute",
+      "massage therapy"
+    ]
+  },
+  {
+    "name": "heart-pulse",
+    "words": [
+      "heart-pulse",
+      "physio",
+      "physiothérapie",
+      "chiro",
+      "cardio",
+      "physiotherapy"
+    ]
+  },
+  {
+    "name": "brain",
+    "words": [
+      "brain",
+      "psychologie",
+      "psychologue",
+      "santé mentale",
+      "psychology",
+      "psychologist",
+      "mental health"
+    ]
+  },
+  {
+    "name": "chat-heart",
+    "words": [
+      "chat-heart",
+      "psychologue",
+      "thérapie",
+      "psychologist",
+      "counselling"
+    ]
+  },
+  {
+    "name": "bandage",
+    "words": [
+      "bandage",
+      "dermatologie",
+      "dermatologue",
+      "pansement",
+      "dermatology",
+      "dermatologist"
+    ]
+  },
+  {
+    "name": "eye",
+    "words": [
+      "eye",
+      "optométriste",
+      "lunettes",
+      "lentilles",
+      "optometrist",
+      "glasses",
+      "ophtalmologie",
+      "ophtalmologiste",
+      "ophthalmology"
+    ]
+  },
+  {
+    "name": "shield-check",
+    "words": ["shield-check", "assurance", "assurances", "insurance"]
+  },
+  {
+    "name": "scissors",
+    "words": [
+      "scissors",
+      "coiffure",
+      "coiffeur",
+      "coiffeuse",
+      "barbier",
+      "salon",
+      "haircut",
+      "hairdresser",
+      "barber"
+    ]
+  },
+  {
+    "name": "brush",
+    "words": ["brush", "maquillage", "pinceau", "makeup", "make-up"]
+  },
+  {
+    "name": "sparkles",
+    "words": [
+      "sparkles",
+      "ongle",
+      "ongles",
+      "manucure",
+      "pédicure",
+      "esthétique",
+      "spa",
+      "nails",
+      "manicure",
+      "pedicure"
+    ]
+  },
+  {
+    "name": "face-smile",
+    "words": [
+      "face-smile",
+      "esthéticienne",
+      "esthéticien",
+      "visage",
+      "soin du visage",
+      "facial",
+      "esthetician"
+    ]
+  },
+  {
+    "name": "flower",
+    "words": [
+      "flower",
+      "beauté",
+      "soins personnels",
+      "cosmétiques",
+      "beauty",
+      "personal care",
+      "cosmetics"
+    ]
+  },
+  {
+    "name": "stopwatch",
+    "words": [
+      "stopwatch",
+      "entraîneur",
+      "entraîneuse",
+      "entraînement privé",
+      "chronomètre",
+      "trainer",
+      "personal trainer",
+      "coach"
+    ]
+  },
+  {
+    "name": "user-star-corner",
+    "words": [
+      "user-star-corner",
+      "tuteur",
+      "tutrice",
+      "professeur",
+      "prof",
+      "cours privés",
+      "tutor",
+      "teacher",
+      "private lessons"
+    ]
+  },
+  {
+    "name": "dumbbell",
+    "words": ["dumbbell", "gym", "entraînement", "fitness", "workout"]
+  },
+  {
+    "name": "weight",
+    "words": [
+      "weight",
+      "équipement",
+      "haltères",
+      "kettlebell",
+      "poids",
+      "equipment",
+      "weights"
+    ]
+  },
+  {
+    "name": "divider",
+    "words": [
+      "divider",
+      "pole",
+      "pole dance",
+      "pole fitness",
+      "barre verticale"
+    ]
+  },
+  {
+    "name": "accessibility",
+    "words": ["accessibility", "yoga", "pilates", "étirements", "stretching"]
+  },
+  {
+    "name": "accessibility-alt",
+    "words": [
+      "accessibility-alt",
+      "danse",
+      "ballet",
+      "barre",
+      "dance",
+      "dancing"
+    ]
+  },
+  {
+    "name": "running",
+    "words": ["sport", "sports", "course", "running"]
+  },
+  {
+    "name": "swimming",
+    "words": ["natation", "piscine", "swimming", "pool"]
+  },
+  {
+    "name": "shirt",
+    "words": [
+      "shirt",
+      "vêtements",
+      "habillement",
+      "mode",
+      "clothing",
+      "clothes",
+      "fashion"
+    ]
+  },
+  {
+    "name": "handbag",
+    "words": ["handbag", "accessoires", "sacs", "accessories", "bags"]
+  },
+  {
+    "name": "shopping-bag",
+    "words": [
+      "shopping-bag",
+      "magasinage",
+      "achats",
+      "shopping",
+      "purchases",
+      "souvenirs",
+      "boutique",
+      "souvenir"
+    ]
+  },
+  {
+    "name": "store",
+    "words": ["magasin", "boutique", "store", "shop"]
+  },
+  {
+    "name": "package",
+    "words": [
+      "package",
+      "commande en ligne",
+      "amazon",
+      "colis",
+      "online order",
+      "parcel"
+    ]
+  },
+  {
+    "name": "devices",
+    "words": [
+      "devices",
+      "électronique",
+      "appareils",
+      "electronics",
+      "gadgets",
+      "technologie",
+      "techno",
+      "technology",
+      "tech"
+    ]
+  },
+  {
+    "name": "gift",
+    "words": ["cadeau", "cadeaux", "gift", "gifts", "presents"]
+  },
+  {
+    "name": "film",
+    "words": ["cinéma", "film", "films", "movies", "cinema"]
+  },
+  {
+    "name": "ticket",
+    "words": [
+      "ticket",
+      "spectacle",
+      "concert",
+      "billets",
+      "événement",
+      "show",
+      "tickets",
+      "event"
+    ]
+  },
+  {
+    "name": "music-notes",
+    "words": [
+      "music-notes",
+      "piano",
+      "guitare",
+      "violon",
+      "chant",
+      "cours de musique",
+      "instrument",
+      "guitar",
+      "violin",
+      "singing",
+      "music lessons"
+    ]
+  },
+  {
+    "name": "music-note",
+    "words": ["music-note", "musique", "music"]
+  },
+  {
+    "name": "book",
+    "words": [
+      "book",
+      "livres",
+      "librairie",
+      "lecture",
+      "books",
+      "reading",
+      "bookstore"
+    ]
+  },
+  {
+    "name": "gamepad",
+    "words": ["gamepad", "jeux vidéo", "jeux", "video games", "games", "gaming"]
+  },
+  {
+    "name": "bone",
+    "words": ["bone", "gâteries", "os", "treats", "chew"]
+  },
+  {
+    "name": "puzzle",
+    "words": [
+      "puzzle",
+      "jeux de société",
+      "loisirs",
+      "passe-temps",
+      "board games",
+      "hobbies",
+      "leisure"
+    ]
+  },
+  {
+    "name": "dice",
+    "words": [
+      "dice",
+      "dés",
+      "jeux de rôle",
+      "jdr",
+      "donjons et dragons",
+      "dnd",
+      "rpg",
+      "role playing",
+      "tabletop"
+    ]
+  },
+  {
+    "name": "flag",
+    "words": [
+      "flag",
+      "activités",
+      "activité",
+      "excursion",
+      "activities",
+      "activity"
+    ]
+  },
+  {
+    "name": "map",
+    "words": [
+      "map",
+      "itinéraire",
+      "visite",
+      "visites",
+      "tourisme",
+      "sightseeing",
+      "tour",
+      "guide"
+    ]
+  },
+  {
+    "name": "component",
+    "words": [
+      "component",
+      "vitrail",
+      "vitraux",
+      "verre",
+      "mosaïque",
+      "stained glass",
+      "glass",
+      "mosaic"
+    ]
+  },
+  {
+    "name": "palette",
+    "words": ["palette", "art", "arts", "artisanat", "crafts"]
+  },
+  {
+    "name": "camera",
+    "words": ["camera", "photo", "photographie", "photography"]
+  },
+  {
+    "name": "image",
+    "words": ["image", "musée", "exposition", "museum", "exhibition"]
+  },
+  {
+    "name": "trophy",
+    "words": ["trophy", "compétition", "tournoi", "competition", "tournament"]
+  },
+  {
+    "name": "users",
+    "words": ["users", "famille", "family"]
+  },
+  {
+    "name": "user",
+    "words": ["user", "personnel", "personal", "me"]
+  },
+  {
+    "name": "backpack",
+    "words": [
+      "backpack",
+      "école",
+      "fournitures scolaires",
+      "school",
+      "school supplies",
+      "matériel scolaire"
+    ]
+  },
+  {
+    "name": "graduation-cap",
+    "words": [
+      "graduation-cap",
+      "éducation",
+      "études",
+      "université",
+      "cours",
+      "formation",
+      "education",
+      "tuition",
+      "university",
+      "courses"
+    ]
+  },
+  {
+    "name": "rabbit",
+    "words": [
+      "rabbit",
+      "enfants",
+      "garderie",
+      "jouets",
+      "kids",
+      "children",
+      "daycare",
+      "toys"
+    ]
+  },
+  {
+    "name": "paw",
+    "words": ["paw", "animaux", "animal", "vétérinaire", "pets", "pet", "vet"]
+  },
+  {
+    "name": "dog",
+    "words": ["chien", "dog"]
+  },
+  {
+    "name": "cat",
+    "words": ["chat", "cat"]
+  },
+  {
+    "name": "hand-coins",
+    "words": [
+      "hand-coins",
+      "don",
+      "dons",
+      "charité",
+      "bienfaisance",
+      "donation",
+      "donations",
+      "charity"
+    ]
+  },
+  {
+    "name": "handshake",
+    "words": [
+      "handshake",
+      "service",
+      "services",
+      "professionnel",
+      "professional"
+    ]
+  },
+  {
+    "name": "heart",
+    "words": [
+      "heart",
+      "couple",
+      "amour",
+      "love",
+      "date",
+      "dates",
+      "rendez-vous galant",
+      "dating"
+    ]
+  },
+  {
+    "name": "percent",
+    "words": ["percent", "intérêts", "interest"]
+  },
+  {
+    "name": "invoice",
+    "words": [
+      "invoice",
+      "facture",
+      "factures",
+      "impôts",
+      "retour d'impôt",
+      "remboursement",
+      "taxes",
+      "tax refund",
+      "government",
+      "bill"
+    ]
+  },
+  {
+    "name": "receipt",
+    "words": [
+      "receipt",
+      "frais",
+      "frais bancaires",
+      "fees",
+      "bank fees",
+      "charges"
+    ]
+  },
+  {
+    "name": "scale",
+    "words": [
+      "scale",
+      "impôts",
+      "taxes",
+      "impôt",
+      "tax",
+      "gouvernement",
+      "government"
+    ]
+  },
+  {
+    "name": "gavel",
+    "words": [
+      "gavel",
+      "avocat",
+      "notaire",
+      "juridique",
+      "amendes",
+      "lawyer",
+      "notary",
+      "legal",
+      "fines"
+    ]
+  },
+  {
+    "name": "credit-card",
+    "words": ["credit-card", "carte de crédit", "dette", "credit card", "debt"]
+  },
+  {
+    "name": "calculator",
+    "words": [
+      "calculator",
+      "comptable",
+      "comptabilité",
+      "accountant",
+      "accounting"
+    ]
+  },
+  {
+    "name": "arrow-left-right",
+    "words": ["arrow-left-right", "transfert", "virement", "transfer"]
+  },
+  {
+    "name": "coupon",
+    "words": ["rabais", "remise", "coupon", "discount"]
+  },
+  {
+    "name": "stamp",
+    "words": [
+      "stamp",
+      "permis",
+      "licence",
+      "immatriculation",
+      "permit",
+      "registration"
+    ]
+  },
+  {
+    "name": "briefcase",
+    "words": [
+      "briefcase",
+      "salaire",
+      "paie",
+      "emploi",
+      "travail",
+      "salary",
+      "pay",
+      "paycheque",
+      "job",
+      "work"
+    ]
+  },
+  {
+    "name": "award",
+    "words": [
+      "award",
+      "prime",
+      "bonus",
+      "boni",
+      "récompense",
+      "récompenses",
+      "points",
+      "remise en argent",
+      "rewards",
+      "cashback"
+    ]
+  },
+  {
+    "name": "pencil-ruler",
+    "words": ["pencil-ruler", "pige", "contrat", "freelance", "contract"]
+  },
+  {
+    "name": "building-4",
+    "words": [
+      "building-4",
+      "allocation",
+      "prestation",
+      "gouvernemental",
+      "benefit",
+      "benefits",
+      "gouvernement",
+      "gouvernementaux",
+      "government"
+    ]
+  },
+  {
+    "name": "undo",
+    "words": [
+      "undo",
+      "remboursement",
+      "retour",
+      "refund",
+      "reimbursement",
+      "return"
+    ]
+  },
+  {
+    "name": "banknote",
+    "words": [
+      "banknote",
+      "revenu",
+      "revenus",
+      "argent",
+      "comptant",
+      "income",
+      "cash",
+      "money"
+    ]
+  },
+  {
+    "name": "tag",
+    "words": ["tag", "vente", "ventes", "sale", "sales", "étiquette"]
+  },
+  {
+    "name": "certificate",
+    "words": [
+      "certificate",
+      "certificat",
+      "diplôme",
+      "certification",
+      "diploma"
+    ]
+  },
+  {
+    "name": "piggy-bank",
+    "words": [
+      "piggy-bank",
+      "épargne",
+      "économies",
+      "fonds d'urgence",
+      "urgence",
+      "savings",
+      "emergency fund"
+    ]
+  },
+  {
+    "name": "sunset",
+    "words": [
+      "sunset",
+      "reer",
+      "retraite",
+      "rente",
+      "rrsp",
+      "retirement",
+      "pension"
+    ]
+  },
+  {
+    "name": "trending-up",
+    "words": [
+      "trending-up",
+      "placements",
+      "investissements",
+      "bourse",
+      "actions",
+      "investments",
+      "stocks",
+      "shares"
+    ]
+  },
+  {
+    "name": "vault",
+    "words": ["vault", "reer", "retraite", "rrsp", "retirement", "pension"]
+  },
+  {
+    "name": "wallet",
+    "words": ["celi", "tfsa", "portefeuille", "wallet"]
+  },
+  {
+    "name": "currency-bitcoin",
+    "words": [
+      "currency-bitcoin",
+      "crypto",
+      "bitcoin",
+      "cryptomonnaie",
+      "cryptocurrency"
+    ]
+  },
+  {
+    "name": "coins",
+    "words": ["coins", "dividendes", "dividends"]
+  },
+  {
+    "name": "money-bag",
+    "words": ["money-bag", "fonds", "fund", "funds"]
+  },
+  {
+    "name": "house-plus",
+    "words": [
+      "house-plus",
+      "immobilier",
+      "real estate",
+      "property",
+      "celiapp",
+      "première maison",
+      "fhsa",
+      "first home"
+    ]
+  },
+  {
+    "name": "target",
+    "words": ["target", "objectif", "projet", "goal", "project"]
+  },
+  {
+    "name": "calendar",
+    "words": [
+      "calendar",
+      "annuel",
+      "mensuel",
+      "récurrent",
+      "yearly",
+      "monthly",
+      "recurring"
+    ]
+  },
+  {
+    "name": "star",
+    "words": ["star", "spécial", "special", "extra"]
+  },
+  {
+    "name": "circle-warning",
+    "words": ["circle-warning", "imprévu", "urgence", "unexpected", "emergency"]
+  },
+  {
+    "name": "tags",
+    "words": [
+      "tags",
+      "divers",
+      "autres",
+      "autre",
+      "misc",
+      "miscellaneous",
+      "other"
+    ]
+  }
+]

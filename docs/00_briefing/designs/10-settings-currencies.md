@@ -1,6 +1,7 @@
 # Settings and currencies
 
-**Status:** reviewed 2026-11-03; built 2026-11-03, see Build notes.
+**Status:** reviewed 2026-11-03; built 2026-11-03, see Build notes. Shared rules:
+[02-screens.md](02-screens.md#shared-patterns).
 
 ## Purpose
 
@@ -97,13 +98,14 @@ the transactions list (spec 14).
 
 - **Default currency:** the trash is shown muted; tapping it shows "Choisissez d'abord une
   autre devise par défaut." in a toast.
-- **Used by an open account:** "Retirer" is disabled with the hint "Le compte {name} est en
-  {code}." (the first one, "et 2 autres" if more). Every new transaction on that account is
-  in its currency, so the currency must stay. Closed accounts do not block.
+- **Used by an open account:** the trash is muted; a tap says "Le compte {name} est en
+  {code}." in a toast (the first one, "et 2 autres" if more). Every new transaction on
+  that account is in its currency, so the currency must stay. Archived accounts do not
+  block.
 - **Not used anywhere:** "Retirer {code}" in the shared confirmation (`ConfirmDialog`),
   without "Cette action est irréversible." since a removed currency can come back.
 - **Used by transactions:** a confirmation names the count: "12 transactions sont en EUR.
-  Elles gardent leur devise ; EUR disparaît seulement des listes de choix." Buttons
+  Elles gardent leur devise; EUR disparaît seulement des listes de choix." Buttons
   "Retirer" and "Annuler".
 - Removing never changes a transaction or an account. It only takes the currency out of
   pickers and out of the display currency switcher.
@@ -156,7 +158,7 @@ the transactions list (spec 14).
 | Remove | Retirer |
 | Default cannot be removed | Choisissez d'abord une autre devise par défaut. |
 | Used by an open account | Le compte {name} est en {code}. / Le compte {name} et {n} autres sont en {code}. |
-| Remove confirmation | {count} transactions sont en {code}. Elles gardent leur devise ; {code} disparaît seulement des listes de choix. |
+| Remove confirmation | {count} transactions sont en {code}. Elles gardent leur devise; {code} disparaît seulement des listes de choix. |
 | HexaRate down | La validation des taux est indisponible. Réessayez dans un moment. |
 | Rates start later | Taux disponibles à partir du {date} |
 | Save failed | La modification n'a pas été enregistrée. |
@@ -169,8 +171,6 @@ What the build does differently or adds, for review:
   (`getMyCurrencies`), so the server already renders the right currency first. The cookie
   would be a second copy to keep in step. Add it back if a screen ever needs the currency
   before the profile can be read.
-- **Open accounts block removal** (built with spec 11): the trash is muted and tapping it
-  shows "Le compte {name} est en {code}." in a toast.
 - **Not yet:** the transaction count in the confirmation, which needs the transactions
   table (spec 14).
 - **Favourite, default and remove** show at once and stay shown until the saved data comes

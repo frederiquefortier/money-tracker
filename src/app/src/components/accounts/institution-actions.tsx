@@ -28,16 +28,14 @@ export function InstitutionActions({
     <div className="flex items-center">
       <IconLink
         icon="pencil"
-        label={t('accounts.editInstitution', { name })}
+        label={t('common.editName', { name })}
         to="/settings/accounts/institutions/$institutionId"
         params={{ institutionId: id }}
       />
       <IconButton
-        icon="trash"
+        icon="trash-full"
         label={
-          inUse
-            ? t('institutions.inUse')
-            : t('institutions.deleteConfirm', { name })
+          inUse ? t('institutions.inUse') : t('common.deleteName', { name })
         }
         muted={inUse}
         onClick={() =>
@@ -46,8 +44,8 @@ export function InstitutionActions({
       />
       <ConfirmDialog
         open={confirming}
-        title={t('institutions.deleteConfirm', { name })}
-        confirmLabel={t('institutions.delete')}
+        title={t('common.deleteName', { name })}
+        confirmLabel={t('common.delete')}
         busy={busy}
         onCancel={() => setConfirming(false)}
         onConfirm={() =>

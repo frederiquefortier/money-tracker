@@ -1,181 +1,203 @@
 # Categories
 
-**Status:** reviewed 2026-11-03.
+**Status:** reviewed 2026-11-03; built 2026-11-03. Shared rules:
+[02-screens.md](02-screens.md#shared-patterns).
 
 ## Purpose
 
 The category tree is how spending gets read: the dashboard, budgets and the yearly review
 all group by it. This spec covers the Catégories screen (the tree and its archive), the
-category form with its icon and colour, and the category picker every transaction form
-uses. Reached from Réglages.
+category form with its icon and colour. The category picker the transaction form uses is
+spec 15. Reached from Réglages.
 
 ## Requirements
 
-CAT-01, 02, 03, 04, 05, 06, 07. CAT-08 (emergency fund exclusion) is phase 2.
+CAT-01, 02, 03, 05, 06 (the star), 07, 09. CAT-04 and the picker side of CAT-06 are spec 15.
+CAT-08 (emergency fund exclusion) is phase 2.
 
 ## Catégories
 
 ```
-┌──────────────────────────────┐
-│ ‹ Réglages                   │
-│ CATÉGORIES                   │
-│ [Dépenses][Revenus][Placements]│
-│ ┌──────────────────────────┐ │
-│ │ (◉) Alimentation       ▾ │ │
-│ │    (◉) Épicerie          │ │
-│ │    (◉) Restaurants     ★ │ │
-│ │ (◉) Logement           ▸ │ │
-│ │ (◉) Transport          ▸ │ │
-│ └──────────────────────────┘ │
-│ ▸ Archivées (3)              │
-│ [ + Ajouter une catégorie ]  │
-└──────────────────────────────┘
+┌──────────────────────────────────┐
+│ ← Réglages                       │
+│ CATÉGORIES [⇕][Trier▾][+ Ajouter]│
+│ [Dépenses][Revenus][Placements]  │
+│ ┌──────────────────────────────┐ │
+│ │ ▾ (◉) Alimentation  + ☆ ▣ 🗑 │ │
+│ │ ├──── (◉) Épicerie  + ☆ ▣ 🗑 │ │
+│ │ └──── (◉) Restaurants + ★ ▣ 🗑│ │
+│ │ ▸ (◉) Logement      + ☆ ▣ 🗑 │ │
+│ │   (◉) Loisirs       + ☆ ▣ 🗑 │ │
+│ └──────────────────────────────┘ │
+│ ▸ Catégories archivées (3)       │
+└──────────────────────────────────┘
 ```
 
 ### The tree (CAT-01, 02)
 
 - Three tabs, one per kind (CAT-02): Dépenses, Revenus, Placements. Dépenses is open by
   default. The tab is remembered per browser.
-- One row per category: its icon in a filled circle of its colour, the name, a star when
-  favourite, and a chevron when it has children. Children are indented one step per level,
-  with no depth limit (CAT-01).
-- Alphabetical at every level.
-- Tapping a row opens its form; the chevron expands or collapses. Expanded parents are
-  remembered per browser.
+- The add button sits beside the title, as on Comptes and Devises; it opens the form with
+  the open tab's type.
+- **Tout déplier / Tout replier** (CAT-09, `ExpandAllButton`), an icon button beside the
+  title, opens every branch in every tab, or closes them all once all are open.
+- One row per category: its icon in a filled circle of its colour, then the name.
+  Children are indented one step per level, with no depth limit (CAT-01).
+- **Trier** (CAT-09), the shared `SortMenu` beside the title (an outline button with a
+  chevron, like a select): Nom (alphabetical at every
+  level, the default) or Couleur (rainbow order from red at every level, greys last).
+  Kept per browser. Sibling colours are always worked out in alphabetical order, so
+  sorting never recolours a branch.
+- **Every row opens its form on tap**, with or without children, like an account row.
+- **A category with children** has a chevron before its icon (a leaf has the same space
+  empty, so names line up). The chevron alone opens or closes the branch; expanded
+  parents are remembered per browser.
+- **Connectors**, as in a tree diagram: each child is joined to its parent by an elbow, a
+  line down from the parent's chevron, then across to the child's chevron (or its icon
+  when it has no children). The line continues to the next sibling and stops at the last
+  one. Drawn in the plum of the linked-field line.
+- **Row actions** (the sheet only edits), as icons in the fixed slot at the end of every
+  row: add a sub-category, the favourite star (CAT-06, changes in place, the only place
+  it is set here), archive, and trash.
+  - **Add** (the +) opens the form with this category as the parent, so a child is added
+    where it goes without scrolling back to the top. The branch opens, so the new child
+    shows once saved. Archived rows have no +.
+  - **Archive** (CAT-03) asks for a date (default today) in the shared confirmation. From
+    that date the category disappears from pickers; transactions before it keep it.
+    Archiving a parent archives its whole branch from the same date; the confirmation
+    names how many sub-categories go with it.
+  - **Trash** deletes a category with no transactions and no children, confirmed in red.
+    While it has children it is muted, and a tap says why in a toast.
+  - A failed action says so in a toast.
 
 ### Archived (CAT-05)
 
 - Archived categories leave the tree and sit in a collapsed section under it,
-  "Archivées (3)", one line each: icon, full path ("Transport > Taxi"), and "archivée
-  depuis le 3 mars 2024".
-- Tapping one opens its form, where it can be reactivated.
+  "Catégories archivées (3)", like "Comptes archivés": flat and muted, one line each with
+  the icon, the full path ("Transport > Taxi"), then "Archivée le 3 mars 2024" on the
+  right, before the actions.
+- Actions: reactivate (the undo icon, with a date) and trash. A sub-category cannot be
+  reactivated while its parent is archived ("Réactivez d'abord “{parent}”." in a toast).
+- Tapping the row opens its form.
 
 ## Category form
 
 ```
 ┌──────────────────────────────┐
-│ ‹ Annuler  NOUVELLE CATÉGORIE│
-│                  Enregistrer │
-│        ( ◉ )  Modifier       │
-│ Nom          [Restaurants  ] │
+│ NOUVELLE CATÉGORIE         ✕ │
+│ Nom *        [Restaurants  ] │
 │ Type         [Dépense     ▾] │
-│ Parent       [Alimentation▾] │
-│ Couleur  ● ● ● ● ● ● ● ● ● ● │
-│ ☆ Favori                     │
+│ │ Parent     [Alimentation ✕]│
+│ Icône                        │
+│ ( ◉ )✎                       │
+│ Couleur                      │
+│ ● ● ● ● ● ● ● ● ● ●          │
+│ ● ● ● ● ● ● ● ● ● ●          │
+│ ● ● ● ● ● ● ● ● ● ◎          │
 │ ──────────────────────────── │
-│ Archiver à partir du …       │
-│ Historique                   │
-│ Supprimer la catégorie       │
+│ Historique (read-only)       │
+│        Annuler  Enregistrer  │
 └──────────────────────────────┘
 ```
 
-- **Icon** at the top, large, in its colour circle. Tap "Modifier" for the icon picker.
+The form is a route sheet over the tree, like the account form: it only edits, with one
+"Enregistrer" at the bottom. The favourite is the star on the row, not a field.
+
 - **Nom** required, unique among siblings (two "Autres" under different parents is fine).
-- **Type** (CAT-02): expense (default), income, investment. Only top-level categories
-  choose; a sub-category takes its parent's type and the field is read-only.
-- **Parent**: a picker of active categories of the same type, "Aucun (niveau principal)"
-  first. A category cannot be moved under itself or its own children.
+- **Type** (CAT-02), then **Parent** as its sub-field, indented under it with a line down
+  its left side (`LinkedFields`), since the parent is chosen within the type:
+  - Type: expense (default), income, investment. Only top-level categories choose; a
+    sub-category takes its parent's type and the field is read-only.
+  - Parent: the shared combobox, typed and filtered, listing active categories of the
+    type by full path with their icon. Empty means top level; a × empties it, as for the
+    account's institution. A category cannot be moved under itself or its own children.
+- **Icône**, a labelled field like the others: the icon in its colour circle on the left.
+  Tapping the circle opens the icon picker; a pencil appears on it on hover and focus, and
+  always on touch screens. The colour has its own field.
 - **Couleur**: every category has its own, chosen freely (below). A new sub-category
   starts with a variation of its parent's colour; picking one by hand keeps it.
   "Réinitialiser" returns to the variation.
-- **Favori** (CAT-06): a star toggle, the same flag as the star in the picker.
-- **Archiver à partir du [date]** (CAT-03): asks for a date (default today). From that
-  date the category disappears from pickers; transactions before it keep it. Archiving a
-  parent archives its whole branch from the same date; the confirmation names how many
-  sub-categories go with it.
-  An archived category shows **Réactiver à partir du [date]** instead. A sub-category
-  cannot be reactivated while its parent is archived ("Réactivez d'abord {parent}.").
-- **Historique** (CAT-03): a timeline of the archive and reactivation events, newest
-  first: "Archivée le 3 mars 2024", "Réactivée le 1 janvier 2025".
-- **Supprimer la catégorie**: only for a category with no transactions and no children;
-  otherwise hidden, and archiving is the way out.
-- **Enregistrer et ajouter** (new categories only): saves, then opens a fresh form with
-  the same type and parent, for entering a branch one child after another.
+- **Historique** (CAT-03), when the category has one: the archive and reactivation
+  events, newest first, as text: "Archivée le 3 mars 2024", "Réactivée le 1 janvier
+  2025". Archive, reactivate and delete are row actions, never in the sheet.
 
 ### Colours
 
-- **Free choice:** the browser's colour picker (`<input type="color">`, no library), with
-  the twenty swatches below as quick picks above it.
+- **Free choice:** nineteen quick picks (below), and a twentieth circle for any colour:
+  the browser's colour picker (`<input type="color">`, no library). It shows a rainbow
+  until a custom colour is picked, then that colour inside a rainbow ring, selected like
+  the swatches. Its name, "Couleur personnalisée", is for screen readers and the tooltip.
+- **Each top-level category stands apart.** A new one gets the first quick pick no other
+  top-level category of its type uses. In the form, a quick pick already used by another
+  top-level category of the type carries a small dot (and "déjà utilisée" for screen
+  readers); it can still be picked.
 - **Sub-categories start from the parent.** A new sub-category gets a variation of its
-  parent's colour: same hue, lightness stepped by its place among its siblings, so siblings
-  differ. While it is automatic it follows the parent: change the parent's colour and the
-  branch follows. A colour picked by hand stays.
+  parent's colour, by its place among its siblings: candidates one hue step (12°) either
+  way and up to three lightness steps (0.06) around the parent, never the parent itself,
+  and each next sibling as far as possible from the ones before it, so siblings differ.
+  Yellows and oranges are never darkened below 0.75 lightness, where they turn brown, and
+  yellow-greens stay above 0.86, where they would turn olive. Every quick pick gives at
+  least three distinct sibling colours (yellow), most give seven or more, before they
+  repeat. While it is automatic it follows the parent:
+  change the parent's colour and the branch follows. A colour picked by hand stays.
 - **The icon stays readable on any colour.** The app draws the icon white when white
   reaches 3:1 against the circle (WCAG non-text contrast), otherwise a dark shade of the
   same hue. Nobody has to check contrast by hand.
 
-Quick picks, each tested with a white icon at 3.4:1 or more:
+Quick picks: clean, saturated colours built around the five the author chose (ruby,
+yellow, green, royal, purple), with a true pink, deep ones with a white icon and bright
+ones with a dark icon, every pair far enough apart to tell (a test checks it). The grid
+runs in rainbow order. No browns; slate is the one quiet colour, for catch-alls.
 
 | Key | Colour |
 |---|---|
-| red | `oklch(0.62 0.16 25)` |
-| coral | `oklch(0.62 0.16 38)` |
-| orange | `oklch(0.62 0.16 52)` |
-| amber | `oklch(0.62 0.135 70)` |
-| gold | `oklch(0.62 0.125 88)` |
-| olive | `oklch(0.62 0.135 110)` |
-| lime | `oklch(0.62 0.16 130)` |
-| green | `oklch(0.62 0.16 148)` |
-| emerald | `oklch(0.62 0.13 165)` |
-| teal | `oklch(0.62 0.105 185)` |
-| cyan | `oklch(0.62 0.105 208)` |
-| sky | `oklch(0.62 0.12 230)` |
-| blue | `oklch(0.62 0.16 255)` |
-| indigo | `oklch(0.62 0.16 275)` |
-| violet | `oklch(0.62 0.16 295)` |
-| purple | `oklch(0.62 0.16 312)` |
-| fuchsia | `oklch(0.62 0.16 330)` |
-| pink | `oklch(0.62 0.16 350)` |
-| rose | `oklch(0.62 0.16 8)` |
-| slate | `oklch(0.62 0.03 250)` |
+| ruby | `#c30839` |
+| burgundy | `#850e2c` |
+| coral | `#f45340` |
+| tangerine | `#fe7802` |
+| amber | `#fea91e` |
+| yellow | `#ffcc00` |
+| lime | `#8bd737` |
+| green | `#218b30` |
+| forest | `#095c34` |
+| aqua | `#1ed1cd` |
+| cyan | `#11a7d7` |
+| royal | `#0754c6` |
+| navy | `#132e7f` |
+| indigo | `#5828c4` |
+| purple | `#8d35c0` |
+| lavender | `#bf89ec` |
+| plum | `#6b2470` |
+| pink | `#f83599` |
+| slate | `#5a6a80` |
+
+**Colour by theme.** Top-level colours follow meaning around the wheel, so related
+categories sit next to each other and a colour sort reads as a rainbow: the body (health
+red, sport coral), food tangerine, family and community (Communauté yellow, holding
+gifts and donations, then pets lime), the home (housing green, education forest),
+getting around (transport cyan, travel royal), admin and tech (bank fees navy,
+electronics indigo), then free time and appearance (hobbies lavender, outings purple,
+clothes plum, beauty pink), and slate for everything else. Income and investments reuse the same meanings where they apply (government navy).
 
 ## Icon picker (CAT-07)
 
 - A sheet with a search field and a grid of icons, each in the category's colour circle.
-- The set is a curated subset of about 120 coolicons (ADR-020), vendored like the app's
+- The set is a curated subset of about 150 coolicons (ADR-020), vendored like the app's
   icons. Each icon carries search words in French and English ("panier, épicerie,
-  groceries, cart"). The assistant drafts the list; the author reviews it before the build.
+  groceries, cart"), always including the icon's own name. The assistant drafts the list;
+  the author reviews it before the build.
 - **Suggested from the name:** while the name is typed, the first icon whose words match
-  is used, marked "Suggérée" in the picker. Once the user picks an icon by hand, the name
-  no longer changes it. "Réinitialiser" goes back to the suggestion.
+  is used, marked "Suggérée" in the picker. A whole word of the name (or its plural) wins
+  over a word the name only begins, so "Transport" finds the car before "transport en
+  commun" finds the bus. Once the user picks an icon by hand, the name
+  no longer changes it. Picking the "Suggérée" icon hands the icon back to the name.
 - No match: a neutral default (`tag`).
-
-## Category picker (CAT-04, 06)
-
-Used by the transaction form (spec 15), the merchant form and the parent field above.
-
-```
-┌──────────────────────────────┐
-│ [Rechercher une catégorie  ] │
-│ FAVORIS                      │
-│ (◉) Alimentation > Restaurants ★│
-│ (◉) Transport > Essence      ★│
-│ DÉPENSES                     │
-│ (◉) Alimentation             │
-│    (◉) Épicerie            ☆ │
-│ (◉) Logement                 │
-│ REVENUS                      │
-│ (◉) Salaire                ☆ │
-└──────────────────────────────┘
-```
-
-- **Favoris** first (CAT-06), each as "Parent > Enfant", with a filled star. They are not
-  repeated in the tree below.
-- Then the tree, grouped by type, the transaction's own type first.
-- A star on every row toggles favourite in place (CAT-06); the row moves to or from
-  Favoris after the picker closes, so it does not jump under the finger.
-- **Search** matches any part of the path; results show the full path, flat.
-- **Archived categories never appear** (CAT-04), as of the transaction's date: a category
-  archived in March still appears for a February transaction.
-- **Editing an old transaction** whose category is archived: the field shows it with an
-  "Archivée" badge, and the picker opens without it, so it can be changed (CAT-04).
-- Parents are selectable too: spending can sit on "Alimentation" itself.
 
 ## States
 
 - **No category yet:** "Aucune catégorie pour l'instant." and the add button. First run
   (spec 17) is where the first ones are created.
-- **Save fails:** values kept, error at the top (SET-07).
+- **Save fails:** values kept, the error above the sheet's buttons (SET-07).
 
 ## Data
 
@@ -196,19 +218,20 @@ Used by the transaction form (spec 15), the merchant form and the parent field a
 |---|---|
 | Screen title | Catégories |
 | Tabs | Dépenses, Revenus, Placements |
-| Archived section | Archivées ({count}) |
-| Archived since | archivée depuis le {date} |
+| Archived section | Catégories archivées ({count}) |
+| Archived on | Archivée le {date} |
 | Empty | Aucune catégorie pour l'instant. |
-| Add | Ajouter une catégorie, Enregistrer et ajouter |
+| Add | Ajouter une catégorie |
 | Form titles | Nouvelle catégorie, Modifier la catégorie |
-| Fields | Nom, Type, Parent, Couleur, Favori |
-| Colour | Couleur personnalisée, Réinitialiser |
+| Fields | Nom, Type, Parent, Icône, Couleur |
+| Colour | Couleur personnalisée (the custom circle's accessible name), Couleur {n}, déjà utilisée |
+| Expand | Tout déplier, Tout replier |
+| Sort | Trier: {sort}; Nom, Couleur |
 | Types | Dépense, Revenu, Placement |
-| No parent | Aucun (niveau principal) |
-| Archive | Archiver à partir du {date}, Réactiver à partir du {date} |
+| Clear parent | Retirer le parent |
+| Archive | À partir du (the verbs are the shared ones) |
 | Archive branch | {count} sous-catégories seront archivées aussi. |
-| Parent archived | Réactivez d'abord {parent}. |
+| Parent archived | Réactivez d'abord “{parent}”. |
+| Has children | Cette catégorie a des sous-catégories. |
 | History | Historique, Archivée le {date}, Réactivée le {date} |
-| Delete | Supprimer la catégorie |
-| Icon picker | Choisir une icône, Rechercher une icône, Suggérée, Réinitialiser |
-| Picker | Rechercher une catégorie, Favoris, Archivée |
+| Icon picker | Choisir une icône, Rechercher une icône, Suggérée |

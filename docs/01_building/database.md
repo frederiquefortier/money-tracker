@@ -79,14 +79,21 @@ per ADR-008. User-owned rows (categories, merchants, notes) store one string, as
 
 | Table | Columns | Req |
 |---|---|---|
-| `categories` | `parent_id` (nullable, self), `name`, `kind` (`expense`/`income`/`investment`), `icon` (a coolicons name, ADR-020), `icon_is_auto`, `color` (hex `#rrggbb`, free choice; a sub-category starts from a variation of its parent's), `color_is_auto` (designs/12-categories.md), `is_favourite`, `exclude_from_emergency_fund` | CAT-01, 02, 06, 07, 08 |
-| `category_status_events` | `category_id`, `status` (`archived`/`active`), `effective_on` | CAT-03. Append-only. |
-| view `category_active_periods` | `category_id`, `active_from`, `active_to` | Derived from the events. Pickers (CAT-04) and charts (DSH-03) both read this, so they never disagree. |
+| `categories` | `parent_id` (nullable, self, composite FK with `user_id`), `name`, `kind` (`expense`/`income`/`investment`), `icon` (a coolicons name, ADR-020, default `tag`), `icon_is_auto`, `color` (hex `#rrggbb`, free choice; a sub-category starts from a variation of its parent's), `color_is_auto` (designs/12-categories.md), `is_favourite` | CAT-01, 02, 06, 07. Names unique among siblings of the same kind, ignoring case; top-level categories count as siblings. Deleting one with children fails on the foreign key. `exclude_from_emergency_fund` comes with CAT-08 (phase 2). |
+| `category_status_events` | `category_id`, `status` (`archived`/`active`), `effective_on` | CAT-03. Append-only: insert and select grants only. A category with no events is active; a trigger makes events alternate starting with an archive, refuses a date before the previous event, and refuses reactivating a sub-category whose parent is archived. Deleted with its category. |
+| view `category_active_periods` | `category_id`, `active_from`, `active_to` | Periods `[active_from, active_to)`, null bounds open; one open period when there is no history. Pickers (CAT-04) and charts (DSH-03) both read this, so they never disagree. |
 
-A trigger on `parent_id` rejects cycles (no depth limit, but no loops) and requires a
-sub-category to have its parent's `kind`. Category kind does not constrain transaction kind:
-a refund is an `income` transaction on an `expense` category, and it reduces that
-category's spending.
+A trigger on `parent_id` and `kind` rejects cycles (no depth limit, but no loops) and
+requires a sub-category to have its parent's `kind`; changing a top-level category's kind
+carries its branch along. Category kind does not constrain transaction kind: a refund is an
+`income` transaction on an `expense` category, and it reduces that category's spending.
+
+Functions: `category_status(id)` gives the status after all events.
+`archive_category(id, from)` archives a category and every active category in its branch
+from the same date, and returns how many sub-categories went with it (ADR-012).
+Reactivating is a single insert into `category_status_events`.
+`recolor_categories(colors)` writes the automatic colours the server computed for a
+branch, in one statement; a colour picked by hand is never touched (ADR-012).
 
 ### Merchants
 

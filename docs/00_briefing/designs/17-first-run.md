@@ -1,6 +1,7 @@
 # First run
 
-**Status:** reviewed 2026-11-03.
+**Status:** reviewed 2026-11-03; aligned with the built screens 2026-11-03. Shared rules:
+[02-screens.md](02-screens.md#shared-patterns).
 
 ## Purpose
 
@@ -46,27 +47,26 @@ category form (spec 12).
 
 ### 2. Devises
 
-- The currency list from spec 10, in the card: the five defaults (CUR-01), stars for
-  favourites, "Ajouter une devise", and a radio for the default currency (CUR-05),
-  prefilled with CAD.
+- The Devises list from spec 10, as built: the five defaults (CUR-01), the star, house
+  and trash on each row, "Ajouter une devise" beside the step title. CAD starts as the
+  default (CUR-05).
 - The display currency starts as the default currency.
 
 ### 3. Comptes
 
 - The accounts added so far, grouped by institution as in spec 11 (without totals), and
-  "Ajouter un compte", which opens the account form (spec 11) over the step.
-- After each save the step lists the new account and "Ajouter un compte" stays in reach
-  for the next one. The account form has a single "Enregistrer" (spec 11, decided
-  2026-11-03).
+  the "Ajouter" menu beside the step title, which opens the account or institution sheet
+  over the step.
+- After each save the sheet closes, the step lists the new account and "Ajouter" is in
+  reach for the next one.
 - "Continuer" once at least one account exists; otherwise "Je les créerai plus tard".
 
 ### 4. Catégories
 
-- The category tree as in spec 12 (the three type tabs, icons and colours), and "Ajouter
-  une catégorie", which opens the category form (spec 12) over the step.
-- The form's "Enregistrer et ajouter" saves and opens a fresh form with the same type and
-  parent, so a branch is entered one child after another. The parent field shows the last
-  parent used; "Aucun (niveau principal)" starts a new branch.
+- The category tree as in spec 12 (the three type tabs, icons and colours, the row
+  actions), and "Ajouter une catégorie" beside the step title, which opens the category
+  sheet over the step with the open tab's type.
+- A branch is entered one child at a time: the parent is typed into the Parent field.
 - No starter set (SET-01).
 - "Terminer" once at least one category exists; otherwise "Je les créerai plus tard".
 
@@ -77,7 +77,8 @@ category form (spec 12).
 
 ## States
 
-- **Save fails** on a step: the step stays, values kept, error at the top.
+- **Save fails** in a sheet: values kept, the error above the sheet's buttons. A failed
+  step saves (language, currencies) say so in a toast.
 - **Coming back** to a step already done shows what exists, editable, with the same add
   buttons.
 
@@ -94,9 +95,6 @@ category form (spec 12).
 | Key | Français |
 |---|---|
 | Progress | Étape {n} sur {total} |
-| Buttons | Continuer, Retour, Terminer, Enregistrer et ajouter |
+| Buttons | Continuer, Retour, Terminer |
 | Steps | Langue, Devises, Comptes, Catégories |
-| Currencies hint | Choisissez la devise par défaut et vos favorites. |
-| Accounts hint | Ajoutez les comptes que vous suivez. Les autres pourront venir de l'import. |
-| Categories hint | Construisez votre arbre de catégories. |
 | Skip | Je les créerai plus tard |

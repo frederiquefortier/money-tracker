@@ -39,6 +39,8 @@ Replace daily use of the spreadsheet.
 
 **Status (2026-11-03):** currencies, the rates job and the Réglages and Devises screens
 (spec 10), then institutions and accounts (spec 11) are built and tried in local dev.
+Categories (spec 12) are built: the tree, the form, the icon picker and the category
+picker, not yet tried in a browser.
 
 - Currencies, HexaRate validation, the Frankfurter rates job with a backfill to 2018,
   converted-amount markers. CUR-01..09 (ADR-009).
@@ -49,7 +51,7 @@ Replace daily use of the spreadsheet.
   [00-layout-reference.md](../00_briefing/designs/00-layout-reference.md) (TravelSpend patterns); the look
   follows [01-visual-direction.md](../00_briefing/designs/01-visual-direction.md).
 - Institutions and accounts. ACC-01..07.
-- Categories with archive history, favourites, coolicons icons. CAT-01..07.
+- Categories with archive history, favourites, coolicons icons, sort and expand all. CAT-01..07, 09.
 - Merchants with default category, and merging. MER-01, 05.
 - Transactions: expense, income, adjustment, transfer with fee (including between
   currencies), splits, status, notes. TRX-01..06, 09..11. Multi-row writes as SQL functions

@@ -1,4 +1,6 @@
 // French is the source language (ADR-008). en.ts is typed against this shape.
+import { categoriesFr } from './fr-categories'
+
 export const fr = {
   app: {
     name: 'Money Tracker',
@@ -18,6 +20,20 @@ export const fr = {
     loading: 'Chargement…',
     clear: 'Effacer',
     irreversible: 'Cette action est irréversible.',
+    add: 'Ajouter',
+    edit: 'Modifier',
+    editName: 'Modifier “{{name}}”',
+    reset: 'Réinitialiser',
+    remove: 'Retirer',
+    archive: 'Archiver',
+    archiveName: 'Archiver “{{name}}”',
+    reactivate: 'Réactiver',
+    reactivateName: 'Réactiver “{{name}}”',
+    delete: 'Supprimer',
+    deleteName: 'Supprimer “{{name}}”',
+    expandAll: 'Tout déplier',
+    collapseAll: 'Tout replier',
+    sortLabel: 'Trier: {{sort}}',
   },
   displayCurrency: {
     label: 'Devise d’affichage: {{code}}',
@@ -107,6 +123,7 @@ export const fr = {
   settings: {
     title: 'Réglages',
     accounts: 'Comptes',
+    categories: 'Catégories',
     currencies: 'Devises',
     back: 'Réglages',
   },
@@ -119,7 +136,6 @@ export const fr = {
     title: 'Comptes',
     empty: 'Aucun compte pour l’instant.',
     noInstitution: 'Sans institution',
-    sortLabel: 'Trier: {{sort}}',
     sort: {
       name: 'Nom',
       type: 'Type',
@@ -128,7 +144,6 @@ export const fr = {
       balanceDesc: 'Solde décroissant',
     },
     website: 'Site web de {{name}}',
-    editInstitution: 'Modifier “{{name}}”',
     addMenu: 'Ajouter',
     addAccount: 'Un compte',
     addInstitution: 'Une institution',
@@ -149,15 +164,10 @@ export const fr = {
     openingBalance: 'Solde à l’ouverture',
     openedOn: 'Date d’ouverture',
     hideFromNew: 'Masquer des nouvelles transactions',
-    close: 'Archiver',
-    closeName: 'Archiver “{{name}}”',
-    reopenName: 'Rouvrir “{{name}}”',
     closedOnField: 'Date d’archivage',
-    delete: 'Supprimer le compte',
-    deleteConfirm: 'Supprimer “{{name}}”',
     createInstitution: 'Créer « {{text}} »',
     currencyRemoved:
-      'Ajoutez d’abord {{code}} à vos devises pour rouvrir ce compte.',
+      'Ajoutez d’abord {{code}} à vos devises pour réactiver ce compte.',
   },
   institutions: {
     newTitle: 'Nouvelle institution',
@@ -165,17 +175,15 @@ export const fr = {
     name: 'Nom',
     website: 'Site web',
     saved: 'Institution enregistrée.',
-    delete: 'Supprimer l’institution',
-    deleteConfirm: 'Supprimer “{{name}}”',
     inUse: 'Des comptes utilisent encore cette institution.',
   },
+  categories: categoriesFr,
   currencies: {
     title: 'Devises',
     defaultBadge: 'Par défaut',
     add: 'Ajouter une devise',
     makeDefaultFor: 'Utiliser {{code}} par défaut',
     isDefault: '{{code}} est la devise par défaut',
-    remove: 'Retirer',
     removeCode: 'Retirer {{code}}',
     defaultCannotBeRemoved: 'Choisissez d’abord une autre devise par défaut.',
     usedByAccount_zero: 'Le compte {{name}} est en {{code}}.',
@@ -192,7 +200,6 @@ export const fr = {
       'Taux disponibles après la prochaine mise à jour quotidienne.',
     removeConfirm: 'Retirer {{code}}',
     currency: 'Devise',
-    addShort: 'Ajouter',
     added: '{{code}} ajoutée.',
   },
 }
