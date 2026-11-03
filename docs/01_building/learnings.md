@@ -4,6 +4,38 @@ Document new concepts, techniques, and knowledge gained. Reference this file to 
 
 <!-- Newest first: a new entry goes directly below this line. Template at the bottom. -->
 
+### 2026-11-03 - How Frankfurter and HexaRate answer
+
+**What Was New:**
+- The two rate providers behind ADR-009, probed while writing the rates job.
+
+**Key Points:**
+- Frankfurter (`api.frankfurter.dev/v1`) returns daily EUR rates for any range in one
+  call: 2018 to today is about 2,260 days and 1.1 MB, not thinned out to weeks.
+- A range answer starts on the last business day before the start date (`2018-01-01..`
+  begins on 2017-12-29), so the job drops days before the date it asked for.
+- A start date after the last published day answers 404 `{"message":"not found"}`. For a
+  daily job that is the normal "nothing new yet", not an error.
+- Frankfurter now covers more than the ECB's list in older years (ARS, DZD, MAD in 2018);
+  the set on the latest day is what is still published.
+- HexaRate (`/api/rates/latest/EUR?target=XOF`) answers `mid`, `unit` and a `timestamp`;
+  an unknown code is a 422 with `INVALID_CURRENCY`. That 422 is how CUR-02 tells "not a
+  currency" from "provider down".
+- Node's `Intl.supportedValuesOf('currency')` gives 162 codes in current use, and
+  `Intl.DisplayNames` names them in French and English: enough to build the `currencies`
+  table without a third-party list.
+
+**Sources:**
+- frankfurter.dev documentation
+- hexarate.paikama.co
+- MDN, "Intl.supportedValuesOf()" and "Intl.DisplayNames"
+
+**Where to Learn More:**
+- ECB, "Euro foreign exchange reference rates" (publication time and holidays)
+
+**Applied In:**
+- `src/app/src/lib/rates.ts`, `src/app/netlify/functions/rates.ts`, the currencies migration.
+
 ### 2026-11-02 - Sec-Fetch-Site, and what SameSite=lax leaves open
 
 **What Was New:**

@@ -6,7 +6,7 @@ history come in through the in-app import ([import.md](../../../docs/01_building
 
 | File | Loaded into | Used for |
 |---|---|---|
-| `currencies-default.csv` | `user_currencies` on sign-up | The five starting currencies (CUR-01) |
+| `currencies-default.csv` | Nothing; the sign-up trigger lists the same five codes | The five starting currencies (CUR-01). Keep in step with `handle_new_user`. |
 | `account-types.csv` | `account_types` | ACC-01 |
 | `holding-types.csv` | `holding_types` | NW-01 and the region packs (LOC-02). `country` empty means any. |
 | `import-templates/` | Offered for download in the app | The v1 import format with invented rows (IMP-01) |

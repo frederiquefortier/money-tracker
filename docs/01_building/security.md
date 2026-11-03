@@ -48,7 +48,7 @@ encrypted dump is the only backup.
    that a second user sees zero rows.
 8. **Least-privilege grants.** `anon` has nothing; `authenticated` never holds `TRUNCATE`
    (it skips RLS), `REFERENCES` or `TRIGGER`. A partly writable table grants `update` per
-   column (`profiles`: `locale`).
+   column (`profiles`: `locale`, `default_currency`, `display_currency`).
 
 ### App and server
 

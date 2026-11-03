@@ -1,7 +1,7 @@
 # Database
 
-The schema, updated with every migration. Only `profiles` exists so far; the rest is the
-design. IDs refer to [requirements.md](../00_briefing/requirements.md).
+The schema, updated with every migration. `profiles`, `currencies`, `exchange_rates` and
+`user_currencies` exist so far; the rest is the design. IDs refer to [requirements.md](../00_briefing/requirements.md).
 
 ## Conventions
 
@@ -19,7 +19,8 @@ and the RLS policies from [security.md](security.md#database). Foreign keys to o
 tables are composite: `foreign key (user_id, account_id) references accounts (user_id, id)`.
 
 Grants follow [security.md](security.md#database), rule 8. `profiles` grants `select` and
-`update (locale)`: a new user-editable profile column joins that grant in its migration.
+`update (locale, default_currency, display_currency)`: a new user-editable profile column
+joins that grant in its migration.
 
 Soft states are dates, not booleans, wherever the date matters: `closed_on`, `archived_at`,
 `ends_on`. History that the user can view is its own table of events, never an overwritten
@@ -46,16 +47,17 @@ column.
 
 | Table | Columns | Notes |
 |---|---|---|
-| `currencies` | `code`, `name_fr`, `name_en`, `symbol`, `minor_units` | ISO 4217 list, loaded by a migration. CUR-02 validates against HexaRate before a user can add one. |
-| `exchange_rates` | `base`, `quote`, `rate_date`, `rate`, `source` (`frankfurter`/`hexarate`) | Unique on (`base`, `quote`, `rate_date`). Backfilled to 2018 and filled daily (ADR-009). One base (EUR, the ECB's) is enough; cross rates are computed. |
+| `currencies` | `code`, `name_fr`, `name_en`, `symbol`, `minor_units` | The 162 currencies in current use per ICU (Node 24 `Intl`), loaded by a migration. CUR-02 validates against HexaRate before a user can add one. |
+| `exchange_rates` | `base`, `quote`, `rate_date`, `rate`, `source` (`frankfurter`/`hexarate`) | Primary key (`base`, `quote`, `rate_date`). `base` is always EUR (a check), the ECB's; cross rates are computed. Backfilled to 2018 and filled daily by the rates job (ADR-009). |
+| function `exchange_rate(from, to, on_date)` | | Units of `to` for one `from`. Each leg takes the last rate on or before the date, so weekends and holidays use the previous business day. 1 for the same currency; null when a leg has no rate yet, never zero (ADR-004). |
 | `account_types`, `holding_types` | `code`, `country`, `kind`, `label_fr`, `label_en` | Region pack data (LOC-02). CSVs in `src/data/reference/`. |
 
 ### Profile and currencies
 
 | Table | Columns | Req |
 |---|---|---|
-| `profiles` | `user_id` (PK), `locale` (`fr` or `en`, ADR-019), `default_currency`, `display_currency`, `transfer_fee_category_id`, `birth_date`, `home_country`, `show_budget_tooltips` | SET, CUR-05/06, BUD-06, TRX-04 |
-| `user_currencies` | `code`, `is_favourite`, `removed_at` | CUR-01..04. Five rows inserted by a trigger on sign-up. Removing sets `removed_at`, so adding back skips the HexaRate check. Listed alphabetically; the default is `profiles.default_currency`. |
+| `profiles` | `user_id` (PK), `locale` (`fr` or `en`, ADR-019), `default_currency`, `display_currency` (both CAD on sign-up, composite FKs to `user_currencies`), `transfer_fee_category_id`, `birth_date`, `home_country`, `show_budget_tooltips` | SET, CUR-05/06, BUD-06, TRX-04 |
+| `user_currencies` | `code`, `is_favourite`, `removed_at` | CUR-01..04. Unique (`user_id`, `code`). Five rows inserted by the sign-up trigger. Removing sets `removed_at`, so adding back skips the HexaRate check; there is no delete grant. Triggers refuse removing the default, move the display currency to the default when it is removed, and keep both profile currencies pointing at active rows. Open accounts will block removal once `accounts` exists. |
 
 Labels in reference tables come in pairs (`label_fr`, `label_en`; `name_fr`, `name_en`)
 per ADR-008. User-owned rows (categories, merchants, notes) store one string, as typed.

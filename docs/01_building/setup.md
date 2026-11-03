@@ -122,13 +122,19 @@ into two apps (phone and password manager) and enter the code.
 2. **Base directory**: `src/app`. Build command and publish directory come from
    `netlify.toml` (`npm run build`, `dist/client`).
 3. **Environment variables**, before the first deploy: `SUPABASE_URL` and
-   `SUPABASE_PUBLISHABLE_KEY`, same values as `.env.local`, available to Functions.
+   `SUPABASE_PUBLISHABLE_KEY`, same values as `.env.local`, available to Functions. Then
+   `SUPABASE_SECRET_KEY` (Project Settings, API Keys, a **secret** key, `sb_secret_…`),
+   scoped to **Functions only**: the rates job reads it, the app never does.
 4. Deploy. The site gets an address like `https://<name>.netlify.app`.
 5. **Deploy previews off** (ADR-017): Project configuration, Build & deploy, Branches and
    deploy contexts, Deploy previews: none.
 6. `site_url` in `config.toml` is the Netlify address; `config push` after changing it, so
    email links open the deployed app.
 7. Turn off the Netlify toolbar: its injected script has no nonce, so the CSP blocks it.
+8. **Rates backfill.** The `rates` scheduled function runs daily at 17:00 UTC and starts
+   from the last stored day, so its first run loads everything since 2018. Once the
+   currencies migration is applied, run it once by hand: Logs, Functions, `rates`, **Run
+   now**. If it times out, run it again; it resumes where it stopped.
 
 ## 10. After setup
 

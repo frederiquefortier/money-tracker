@@ -1,6 +1,6 @@
 code,name_fr,name_en,symbol,minor_units
-CAD,Dollar canadien,Canadian dollar,$,2
-CHF,Franc suisse,Swiss franc,CHF,2
+CAD,Dollar canadien,Canadian Dollar,$,2
+CHF,Franc suisse,Swiss Franc,CHF,2
 EUR,Euro,Euro,€,2
-GBP,Livre sterling,Pound sterling,£,2
-USD,Dollar américain,US dollar,$,2
+GBP,Livre sterling,British Pound,£,2
+USD,Dollar américain,US Dollar,$,2
