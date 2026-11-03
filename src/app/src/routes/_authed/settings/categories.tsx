@@ -1,14 +1,13 @@
-import { Link, Outlet, createFileRoute } from '@tanstack/react-router'
+import { Outlet, createFileRoute } from '@tanstack/react-router'
 import { useId } from 'react'
 import { useTranslation } from 'react-i18next'
+import { AddButton } from '#/components/add-button'
 import { ArchivedCategories } from '#/components/categories/archived-categories'
 import { CategoryTree } from '#/components/categories/category-tree'
 import { KindTabs } from '#/components/categories/kind-tabs'
 import { ExpandAllButton } from '#/components/expand-all-button'
-import { Icon } from '#/components/icon'
 import { SettingsPage } from '#/components/settings-page'
 import { SortMenu } from '#/components/sort-menu'
-import { Button } from '#/components/ui/button'
 import { FORMAT_LOCALE } from '#/i18n/locales'
 import type { Locale } from '#/i18n/locales'
 import {
@@ -82,12 +81,12 @@ function shape(
 function AddCategoryButton({ kind }: { kind: Kind }) {
   const { t } = useTranslation()
   return (
-    <Button asChild variant="outline">
-      <Link to="/settings/categories/new" search={{ kind }}>
-        <Icon name="plus" className="size-4" />
-        {t('categories.add')}
-      </Link>
-    </Button>
+    <AddButton
+      to="/settings/categories/new"
+      search={{ kind }}
+      text={t('categories.addShort')}
+      label={t('categories.add')}
+    />
   )
 }
 

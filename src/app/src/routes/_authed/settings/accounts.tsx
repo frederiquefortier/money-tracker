@@ -1,19 +1,12 @@
-import { Link, Outlet, createFileRoute } from '@tanstack/react-router'
+import { Outlet, createFileRoute } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
+import { AddButton } from '#/components/add-button'
 import { AccountGroup } from '#/components/accounts/account-group'
 import type { ListedAccount } from '#/components/accounts/account-row'
 import { ClosedAccounts } from '#/components/accounts/closed-accounts'
 import { ExpandAllButton } from '#/components/expand-all-button'
-import { Icon } from '#/components/icon'
 import { SettingsPage } from '#/components/settings-page'
 import { SortMenu } from '#/components/sort-menu'
-import { Button } from '#/components/ui/button'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '#/components/ui/dropdown-menu'
 import { FORMAT_LOCALE } from '#/i18n/locales'
 import type { Locale } from '#/i18n/locales'
 import { NO_INSTITUTION, SORTS, sortAccounts, typeLabel } from '#/lib/accounts'
@@ -65,27 +58,21 @@ function shape(page: AccountsPage, locale: Locale, sort: Sort) {
   return { listed, open, groups, used }
 }
 
-function AddMenu() {
+function AddButtons() {
   const { t } = useTranslation()
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="outline">
-          <Icon name="plus" className="size-4" />
-          {t('accounts.addMenu')}
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        <DropdownMenuItem asChild>
-          <Link to="/settings/accounts/new">{t('accounts.addAccount')}</Link>
-        </DropdownMenuItem>
-        <DropdownMenuItem asChild>
-          <Link to="/settings/accounts/institutions/new">
-            {t('accounts.addInstitution')}
-          </Link>
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <>
+      <AddButton
+        to="/settings/accounts/institutions/new"
+        text={t('accounts.addInstitutionShort')}
+        label={t('accounts.addInstitution')}
+      />
+      <AddButton
+        to="/settings/accounts/new"
+        text={t('accounts.addAccountShort')}
+        label={t('accounts.addAccount')}
+      />
+    </>
   )
 }
 
@@ -136,7 +123,7 @@ function Accounts() {
             labelOf={(option) => t(`accounts.sort.${option}`)}
             onChange={setSort}
           />
-          <AddMenu />
+          <AddButtons />
         </>
       }
     >

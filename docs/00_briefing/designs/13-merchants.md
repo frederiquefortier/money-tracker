@@ -20,7 +20,7 @@ MER-03 (country) is phase 5, MER-04 (price evolution) phase 2.
 ```
 ┌──────────────────────────────────┐
 │ ← Réglages                       │
-│ MARCHANDS  [+ AJOUTER UN MARCHAND]│
+│ MARCHANDS              [+ MARCHAND]│
 │ [Rechercher un marchand        ] │
 │ ┌──────────────────────────────┐ │
 │ │ IGA                  84  ⇉ 🗑 │ │
@@ -95,7 +95,7 @@ Used by the transaction form (spec 15): the shared combobox.
 | Screen title | Marchands |
 | Search | Rechercher un marchand |
 | Empty | Aucun marchand pour l'instant. |
-| Add | Ajouter un marchand |
+| Add | Marchand (named Ajouter un marchand) |
 | Form titles | Nouveau marchand, Modifier le marchand |
 | Fields | Nom, Catégorie par défaut |
 | Clear category | Retirer la catégorie |

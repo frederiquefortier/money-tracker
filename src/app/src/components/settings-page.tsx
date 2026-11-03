@@ -28,7 +28,9 @@ export function SettingsPage({
       <div className="mx-auto flex w-full max-w-[40rem] flex-col gap-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <PageTitle>{title}</PageTitle>
-          {actions && <div className="flex items-center gap-2">{actions}</div>}
+          {actions && (
+            <div className="flex flex-wrap items-center gap-2">{actions}</div>
+          )}
         </div>
         {children}
       </div>

@@ -52,7 +52,7 @@ the transactions list (spec 14).
 ```
 ┌──────────────────────────────────────────┐
 │← Réglages                                │
-│ DEVISES           [+ AJOUTER UNE DEVISE] │
+│ DEVISES                       [+ DEVISE] │
 │ ┌──────────────────────────────────────┐ │
 │ │ CAD Dollar c… ($) [Par défaut] ★ ⌂ x │ │
 │ │ CHF Franc suisse (CHF)         ☆ ⌂ x │ │
@@ -75,13 +75,13 @@ the transactions list (spec 14).
   currency: **star** toggles favourite (CUR-03; favourites are not reordered here, they come
   first in every picker), **house** makes it the default, **trash** removes it. On the
   default currency the house and the trash are shown muted, like disabled.
-- The back link sits at the top left of the page; the title and "Ajouter une devise" share
+- The back link sits at the top left of the page; the title and "+ Devise" share
   the line above the card. Buttons placed with a card share its radius; button text is set
   in Inconsolata, uppercase.
 
 ### Adding (CUR-02)
 
-- "Ajouter une devise" opens the same sheet as the account form
+- "+ Devise" opens the same sheet as the account form
   (`/settings/currencies/add`), with one field: a `Combobox` over the ISO 4217 list
   (`currencies`), minus the ones already added. Typing matches the code and the name in
   both languages; each option reads "CODE - Nom (symbole)".
@@ -152,7 +152,7 @@ the transactions list (spec 14).
 | Hub rows | Comptes, Catégories, Marchands, Devises, Importer et exporter, Se déconnecter |
 | Screen title | Devises |
 | Default badge | Par défaut |
-| Add button | Ajouter une devise |
+| Add button | Devise (named Ajouter une devise, also the sheet title) |
 | Search placeholder | Rechercher un code ou un nom |
 | Make default | Utiliser par défaut |
 | Remove | Retirer |

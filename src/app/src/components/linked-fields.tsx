@@ -1,7 +1,6 @@
 /**
- * A line down the left side: fields that describe one thing (the opening date and the
- * balance on that date), or a sub-field of the field above it (a category's parent, within
- * its type).
+ * A line down the left side of a sub-field, under the field it belongs to: the balance on
+ * the opening date, a category's parent within its type.
  */
 export function LinkedFields({ children }: { children: React.ReactNode }) {
   return (

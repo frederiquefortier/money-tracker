@@ -31,8 +31,10 @@ component to use, so a screen is assembled, not redrawn.
 - **Page:** `SettingsPage` (or the tab's own page): "← Réglages" top left, the title with
   its buttons beside it, never a button under the list: expand all, "Trier: …"
   (`SortMenu`, an outline button with a chevron, like a select; kept per browser), then
-  "Ajouter…". A menu opens at least as wide as its button, aligned to it, and grows
-  to fit its labels rather than cutting them.
+  one `AddButton` per thing the screen adds: a plus and the noun, "+ Compte",
+  "+ Catégorie", with "Ajouter un compte" as its accessible name, never an add menu. A
+  menu opens at least as wide as its button, aligned to it, and grows to fit its labels
+  rather than cutting them.
 - **Lists:** cards (`ListCard`), one line per item where it fits. Tapping an item opens
   its form. A card header (an institution) toggles with `CollapseToggle` and edits with a
   pencil. In a tree, every row opens its form; a parent's chevron alone toggles its
@@ -56,7 +58,7 @@ component to use, so a screen is assembled, not redrawn.
   with a toast. Errors from the server show in the sheet above the buttons; validation
   stays under each field, and focus moves to the first one (SET-07).
 - **Fields:** the shared ones (`FormField`, `SelectField`, `CheckboxField`,
-  `LinkedFields`). Required fields carry an asterisk, no legend, no "(facultatif)".
+  `LinkedFields`). `LinkedFields` wraps only the sub-field, never the field it belongs to. Required fields carry an asterisk, no legend, no "(facultatif)".
 - **Choosing from the user's own items:** `Combobox`, typed into the field: it filters,
   offers "Créer « … »" when that makes sense, and a × clears it. Nothing chosen is an
   empty field, never "Aucun(e)".

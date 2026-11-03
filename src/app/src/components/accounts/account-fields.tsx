@@ -49,7 +49,7 @@ function typeOptions(types: ReadonlyArray<AccountType>, locale: Locale) {
     .sort((a, b) => a.label.localeCompare(b.label, FORMAT_LOCALE[locale]))
 }
 
-/** The opening date and the balance on that date, linked. */
+/** The opening date, with the balance on that date as its sub-field. */
 function OpeningFields({
   values,
   fields,
@@ -60,7 +60,7 @@ function OpeningFields({
   const { t } = useTranslation()
   const events = { onBlur: fields.onBlur, onChange: fields.onChange }
   return (
-    <LinkedFields>
+    <>
       <FormField
         name="openedOn"
         type="date"
@@ -70,16 +70,18 @@ function OpeningFields({
         error={fields.error('openedOn')}
         {...events}
       />
-      <FormField
-        name="openingBalance"
-        inputMode="decimal"
-        autoComplete="off"
-        label={t('accounts.openingBalance')}
-        defaultValue={values.openingBalance}
-        error={fields.error('openingBalance')}
-        {...events}
-      />
-    </LinkedFields>
+      <LinkedFields>
+        <FormField
+          name="openingBalance"
+          inputMode="decimal"
+          autoComplete="off"
+          label={t('accounts.openingBalance')}
+          defaultValue={values.openingBalance}
+          error={fields.error('openingBalance')}
+          {...events}
+        />
+      </LinkedFields>
+    </>
   )
 }
 

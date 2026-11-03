@@ -20,7 +20,7 @@ CAT-08 (emergency fund exclusion) is phase 2.
 ```
 ┌──────────────────────────────────┐
 │ ← Réglages                       │
-│ CATÉGORIES [⇕][Trier▾][+ Ajouter]│
+│ CATÉGORIES [⇕][Tri▾][+ CATÉGORIE]│
 │ [Dépenses][Revenus][Placements]  │
 │ ┌──────────────────────────────┐ │
 │ │ ▾ (◉) Alimentation  + ☆ ▣ 🗑 │ │
@@ -221,7 +221,7 @@ clothes plum, beauty pink), and slate for everything else. Income and investment
 | Archived section | Catégories archivées ({count}) |
 | Archived on | Archivée le {date} |
 | Empty | Aucune catégorie pour l'instant. |
-| Add | Ajouter une catégorie |
+| Add | Catégorie (named Ajouter une catégorie, also the sheet title) |
 | Form titles | Nouvelle catégorie, Modifier la catégorie |
 | Fields | Nom, Type, Parent, Icône, Couleur |
 | Colour | Couleur personnalisée (the custom circle's accessible name), Couleur {n}, déjà utilisée |

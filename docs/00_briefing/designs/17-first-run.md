@@ -48,23 +48,23 @@ category form (spec 12).
 ### 2. Devises
 
 - The Devises list from spec 10, as built: the five defaults (CUR-01), the star, house
-  and trash on each row, "Ajouter une devise" beside the step title. CAD starts as the
+  and trash on each row, "+ Devise" beside the step title. CAD starts as the
   default (CUR-05).
 - The display currency starts as the default currency.
 
 ### 3. Comptes
 
 - The accounts added so far, grouped by institution as in spec 11 (without totals), and
-  the "Ajouter" menu beside the step title, which opens the account or institution sheet
-  over the step.
-- After each save the sheet closes, the step lists the new account and "Ajouter" is in
+  "+ Institution" and "+ Compte" beside the step title, which open their sheets over the
+  step.
+- After each save the sheet closes, the step lists the new account and "+ Compte" is in
   reach for the next one.
 - "Continuer" once at least one account exists; otherwise "Je les créerai plus tard".
 
 ### 4. Catégories
 
 - The category tree as in spec 12 (the three type tabs, icons and colours, the row
-  actions), and "Ajouter une catégorie" beside the step title, which opens the category
+  actions), and "+ Catégorie" beside the step title, which opens the category
   sheet over the step with the open tab's type.
 - A branch is entered one child at a time: the parent is typed into the Parent field.
 - No starter set (SET-01).

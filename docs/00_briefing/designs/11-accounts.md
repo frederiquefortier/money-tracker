@@ -19,7 +19,8 @@ ACC-01, 02, 03, 04, 05, 06, 07. ACC-08 (last reconciled, last transaction) is ph
 ```
 ┌──────────────────────────────────┐
 │ ← Réglages                       │
-│ COMPTES      [Trier: Nom▾][AJOUTER▾]│
+│ COMPTES                          │
+│ [Trier▾][+ INSTITUTION][+ COMPTE] │
 │ ┌──────────────────────────────┐ │
 │ │ ▾ Desjardins ↗  4 000,00 $ ✎ 🗑│ │
 │ │ ──────────────────────────── │ │
@@ -68,7 +69,7 @@ ACC-01, 02, 03, 04, 05, 06, 07. ACC-08 (last reconciled, last transaction) is ph
 
 ### Sort (ACC-07)
 
-- "Trier:" menu beside the title (the shared `SortMenu`): Nom, Type, Devise, Solde croissant, Solde décroissant.
+- "Trier:" menu beside the title (the shared `SortMenu`): Nom, Type, Devise, Solde −, Solde +.
   It sorts the rows inside each group; groups stay alphabetical.
 - Balance sorts compare amounts converted to the display currency.
 - The choice is kept per browser.
@@ -83,7 +84,7 @@ ACC-01, 02, 03, 04, 05, 06, 07. ACC-08 (last reconciled, last transaction) is ph
 
 ### Adding
 
-"Ajouter" beside the title opens a menu: "Un compte", "Une institution".
+"+ Institution" and "+ Compte" beside the title, two `AddButton`s.
 
 ## Account form
 
@@ -113,9 +114,9 @@ edits.
   clears it. No institution is an empty field.
 - **Devise**: the user's currencies, favourites first, prefilled with the default currency
   (CUR-05). Locked once the account has a transaction: the field is disabled.
-- **Date d'ouverture** then **Solde à l'ouverture** (ACC-02), joined by a line down their
-  left side (`LinkedFields`). The amount is in the chosen currency; they default to today
-  and 0.
+- **Date d'ouverture**, its own field, then **Solde à l'ouverture** (ACC-02) as its
+  sub-field, indented under it with a line down its left side (`LinkedFields`). The
+  amount is in the chosen currency; they default to today and 0.
 - **Masquer des nouvelles transactions** (ACC-04): a checkbox.
 - Saving closes the sheet with a toast, "Compte créé." or "Compte enregistré.".
 
@@ -124,7 +125,7 @@ edits.
 - **Nom** required, unique per user ignoring case. **Site web** optional, an `https://`
   URL.
 - The same sheet, with its own URL (`/settings/accounts/institutions/new`,
-  `/settings/accounts/institutions/{id}`). Opened from "Ajouter > Une institution", from
+  `/settings/accounts/institutions/{id}`). Opened from "+ Institution", from
   the pencil on its card, or created inline from the account form.
 - **Delete** is the trash on its card header, muted while any account (open or archived)
   uses it; a tap says "Des comptes utilisent encore cette institution." in a toast.
@@ -164,8 +165,8 @@ The `multi_currency` account type is dropped.
 | Key | Français |
 |---|---|
 | Screen title | Comptes |
-| Sort | Trier: {sort}; Nom, Type, Devise, Solde croissant, Solde décroissant |
-| Add menu | Ajouter, Un compte, Une institution |
+| Sort | Trier: {sort}; Nom, Type, Devise, Solde −, Solde + |
+| Add buttons | Institution, Compte (named Ajouter une institution, Ajouter un compte) |
 | Archived section | Comptes archivés ({count}), Archivé le {date} |
 | Hidden label | Masqué des nouvelles transactions |
 | No institution group | Sans institution |

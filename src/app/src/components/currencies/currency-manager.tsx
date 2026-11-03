@@ -1,23 +1,20 @@
 import { useState } from 'react'
-import { Link } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
+import { AddButton } from '#/components/add-button'
 import { ConfirmDialog } from '#/components/confirm-dialog'
 import { CurrencyRow } from '#/components/currencies/currency-row'
 import { useCurrencyActions } from '#/components/currencies/use-currency-actions'
-import { Icon } from '#/components/icon'
 import { ListCard } from '#/components/list-card'
 import { useToast } from '#/components/toaster'
-import { Button } from '#/components/ui/button'
 
 export function AddCurrencyButton() {
   const { t } = useTranslation()
   return (
-    <Button asChild variant="outline">
-      <Link to="/settings/currencies/add">
-        <Icon name="plus" className="size-4" />
-        {t('currencies.add')}
-      </Link>
-    </Button>
+    <AddButton
+      to="/settings/currencies/add"
+      text={t('currencies.addShort')}
+      label={t('currencies.add')}
+    />
   )
 }
 
