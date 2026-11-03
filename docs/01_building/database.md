@@ -55,7 +55,7 @@ column.
 | Table | Columns | Req |
 |---|---|---|
 | `profiles` | `user_id` (PK), `locale` (`fr` or `en`, ADR-019), `default_currency`, `display_currency`, `transfer_fee_category_id`, `birth_date`, `home_country`, `show_budget_tooltips` | SET, CUR-05/06, BUD-06, TRX-04 |
-| `user_currencies` | `code`, `is_default`, `is_favourite`, `display_order` | CUR-01..04. Five rows inserted by a trigger on sign-up. |
+| `user_currencies` | `code`, `is_favourite`, `removed_at` | CUR-01..04. Five rows inserted by a trigger on sign-up. Removing sets `removed_at`, so adding back skips the HexaRate check. Listed alphabetically; the default is `profiles.default_currency`. |
 
 Labels in reference tables come in pairs (`label_fr`, `label_en`; `name_fr`, `name_en`)
 per ADR-008. User-owned rows (categories, merchants, notes) store one string, as typed.
@@ -65,13 +65,13 @@ per ADR-008. User-owned rows (categories, merchants, notes) store one string, as
 | Table | Columns | Req |
 |---|---|---|
 | `institutions` | `name`, `website_url` | ACC-05 |
-| `accounts` | `institution_id`, `name`, `type` (→ `account_types`), `currency`, `opening_balance`, `opened_on`, `closed_on`, `hidden_for_new`, `last_reconciled_on` | ACC-01..04, 08. Also `unique (user_id, id, currency)`, the target of the transactions currency FK. An account's currency cannot change once it has transactions. |
+| `accounts` | `institution_id` (nullable), `name`, `type` (→ `account_types`), `currency`, `opening_balance`, `opened_on`, `closed_on`, `hidden_for_new`, `last_reconciled_on` | ACC-01..04, 08. Also `unique (user_id, id, currency)`, the target of the transactions currency FK. An account's currency cannot change once it has transactions. |
 
 ### Categories
 
 | Table | Columns | Req |
 |---|---|---|
-| `categories` | `parent_id` (nullable, self), `name`, `kind` (`expense`/`income`/`investment`), `icon` (a coolicons name, ADR-020), `icon_is_auto`, `color` (from a fixed palette, for the icon circle and charts; designs/00-layout-reference.md), `is_favourite`, `exclude_from_emergency_fund` | CAT-01, 02, 06, 07, 08 |
+| `categories` | `parent_id` (nullable, self), `name`, `kind` (`expense`/`income`/`investment`), `icon` (a coolicons name, ADR-020), `icon_is_auto`, `color` (hex `#rrggbb`, free choice; a sub-category starts from a variation of its parent's), `color_is_auto` (designs/12-categories.md), `is_favourite`, `exclude_from_emergency_fund` | CAT-01, 02, 06, 07, 08 |
 | `category_status_events` | `category_id`, `status` (`archived`/`active`), `effective_on` | CAT-03. Append-only. |
 | view `category_active_periods` | `category_id`, `active_from`, `active_to` | Derived from the events. Pickers (CAT-04) and charts (DSH-03) both read this, so they never disagree. |
 

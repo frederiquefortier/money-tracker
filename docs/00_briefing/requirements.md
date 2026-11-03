@@ -22,7 +22,7 @@ English; this file is in English like every other meta-doc.
 
 | ID | Requirement | Source | Phase |
 |---|---|---|---|
-| SET-01 | A new user is walked through choosing a language, a default currency, and creating their first categories. No starter category set in v1. | v1 | 1 |
+| SET-01 | A new user is walked through choosing a language and a default currency (both required), then creating their first accounts and categories (each can wait). No starter category set in v1. | v1 | 1 |
 | SET-02 | Birth date (drives the age-based account recommendations in `LOC`). | v1 | 5 |
 | SET-03 | Home country, used for "local purchase" stats and for which region pack applies. | v1, inferred | 5 |
 | SET-04 | The interface is available in French and English, nothing regional (ADR-019). Dates and amounts use Canadian conventions in either language ("15 janvier 2024", "1 234,50 $" / "January 15, 2024", "$1,234.50"). | C10, brief | 0 |
@@ -34,7 +34,7 @@ English; this file is in English like every other meta-doc.
 
 | ID | Requirement | Source | Phase |
 |---|---|---|---|
-| ACC-01 | An account has a name, a type, an institution and a currency. | v1, ai, C6 | 1 |
+| ACC-01 | An account has a name, a type, an optional institution and a currency. A multi-currency balance (Wise) is one account per currency. | v1, ai, C6 | 1 |
 | ACC-02 | Creating an account records its opening balance and date. | v1, ai | 1 |
 | ACC-03 | An account can be closed (keeps history, gone from pickers). | v1, ai | 1 |
 | ACC-04 | An account can be hidden from new transactions without being closed. | v1 | 1 |
@@ -58,6 +58,7 @@ English; this file is in English like every other meta-doc.
 | TRX-09 | Status: pending or cleared, so a pending card charge does not count as reconciled. | sheet | 1 |
 | TRX-10 | A transaction can carry a free-text note (the memo). | sheet | 1 |
 | TRX-11 | A transfer between accounts in different currencies records what left one and what arrived in the other; the gap against that day's market rate shows as the conversion cost. | net-worth data (CAD to CHF) | 1 |
+| TRX-12 | Search transactions by text: merchant and note. | author | 2 |
 
 ## 4. Multi-currency (`CUR`)
 
@@ -66,7 +67,7 @@ English; this file is in English like every other meta-doc.
 | CUR-01 | Each user has a list of usable currencies. Defaults, sorted alphabetically: CAD, CHF, EUR, GBP, USD. | ai, C3 | 1 |
 | CUR-02 | Adding a currency validates it against HexaRate. If the provider is down, adding fails with a retry; existing currencies keep working. | ai, add, C3 | 1 |
 | CUR-03 | Currencies can be marked favourite; favourites come first in every currency picker. Pickers are searchable and show "CODE - Nom" and the symbol. | v1, ai, C3 | 1 |
-| CUR-04 | Removing a currency in use asks for confirmation and names how many transactions use it. | C3 | 1 |
+| CUR-04 | Removing a currency in use asks for confirmation and names how many transactions use it. The default currency and a currency used by an open account cannot be removed. Adding a removed currency back skips the HexaRate check. | C3 | 1 |
 | CUR-05 | A default currency, used to prefill forms. | ai | 1 |
 | CUR-06 | A display currency switchable from any page (header dropdown, like a language switcher). Every amount re-renders in it. | ai, add, C4 | 1 |
 | CUR-07 | Conversion uses the rate on the transaction date, or today's rate when the amount has no date. An amount already in the display currency is never converted. | v1, ai | 1 |
@@ -79,11 +80,11 @@ English; this file is in English like every other meta-doc.
 |---|---|---|---|
 | CAT-01 | Categories nest with no depth limit. | v1, ai | 1 |
 | CAT-02 | A category has a kind: expense (default), income, or investment. | v1, ai | 1 |
-| CAT-03 | Archive a category from a chosen date; reactivate from a chosen date. The full history is viewable as a timeline. | v1, ai, add, C10 | 1 |
+| CAT-03 | Archive a category from a chosen date; reactivate from a chosen date. The full history is viewable as a timeline. Archiving a parent archives its branch; a sub-category cannot be reactivated under an archived parent. | v1, ai, add, C10 | 1 |
 | CAT-04 | Archived categories are absent from every picker. Editing an old transaction still shows its archived category with a badge and lets you change it. | add, C8 | 1 |
 | CAT-05 | The category page shows active categories first and archived ones in a collapsed section with a count and "archivée depuis [date]". | add, C9 | 1 |
 | CAT-06 | Favourite categories sit in a "Favoris" group at the top of the picker, shown as "Parent > Enfant", toggled with a star inside the picker. They are not repeated below. | v1, ai, add, C7 | 1 |
-| CAT-07 | A category has a coolicons icon, chosen in a searchable picker of a curated subset of the set (ADR-020). A default is suggested from the name; "Réinitialiser" returns to it. | v1, ai, add, C11 | 1 |
+| CAT-07 | A category has a coolicons icon, chosen in a searchable picker of a curated subset of the set (ADR-020). A default is suggested from the name; "Réinitialiser" returns to it. Each category has its own colour, chosen freely; a sub-category starts from a variation of its parent's colour. | v1, ai, add, C11 | 1 |
 | CAT-08 | A category can be excluded from the emergency-fund calculation. | v1, ai | 2 |
 
 ## 6. Merchants (`MER`)
@@ -94,6 +95,7 @@ English; this file is in English like every other meta-doc.
 | MER-02 | A merchant has aliases, used to match bank-CSV descriptions on import. | v1, ai | later (with IMP-03) |
 | MER-03 | A merchant has a country of origin. | v1 | 5 |
 | MER-04 | For one merchant, see how the bill has changed over time, in percent. | v1, ai | 2 |
+| MER-05 | Merge two merchants: the transactions of one move to the other, which keeps its name and default category. | author | 1 |
 
 ## 7. Tags (`TAG`)
 
@@ -193,6 +195,7 @@ The "Canada" section, generalised because the data already spans Canada and Swit
 | IMP-03 | Import wizard: source profiles, column and category mapping, merchant-alias matching, suggested transfer pairs and reimbursements. | v1 misc ("Csv importer visual"), MER-02 | later |
 | IMP-04 | Export my data in the import format; export then import reproduces it. This is the export half of SEC-04. | ADR-010, SEC-04 | 1 |
 | IMP-05 | Each import is one all-or-nothing batch that can be undone in one action. Re-importing a row with a known `ref` is skipped. | ADR-010 | 1 |
+| IMP-06 | Before an import commits, each category it would create is decided: created as written, or merged into another category (existing, from the same import, or new under another name). The choices apply to that import only. | author | 1 |
 
 ## 16. Demo and portfolio (`DEM`)
 

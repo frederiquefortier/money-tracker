@@ -40,13 +40,14 @@ Replace daily use of the spreadsheet.
 - Currencies, HexaRate validation, the Frankfurter rates job with a backfill to 2018,
   converted-amount markers. CUR-01..09 (ADR-009).
 - Bilingual reference labels. SET-06.
-- Screen specs in `docs/00_briefing/designs/` before each screen is built: what it shows,
+- Screen specs in `docs/00_briefing/designs/` before each screen is built (map and order in
+  [02-screens.md](../00_briefing/designs/02-screens.md)): what it shows,
   why, and which requirement IDs it covers. Mobile layout follows
   [00-layout-reference.md](../00_briefing/designs/00-layout-reference.md) (TravelSpend patterns); the look
   follows [01-visual-direction.md](../00_briefing/designs/01-visual-direction.md).
 - Institutions and accounts. ACC-01..07.
 - Categories with archive history, favourites, coolicons icons. CAT-01..07.
-- Merchants with default category. MER-01.
+- Merchants with default category, and merging. MER-01, 05.
 - Transactions: expense, income, adjustment, transfer with fee (including between
   currencies), splits, status, notes. TRX-01..06, 09..11. Multi-row writes as SQL functions
   with pgTAP tests (ADR-012).
@@ -54,7 +55,7 @@ Replace daily use of the spreadsheet.
 - **Gate before the spreadsheet is retired** (met 2026-11-02): backup workflow enabled, one
   restore tested, the first monthly copy on the offline drive, and the private key in the
   password manager and on paper (security.md, Backups).
-- **CSV import and export in the fixed format** (IMP-01, 04, 05, SEC-04 export, ADR-010). This is the
+- **CSV import and export in the fixed format** (IMP-01, 04, 05, 06, SEC-04 export, ADR-010). This is the
   milestone: eight years of history in the app.
   1. Settle the new category tree (worked out together from the old Aspire names).
   2. Convert the Aspire export to the format, outside the app.
@@ -65,6 +66,7 @@ Replace daily use of the spreadsheet.
 - Budgets and the emergency fund. BUD-01..04, 06, CAT-08.
 - Tags with automatic rules. TAG-01..03.
 - Recurring transactions. TRX-08.
+- Text search in the transactions list. TRX-12.
 - Merchant price evolution. MER-04.
 - Delete my account and all its data. SEC-04.
 

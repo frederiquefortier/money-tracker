@@ -17,7 +17,8 @@ never app code.
 ```
 1. Upload   accounts.csv, transactions.csv, optionally splits.csv (read in the browser)
 2. Check    every row validated; errors listed by file and line, nothing written
-3. Summary  counts, date range, and what will be created: new accounts, categories, merchants
+3. Summary  counts, date range, and what will be created: new accounts, categories, merchants;
+            each new category is created or merged into another (IMP-06)
 4. Commit   one request, one `import_batch(jsonb)` call, one database transaction; undoable
 ```
 

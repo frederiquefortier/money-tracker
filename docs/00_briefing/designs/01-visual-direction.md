@@ -18,6 +18,8 @@ viewing are in `references/visual/` (gitignored: third-party images, never commi
   the top, so figures stay easy to read.
 - **Surfaces are flat.** Cream cards with a thin border. No shadows: the shadow scale is
   removed from the Tailwind theme, so a shadcn component added later gets none either.
+- **Incomes are green** (`--income`), expenses in the text colour; red never marks an
+  amount.
 - **Primary is the sparkle red.** White text on it and red text on cream both pass WCAG AA.
 - **Inconsolata as the accent font**, uppercase and spaced: the wordmark and card titles.
   Amounts will use it too (tabular figures line up). Body text stays Nunito.

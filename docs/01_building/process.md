@@ -61,6 +61,9 @@ without touching `docs/`.
 
 | Date | Topic | Assistant proposed | Author decided | Where |
 |---|---|---|---|---|
+| 2026-11-03 | Import categories | A checkbox to accept the new categories, or refuse the import | Each new category created or merged into another, existing or new (IMP-06) | designs/18-import-export.md |
+| 2026-11-03 | First run | A text box to type the category tree, accounts left to the import | The account and category forms with "Enregistrer et ajouter"; an accounts step | designs/17-first-run.md |
+| 2026-11-03 | Category colours | Ten, then twenty fixed swatches; sub-categories a tint of the top-level colour | Free colour picker for every category, swatches as quick picks; a sub-category starts from a variation of its parent's; the icon colour adapts for contrast | designs/12-categories.md |
 | 2026-11-02 | Visual feel | Piggy-bank palette: rose and cream, soft blush glows, light shadows | Grainy sunset gradients, sparkles, flat surfaces with no shadows, Inconsolata as accent | designs/01-visual-direction.md |
 | 2026-11-02 | Demo account | Create the demo account before phase 1, for trying unfinished screens | No demo account; unfinished work is tried in the owner's | ADR-021 |
 | 2026-11-02 | Demo | Demo-data generator in phase 1, public demo in phase 2 | Both deferred: the app stays private, a demo matters only if another user joins | DEM-01..02 |

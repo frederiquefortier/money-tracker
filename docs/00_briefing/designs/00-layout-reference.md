@@ -14,7 +14,7 @@ copyrighted images, never committed).
 | Pattern | In TravelSpend | Here |
 |---|---|---|
 | **Bottom tab bar** (mobile) | Entries, Stats, Search, Map, Settings; icon over a short label; active tab in the accent colour | The main sections of v1, coolicons icons, rose for the active tab. On wide screens the same items become a side or top bar. |
-| **Floating add button** | Round accent "+" bottom right, above the tab bar | Same: add a transaction from anywhere |
+| **Floating add button** | Round accent "+" bottom right, above the tab bar | Same, on the Transactions tab only |
 | **Top bar** | Menu left, context name centred (the trip), people icon right | Period or account in the centre (the "trip" equivalent is a date range), FR/EN and profile on the right |
 | **Summary tiles** | Two cards side by side: Total and Daily average, each with a thin progress bar against the budget (`$3,748/30,000`) | Spent this period and a second figure (daily average, or remaining budget), with a progress bar when a budget exists (BUD-01) |
 | **Transaction rows** | Coloured circle with a white category glyph; title over category; amount right; original-currency amount muted below it (`₫55,000`) | Same anatomy. The circle uses the category's coolicons icon and colour; the second line on the right is the original amount (CUR-08). |
@@ -38,7 +38,8 @@ copyrighted images, never committed).
   padding only.
 - **The language toggle lives in the header** (and top right on the signed-out screens),
   nowhere else.
-- **The floating add button** arrives with the add-transaction screen (phase 1).
+- **The floating add button** arrives with the add-transaction screen (phase 1), on the
+  Transactions tab only.
 
 ## Seen, not adopted (yet)
 
@@ -52,5 +53,5 @@ copyrighted images, never committed).
 ## Data the layout needs
 
 - A **colour per category**, for the icon circles and the chart. Add `color` to
-  `categories` in phase 1 (database.md), chosen from a fixed palette with tested contrast
-  for a white glyph.
+  `categories` in phase 1 (database.md), chosen freely; the icon colour adapts for
+  contrast ([12-categories.md](12-categories.md#colours)).
