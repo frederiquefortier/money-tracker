@@ -61,6 +61,7 @@ without touching `docs/`.
 
 | Date | Topic | Assistant proposed | Author decided | Where |
 |---|---|---|---|---|
+| 2026-11-03 | Account name uniqueness | Account names unique among all of a user's open accounts | Unique per institution, so the same name can exist at two banks | designs/11-accounts.md |
 | 2026-11-03 | Delete and action errors | Institution delete in its sheet while accounts delete from the row; errors as toasts on rows, inline in the sheet for institution delete; one place to be chosen for each | Every delete is an icon on its row or card header; every action failure is a toast | designs/11-accounts.md |
 | 2026-11-03 | Page background | Pale pink cream behind plum text and buttons | Plum cream background and cards; outline buttons without a fill | designs/01-visual-direction.md |
 | 2026-11-03 | Plum everywhere | Plum for the primary and its tints only; the group total aligned with the row balances | Text and borders in plum tints too; the header alignment reverted to total then pencil | designs/01-visual-direction.md |

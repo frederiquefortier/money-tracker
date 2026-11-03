@@ -97,7 +97,8 @@ ACC-01, 02, 03, 04, 05, 06, 07. ACC-08 (last reconciled, last transaction) is ph
 └──────────────────────────────┘
 ```
 
-- **Nom** required, unique among the user's open accounts.
+- **Nom** required, unique among the user's open accounts at the same institution (or among those
+  with no institution).
 - **Type**: the `account_types` labels, in the interface language.
 - **Institution** (optional): a searchable picker of the user's institutions, "Aucune" first, with "Créer
   « {texte} »" as the last item when nothing matches (ACC-05, inline create: name only,
@@ -218,5 +219,6 @@ What the build does differently or leaves for later, for review:
   details on tap come with the converted-amount marker of spec 14.
 - **A missing rate** in a group shows "Taux manquant" in the error colour, with the
   explanation on hover.
-- **Institution names** are unique per user ignoring case, like account names.
+- **Institution names** are unique per user ignoring case. Account names are unique per
+  institution, so two banks can each have a "Chèque".
 

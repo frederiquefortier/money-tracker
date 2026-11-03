@@ -1,7 +1,7 @@
 begin;
 create extension if not exists pgtap with schema extensions;
 
-select plan(22);
+select plan(24);
 
 insert into auth.users (id, email) values
   ('11111111-1111-1111-1111-111111111111', 'alice@example.test'),
@@ -59,8 +59,18 @@ select lives_ok(
   'an account needs no institution'
 );
 select throws_ok(
-  $$ insert into public.accounts (name, type, currency) values ('chèque', 'savings', 'CAD') $$,
-  '23505', null, 'open account names are unique, ignoring case'
+  $$ insert into public.accounts (institution_id, name, type, currency)
+     select id, 'chèque', 'savings', 'CAD' from public.institutions
+     where name = 'Banque Exemple' $$,
+  '23505', null, 'open account names are unique per institution, ignoring case'
+);
+select lives_ok(
+  $$ insert into public.accounts (name, type, currency) values ('Chèque', 'checking', 'CAD') $$,
+  'the same name works at another institution, or none'
+);
+select throws_ok(
+  $$ insert into public.accounts (name, type, currency) values ('suisse', 'savings', 'CHF') $$,
+  '23505', null, 'names are unique among accounts with no institution'
 );
 select throws_ok(
   $$ insert into public.accounts (institution_id, name, type, currency)
@@ -80,7 +90,7 @@ select throws_ok(
 -- Isolation
 select results_eq(
   'select name from public.accounts order by name',
-  $$ values ('Chèque'), ('Suisse') $$,
+  $$ values ('Chèque'), ('Chèque'), ('Suisse') $$,
   'a user sees only their own accounts'
 );
 select is((select count(*)::int from public.institutions), 2, 'a user sees only their own institutions');
