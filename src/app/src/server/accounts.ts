@@ -1,6 +1,12 @@
 import { createServerFn } from '@tanstack/react-start'
 import { z } from 'zod'
-import { accountInputSchema, institutionInputSchema } from '#/lib/accounts'
+import {
+  NO_INSTITUTION,
+  accountInputSchema,
+  institutionInputSchema,
+} from '#/lib/accounts'
+import { failed } from '#/lib/result'
+import type { Result } from '#/lib/result'
 import { getSupabase } from '#/lib/supabase.server'
 
 export type AccountType = { code: string; labelFr: string; labelEn: string }
@@ -31,15 +37,14 @@ export type GroupTotal = { total: string | null; converted: boolean }
 export type AccountsPage = {
   accounts: Array<Account>
   institutions: Array<Institution>
-  /** Keyed by institution id; '' is the accounts without one. */
+  /** Keyed by institution id, or NO_INSTITUTION. */
   totals: Record<string, GroupTotal>
   types: Array<AccountType>
 }
 
 export type AccountError =
   'nameTaken' | 'inUse' | 'currencyRemoved' | 'notFound' | 'failed'
-type Result<T = object> =
-  ({ ok: true } & T) | { ok: false; error: AccountError }
+type AccountResult<T = object> = Result<AccountError, T>
 
 const idInput = z.object({ id: z.uuid() })
 
@@ -51,8 +56,7 @@ function failure(
   if (error.code === '23503') return { ok: false, error: 'inUse' }
   if (error.message === 'currency_removed')
     return { ok: false, error: 'currencyRemoved' }
-  console.error(`[accounts] ${context}:`, error.code ?? 'unknown')
-  return { ok: false, error: 'failed' }
+  return failed('accounts', context, error.code)
 }
 
 // Amounts as text: PostgREST sends numeric as a JSON number, a float (ADR-004).
@@ -79,9 +83,9 @@ async function getTypes() {
   if (error)
     throw new Error(`Account types could not be loaded (${error.code})`)
   return data.map((t) => ({
-    code: t.code as string,
-    labelFr: t.label_fr as string,
-    labelEn: t.label_en as string,
+    code: t.code,
+    labelFr: t.label_fr,
+    labelEn: t.label_en,
   }))
 }
 
@@ -123,7 +127,7 @@ export const getAccounts = createServerFn({ method: 'GET' }).handler(
 
     const byAccount = new Map(balances.data.map((b) => [b.account_id, b]))
     return {
-      accounts: (accounts.data as Array<AccountRow>).map((a) => {
+      accounts: accounts.data.map((a) => {
         const b = byAccount.get(a.id)
         return {
           ...toAccount(a),
@@ -135,8 +139,8 @@ export const getAccounts = createServerFn({ method: 'GET' }).handler(
       institutions,
       totals: Object.fromEntries(
         totals.data.map((t) => [
-          t.institution_id ?? '',
-          { total: t.total, converted: t.converted },
+          t.institution_id ?? NO_INSTITUTION,
+          { total: t.total, converted: t.converted ?? false },
         ]),
       ),
       types,
@@ -160,7 +164,7 @@ function toAccount(a: AccountRow) {
 
 export const saveAccount = createServerFn({ method: 'POST' })
   .validator(accountInputSchema)
-  .handler(async ({ data }): Promise<Result<{ id: string }>> => {
+  .handler(async ({ data }): Promise<AccountResult<{ id: string }>> => {
     const values = {
       name: data.name,
       type: data.type,
@@ -182,7 +186,7 @@ export const saveAccount = createServerFn({ method: 'POST' })
 
 export const closeAccount = createServerFn({ method: 'POST' })
   .validator(idInput.extend({ closedOn: z.iso.date() }))
-  .handler(async ({ data }): Promise<Result> => {
+  .handler(async ({ data }): Promise<AccountResult> => {
     const { error } = await getSupabase()
       .from('accounts')
       .update({ closed_on: data.closedOn })
@@ -192,7 +196,7 @@ export const closeAccount = createServerFn({ method: 'POST' })
 
 export const reopenAccount = createServerFn({ method: 'POST' })
   .validator(idInput)
-  .handler(async ({ data }): Promise<Result> => {
+  .handler(async ({ data }): Promise<AccountResult> => {
     const { error } = await getSupabase()
       .from('accounts')
       .update({ closed_on: null })
@@ -203,7 +207,7 @@ export const reopenAccount = createServerFn({ method: 'POST' })
 /** Accounts with transactions will refuse (spec 11); none exist yet. */
 export const deleteAccount = createServerFn({ method: 'POST' })
   .validator(idInput)
-  .handler(async ({ data }): Promise<Result> => {
+  .handler(async ({ data }): Promise<AccountResult> => {
     const { error } = await getSupabase()
       .from('accounts')
       .delete()
@@ -213,7 +217,7 @@ export const deleteAccount = createServerFn({ method: 'POST' })
 
 export const saveInstitution = createServerFn({ method: 'POST' })
   .validator(institutionInputSchema)
-  .handler(async ({ data }): Promise<Result<{ id: string }>> => {
+  .handler(async ({ data }): Promise<AccountResult<{ id: string }>> => {
     const values = { name: data.name, website_url: data.websiteUrl || null }
     const supabase = getSupabase()
     const query = data.id
@@ -227,7 +231,7 @@ export const saveInstitution = createServerFn({ method: 'POST' })
 
 export const deleteInstitution = createServerFn({ method: 'POST' })
   .validator(idInput)
-  .handler(async ({ data }): Promise<Result> => {
+  .handler(async ({ data }): Promise<AccountResult> => {
     const { error } = await getSupabase()
       .from('institutions')
       .delete()

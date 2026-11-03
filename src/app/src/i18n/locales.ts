@@ -11,6 +11,11 @@ export const FORMAT_LOCALE: Record<Locale, string> = {
   en: 'en-CA',
 }
 
+/** Reference rows carry both labels (`_fr` and `_en` columns). */
+export function inLocale<T>(locale: Locale, fr: T, en: T): T {
+  return locale === 'fr' ? fr : en
+}
+
 export function isLocale(value: unknown): value is Locale {
   return (
     typeof value === 'string' &&

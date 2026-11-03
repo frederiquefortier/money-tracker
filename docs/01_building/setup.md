@@ -114,6 +114,9 @@ npm run dev
 ```
 The app is at http://localhost:3000 and shows the sign-in page.
 
+After a migration, `npm run db:types` regenerates `src/lib/database.gen.ts` from the
+linked project (ADR-023).
+
 ## 8. Accounts
 
 **Owner, by invitation.** Dashboard, **Authentication → Users → Add user → Send

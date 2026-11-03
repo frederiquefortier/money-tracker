@@ -4,6 +4,32 @@ Document architectural choices with context, alternatives considered, and trade-
 
 <!-- Newest first: a new ADR goes directly below this line. Template at the bottom. -->
 
+### ADR-023: Generated database types, amounts kept as text (2026-11-03)
+
+**Context:**
+- Server functions read Supabase rows untyped and cast them (`as string`,
+  `as unknown as CurrencyRow`). A renamed column compiled fine and failed at runtime.
+- `supabase gen types` types every `numeric` column as `number`, which would invite a float
+  into money code (ADR-004).
+
+**Decision:**
+- `npm run db:types` (from `src/app`) writes `src/lib/database.gen.ts` from the linked
+  project. It is committed, and regenerated with every migration.
+- `src/lib/database.ts` wraps it and turns the amount columns that are written
+  (`accounts.opening_balance`) into strings. `getSupabase()` is typed with that wrapper.
+- Reads keep casting amounts to text in the select (`balance::text`), which the client
+  types as `string`.
+
+**Alternatives Considered:**
+- Hand-written row types -> Drift from the schema with no warning.
+- `MergeDeep` from type-fest, as the Supabase docs suggest -> A dependency for one
+  override (ADR-011).
+
+**Consequences:**
+- Column names, nullability and joins are checked by `tsc`; the casts are gone.
+- A new numeric column that the app writes needs a line in `database.ts`.
+- Forgetting `db:types` after a migration leaves the types one migration behind.
+
 ### ADR-022: Until real data exists, the project is the dev database (2026-11-03)
 
 **Context:**

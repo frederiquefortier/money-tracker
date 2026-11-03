@@ -12,14 +12,12 @@ function AddCurrency() {
   const { t } = useTranslation()
   const { catalog } = useLoaderData({ from: '/_authed/settings/currencies' })
   const { currencies } = useMyCurrencies()
-  const { session } = Route.useRouteContext()
 
   return (
     <RouteSheet to="/settings/currencies" title={t('currencies.add')}>
       <AddCurrencyForm
         catalog={catalog}
         owned={new Set(currencies.map((c) => c.code))}
-        locale={session.locale}
       />
     </RouteSheet>
   )

@@ -18,6 +18,7 @@
     "generate-routes": "tsr generate",
     "rates": "node --env-file-if-exists=.env.local scripts/rates.ts",
     "db:test": "node scripts/db-test.ts",
+    "db:types": "supabase --workdir .. gen types typescript --linked --schema public > src/lib/database.gen.ts",
     "db:push": "sh -c 'set -a; [ -f .env.local ] && . ./.env.local; set +a; supabase --workdir .. db push --linked'"
   },
   "dependencies": {

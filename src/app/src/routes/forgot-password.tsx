@@ -42,11 +42,7 @@ function ForgotPassword() {
   const formRef = useFocusFirstError(state.errors)
 
   return (
-    <AuthShell
-      icon="key"
-      title={t('forgotPassword.title')}
-      description={t('forgotPassword.intro')}
-    >
+    <AuthShell icon="key" title={t('forgotPassword.title')}>
       {state.sent ? (
         // The same message whether or not the address has an account.
         <FormAlert tone="success">{t('forgotPassword.sent')}</FormAlert>

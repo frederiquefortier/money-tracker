@@ -7,6 +7,24 @@ import type { ValidationId } from '#/lib/schemas'
 /** Field name to message id. `null`: rechecked since the submit and now valid. */
 export type FieldErrors = Partial<Record<string, string | null>>
 
+/** A sheet form's state: what was typed, its errors, and whether the save failed. */
+export type FormState<TValues> = {
+  values: TValues
+  errors: FieldErrors
+  failed: boolean
+}
+
+/** A taken name shows under the name field; any other failure above the buttons. */
+export function savedState<TValues>(
+  values: TValues,
+  result: { ok: true } | { ok: false; error: string },
+): FormState<TValues> {
+  if (result.ok) return { values, errors: {}, failed: false }
+  return result.error === 'nameTaken'
+    ? { values, errors: { name: 'nameTaken' }, failed: false }
+    : { values, errors: {}, failed: true }
+}
+
 type Validated<T> =
   { data: T; errors: null } | { data: null; errors: FieldErrors }
 

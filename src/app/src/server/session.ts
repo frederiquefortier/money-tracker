@@ -8,6 +8,7 @@ import { z } from 'zod'
 import { signInSchema, totpCodeSchema } from '#/lib/schemas'
 import { LOCALES, LOCALE_COOKIE, isLocale, resolveLocale } from '#/i18n/locales'
 import type { Locale } from '#/i18n/locales'
+import type { Result } from '#/lib/result'
 import { getSupabase } from '#/lib/supabase.server'
 
 export type Session = {
@@ -55,7 +56,7 @@ export const getSession = createServerFn({ method: 'GET' }).handler(
 
 export const setLocale = createServerFn({ method: 'POST' })
   .validator(z.object({ locale: z.enum(LOCALES) }))
-  .handler(async ({ data }) => {
+  .handler(async ({ data }): Promise<Result<never>> => {
     writeLocaleCookie(data.locale)
     const supabase = getSupabase()
     const { data: auth } = await supabase.auth.getClaims()
@@ -67,17 +68,24 @@ export const setLocale = createServerFn({ method: 'POST' })
         .eq('user_id', auth.claims.sub)
       if (error) console.error('[profile] locale not saved:', error.code)
     }
+    return { ok: true }
   })
+
+type SignInResult = Result<
+  'invalidCredentials' | 'tooManyAttempts' | 'genericError'
+>
+
+type Enrollment = { factorId: string; qrCode: string; secret: string }
 
 export const signIn = createServerFn({ method: 'POST' })
   .validator(signInSchema)
-  .handler(async ({ data }) => {
+  .handler(async ({ data }): Promise<SignInResult> => {
     const { error } = await getSupabase().auth.signInWithPassword(data)
-    if (!error) return { ok: true as const }
+    if (!error) return { ok: true }
     // One code for wrong password and unknown email: accounts cannot be enumerated.
     // Other failures are logged as a code, never with the email.
     if (error.code === 'invalid_credentials') {
-      return { ok: false as const, error: 'invalidCredentials' as const }
+      return { ok: false, error: 'invalidCredentials' }
     }
     console.error(
       '[auth] sign-in failed:',
@@ -85,9 +93,9 @@ export const signIn = createServerFn({ method: 'POST' })
       error.status ?? '',
     )
     if (error.code === 'over_request_rate_limit') {
-      return { ok: false as const, error: 'tooManyAttempts' as const }
+      return { ok: false, error: 'tooManyAttempts' }
     }
-    return { ok: false as const, error: 'genericError' as const }
+    return { ok: false, error: 'genericError' }
   })
 
 export const signOut = createServerFn({ method: 'POST' }).handler(async () => {
@@ -95,13 +103,14 @@ export const signOut = createServerFn({ method: 'POST' }).handler(async () => {
 })
 
 export const startTotpEnrollment = createServerFn({ method: 'POST' }).handler(
-  async () => {
+  async (): Promise<Result<'failed', Enrollment>> => {
     const supabase = getSupabase()
     const { data: auth } = await supabase.auth.getUser()
-    if (!auth.user) return { ok: false as const }
+    if (!auth.user) return { ok: false, error: 'failed' }
 
     const { data: factors } = await supabase.auth.mfa.listFactors()
-    if (!factors || factors.totp.length > 0) return { ok: false as const }
+    if (!factors || factors.totp.length > 0)
+      return { ok: false, error: 'failed' }
 
     // An abandoned enrolment leaves an unverified factor.
     for (const factor of factors.all) {
@@ -113,9 +122,9 @@ export const startTotpEnrollment = createServerFn({ method: 'POST' }).handler(
     const { data, error } = await supabase.auth.mfa.enroll({
       factorType: 'totp',
     })
-    if (error) return { ok: false as const }
+    if (error) return { ok: false, error: 'failed' }
     return {
-      ok: true as const,
+      ok: true,
       factorId: data.id,
       qrCode: data.totp.qr_code,
       secret: data.totp.secret,
@@ -131,17 +140,17 @@ export const verifyTotp = createServerFn({ method: 'POST' })
       code: totpCodeSchema,
     }),
   )
-  .handler(async ({ data }) => {
+  .handler(async ({ data }): Promise<Result<'invalidCode'>> => {
     const supabase = getSupabase()
     const factorId =
       data.factorId ?? (await supabase.auth.mfa.listFactors()).data?.totp[0]?.id
-    if (!factorId) return { ok: false as const }
+    if (!factorId) return { ok: false, error: 'invalidCode' }
 
     const { error } = await supabase.auth.mfa.challengeAndVerify({
       factorId,
       code: data.code,
     })
-    if (error) return { ok: false as const }
+    if (error) return { ok: false, error: 'invalidCode' }
 
     // Now aal2: the saved locale wins over the browser's.
     const { data: profile } = await supabase
@@ -150,5 +159,5 @@ export const verifyTotp = createServerFn({ method: 'POST' })
       .single()
     const saved = isLocale(profile?.locale) ? profile.locale : undefined
     if (saved) writeLocaleCookie(saved)
-    return { ok: true as const }
+    return { ok: true }
   })

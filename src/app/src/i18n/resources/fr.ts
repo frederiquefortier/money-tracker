@@ -12,6 +12,8 @@ export const fr = {
     close: 'Fermer',
     saveFailed: 'La modification n’a pas été enregistrée.',
     cancel: 'Annuler',
+    save: 'Enregistrer',
+    saving: 'Enregistrement…',
     suggestions: 'Suggestions pour {{label}}',
     loading: 'Chargement…',
     clear: 'Effacer',
@@ -46,7 +48,7 @@ export const fr = {
   mfa: {
     enrollTitle: 'Activer la double authentification',
     enrollIntro:
-      'La double authentification est obligatoire. Scannez ce code avec une application d’authentification, idéalement dans deux applications (téléphone et gestionnaire de mots de passe), puis entrez le code à six chiffres.',
+      'Scannez ce code avec une application d’authentification, puis entrez le code à six chiffres.',
     start: 'Commencer',
     qrAlt: 'Code QR à scanner avec une application d’authentification',
     secretLabel: 'Ou entrez cette clé manuellement',
@@ -77,8 +79,6 @@ export const fr = {
   },
   forgotPassword: {
     title: 'Mot de passe oublié',
-    intro:
-      'Entrez votre courriel. Si un compte y est associé, vous recevrez un lien pour choisir un nouveau mot de passe.',
     submit: 'Envoyer le lien',
     pending: 'Envoi…',
     sent: 'Si un compte existe pour ce courriel, le lien vient d’être envoyé. Il expire dans une heure.',
@@ -86,11 +86,8 @@ export const fr = {
   },
   setPassword: {
     title: 'Choisir votre mot de passe',
-    rule: 'Au moins {{min}} caractères, avec au moins une lettre et un chiffre.',
     password: 'Nouveau mot de passe',
     confirm: 'Confirmer le mot de passe',
-    submit: 'Enregistrer',
-    pending: 'Enregistrement…',
     weakPassword: 'Ce mot de passe est trop faible.',
     samePassword: 'Choisissez un mot de passe différent de l’actuel.',
   },
@@ -120,7 +117,6 @@ export const fr = {
   },
   accounts: {
     title: 'Comptes',
-    add: 'Ajouter un compte',
     empty: 'Aucun compte pour l’instant.',
     noInstitution: 'Sans institution',
     sortLabel: 'Trier: {{sort}}',
@@ -131,8 +127,6 @@ export const fr = {
       balanceAsc: 'Solde croissant',
       balanceDesc: 'Solde décroissant',
     },
-    collapse: 'Replier {{name}}',
-    expand: 'Déplier {{name}}',
     website: 'Site web de {{name}}',
     editInstitution: 'Modifier “{{name}}”',
     addMenu: 'Ajouter',
@@ -145,9 +139,6 @@ export const fr = {
     closedOn: 'Archivé le {{date}}',
     newTitle: 'Nouveau compte',
     editTitle: 'Modifier le compte',
-    cancel: 'Annuler',
-    save: 'Enregistrer',
-    saving: 'Enregistrement…',
     created: 'Compte créé.',
     updated: 'Compte enregistré.',
     name: 'Nom',
@@ -176,6 +167,7 @@ export const fr = {
     saved: 'Institution enregistrée.',
     delete: 'Supprimer l’institution',
     deleteConfirm: 'Supprimer “{{name}}”',
+    inUse: 'Des comptes utilisent encore cette institution.',
   },
   currencies: {
     title: 'Devises',

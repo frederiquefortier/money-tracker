@@ -1,9 +1,7 @@
-import { useOptimistic, useTransition } from 'react'
-import { useRouter } from '@tanstack/react-router'
+import { useOptimistic } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useMyCurrencies } from '#/lib/use-my-currencies'
 import { Icon } from '#/components/icon'
-import { useToast } from '#/components/toaster'
+import { useServerAction } from '#/components/use-server-action'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,25 +10,23 @@ import {
   DropdownMenuTrigger,
 } from '#/components/ui/dropdown-menu'
 import { pickerOrder } from '#/lib/currencies'
+import { useMyCurrencies } from '#/lib/use-my-currencies'
 import { cn, focusRing } from '#/lib/utils'
 import { setDisplayCurrency } from '#/server/currencies'
 
 /** CUR-06: the currency every amount is shown in, saved on the profile. */
 export function DisplayCurrencySwitcher() {
   const { t } = useTranslation()
-  const router = useRouter()
-  const toast = useToast()
+  const { run } = useServerAction()
   const currencies = useMyCurrencies()
   const [shown, setShown] = useOptimistic(currencies.displayCurrency)
-  const [, startTransition] = useTransition()
 
   function choose(code: string) {
     if (code === shown) return
-    startTransition(async () => {
+    // Called inside the transition, so the optimistic code shows until the save ends.
+    run(() => {
       setShown(code)
-      const result = await setDisplayCurrency({ data: { code } })
-      if (!result.ok) toast({ text: t('common.saveFailed') })
-      await router.invalidate()
+      return setDisplayCurrency({ data: { code } })
     })
   }
 

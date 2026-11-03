@@ -1,21 +1,20 @@
 import { useTranslation } from 'react-i18next'
 import { IconActions, IconButton } from '#/components/icon-button'
-import type { Locale } from '#/i18n/locales'
 import { RATES_HISTORY_START, currencyName } from '#/lib/currencies'
 import type { Currency, UserCurrency } from '#/lib/currencies'
 import { formatDate } from '#/lib/format'
+import { useLocale } from '#/lib/use-locale'
 
 /** Code, then the name with its symbol in parentheses, then the tag. */
 function CurrencyLabel({
   currency,
-  locale,
   isDefault = false,
 }: {
   currency: Currency
-  locale: Locale
   isDefault?: boolean
 }) {
   const { t } = useTranslation()
+  const locale = useLocale()
   return (
     <>
       <span className="w-9 shrink-0 font-mono font-bold">{currency.code}</span>
@@ -34,14 +33,9 @@ function CurrencyLabel({
   )
 }
 
-function RatesNote({
-  ratesFrom,
-  locale,
-}: {
-  ratesFrom: string | null | undefined
-  locale: Locale
-}) {
+function RatesNote({ ratesFrom }: { ratesFrom: string | null | undefined }) {
   const { t } = useTranslation()
+  const locale = useLocale()
   // undefined: EUR, or a currency not loaded yet. Older history needs no note.
   if (
     ratesFrom === undefined ||
@@ -62,7 +56,6 @@ export function CurrencyRow({
   isDefault,
   removeHint,
   ratesFrom,
-  locale,
   onFavourite,
   onMakeDefault,
   onRemove,
@@ -71,7 +64,6 @@ export function CurrencyRow({
   isDefault: boolean
   removeHint: string | null
   ratesFrom: string | null | undefined
-  locale: Locale
   onFavourite: (on: boolean) => void
   onMakeDefault: () => void
   onRemove: () => void
@@ -81,11 +73,7 @@ export function CurrencyRow({
   return (
     <li className="py-2.5 pr-2 pl-4">
       <div className="flex items-center gap-3">
-        <CurrencyLabel
-          currency={currency}
-          locale={locale}
-          isDefault={isDefault}
-        />
+        <CurrencyLabel currency={currency} isDefault={isDefault} />
         <IconActions slots={3}>
           <IconButton
             icon={currency.isFavourite ? 'star-fill' : 'star'}
@@ -111,7 +99,7 @@ export function CurrencyRow({
           />
         </IconActions>
       </div>
-      <RatesNote ratesFrom={ratesFrom} locale={locale} />
+      <RatesNote ratesFrom={ratesFrom} />
     </li>
   )
 }

@@ -1,25 +1,23 @@
 import { useActionState, useState } from 'react'
-import { useRouteContext } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
-import { useMyCurrencies } from '#/lib/use-my-currencies'
 import { AccountFields } from '#/components/accounts/account-fields'
 import type { AccountValues } from '#/components/accounts/account-fields'
-import { FormAlert } from '#/components/form-field'
 import { useCloseSheet } from '#/components/route-sheet'
-import { Button } from '#/components/ui/button'
-import { SheetBody, SheetClose, SheetFooter } from '#/components/ui/sheet'
+import { SheetForm } from '#/components/sheet-form'
 import { accountFormSchema } from '#/lib/accounts'
 import {
   formValues,
+  savedState,
   useFieldValidation,
   useFocusFirstError,
   validate,
 } from '#/lib/form'
-import type { FieldErrors } from '#/lib/form'
+import type { FormState } from '#/lib/form'
+import { useMyCurrencies } from '#/lib/use-my-currencies'
 import { saveAccount } from '#/server/accounts'
 import type { AccountType, Institution } from '#/server/accounts'
 
-type State = { values: AccountValues; errors: FieldErrors; failed: boolean }
+type State = FormState<AccountValues>
 
 function useAccountSubmit({
   accountId,
@@ -32,7 +30,7 @@ function useAccountSubmit({
   institutionId: string | null
   onSaved: () => void
 }) {
-  const [state, submit, pending] = useActionState(
+  return useActionState(
     async (_: State, form: FormData): Promise<State> => {
       const values = {
         ...formValues(form, [
@@ -54,22 +52,16 @@ function useAccountSubmit({
           hiddenForNew: values.hiddenForNew,
         },
       })
-      if (result.ok) {
-        onSaved()
-        return { values, errors: {}, failed: false }
-      }
-      return result.error === 'nameTaken'
-        ? { values, errors: { name: 'nameTaken' }, failed: false }
-        : { values, errors: {}, failed: true }
+      if (result.ok) onSaved()
+      return savedState(values, result)
     },
     { values: initial, errors: {}, failed: false },
   )
-  return { state, submit, pending }
 }
 
 /**
  * SET-07: errors under each field on blur and on submit, focus on the first one, typed
- * values kept on failure. The form spans the sheet's body and footer.
+ * values kept on failure.
  */
 export function AccountForm({
   accountId,
@@ -78,7 +70,6 @@ export function AccountForm({
   institutions,
   types,
   onSaved,
-  children,
 }: {
   accountId?: string
   initial: AccountValues
@@ -86,16 +77,14 @@ export function AccountForm({
   institutions: ReadonlyArray<Institution>
   types: ReadonlyArray<AccountType>
   onSaved: () => void
-  children?: React.ReactNode
 }) {
   const { t } = useTranslation()
-  const { session } = useRouteContext({ from: '__root__' })
-  const currencies = useMyCurrencies()
+  const { currencies } = useMyCurrencies()
   const [institutionId, setInstitutionId] = useState(initialInstitutionId)
   const [currency, setCurrency] = useState(initial.currency)
   const [created, setCreated] = useState<Array<Institution>>([])
   const closeSheet = useCloseSheet()
-  const { state, submit, pending } = useAccountSubmit({
+  const [state, submit, pending] = useAccountSubmit({
     accountId,
     initial,
     institutionId,
@@ -108,41 +97,26 @@ export function AccountForm({
   const formRef = useFocusFirstError(state.errors)
 
   return (
-    <form
-      ref={formRef}
+    <SheetForm
       action={submit}
-      noValidate
-      className="flex min-h-0 flex-1 flex-col"
+      formRef={formRef}
+      pending={pending}
+      error={state.failed && t('common.saveFailed')}
     >
-      <SheetBody className="flex flex-col gap-5">
-        <AccountFields
-          values={state.values}
-          fields={fields}
-          types={types}
-          currencies={currencies.currencies}
-          institutions={[...institutions, ...created]}
-          institutionId={institutionId}
-          onInstitutionChange={(id, made) => {
-            setInstitutionId(id)
-            if (made) setCreated((list) => [...list, made])
-          }}
-          currency={currency}
-          onCurrencyChange={setCurrency}
-          locale={session.locale}
-        />
-        {state.failed && <FormAlert>{t('common.saveFailed')}</FormAlert>}
-        {children}
-      </SheetBody>
-      <SheetFooter>
-        <SheetClose asChild>
-          <Button type="button" variant="ghost">
-            {t('accounts.cancel')}
-          </Button>
-        </SheetClose>
-        <Button type="submit" disabled={pending}>
-          {pending ? t('accounts.saving') : t('accounts.save')}
-        </Button>
-      </SheetFooter>
-    </form>
+      <AccountFields
+        values={state.values}
+        fields={fields}
+        types={types}
+        currencies={currencies}
+        institutions={[...institutions, ...created]}
+        institutionId={institutionId}
+        onInstitutionChange={(id, made) => {
+          setInstitutionId(id)
+          if (made) setCreated((list) => [...list, made])
+        }}
+        currency={currency}
+        onCurrencyChange={setCurrency}
+      />
+    </SheetForm>
   )
 }

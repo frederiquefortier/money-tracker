@@ -2,6 +2,8 @@ import { Link, createFileRoute, useRouter } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { Icon } from '#/components/icon'
 import type { IconName } from '#/components/icon'
+import { ListCard, cardSurface, rowHover } from '#/components/list-card'
+import { SettingsPage } from '#/components/settings-page'
 import { cn, focusRing } from '#/lib/utils'
 import { signOut } from '#/server/session'
 
@@ -20,7 +22,8 @@ const SCREENS = [
 }>
 
 const row = cn(
-  'flex w-full items-center gap-3 px-4 py-3.5 text-left font-semibold transition-colors hover:bg-secondary/60',
+  'flex w-full items-center gap-3 px-4 py-3.5 text-left font-semibold',
+  rowHover,
   focusRing,
 )
 
@@ -35,11 +38,8 @@ function Settings() {
   }
 
   return (
-    <div className="mx-auto flex max-w-[40rem] flex-col gap-4">
-      <h1 className="font-mono text-xl font-bold tracking-wide uppercase">
-        {t('settings.title')}
-      </h1>
-      <ul className="divide-y overflow-hidden rounded-xl border bg-card">
+    <SettingsPage title={t('settings.title')} back={false}>
+      <ListCard>
         {SCREENS.map((screen) => (
           <li key={screen.to}>
             <Link to={screen.to} className={row}>
@@ -52,8 +52,8 @@ function Settings() {
             </Link>
           </li>
         ))}
-      </ul>
-      <div className="overflow-hidden rounded-xl border bg-card">
+      </ListCard>
+      <div className={cardSurface}>
         <button
           type="button"
           className={cn(row, 'text-destructive hover:bg-destructive/10')}
@@ -63,6 +63,6 @@ function Settings() {
           {t('common.signOut')}
         </button>
       </div>
-    </div>
+    </SettingsPage>
   )
 }

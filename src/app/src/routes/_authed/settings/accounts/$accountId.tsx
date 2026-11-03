@@ -1,13 +1,11 @@
-import {
-  Navigate,
-  createFileRoute,
-  useLoaderData,
-} from '@tanstack/react-router'
+import { Navigate, createFileRoute } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { AccountForm } from '#/components/accounts/account-form'
 import { RouteSheet } from '#/components/route-sheet'
 import { useToast } from '#/components/toaster'
 import { amountForInput } from '#/lib/accounts'
+import { useAccountsPage } from '#/lib/use-accounts-page'
+import { useLocale } from '#/lib/use-locale'
 
 export const Route = createFileRoute('/_authed/settings/accounts/$accountId')({
   component: EditAccount,
@@ -16,10 +14,8 @@ export const Route = createFileRoute('/_authed/settings/accounts/$accountId')({
 function EditAccount() {
   const { t } = useTranslation()
   const toast = useToast()
-  const { accounts, institutions, types } = useLoaderData({
-    from: '/_authed/settings/accounts',
-  })
-  const { session } = Route.useRouteContext()
+  const { accounts, institutions, types } = useAccountsPage()
+  const locale = useLocale()
   const { accountId } = Route.useParams()
   const account = accounts.find((a) => a.id === accountId)
   if (!account) return <Navigate to="/settings/accounts" />
@@ -33,10 +29,7 @@ function EditAccount() {
           name: account.name,
           type: account.type,
           currency: account.currency,
-          openingBalance: amountForInput(
-            account.openingBalance,
-            session.locale,
-          ),
+          openingBalance: amountForInput(account.openingBalance, locale),
           openedOn: account.openedOn,
           hiddenForNew: account.hiddenForNew,
         }}

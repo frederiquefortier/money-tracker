@@ -1,14 +1,12 @@
 import { useActionState, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Combobox } from '#/components/combobox'
-import { FormAlert } from '#/components/form-field'
 import { useCloseSheet } from '#/components/route-sheet'
+import { SheetForm } from '#/components/sheet-form'
 import { useToast } from '#/components/toaster'
-import { Button } from '#/components/ui/button'
-import { SheetBody, SheetClose, SheetFooter } from '#/components/ui/sheet'
-import type { Locale } from '#/i18n/locales'
 import { currencyName } from '#/lib/currencies'
 import type { Currency } from '#/lib/currencies'
+import { useLocale } from '#/lib/use-locale'
 import { addCurrency } from '#/server/currencies'
 
 type Failure = 'unknown' | 'down' | null
@@ -17,13 +15,12 @@ type Failure = 'unknown' | 'down' | null
 export function AddCurrencyForm({
   catalog,
   owned,
-  locale,
 }: {
   catalog: ReadonlyArray<Currency>
   owned: ReadonlySet<string>
-  locale: Locale
 }) {
   const { t } = useTranslation()
+  const locale = useLocale()
   const toast = useToast()
   const closeSheet = useCloseSheet()
   const [code, setCode] = useState<string | null>(null)
@@ -51,34 +48,27 @@ export function AddCurrencyForm({
     }))
 
   return (
-    <form action={submit} className="flex min-h-0 flex-1 flex-col">
-      <SheetBody className="flex flex-col gap-5">
-        <Combobox
-          label={t('currencies.currency')}
-          required
-          options={options}
-          value={code}
-          onChange={setCode}
-          clearLabel={t('common.clear')}
-        />
-        {failure && (
-          <FormAlert>
-            {failure === 'unknown'
-              ? t('currencies.unknown', { code })
-              : t('currencies.hexaRateDown')}
-          </FormAlert>
-        )}
-      </SheetBody>
-      <SheetFooter>
-        <SheetClose asChild>
-          <Button type="button" variant="ghost">
-            {t('common.cancel')}
-          </Button>
-        </SheetClose>
-        <Button type="submit" disabled={!code || pending}>
-          {pending ? t('currencies.adding') : t('currencies.addShort')}
-        </Button>
-      </SheetFooter>
-    </form>
+    <SheetForm
+      action={submit}
+      pending={pending}
+      canSubmit={code !== null}
+      submitLabel={t('currencies.addShort')}
+      pendingLabel={t('currencies.adding')}
+      error={
+        failure &&
+        (failure === 'unknown'
+          ? t('currencies.unknown', { code })
+          : t('currencies.hexaRateDown'))
+      }
+    >
+      <Combobox
+        label={t('currencies.currency')}
+        required
+        options={options}
+        value={code}
+        onChange={setCode}
+        clearLabel={t('common.clear')}
+      />
+    </SheetForm>
   )
 }

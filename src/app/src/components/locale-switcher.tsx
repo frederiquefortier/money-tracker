@@ -1,7 +1,8 @@
-import { useRouteContext, useRouter } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
+import { useServerAction } from '#/components/use-server-action'
 import { LOCALES } from '#/i18n/locales'
 import type { Locale } from '#/i18n/locales'
+import { useLocale } from '#/lib/use-locale'
 import { cn, focusRing } from '#/lib/utils'
 import { setLocale } from '#/server/session'
 
@@ -13,13 +14,11 @@ const LABELS: Record<Locale, { short: string; name: string }> = {
 
 export function LocaleSwitcher() {
   const { t } = useTranslation()
-  const router = useRouter()
-  const { session } = useRouteContext({ from: '__root__' })
+  const current = useLocale()
+  const { run } = useServerAction()
 
-  async function change(locale: Locale) {
-    if (locale === session.locale) return
-    await setLocale({ data: { locale } })
-    await router.invalidate()
+  function change(locale: Locale) {
+    if (locale !== current) run(() => setLocale({ data: { locale } }))
   }
 
   return (
@@ -35,12 +34,12 @@ export function LocaleSwitcher() {
           lang={locale}
           title={LABELS[locale].name}
           aria-label={LABELS[locale].name}
-          aria-pressed={locale === session.locale}
-          onClick={() => void change(locale)}
+          aria-pressed={locale === current}
+          onClick={() => change(locale)}
           className={cn(
             'rounded-full px-3 py-1 text-xs font-semibold transition-colors',
             focusRing,
-            locale === session.locale
+            locale === current
               ? 'bg-card text-primary'
               : 'text-secondary-foreground/70 hover:text-secondary-foreground',
           )}

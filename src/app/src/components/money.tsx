@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next'
-import { FORMAT_LOCALE } from '#/i18n/locales'
-import type { Locale } from '#/i18n/locales'
+import { moneyFormat } from '#/lib/format'
+import { useLocale } from '#/lib/use-locale'
 import { cn } from '#/lib/utils'
 
 /**
@@ -10,21 +10,19 @@ import { cn } from '#/lib/utils'
 export function Money({
   amount,
   currency,
-  locale,
   converted = false,
   className,
 }: {
   amount: string
   currency: string
-  locale: Locale
   converted?: boolean
   className?: string
 }) {
   const { t } = useTranslation()
-  const parts = new Intl.NumberFormat(FORMAT_LOCALE[locale], {
-    style: 'currency',
-    currency,
-  }).formatToParts(amount as Intl.StringNumericLiteral)
+  const locale = useLocale()
+  const parts = moneyFormat(currency, locale).formatToParts(
+    amount as Intl.StringNumericLiteral,
+  )
   const text = parts.map((p) => p.value).join('')
 
   return (

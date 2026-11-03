@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { inLocale } from '#/i18n/locales'
 import type { Locale } from '#/i18n/locales'
 
 export const currencyCodeSchema = z.string().regex(/^[A-Z]{3}$/)
@@ -23,7 +24,7 @@ export type MyCurrencies = {
 export const RATES_HISTORY_START = '2018-01-02'
 
 export function currencyName(currency: Currency, locale: Locale) {
-  return locale === 'fr' ? currency.nameFr : currency.nameEn
+  return inLocale(locale, currency.nameFr, currency.nameEn)
 }
 
 /** Favourites first, then alphabetical by code (CUR-03). */

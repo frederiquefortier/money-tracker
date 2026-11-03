@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { formatDate, formatMoney } from './format'
+import { formatDate, formatMoney, todayIso } from './format'
 
 // ICU versions differ in which space they use as a separator.
 const plain = (s: string) => s.replace(/[\u00a0\u202f]/g, ' ')
@@ -38,5 +38,13 @@ describe('formatDate', () => {
 
   it('rejects anything that is not YYYY-MM-DD', () => {
     expect(() => formatDate('15/01/2024', 'fr')).toThrow(RangeError)
+  })
+})
+
+describe('todayIso', () => {
+  it('uses the local date, not the UTC one', () => {
+    // 23:30 local time: in Canada, already the next day in UTC.
+    expect(todayIso(new Date(2026, 10, 3, 23, 30))).toBe('2026-11-03')
+    expect(todayIso(new Date(2026, 0, 9, 0, 5))).toBe('2026-01-09')
   })
 })

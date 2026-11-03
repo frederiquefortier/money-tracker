@@ -57,7 +57,7 @@ flags a session that touched `src/` without touching `docs/`.
 | The change... | ...also updates |
 |---|---|
 | adds, changes or drops a feature | [requirements.md](docs/00_briefing/requirements.md) (the row, its phase) and [roadmap.md](docs/03_planning/roadmap.md) |
-| touches the schema | [database.md](docs/01_building/database.md), with a pgTAP test |
+| touches the schema | [database.md](docs/01_building/database.md), with a pgTAP test, and `npm run db:types` |
 | makes or reverses a structural choice | a new ADR in [decisions.md](docs/01_building/decisions.md) (never edit an old ADR's decision; supersede it) |
 | adds a dependency | its line in ADR-011 |
 | changes the import format | [import.md](docs/01_building/import.md) and the templates |

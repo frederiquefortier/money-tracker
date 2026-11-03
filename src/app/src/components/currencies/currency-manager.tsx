@@ -1,26 +1,36 @@
 import { useState } from 'react'
-import { Link, useRouteContext } from '@tanstack/react-router'
+import { Link } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { ConfirmDialog } from '#/components/confirm-dialog'
 import { CurrencyRow } from '#/components/currencies/currency-row'
 import { useCurrencyActions } from '#/components/currencies/use-currency-actions'
 import { Icon } from '#/components/icon'
+import { ListCard } from '#/components/list-card'
 import { useToast } from '#/components/toaster'
 import { Button } from '#/components/ui/button'
 
+export function AddCurrencyButton() {
+  const { t } = useTranslation()
+  return (
+    <Button asChild variant="outline">
+      <Link to="/settings/currencies/add">
+        <Icon name="plus" className="size-4" />
+        {t('currencies.add')}
+      </Link>
+    </Button>
+  )
+}
+
 /** The Devises list (spec 10), reused by first run (spec 17). */
 export function CurrencyManager({
-  heading,
   ratesFrom,
   openAccounts,
 }: {
-  heading: React.ReactNode
   ratesFrom: Record<string, string | null>
   openAccounts: Partial<Record<string, Array<string>>>
 }) {
   const { t } = useTranslation()
   const toast = useToast()
-  const { session } = useRouteContext({ from: '__root__' })
   const { shown, favourite, makeDefault, remove } = useCurrencyActions()
   const [removing, setRemoving] = useState<string | null>(null)
 
@@ -38,17 +48,8 @@ export function CurrencyManager({
   }
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex items-center justify-between gap-3">
-        {heading}
-        <Button asChild variant="outline">
-          <Link to="/settings/currencies/add">
-            <Icon name="plus" className="size-4" />
-            {t('currencies.add')}
-          </Link>
-        </Button>
-      </div>
-      <ul className="divide-y overflow-hidden rounded-xl border bg-card">
+    <>
+      <ListCard>
         {shown.currencies.map((currency) => {
           const removeHint = removalBlock(currency.code)
           return (
@@ -58,7 +59,6 @@ export function CurrencyManager({
               isDefault={currency.code === shown.defaultCurrency}
               removeHint={removeHint}
               ratesFrom={ratesFrom[currency.code]}
-              locale={session.locale}
               onFavourite={(on) => favourite(currency.code, on)}
               onMakeDefault={() => makeDefault(currency.code)}
               onRemove={() =>
@@ -69,7 +69,7 @@ export function CurrencyManager({
             />
           )
         })}
-      </ul>
+      </ListCard>
       <ConfirmDialog
         open={removing !== null}
         title={t('currencies.removeConfirm', { code: removing ?? '' })}
@@ -81,6 +81,6 @@ export function CurrencyManager({
           setRemoving(null)
         }}
       />
-    </div>
+    </>
   )
 }

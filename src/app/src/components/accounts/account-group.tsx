@@ -1,104 +1,43 @@
-import { Link } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
-import { AccountActions } from '#/components/accounts/account-actions'
-import { Icon } from '#/components/icon'
-import { IconAnchor, IconLink } from '#/components/icon-button'
+import { AccountRow } from '#/components/accounts/account-row'
+import type { ListedAccount } from '#/components/accounts/account-row'
+import { InstitutionActions } from '#/components/accounts/institution-actions'
+import { CollapseToggle } from '#/components/collapse-toggle'
+import { IconAnchor } from '#/components/icon-button'
+import { cardSurface } from '#/components/list-card'
 import { MissingRate, Money } from '#/components/money'
-import type { Locale } from '#/i18n/locales'
+import { compareDecimal } from '#/lib/accounts'
 import { formatMoney } from '#/lib/format'
-import { cn, focusRing } from '#/lib/utils'
-import type { Account, GroupTotal, Institution } from '#/server/accounts'
+import { useLocale } from '#/lib/use-locale'
+import type { GroupTotal, Institution } from '#/server/accounts'
 
-export type ListedAccount = Account & { typeLabel: string }
-
-function AccountRow({
-  account,
-  locale,
-}: {
-  account: ListedAccount
-  locale: Locale
-}) {
+function Balance({ account }: { account: ListedAccount }) {
   const { t } = useTranslation()
-  const hasPending = !/^-?0(\.0+)?$/.test(account.pending)
+  const locale = useLocale()
   return (
-    <li className="flex items-center pr-2 hover:bg-secondary/60">
-      <Link
-        to="/settings/accounts/$accountId"
-        params={{ accountId: account.id }}
-        className={cn(
-          'flex min-w-0 flex-1 items-center gap-3 py-3 pl-4',
-          focusRing,
-        )}
-      >
-        <span className="min-w-0 flex-1">
-          <span className="flex items-center gap-1.5 font-semibold">
-            {account.hiddenForNew && (
-              <span title={t('accounts.hidden')}>
-                <Icon
-                  name="eye-off"
-                  label={t('accounts.hidden')}
-                  className="text-muted-foreground"
-                />
-              </span>
-            )}
-            <span className="truncate">{account.name}</span>
-          </span>
-          <span className="block text-sm text-muted-foreground">
-            {account.typeLabel}{' '}
-            <span className="font-mono font-semibold">{account.currency}</span>
-          </span>
+    <>
+      <Money
+        amount={account.balance}
+        currency={account.currency}
+        className="font-semibold"
+      />
+      {compareDecimal(account.pending, '0') !== 0 && (
+        <span className="block text-xs text-muted-foreground">
+          {t('accounts.pending', {
+            amount: formatMoney(account.pending, account.currency, locale),
+          })}
         </span>
-        <span className="text-right">
-          <Money
-            amount={account.balance}
-            currency={account.currency}
-            locale={locale}
-            className="font-semibold"
-          />
-          {hasPending && (
-            <span className="block text-xs text-muted-foreground">
-              {t('accounts.pending', {
-                amount: formatMoney(account.pending, account.currency, locale),
-              })}
-            </span>
-          )}
-        </span>
-      </Link>
-      <AccountActions account={account} />
-    </li>
-  )
-}
-
-/** An institution with no open account still shows, so it can be found (ACC-05). */
-function EmptyGroup() {
-  const { t } = useTranslation()
-  return (
-    <p className="border-t px-4 py-3 text-sm text-muted-foreground">
-      {t('accounts.emptyInstitution')}
-    </p>
-  )
-}
-
-function EditInstitution({ institution }: { institution: Institution }) {
-  const { t } = useTranslation()
-  return (
-    <IconLink
-      icon="pencil"
-      label={t('accounts.editInstitution', { name: institution.name })}
-      to="/settings/accounts/institutions/$institutionId"
-      params={{ institutionId: institution.id }}
-    />
+      )}
+    </>
   )
 }
 
 function GroupTotalAmount({
   total,
   currency,
-  locale,
 }: {
   total: GroupTotal | undefined
   currency: string
-  locale: Locale
 }) {
   // No total: the group holds only closed accounts.
   if (!total) return null
@@ -107,42 +46,9 @@ function GroupTotalAmount({
     <Money
       amount={total.total}
       currency={currency}
-      locale={locale}
       converted={total.converted}
       className="font-bold"
     />
-  )
-}
-
-function CollapseToggle({
-  name,
-  collapsed,
-  onToggle,
-}: {
-  name: string
-  collapsed: boolean
-  onToggle: () => void
-}) {
-  const { t } = useTranslation()
-  return (
-    <button
-      type="button"
-      onClick={onToggle}
-      aria-expanded={!collapsed}
-      aria-label={t(collapsed ? 'accounts.expand' : 'accounts.collapse', {
-        name,
-      })}
-      className={cn(
-        'flex min-w-0 items-center gap-1.5 rounded-lg font-bold',
-        focusRing,
-      )}
-    >
-      <Icon
-        name="chevron-down"
-        className={cn('size-5 transition-transform', collapsed && '-rotate-90')}
-      />
-      <span className="truncate">{name}</span>
-    </button>
   )
 }
 
@@ -150,26 +56,33 @@ function CollapseToggle({
 export function AccountGroup({
   institution,
   accounts,
+  inUse,
   total,
   displayCurrency,
-  locale,
   collapsed,
   onToggle,
 }: {
   institution: Institution | null
   accounts: ReadonlyArray<ListedAccount>
+  /** Any account, open or closed, is in this institution. */
+  inUse: boolean
   total: GroupTotal | undefined
   displayCurrency: string
-  locale: Locale
   collapsed: boolean
   onToggle: () => void
 }) {
   const { t } = useTranslation()
   const name = institution?.name ?? t('accounts.noInstitution')
   return (
-    <section className="overflow-hidden rounded-xl border bg-card">
+    <section className={cardSurface}>
       <header className="flex items-center gap-2 py-2.5 pr-2 pl-3">
-        <CollapseToggle name={name} collapsed={collapsed} onToggle={onToggle} />
+        <CollapseToggle
+          expanded={!collapsed}
+          onToggle={onToggle}
+          className="font-bold"
+        >
+          {name}
+        </CollapseToggle>
         {institution?.websiteUrl && (
           <IconAnchor
             icon="external-link"
@@ -178,22 +91,30 @@ export function AccountGroup({
           />
         )}
         <span className="ml-auto">
-          <GroupTotalAmount
-            total={total}
-            currency={displayCurrency}
-            locale={locale}
-          />
+          <GroupTotalAmount total={total} currency={displayCurrency} />
         </span>
-        {institution && <EditInstitution institution={institution} />}
+        {institution && (
+          <InstitutionActions institution={institution} inUse={inUse} />
+        )}
       </header>
       {!collapsed && accounts.length > 0 && (
         <ul className="divide-y border-t">
           {accounts.map((account) => (
-            <AccountRow key={account.id} account={account} locale={locale} />
+            <AccountRow
+              key={account.id}
+              account={account}
+              details={account.typeLabel}
+              aside={<Balance account={account} />}
+            />
           ))}
         </ul>
       )}
-      {!collapsed && accounts.length === 0 && institution && <EmptyGroup />}
+      {/* An institution with no open account still shows, so it can be found (ACC-05). */}
+      {!collapsed && accounts.length === 0 && institution && (
+        <p className="border-t px-4 py-3 text-sm text-muted-foreground">
+          {t('accounts.emptyInstitution')}
+        </p>
+      )}
     </section>
   )
 }

@@ -1,7 +1,10 @@
 import { Outlet, createFileRoute } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
-import { CurrencyManager } from '#/components/currencies/currency-manager'
-import { BackLink } from '#/components/back-link'
+import {
+  AddCurrencyButton,
+  CurrencyManager,
+} from '#/components/currencies/currency-manager'
+import { SettingsPage } from '#/components/settings-page'
 import { getCurrencySettings } from '#/server/currencies'
 
 export const Route = createFileRoute('/_authed/settings/currencies')({
@@ -14,21 +17,10 @@ function Currencies() {
   const { ratesFrom, openAccounts } = Route.useLoaderData()
 
   return (
-    <div className="flex flex-col gap-4">
-      <BackLink to="/settings" label={t('settings.back')} />
-      <div className="mx-auto w-full max-w-[40rem]">
-        <CurrencyManager
-          heading={
-            <h1 className="font-mono text-xl font-bold tracking-wide uppercase">
-              {t('currencies.title')}
-            </h1>
-          }
-          ratesFrom={ratesFrom}
-          openAccounts={openAccounts}
-        />
-      </div>
+    <SettingsPage title={t('currencies.title')} actions={<AddCurrencyButton />}>
+      <CurrencyManager ratesFrom={ratesFrom} openAccounts={openAccounts} />
       {/* Adding a currency opens here as a sheet (spec 10). */}
       <Outlet />
-    </div>
+    </SettingsPage>
   )
 }

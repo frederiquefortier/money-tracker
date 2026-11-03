@@ -7,44 +7,57 @@ import {
   DialogTitle,
 } from '#/components/ui/dialog'
 
-/** Confirms a destructive action: "Supprimer {name}" in red, a red button, Annuler. */
+/**
+ * Asks before an action. Destructive by default: "Supprimer {name}" in red, a red button,
+ * Annuler. `children` holds what the action needs, such as a date.
+ */
 export function ConfirmDialog({
   open,
   title,
   confirmLabel,
-  irreversible = true,
+  tone = 'destructive',
+  irreversible = tone === 'destructive',
   busy = false,
+  canConfirm = true,
   onCancel,
   onConfirm,
+  children,
 }: {
   open: boolean
   title: string
   confirmLabel: string
+  tone?: 'destructive' | 'default'
   /** Adds "Cette action est irréversible."; false for what can be undone. */
   irreversible?: boolean
   busy?: boolean
+  canConfirm?: boolean
   onCancel: () => void
   onConfirm: () => void
+  children?: React.ReactNode
 }) {
   const { t } = useTranslation()
+  const destructive = tone === 'destructive'
   return (
     <Dialog open={open} onOpenChange={(next) => !next && onCancel()}>
       <DialogContent
         closeLabel={t('common.close')}
         {...(irreversible ? {} : { 'aria-describedby': undefined })}
       >
-        <DialogTitle className="text-destructive">{title}</DialogTitle>
+        <DialogTitle className={destructive ? 'text-destructive' : undefined}>
+          {title}
+        </DialogTitle>
         {irreversible && (
           <DialogDescription>{t('common.irreversible')}</DialogDescription>
         )}
+        {children}
         <div className="flex justify-end gap-2">
           <Button type="button" variant="ghost" onClick={onCancel}>
             {t('common.cancel')}
           </Button>
           <Button
             type="button"
-            variant="destructive"
-            disabled={busy}
+            variant={destructive ? 'destructive' : 'default'}
+            disabled={busy || !canConfirm}
             onClick={onConfirm}
           >
             {confirmLabel}

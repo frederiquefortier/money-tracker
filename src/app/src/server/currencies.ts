@@ -3,11 +3,13 @@ import { z } from 'zod'
 import { currencyCodeSchema } from '#/lib/currencies'
 import type { Currency, MyCurrencies } from '#/lib/currencies'
 import { fetchHexaRate } from '#/lib/rates'
+import { failed } from '#/lib/result'
+import type { Result } from '#/lib/result'
 import { getSupabase } from '#/lib/supabase.server'
 
 export type CurrencyError =
   'unavailable' | 'unknown' | 'isDefault' | 'usedByAccount' | 'failed'
-type Result = { ok: true } | { ok: false; error: CurrencyError }
+type CurrencyResult = Result<CurrencyError>
 
 const codeInput = z.object({ code: currencyCodeSchema })
 
@@ -23,11 +25,6 @@ function toCurrency(code: string, row: CurrencyRow): Currency {
     nameEn: row.name_en,
     symbol: row.symbol,
   }
-}
-
-function failed(context: string, code: string | undefined): Result {
-  console.error(`[currencies] ${context}:`, code ?? 'unknown')
-  return { ok: false, error: 'failed' }
 }
 
 /** The active list and the profile's two currencies, for every signed-in screen. */
@@ -55,7 +52,7 @@ export const getMyCurrencies = createServerFn({ method: 'GET' }).handler(
     }
     return {
       currencies: list.data.map((row) => ({
-        ...toCurrency(row.code, row.currencies as unknown as CurrencyRow),
+        ...toCurrency(row.code, row.currencies),
         isFavourite: row.is_favourite,
       })),
       defaultCurrency: profile.data.default_currency,
@@ -89,7 +86,7 @@ export const getCurrencySettings = createServerFn({ method: 'GET' }).handler(
     // One primary-key lookup per currency; EUR is the base and always has rates.
     const firsts = await Promise.all(
       mine.data
-        .map((row) => row.code as string)
+        .map((row) => row.code)
         .filter((code) => code !== 'EUR')
         .map(async (code) => {
           const { data: first } = await supabase
@@ -100,7 +97,7 @@ export const getCurrencySettings = createServerFn({ method: 'GET' }).handler(
             .order('rate_date')
             .limit(1)
             .maybeSingle()
-          return [code, (first?.rate_date as string | undefined) ?? null]
+          return [code, first?.rate_date ?? null]
         }),
     )
     return {
@@ -123,14 +120,14 @@ export const getCurrencySettings = createServerFn({ method: 'GET' }).handler(
  */
 export const addCurrency = createServerFn({ method: 'POST' })
   .validator(codeInput)
-  .handler(async ({ data }): Promise<Result> => {
+  .handler(async ({ data }): Promise<CurrencyResult> => {
     const supabase = getSupabase()
     const { data: existing, error } = await supabase
       .from('user_currencies')
       .select('removed_at')
       .eq('code', data.code)
       .maybeSingle()
-    if (error) return failed('lookup', error.code)
+    if (error) return failed('currencies', 'lookup', error.code)
 
     if (existing) {
       if (existing.removed_at === null) return { ok: true }
@@ -139,7 +136,7 @@ export const addCurrency = createServerFn({ method: 'POST' })
         .update({ removed_at: null })
         .eq('code', data.code)
       return restored.error
-        ? failed('restore', restored.error.code)
+        ? failed('currencies', 'restore', restored.error.code)
         : { ok: true }
     }
 
@@ -152,17 +149,19 @@ export const addCurrency = createServerFn({ method: 'POST' })
       .insert({ code: data.code })
     // 23503: not in the ISO list.
     if (inserted.error?.code === '23503') return { ok: false, error: 'unknown' }
-    return inserted.error ? failed('insert', inserted.error.code) : { ok: true }
+    return inserted.error
+      ? failed('currencies', 'insert', inserted.error.code)
+      : { ok: true }
   })
 
 export const setFavourite = createServerFn({ method: 'POST' })
   .validator(codeInput.extend({ on: z.boolean() }))
-  .handler(async ({ data }): Promise<Result> => {
+  .handler(async ({ data }): Promise<CurrencyResult> => {
     const { error } = await getSupabase()
       .from('user_currencies')
       .update({ is_favourite: data.on })
       .eq('code', data.code)
-    return error ? failed('favourite', error.code) : { ok: true }
+    return error ? failed('currencies', 'favourite', error.code) : { ok: true }
   })
 
 /**
@@ -172,7 +171,7 @@ export const setFavourite = createServerFn({ method: 'POST' })
  */
 export const removeCurrency = createServerFn({ method: 'POST' })
   .validator(codeInput)
-  .handler(async ({ data }): Promise<Result> => {
+  .handler(async ({ data }): Promise<CurrencyResult> => {
     const { error } = await getSupabase()
       .from('user_currencies')
       .update({ removed_at: new Date().toISOString() })
@@ -184,7 +183,7 @@ export const removeCurrency = createServerFn({ method: 'POST' })
     if (error?.message === 'currency_used_by_open_account') {
       return { ok: false, error: 'usedByAccount' }
     }
-    return error ? failed('remove', error.code) : { ok: true }
+    return error ? failed('currencies', 'remove', error.code) : { ok: true }
   })
 
 export const setDefaultCurrency = createServerFn({ method: 'POST' })
@@ -197,14 +196,14 @@ export const setDisplayCurrency = createServerFn({ method: 'POST' })
 
 async function updateProfile(
   values: { default_currency: string } | { display_currency: string },
-): Promise<Result> {
+): Promise<CurrencyResult> {
   const supabase = getSupabase()
   const { data: auth } = await supabase.auth.getClaims()
-  if (!auth?.claims) return { ok: false, error: 'failed' }
+  if (!auth?.claims) return failed('currencies', 'profile', 'no session')
   // Supabase refuses an update without a filter; RLS limits it to the user anyway.
   const { error } = await supabase
     .from('profiles')
     .update(values)
     .eq('user_id', auth.claims.sub)
-  return error ? failed('profile', error.code) : { ok: true }
+  return error ? failed('currencies', 'profile', error.code) : { ok: true }
 }

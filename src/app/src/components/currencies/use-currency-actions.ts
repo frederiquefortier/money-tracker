@@ -1,8 +1,6 @@
 import { useState } from 'react'
-import { useRouter } from '@tanstack/react-router'
-import { useTranslation } from 'react-i18next'
+import { useServerAction } from '#/components/use-server-action'
 import { useMyCurrencies } from '#/lib/use-my-currencies'
-import { useToast } from '#/components/toaster'
 import type { MyCurrencies } from '#/lib/currencies'
 import {
   removeCurrency,
@@ -44,9 +42,7 @@ let nextId = 0
  * failed change is dropped with a toast.
  */
 export function useCurrencyActions() {
-  const { t } = useTranslation()
-  const router = useRouter()
-  const toast = useToast()
+  const { run } = useServerAction()
   const currencies = useMyCurrencies()
   const [pending, setPending] = useState<Array<Pending>>([])
   const [loaded, setLoaded] = useState(currencies)
@@ -56,19 +52,17 @@ export function useCurrencyActions() {
     setPending((list) => list.filter((p) => !p.saved))
   }
 
-  async function save(change: Change, call: () => Promise<{ ok: boolean }>) {
+  function save(change: Change, call: Parameters<typeof run>[0]) {
     const id = nextId++
     setPending((list) => [...list, { id, change, saved: false }])
-    const result = await call()
-    if (!result.ok) {
-      setPending((list) => list.filter((p) => p.id !== id))
-      toast({ text: t('common.saveFailed') })
-      return
-    }
-    setPending((list) =>
-      list.map((p) => (p.id === id ? { ...p, saved: true } : p)),
-    )
-    await router.invalidate()
+    run(call, {
+      onResult: (ok) =>
+        setPending((list) =>
+          ok
+            ? list.map((p) => (p.id === id ? { ...p, saved: true } : p))
+            : list.filter((p) => p.id !== id),
+        ),
+    })
   }
 
   return {
@@ -77,16 +71,14 @@ export function useCurrencyActions() {
       currencies,
     ),
     favourite: (code: string, on: boolean) =>
-      void save({ type: 'favourite', code, on }, () =>
+      save({ type: 'favourite', code, on }, () =>
         setFavourite({ data: { code, on } }),
       ),
     makeDefault: (code: string) =>
-      void save({ type: 'default', code }, () =>
+      save({ type: 'default', code }, () =>
         setDefaultCurrency({ data: { code } }),
       ),
     remove: (code: string) =>
-      void save({ type: 'remove', code }, () =>
-        removeCurrency({ data: { code } }),
-      ),
+      save({ type: 'remove', code }, () => removeCurrency({ data: { code } })),
   }
 }

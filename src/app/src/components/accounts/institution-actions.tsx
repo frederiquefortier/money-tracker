@@ -1,0 +1,61 @@
+import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import { ConfirmDialog } from '#/components/confirm-dialog'
+import { IconButton, IconLink } from '#/components/icon-button'
+import { useToast } from '#/components/toaster'
+import { useServerAction } from '#/components/use-server-action'
+import { deleteInstitution } from '#/server/accounts'
+import type { Institution } from '#/server/accounts'
+
+/**
+ * Edit and delete on the institution's card header, after the total. Delete waits until
+ * no account, open or closed, uses it (ACC-05).
+ */
+export function InstitutionActions({
+  institution,
+  inUse,
+}: {
+  institution: Institution
+  inUse: boolean
+}) {
+  const { t } = useTranslation()
+  const toast = useToast()
+  const { run, busy } = useServerAction()
+  const [confirming, setConfirming] = useState(false)
+  const { id, name } = institution
+
+  return (
+    <div className="flex items-center">
+      <IconLink
+        icon="pencil"
+        label={t('accounts.editInstitution', { name })}
+        to="/settings/accounts/institutions/$institutionId"
+        params={{ institutionId: id }}
+      />
+      <IconButton
+        icon="trash"
+        label={
+          inUse
+            ? t('institutions.inUse')
+            : t('institutions.deleteConfirm', { name })
+        }
+        muted={inUse}
+        onClick={() =>
+          inUse ? toast({ text: t('institutions.inUse') }) : setConfirming(true)
+        }
+      />
+      <ConfirmDialog
+        open={confirming}
+        title={t('institutions.deleteConfirm', { name })}
+        confirmLabel={t('institutions.delete')}
+        busy={busy}
+        onCancel={() => setConfirming(false)}
+        onConfirm={() =>
+          run(() => deleteInstitution({ data: { id } }), {
+            onResult: () => setConfirming(false),
+          })
+        }
+      />
+    </div>
+  )
+}

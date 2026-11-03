@@ -13,6 +13,8 @@ export const en: Messages = {
     close: 'Close',
     saveFailed: 'The change was not saved.',
     cancel: 'Cancel',
+    save: 'Save',
+    saving: 'Saving…',
     suggestions: 'Suggestions for {{label}}',
     loading: 'Loading…',
     clear: 'Clear',
@@ -47,7 +49,7 @@ export const en: Messages = {
   mfa: {
     enrollTitle: 'Turn on two-factor authentication',
     enrollIntro:
-      'Two-factor authentication is required. Scan this code with an authenticator app, ideally in two apps (phone and password manager), then enter the six-digit code.',
+      'Scan this code with an authenticator app, then enter the six-digit code.',
     start: 'Start',
     qrAlt: 'QR code to scan with an authenticator app',
     secretLabel: 'Or enter this key manually',
@@ -76,8 +78,6 @@ export const en: Messages = {
   },
   forgotPassword: {
     title: 'Forgot password',
-    intro:
-      'Enter your email. If it belongs to an account, you will receive a link to choose a new password.',
     submit: 'Send the link',
     pending: 'Sending…',
     sent: 'If an account exists for this email, the link has been sent. It expires in one hour.',
@@ -85,11 +85,8 @@ export const en: Messages = {
   },
   setPassword: {
     title: 'Choose your password',
-    rule: 'At least {{min}} characters, with at least one letter and one digit.',
     password: 'New password',
     confirm: 'Confirm password',
-    submit: 'Save',
-    pending: 'Saving…',
     weakPassword: 'This password is too weak.',
     samePassword: 'Choose a password different from the current one.',
   },
@@ -119,7 +116,6 @@ export const en: Messages = {
   },
   accounts: {
     title: 'Accounts',
-    add: 'Add an account',
     empty: 'No accounts yet.',
     noInstitution: 'No institution',
     sortLabel: 'Sort: {{sort}}',
@@ -130,8 +126,6 @@ export const en: Messages = {
       balanceAsc: 'Balance, lowest first',
       balanceDesc: 'Balance, highest first',
     },
-    collapse: 'Collapse {{name}}',
-    expand: 'Expand {{name}}',
     website: '{{name}} website',
     editInstitution: 'Edit “{{name}}”',
     addMenu: 'Add',
@@ -144,9 +138,6 @@ export const en: Messages = {
     closedOn: 'Archived on {{date}}',
     newTitle: 'New account',
     editTitle: 'Edit account',
-    cancel: 'Cancel',
-    save: 'Save',
-    saving: 'Saving…',
     created: 'Account created.',
     updated: 'Account saved.',
     name: 'Name',
@@ -175,6 +166,7 @@ export const en: Messages = {
     saved: 'Institution saved.',
     delete: 'Delete institution',
     deleteConfirm: 'Delete “{{name}}”',
+    inUse: 'Accounts still use this institution.',
   },
   currencies: {
     title: 'Currencies',

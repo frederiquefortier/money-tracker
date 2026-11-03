@@ -22,6 +22,9 @@ Grants follow [security.md](security.md#database), rule 8. `profiles` grants `se
 `update (locale, default_currency, display_currency)`: a new user-editable profile column
 joins that grant in its migration.
 
+The app's types come from the schema: `npm run db:types` after every migration, and a
+numeric column the app writes gets a string override in `src/lib/database.ts` (ADR-023).
+
 Soft states are dates, not booleans, wherever the date matters: `closed_on`, `archived_at`,
 `ends_on`. History that the user can view is its own table of events, never an overwritten
 column.

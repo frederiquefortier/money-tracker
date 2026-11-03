@@ -1,7 +1,21 @@
 import { z } from 'zod'
+import { inLocale } from '#/i18n/locales'
+import type { Locale } from '#/i18n/locales'
 import { currencyCodeSchema } from '#/lib/currencies'
 
 // Shared by the account forms and their server functions (SET-07).
+
+/** The group key of the accounts without an institution. */
+export const NO_INSTITUTION = ''
+
+export const DEFAULT_ACCOUNT_TYPE = 'checking'
+
+export function typeLabel(
+  type: { labelFr: string; labelEn: string },
+  locale: Locale,
+) {
+  return inLocale(locale, type.labelFr, type.labelEn)
+}
 
 /** "1 250,50", "-500" or "1250.5" to a plain decimal string; null when not an amount. */
 export function parseAmount(input: string): string | null {

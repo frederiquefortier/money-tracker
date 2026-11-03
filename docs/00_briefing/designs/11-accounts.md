@@ -44,7 +44,8 @@ ACC-01, 02, 03, 04, 05, 06, 07. ACC-08 (last reconciled, last transaction) is ph
   another currency, the total is converted and carries the converted marker (CUR-09:
   `≈` and the details on tap).
 - Collapsed groups are remembered per browser.
-- A pencil on the header opens the institution sheet.
+- A pencil on the header opens the institution sheet; a trash beside it deletes the
+  institution.
 
 ### Rows
 
@@ -127,7 +128,7 @@ ACC-01, 02, 03, 04, 05, 06, 07. ACC-08 (last reconciled, last transaction) is ph
   irréversible."). None of them is in the form, so the sheet only edits. On an open account
   the balance and the icons are centred on the row; on an archived one the icons and the
   "Archivé le …" date sit on the first line, level with the name. Rows end in a fixed-width action slot (`IconActions`); the
-  group header keeps its own layout, total then pencil. Names in
+  group header keeps its own layout, total then pencil and trash. Names in
   titles and labels are quoted: "Supprimer “Chèque”". The section reads "Comptes archivés ({count})".
 
 ## Institution form (ACC-05)
@@ -136,16 +137,18 @@ ACC-01, 02, 03, 04, 05, 06, 07. ACC-08 (last reconciled, last transaction) is ph
 - Opens in the same sheet as the account form, with its own URL
   (`/settings/accounts/institutions/new`, `/settings/accounts/institutions/{id}`).
   Created from the "Ajouter" menu on Comptes ("Un compte", "Une institution") or inline
-  from the account form; edited with the pencil on its card. "Supprimer l'institution"
-  only when no account uses it.
+  from the account form; edited with the pencil on its card, deleted with the trash beside
+  it. The sheet only edits.
 - An institution with no open account still has its card, saying "Aucun compte ouvert.",
   so it can always be found.
 - In the account form, the institution is typed into the field itself (`Combobox`): the
   list filters as you type, "Créer « … »" adds a new one, and a small × clears the choice.
   No institution shows an empty field.
 - Deleting an account or an institution asks first, in the shared `ConfirmDialog` (red
-  title, red button). "Supprimer l'institution" is disabled while any account, open or
-  closed, uses it.
+  title, red button). The institution's trash is muted while any account, open or closed,
+  uses it; a tap explains why in a toast, as on Devises.
+- A row or header action that fails says so in a toast; errors inside a sheet stay in the
+  sheet, above its buttons.
 
 ## States
 
@@ -196,7 +199,8 @@ The `multi_currency` account type is dropped.
 | Inline create | Créer « {text} » |
 | Close | Fermer le compte, Date de fermeture, Rouvrir le compte |
 | Delete | Supprimer le compte |
-| Institution form | Nouvelle institution, Modifier l'institution, Nom, Site web, Supprimer l'institution |
+| Institution form | Nouvelle institution, Modifier l'institution, Nom, Site web |
+| Delete institution | Supprimer l'institution; in use: Des comptes utilisent encore cette institution. |
 
 ## Build notes
 

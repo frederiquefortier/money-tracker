@@ -11,7 +11,7 @@ import {
   validate,
 } from '#/lib/form'
 import type { FieldErrors } from '#/lib/form'
-import { PASSWORD_MIN_LENGTH, newPasswordSchema } from '#/lib/schemas'
+import { newPasswordSchema } from '#/lib/schemas'
 import { setPassword } from '#/server/password'
 
 export const Route = createFileRoute('/set-password')({
@@ -55,11 +55,7 @@ function SetPassword() {
   const formRef = useFocusFirstError(state.errors)
 
   return (
-    <AuthShell
-      icon="lock"
-      title={t('setPassword.title')}
-      description={t('setPassword.rule', { min: PASSWORD_MIN_LENGTH })}
-    >
+    <AuthShell icon="lock" title={t('setPassword.title')}>
       <form
         ref={formRef}
         action={submit}
@@ -103,7 +99,7 @@ function SetPassword() {
           </FormAlert>
         )}
         <Button type="submit" disabled={pending}>
-          {pending ? t('setPassword.pending') : t('setPassword.submit')}
+          {pending ? t('common.saving') : t('common.save')}
         </Button>
       </form>
     </AuthShell>

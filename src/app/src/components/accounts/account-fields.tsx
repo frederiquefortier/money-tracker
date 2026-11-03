@@ -1,12 +1,14 @@
-import { useId } from 'react'
 import { useTranslation } from 'react-i18next'
 import { InstitutionPicker } from '#/components/accounts/institution-picker'
+import { CheckboxField } from '#/components/checkbox-field'
 import { FormField } from '#/components/form-field'
 import { SelectField } from '#/components/select-field'
-import { Checkbox } from '#/components/ui/checkbox'
 import { LinkedFields } from '#/components/linked-fields'
+import { FORMAT_LOCALE } from '#/i18n/locales'
 import type { Locale } from '#/i18n/locales'
+import { typeLabel } from '#/lib/accounts'
 import { currencyName, pickerOrder } from '#/lib/currencies'
+import { useLocale } from '#/lib/use-locale'
 import type { UserCurrency } from '#/lib/currencies'
 import type { AccountType, Institution } from '#/server/accounts'
 
@@ -42,23 +44,42 @@ function currencyOptions(
 }
 
 function typeOptions(types: ReadonlyArray<AccountType>, locale: Locale) {
-  return types.map((type) => ({
-    value: type.code,
-    label: locale === 'fr' ? type.labelFr : type.labelEn,
-  }))
+  return types
+    .map((type) => ({ value: type.code, label: typeLabel(type, locale) }))
+    .sort((a, b) => a.label.localeCompare(b.label, FORMAT_LOCALE[locale]))
 }
 
-/** ACC-04. */
-function HiddenCheckbox({ defaultChecked }: { defaultChecked: boolean }) {
+/** The opening date and the balance on that date, linked. */
+function OpeningFields({
+  values,
+  fields,
+}: {
+  values: AccountValues
+  fields: FieldProps
+}) {
   const { t } = useTranslation()
-  const id = useId()
+  const events = { onBlur: fields.onBlur, onChange: fields.onChange }
   return (
-    <div className="flex items-center gap-3">
-      <Checkbox id={id} name="hiddenForNew" defaultChecked={defaultChecked} />
-      <label htmlFor={id} className="cursor-pointer text-sm font-medium">
-        {t('accounts.hideFromNew')}
-      </label>
-    </div>
+    <LinkedFields>
+      <FormField
+        name="openedOn"
+        type="date"
+        required
+        label={t('accounts.openedOn')}
+        defaultValue={values.openedOn}
+        error={fields.error('openedOn')}
+        {...events}
+      />
+      <FormField
+        name="openingBalance"
+        inputMode="decimal"
+        autoComplete="off"
+        label={t('accounts.openingBalance')}
+        defaultValue={values.openingBalance}
+        error={fields.error('openingBalance')}
+        {...events}
+      />
+    </LinkedFields>
   )
 }
 
@@ -73,7 +94,6 @@ export function AccountFields({
   onInstitutionChange,
   currency,
   onCurrencyChange,
-  locale,
 }: {
   values: AccountValues
   fields: FieldProps
@@ -84,10 +104,9 @@ export function AccountFields({
   onInstitutionChange: (id: string | null, created?: Institution) => void
   currency: string
   onCurrencyChange: (code: string) => void
-  locale: Locale
 }) {
   const { t } = useTranslation()
-  const events = { onBlur: fields.onBlur, onChange: fields.onChange }
+  const locale = useLocale()
 
   return (
     <>
@@ -97,7 +116,8 @@ export function AccountFields({
         required
         defaultValue={values.name}
         error={fields.error('name')}
-        {...events}
+        onBlur={fields.onBlur}
+        onChange={fields.onChange}
       />
       <SelectField
         name="type"
@@ -119,27 +139,12 @@ export function AccountFields({
         onChange={(event) => onCurrencyChange(event.target.value)}
         options={currencyOptions(currencies, currency, locale)}
       />
-      <LinkedFields>
-        <FormField
-          name="openedOn"
-          type="date"
-          required
-          label={t('accounts.openedOn')}
-          defaultValue={values.openedOn}
-          error={fields.error('openedOn')}
-          {...events}
-        />
-        <FormField
-          name="openingBalance"
-          inputMode="decimal"
-          autoComplete="off"
-          label={t('accounts.openingBalance')}
-          defaultValue={values.openingBalance}
-          error={fields.error('openingBalance')}
-          {...events}
-        />
-      </LinkedFields>
-      <HiddenCheckbox defaultChecked={values.hiddenForNew} />
+      <OpeningFields values={values} fields={fields} />
+      <CheckboxField
+        name="hiddenForNew"
+        label={t('accounts.hideFromNew')}
+        defaultChecked={values.hiddenForNew}
+      />
     </>
   )
 }
