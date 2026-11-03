@@ -103,6 +103,11 @@ Fill in, from the Supabase dashboard:
   (`https://<ref>.supabase.co`).
 - `SUPABASE_PUBLISHABLE_KEY`: Project Settings, **API Keys**, the **publishable** key
   (`sb_publishable_…`). Never the secret key.
+- `SUPABASE_DB_PASSWORD`: the database password set when the project was created
+  (Project Settings, Database, to reset it). Only `npm run db:push` reads it (ADR-022).
+- `SUPABASE_SECRET_KEY`: Project Settings, API Keys, a **secret** key (`sb_secret_…`).
+  Only `npm run rates` reads it: the daily rates job, run once from the laptop. The first
+  run loads every rate since 2018.
 
 ```
 npm run dev

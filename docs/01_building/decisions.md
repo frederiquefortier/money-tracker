@@ -4,6 +4,35 @@ Document architectural choices with context, alternatives considered, and trade-
 
 <!-- Newest first: a new ADR goes directly below this line. Template at the bottom. -->
 
+### ADR-022: Until real data exists, the project is the dev database (2026-11-03)
+
+**Context:**
+- ADR-017 made CI on `main` the only way to migrate, after a backup, because the project
+  would hold real data. It holds none yet: the import is still ahead (phase 1).
+- Local dev points at that project, so a new screen could not run locally until its
+  migration reached `main`, which meant pushing untested work to `main`.
+
+**Decision:**
+- Until the first real import, the Supabase project is the development database.
+  `npm run db:push` (from `src/app`) applies pending migrations from the laptop, with no
+  backup step: there is nothing to back up.
+- Work is tried in local dev before it reaches `main`. CI still runs the checks and
+  pgTAP, and its migrate job finds laptop-pushed migrations up to date.
+- Before the first real import, this is revisited: a separate dev project, or the backup
+  gate back in front of every push.
+
+**Alternatives Considered:**
+- CI as the only path (ADR-017) -> Nothing can be tried locally before `main`.
+- Laptop push gated on the GitHub backup workflow -> Ceremony for an empty database, and
+  it needed the GitHub CLI.
+- A second free project now -> The right shape once data exists; until then it is a
+  second sign-in and TOTP setup for no gain.
+
+**Consequences:**
+- Supersedes "migrations only from CI" in ADR-017 until real data exists.
+- A migration can be pushed, tried, and fixed with a follow-up migration the same day.
+- The import milestone gains a step: decide the dev setup before importing.
+
 ### ADR-021: One account; unfinished work is tried in it (2026-11-02)
 
 **Context:**
@@ -120,7 +149,7 @@ Document architectural choices with context, alternatives considered, and trade-
 
 ### ADR-017: One Supabase project for development and real use (2026-10-27)
 
-*The demo account is superseded by ADR-021 (one account).*
+*The demo account is superseded by ADR-021 (one account); migrations only from CI by ADR-022.*
 
 **Context:**
 - The owner is the only user, the project is in Canada (`ca-central-1`, close to the Ohio

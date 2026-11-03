@@ -9,6 +9,12 @@ export const fr = {
     signOut: 'Se déconnecter',
     language: 'Langue',
     genericError: 'Une erreur est survenue. Réessayez.',
+    close: 'Fermer',
+    undo: 'Annuler',
+    saveFailed: 'La modification n’a pas été enregistrée.',
+  },
+  displayCurrency: {
+    label: 'Devise d’affichage : {{code}}',
   },
   validation: {
     required: 'Ce champ est requis.',
@@ -92,10 +98,32 @@ export const fr = {
       'Vos comptes et vos transactions arrivent ici, avec l’import de votre historique.',
     dashboard: 'Vos dépenses par catégorie et par mois s’afficheront ici.',
     budget: 'Vos objectifs et votre fonds d’urgence vivront ici.',
-    settings: 'Comptes, catégories et devises s’ajouteront à cette page.',
   },
   settings: {
-    signedInAs: 'Connecté avec',
+    title: 'Réglages',
+    currencies: 'Devises',
+    back: 'Réglages',
+  },
+  currencies: {
+    title: 'Devises',
+    defaultBadge: 'Par défaut',
+    add: 'Ajouter une devise',
+    search: 'Rechercher un code ou un nom',
+    noResults: 'Aucune devise ne correspond.',
+    makeDefaultFor: 'Utiliser {{code}} par défaut',
+    isDefault: '{{code}} est la devise par défaut',
+    removeCode: 'Retirer {{code}}',
+    defaultCannotBeRemoved: 'Choisissez d’abord une autre devise par défaut.',
+    favourite: '{{code}} en favori',
+    adding: 'Validation de {{code}}…',
+    hexaRateDown:
+      'La validation des taux est indisponible. Réessayez dans un moment.',
+    unknown: 'Le service de taux ne connaît pas {{code}}.',
+    retry: 'Réessayer',
+    ratesFrom: 'Taux disponibles à partir du {{date}}',
+    ratesPending:
+      'Taux disponibles après la prochaine mise à jour quotidienne.',
+    removed: '{{code}} retirée des listes de choix.',
   },
 }
 

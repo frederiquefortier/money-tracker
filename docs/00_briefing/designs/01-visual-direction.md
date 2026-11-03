@@ -22,6 +22,7 @@ viewing are in `references/visual/` (gitignored: third-party images, never commi
   amount.
 - **Primary is the sparkle red.** White text on it and red text on cream both pass WCAG AA.
 - **Inconsolata as the accent font**, uppercase and spaced: the wordmark and card titles.
+  Button text is set in Inconsolata too, uppercase (2026-11-03).
   Amounts will use it too (tabular figures line up). Body text stays Nunito.
 - **Every signed-out card title has an icon** in the primary red: log-in, key, lock, mail,
   shield-check (`AuthShell`'s `icon` prop).

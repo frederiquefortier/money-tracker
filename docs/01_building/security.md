@@ -57,7 +57,9 @@ encrypted dump is the only backup.
 2. **Every server function validates input with Zod** and takes the user from the session,
    never from the payload.
 3. **The secret key** (`SUPABASE_SECRET_KEY`) is only for scheduled jobs (rates, recurring
-   transactions), in Netlify variables scoped to Functions.
+   transactions), in Netlify variables scoped to Functions. Until real data exists it is also
+   in the laptop's local env file for `npm run rates` (ADR-022); no app code reads it, and
+   CI fails if it reaches the browser bundle.
 4. **Headers from the server entry** (ADR-015): a per-request nonce CSP allowing only our
    origin, HSTS, `frame-ancestors 'none'`, `Referrer-Policy: same-origin`, a locked
    `Permissions-Policy`, and `Cache-Control: private, no-store`. `netlify.toml` covers static

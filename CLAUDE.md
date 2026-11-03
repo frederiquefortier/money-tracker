@@ -35,8 +35,8 @@ root keeps only `README.md`, `CLAUDE.md`, `.gitignore`, `.github/`, `.claude/` a
 ([ADR-007](docs/01_building/decisions.md)).
 
 **Every command runs from `src/app/`**, including the Supabase CLI:
-`npx supabase --workdir .. <command>` (`--workdir ..` points it at `src/supabase/`). Migrations are never pushed from a laptop: CI applies them on `main` after a backup
-(ADR-017). There is one account, the owner's; unfinished work is tried there (ADR-021).
+`npx supabase --workdir .. <command>` (`--workdir ..` points it at `src/supabase/`). Until real data exists, the Supabase project is the dev database: push migrations from the
+laptop with `npm run db:push` and try work locally before it reaches `main` (ADR-022). There is one account, the owner's; unfinished work is tried there (ADR-021).
 
 ## Working in the docs (dev journal)
 - Before changing direction, check [decisions.md](docs/01_building/decisions.md) (ADRs).

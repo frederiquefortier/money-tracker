@@ -37,6 +37,9 @@ migration for `profiles.locale` is written (ADR-019).
 ## Phase 1: The ledger
 Replace daily use of the spreadsheet.
 
+**Status (2026-11-03):** currencies, the rates job and the Réglages and Devises screens
+are built (spec 10); the rates backfill runs once the migration is applied.
+
 - Currencies, HexaRate validation, the Frankfurter rates job with a backfill to 2018,
   converted-amount markers. CUR-01..09 (ADR-009).
 - Bilingual reference labels. SET-06.

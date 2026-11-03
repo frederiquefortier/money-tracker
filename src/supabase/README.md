@@ -12,7 +12,8 @@ project holds real data (ADR-017):
 | Lint and pgTAP | CI, on every push | `supabase db start`, `db lint`, `test db` (ci.yml) |
 | Log the CLI in (once per machine) | `src/app` | `npx supabase login` |
 | Link the project | `src/app` | `npx supabase --workdir .. link` |
-| Apply migrations | CI, on `main` only, after the checks and a backup | `supabase db push` (ci.yml, `migrate` job) |
+| Apply migrations | CI, on `main`, after the checks and a backup | `supabase db push` (ci.yml, `migrate` job) |
+| Apply migrations from the laptop, until real data exists (ADR-022) | `src/app` | `npm run db:push` |
 | Push auth settings from `config.toml` | `src/app` | `npx supabase --workdir .. config push` |
 | Regenerate TypeScript types | `src/app` | `npx supabase --workdir .. gen types typescript --linked --schema public > src/lib/database.types.ts` |
 

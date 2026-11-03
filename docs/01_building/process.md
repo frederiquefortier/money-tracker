@@ -61,6 +61,8 @@ without touching `docs/`.
 
 | Date | Topic | Assistant proposed | Author decided | Where |
 |---|---|---|---|---|
+| 2026-11-03 | Devises layout | Two-line rows; tapping a row opens a sheet with "Utiliser par défaut" and "Retirer"; add button under the list; pill buttons | One line per currency, symbol beside the code, a "Par défaut" tag beside the name, every action as an icon on the row, add button beside the title, back link top left, buttons with the card's radius; then the symbol moved beside the actions and styled like the code, a house icon for the default (muted on the default, like the trash), uppercase monospace button text | designs/10-settings-currencies.md |
+| 2026-11-03 | Local dev database | Try after CI migrates `main`; then a laptop push gated on the backup workflow | No data yet, so the project is the dev database: push from the laptop with no backup, never push untested work to `main` | ADR-022 |
 | 2026-11-03 | Import categories | A checkbox to accept the new categories, or refuse the import | Each new category created or merged into another, existing or new (IMP-06) | designs/18-import-export.md |
 | 2026-11-03 | First run | A text box to type the category tree, accounts left to the import | The account and category forms with "Enregistrer et ajouter"; an accounts step | designs/17-first-run.md |
 | 2026-11-03 | Category colours | Ten, then twenty fixed swatches; sub-categories a tint of the top-level colour | Free colour picker for every category, swatches as quick picks; a sub-category starts from a variation of its parent's; the icon colour adapts for contrast | designs/12-categories.md |

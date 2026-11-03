@@ -6,8 +6,8 @@ import {
   fetchFrankfurter,
   fetchHexaRate,
   frankfurterRows,
-} from '../../src/lib/rates'
-import type { RateRow } from '../../src/lib/rates'
+} from '../../src/lib/rates.ts'
+import type { RateRow } from '../../src/lib/rates.ts'
 
 // After the ECB publishes (about 16:00 Frankfurt time) and Frankfurter picks it up.
 export const config = { schedule: '0 17 * * *' }

@@ -1,6 +1,6 @@
 # Settings and currencies
 
-**Status:** reviewed 2026-11-03.
+**Status:** reviewed 2026-11-03; built 2026-11-03, see Build notes.
 
 ## Purpose
 
@@ -39,8 +39,9 @@ the transactions list (spec 14).
 └──────────────────────────────┘
 ```
 
-- One card per group, rows separated by a thin border, a coolicons icon on the left and a
-  chevron on the right. A row is a link to its screen.
+- One card per group, rows separated by a thin border, a coolicons icon on the left and an
+  arrow on the right. A row is a link to its screen.
+- **Se déconnecter** is in red (the destructive colour), icon included, with no arrow.
 - Rows appear as their screens are built; a row never leads to a placeholder.
 - From `md` up: the same cards, centred, at most 40rem wide. The sub-screens open in the
   same place (no two-pane layout in v1).
@@ -48,30 +49,34 @@ the transactions list (spec 14).
 ## Devises
 
 ```
-┌──────────────────────────────┐
-│ ‹ Réglages                   │
-│ DEVISES                      │
-│ ┌──────────────────────────┐ │
-│ │ CAD  Dollar canadien  $ ★ │ │
-│ │      Par défaut           │ │
-│ │ CHF  Franc suisse    CHF ☆│ │
-│ │ EUR  Euro             € ☆ │ │
-│ │ GBP  Livre sterling   £ ☆ │ │
-│ │ USD  Dollar américain $ ★ │ │
-│ └──────────────────────────┘ │
-│ [ + Ajouter une devise ]     │
-└──────────────────────────────┘
+┌──────────────────────────────────────────┐
+│← Réglages                                │
+│ DEVISES           [+ AJOUTER UNE DEVISE] │
+│ ┌──────────────────────────────────────┐ │
+│ │ CAD Dollar c… [Par défaut]   $ ★ ⌂ x │ │
+│ │ CHF Franc suisse           CHF ☆ ⌂ x │ │
+│ │ EUR Euro                     € ☆ ⌂ x │ │
+│ │ GBP Livre sterling           £ ☆ ⌂ x │ │
+│ │ USD Dollar américain         $ ★ ⌂ x │ │
+│ └──────────────────────────────────────┘ │
+└──────────────────────────────────────────┘
+★ ☆ favourite   ⌂ use as default (muted on the default)   x remove (muted on the default)
 ```
 
 ### The list (CUR-01, 03, 05)
 
-- One row per user currency, alphabetical by code. The code is set in Inconsolata, the
-  name follows the interface language (`name_fr` or `name_en`), then the symbol.
-- **Star** on the right toggles favourite (CUR-03). Favourites are not reordered here; they
-  come first in every picker.
-- **Par défaut** under the default currency (CUR-05). Exactly one currency is the default.
-- Tapping a row opens a small sheet with: "Utiliser par défaut" (hidden on the default),
-  "Retirer" (destructive).
+- One line per user currency, alphabetical by code: the code in Inconsolata, the name in
+  the interface language (`name_fr` or `name_en`), then the symbol, styled like the code,
+  next to the actions. A long name truncates.
+- **Par défaut** is a small tag on the same line as the name of the default currency
+  (CUR-05). Exactly one currency is the default.
+- Every action is on the row, as icon buttons on the right, each with a label naming the
+  currency: **star** toggles favourite (CUR-03; favourites are not reordered here, they come
+  first in every picker), **house** makes it the default, **trash** removes it. On the
+  default currency the house and the trash are shown muted, like disabled.
+- The back link sits at the top left of the page; the title and "Ajouter une devise" share
+  the line above the card. Buttons placed with a card share its radius; button text is set
+  in Inconsolata, uppercase.
 
 ### Adding (CUR-02)
 
@@ -89,8 +94,8 @@ the transactions list (spec 14).
 
 ### Removing (CUR-04)
 
-- **Default currency:** "Retirer" is disabled with the hint "Choisissez d'abord une autre
-  devise par défaut."
+- **Default currency:** the trash is shown muted; tapping it shows "Choisissez d'abord une
+  autre devise par défaut." in a toast.
 - **Used by an open account:** "Retirer" is disabled with the hint "Le compte {name} est en
   {code}." (the first one, "et 2 autres" if more). Every new transaction on that account is
   in its currency, so the currency must stay. Closed accounts do not block.
@@ -153,3 +158,24 @@ the transactions list (spec 14).
 | HexaRate down | La validation des taux est indisponible. Réessayez dans un moment. |
 | Rates start later | Taux disponibles à partir du {date} |
 | Save failed | La modification n'a pas été enregistrée. |
+
+## Build notes
+
+What the build does differently or adds, for review:
+
+- **No display-currency cookie.** The signed-in layout reads the profile on every load
+  (`getMyCurrencies`), so the server already renders the right currency first. The cookie
+  would be a second copy to keep in step. Add it back if a screen ever needs the currency
+  before the profile can be read.
+- **Not yet:** the open-account block and the transaction-count confirmation on
+  "Retirer". Both need tables that come with specs 11 and 14; removal is immediate with the
+  "Annuler" toast until then.
+- **Rows only appear as screens exist:** the hub shows Devises and Se déconnecter.
+- **Extra copy:**
+
+  | Key | Français |
+  |---|---|
+  | Unknown to HexaRate | Le service de taux ne connaît pas {code}. |
+  | Rates not fetched yet | Taux disponibles après la prochaine mise à jour quotidienne. |
+  | Removed toast | {code} retirée des listes de choix. |
+

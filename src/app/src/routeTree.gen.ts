@@ -17,8 +17,9 @@ import { Route as SignInRouteImport } from './routes/sign-in'
 import { Route as AuthedIndexRouteImport } from './routes/_authed/index'
 import { Route as AuthedBudgetRouteImport } from './routes/_authed/budget'
 import { Route as AuthedDashboardRouteImport } from './routes/_authed/dashboard'
-import { Route as AuthedSettingsRouteImport } from './routes/_authed/settings'
 import { Route as AuthConfirmRouteImport } from './routes/auth/confirm'
+import { Route as AuthedSettingsIndexRouteImport } from './routes/_authed/settings/index'
+import { Route as AuthedSettingsCurrenciesRouteImport } from './routes/_authed/settings/currencies'
 
 const AuthedRoute = AuthedRouteImport.update({
   id: '/_authed',
@@ -59,16 +60,22 @@ const AuthedDashboardRoute = AuthedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthedRoute,
 } as any)
-const AuthedSettingsRoute = AuthedSettingsRouteImport.update({
-  id: '/settings',
-  path: '/settings',
-  getParentRoute: () => AuthedRoute,
-} as any)
 const AuthConfirmRoute = AuthConfirmRouteImport.update({
   id: '/auth/confirm',
   path: '/auth/confirm',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthedSettingsIndexRoute = AuthedSettingsIndexRouteImport.update({
+  id: '/settings/',
+  path: '/settings/',
+  getParentRoute: () => AuthedRoute,
+} as any)
+const AuthedSettingsCurrenciesRoute =
+  AuthedSettingsCurrenciesRouteImport.update({
+    id: '/settings/currencies',
+    path: '/settings/currencies',
+    getParentRoute: () => AuthedRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof AuthedIndexRoute
@@ -78,8 +85,9 @@ export interface FileRoutesByFullPath {
   '/sign-in': typeof SignInRoute
   '/budget': typeof AuthedBudgetRoute
   '/dashboard': typeof AuthedDashboardRoute
-  '/settings': typeof AuthedSettingsRoute
   '/auth/confirm': typeof AuthConfirmRoute
+  '/settings/currencies': typeof AuthedSettingsCurrenciesRoute
+  '/settings/': typeof AuthedSettingsIndexRoute
 }
 export interface FileRoutesByTo {
   '/forgot-password': typeof ForgotPasswordRoute
@@ -88,9 +96,10 @@ export interface FileRoutesByTo {
   '/sign-in': typeof SignInRoute
   '/budget': typeof AuthedBudgetRoute
   '/dashboard': typeof AuthedDashboardRoute
-  '/settings': typeof AuthedSettingsRoute
   '/auth/confirm': typeof AuthConfirmRoute
   '/': typeof AuthedIndexRoute
+  '/settings/currencies': typeof AuthedSettingsCurrenciesRoute
+  '/settings': typeof AuthedSettingsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -101,9 +110,10 @@ export interface FileRoutesById {
   '/sign-in': typeof SignInRoute
   '/_authed/budget': typeof AuthedBudgetRoute
   '/_authed/dashboard': typeof AuthedDashboardRoute
-  '/_authed/settings': typeof AuthedSettingsRoute
   '/auth/confirm': typeof AuthConfirmRoute
   '/_authed/': typeof AuthedIndexRoute
+  '/_authed/settings/currencies': typeof AuthedSettingsCurrenciesRoute
+  '/_authed/settings/': typeof AuthedSettingsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -115,8 +125,9 @@ export interface FileRouteTypes {
     | '/sign-in'
     | '/budget'
     | '/dashboard'
-    | '/settings'
     | '/auth/confirm'
+    | '/settings/currencies'
+    | '/settings/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/forgot-password'
@@ -125,9 +136,10 @@ export interface FileRouteTypes {
     | '/sign-in'
     | '/budget'
     | '/dashboard'
-    | '/settings'
     | '/auth/confirm'
     | '/'
+    | '/settings/currencies'
+    | '/settings'
   id:
     | '__root__'
     | '/_authed'
@@ -137,9 +149,10 @@ export interface FileRouteTypes {
     | '/sign-in'
     | '/_authed/budget'
     | '/_authed/dashboard'
-    | '/_authed/settings'
     | '/auth/confirm'
     | '/_authed/'
+    | '/_authed/settings/currencies'
+    | '/_authed/settings/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -209,13 +222,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthedDashboardRouteImport
       parentRoute: typeof AuthedRoute
     }
-    '/_authed/settings': {
-      id: '/_authed/settings'
-      path: '/settings'
-      fullPath: '/settings'
-      preLoaderRoute: typeof AuthedSettingsRouteImport
-      parentRoute: typeof AuthedRoute
-    }
     '/auth/confirm': {
       id: '/auth/confirm'
       path: '/auth/confirm'
@@ -223,21 +229,37 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthConfirmRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authed/settings/': {
+      id: '/_authed/settings/'
+      path: '/settings'
+      fullPath: '/settings/'
+      preLoaderRoute: typeof AuthedSettingsIndexRouteImport
+      parentRoute: typeof AuthedRoute
+    }
+    '/_authed/settings/currencies': {
+      id: '/_authed/settings/currencies'
+      path: '/settings/currencies'
+      fullPath: '/settings/currencies'
+      preLoaderRoute: typeof AuthedSettingsCurrenciesRouteImport
+      parentRoute: typeof AuthedRoute
+    }
   }
 }
 
 interface AuthedRouteChildren {
   AuthedBudgetRoute: typeof AuthedBudgetRoute
   AuthedDashboardRoute: typeof AuthedDashboardRoute
-  AuthedSettingsRoute: typeof AuthedSettingsRoute
   AuthedIndexRoute: typeof AuthedIndexRoute
+  AuthedSettingsCurrenciesRoute: typeof AuthedSettingsCurrenciesRoute
+  AuthedSettingsIndexRoute: typeof AuthedSettingsIndexRoute
 }
 
 const AuthedRouteChildren: AuthedRouteChildren = {
   AuthedBudgetRoute: AuthedBudgetRoute,
   AuthedDashboardRoute: AuthedDashboardRoute,
-  AuthedSettingsRoute: AuthedSettingsRoute,
   AuthedIndexRoute: AuthedIndexRoute,
+  AuthedSettingsCurrenciesRoute: AuthedSettingsCurrenciesRoute,
+  AuthedSettingsIndexRoute: AuthedSettingsIndexRoute,
 }
 
 const AuthedRouteWithChildren =
