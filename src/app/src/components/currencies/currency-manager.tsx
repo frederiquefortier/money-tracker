@@ -1,106 +1,86 @@
-import { useRouteContext } from '@tanstack/react-router'
+import { useState } from 'react'
+import { Link, useRouteContext } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
-import { AddCurrencyDialog } from '#/components/currencies/add-currency-dialog'
-import {
-  CurrencyRow,
-  PendingCurrencyRow,
-} from '#/components/currencies/currency-row'
+import { ConfirmDialog } from '#/components/confirm-dialog'
+import { CurrencyRow } from '#/components/currencies/currency-row'
 import { useCurrencyActions } from '#/components/currencies/use-currency-actions'
-import type { Adding } from '#/components/currencies/use-currency-actions'
-import { FormAlert } from '#/components/form-field'
+import { Icon } from '#/components/icon'
 import { useToast } from '#/components/toaster'
 import { Button } from '#/components/ui/button'
-import type { Currency } from '#/lib/currencies'
 
 /** The Devises list (spec 10), reused by first run (spec 17). */
 export function CurrencyManager({
   heading,
-  catalog,
   ratesFrom,
+  openAccounts,
 }: {
   heading: React.ReactNode
-  catalog: ReadonlyArray<Currency>
   ratesFrom: Record<string, string | null>
+  openAccounts: Partial<Record<string, Array<string>>>
 }) {
   const { t } = useTranslation()
   const toast = useToast()
   const { session } = useRouteContext({ from: '__root__' })
-  const { shown, adding, add, favourite, makeDefault, remove } =
-    useCurrencyActions()
+  const { shown, favourite, makeDefault, remove } = useCurrencyActions()
+  const [removing, setRemoving] = useState<string | null>(null)
 
-  const owned = new Set(shown.currencies.map((c) => c.code))
-  if (adding) owned.add(adding.currency.code)
+  /** Why a currency cannot be removed, or null (CUR-04). */
+  function removalBlock(code: string) {
+    if (code === shown.defaultCurrency)
+      return t('currencies.defaultCannotBeRemoved')
+    const accounts = openAccounts[code] ?? []
+    if (accounts.length === 0) return null
+    return t('currencies.usedByAccount', {
+      name: accounts[0],
+      code,
+      count: accounts.length - 1,
+    })
+  }
 
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between gap-3">
         {heading}
-        <AddCurrencyDialog
-          catalog={catalog}
-          exclude={owned}
-          locale={session.locale}
-          onChoose={(currency) => void add(currency)}
-        />
+        <Button asChild variant="outline">
+          <Link to="/settings/currencies/add">
+            <Icon name="plus" className="size-4" />
+            {t('currencies.add')}
+          </Link>
+        </Button>
       </div>
       <ul className="divide-y overflow-hidden rounded-xl border bg-card">
         {shown.currencies.map((currency) => {
-          const isDefault = currency.code === shown.defaultCurrency
+          const removeHint = removalBlock(currency.code)
           return (
             <CurrencyRow
               key={currency.code}
               currency={currency}
-              isDefault={isDefault}
+              isDefault={currency.code === shown.defaultCurrency}
+              removeHint={removeHint}
               ratesFrom={ratesFrom[currency.code]}
               locale={session.locale}
               onFavourite={(on) => favourite(currency.code, on)}
               onMakeDefault={() => makeDefault(currency.code)}
               onRemove={() =>
-                isDefault
-                  ? toast({ text: t('currencies.defaultCannotBeRemoved') })
-                  : remove(currency.code)
+                removeHint
+                  ? toast({ text: removeHint })
+                  : setRemoving(currency.code)
               }
             />
           )
         })}
-        {adding?.status === 'pending' && (
-          <PendingCurrencyRow
-            currency={adding.currency}
-            locale={session.locale}
-          />
-        )}
       </ul>
-      {adding && adding.status !== 'pending' && (
-        <AddFailure adding={adding} onRetry={() => void add(adding.currency)} />
-      )}
-    </div>
-  )
-}
-
-function AddFailure({
-  adding,
-  onRetry,
-}: {
-  adding: Adding
-  onRetry: () => void
-}) {
-  const { t } = useTranslation()
-  if (adding.status === 'unknown') {
-    return (
-      <FormAlert>
-        {t('currencies.unknown', { code: adding.currency.code })}
-      </FormAlert>
-    )
-  }
-  return (
-    <div className="flex flex-col gap-2">
-      <FormAlert>{t('currencies.hexaRateDown')}</FormAlert>
-      <Button
-        variant="outline"
-        className="self-start rounded-xl"
-        onClick={onRetry}
-      >
-        {t('currencies.retry')}
-      </Button>
+      <ConfirmDialog
+        open={removing !== null}
+        title={t('currencies.removeConfirm', { code: removing ?? '' })}
+        confirmLabel={t('currencies.remove')}
+        irreversible={false}
+        onCancel={() => setRemoving(null)}
+        onConfirm={() => {
+          if (removing) remove(removing)
+          setRemoving(null)
+        }}
+      />
     </div>
   )
 }

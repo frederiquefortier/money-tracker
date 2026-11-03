@@ -8,18 +8,6 @@ function Dialog(props: React.ComponentProps<typeof DialogPrimitive.Root>) {
   return <DialogPrimitive.Root data-slot="dialog" {...props} />
 }
 
-function DialogTrigger(
-  props: React.ComponentProps<typeof DialogPrimitive.Trigger>,
-) {
-  return <DialogPrimitive.Trigger data-slot="dialog-trigger" {...props} />
-}
-
-function DialogClose(
-  props: React.ComponentProps<typeof DialogPrimitive.Close>,
-) {
-  return <DialogPrimitive.Close data-slot="dialog-close" {...props} />
-}
-
 function DialogContent({
   className,
   children,
@@ -44,7 +32,7 @@ function DialogContent({
         {...props}
       >
         {children}
-        <DialogPrimitive.Close className="absolute top-4 right-4 rounded-full p-1 text-muted-foreground hover:text-foreground focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none">
+        <DialogPrimitive.Close className="absolute top-4 right-4 rounded-full p-1 text-muted-foreground hover:text-foreground outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">
           <Icon name="close" label={closeLabel} className="size-5" />
         </DialogPrimitive.Close>
       </DialogPrimitive.Content>
@@ -78,11 +66,4 @@ function DialogDescription({
   )
 }
 
-export {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogTitle,
-  DialogTrigger,
-}
+export { Dialog, DialogContent, DialogDescription, DialogTitle }

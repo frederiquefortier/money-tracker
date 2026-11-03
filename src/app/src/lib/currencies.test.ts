@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { pickerOrder, searchCurrencies } from './currencies'
+import { pickerOrder } from './currencies'
 
 const currency = (code: string, nameFr: string, nameEn: string) => ({
   code,
@@ -24,19 +24,5 @@ describe('pickerOrder', () => {
       'CHF',
       'USD',
     ])
-  })
-})
-
-describe('searchCurrencies', () => {
-  it('matches the code and both names, ignoring case and accents', () => {
-    expect(searchCurrencies(list, 'chf').map((c) => c.code)).toEqual(['CHF'])
-    expect(searchCurrencies(list, 'americain').map((c) => c.code)).toEqual([
-      'USD',
-    ])
-    expect(searchCurrencies(list, 'swiss').map((c) => c.code)).toEqual(['CHF'])
-  })
-
-  it('returns everything for an empty query', () => {
-    expect(searchCurrencies(list, '  ')).toHaveLength(4)
   })
 })

@@ -1,6 +1,7 @@
 import { useOptimistic, useTransition } from 'react'
-import { useRouteContext, useRouter } from '@tanstack/react-router'
+import { useRouter } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
+import { useMyCurrencies } from '#/lib/use-my-currencies'
 import { Icon } from '#/components/icon'
 import { useToast } from '#/components/toaster'
 import {
@@ -19,7 +20,7 @@ export function DisplayCurrencySwitcher() {
   const { t } = useTranslation()
   const router = useRouter()
   const toast = useToast()
-  const { currencies } = useRouteContext({ from: '/_authed' })
+  const currencies = useMyCurrencies()
   const [shown, setShown] = useOptimistic(currencies.displayCurrency)
   const [, startTransition] = useTransition()
 

@@ -55,8 +55,9 @@ category form (spec 12).
 
 - The accounts added so far, grouped by institution as in spec 11 (without totals), and
   "Ajouter un compte", which opens the account form (spec 11) over the step.
-- The form's "Enregistrer et ajouter" saves and opens a fresh form with the same
-  institution and currency, for entering several accounts in a row.
+- After each save the step lists the new account and "Ajouter un compte" stays in reach
+  for the next one. The account form has a single "Enregistrer" (spec 11, decided
+  2026-11-03).
 - "Continuer" once at least one account exists; otherwise "Je les créerai plus tard".
 
 ### 4. Catégories

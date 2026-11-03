@@ -1,6 +1,6 @@
 # Accounts
 
-**Status:** reviewed 2026-11-03.
+**Status:** reviewed 2026-11-03; built 2026-11-03, see Build notes.
 
 ## Purpose
 
@@ -44,7 +44,7 @@ ACC-01, 02, 03, 04, 05, 06, 07. ACC-08 (last reconciled, last transaction) is ph
   another currency, the total is converted and carries the converted marker (CUR-09:
   `≈` and the details on tap).
 - Collapsed groups are remembered per browser.
-- A "…" on the header: "Modifier l'institution", "Ajouter un compte ici".
+- A pencil on the header opens the institution sheet.
 
 ### Rows
 
@@ -72,7 +72,8 @@ ACC-01, 02, 03, 04, 05, 06, 07. ACC-08 (last reconciled, last transaction) is ph
 ### Closed accounts (ACC-03)
 
 - A collapsed line at the bottom, "Comptes fermés (2)". Open, it lists them flat, muted,
-  with the closing date instead of a balance.
+  each with its institution, type and currency, and the closing date instead of a
+  balance.
 - They are excluded from the group totals and from every picker.
 
 ## Account form
@@ -108,17 +109,43 @@ ACC-01, 02, 03, 04, 05, 06, 07. ACC-08 (last reconciled, last transaction) is ph
 - **Masquer des nouvelles transactions** (ACC-04): a checkbox.
 - **Fermer le compte** (edit only, ACC-03): asks for a closing date (default today), then
   moves the account to Comptes fermés. A closed account shows "Rouvrir le compte" instead.
-- **Enregistrer et ajouter** (new accounts only): saves, then opens a fresh form with the
-  same institution and currency.
 - **Supprimer le compte** (edit only): only for an account with no transactions;
   otherwise it is not shown, and closing is the way out. Asks for confirmation.
-- Phone: the form is a full screen with Annuler and Enregistrer in the top bar (layout
-  reference, expense form). From `md` up: a centred card, at most 32rem.
+- **One save button.** "Enregistrer" (it reads "Enregistrement…" while saving) and
+  "Annuler" sit in the sheet's footer. Saving returns to Comptes with a toast, "Compte créé."
+  or "Compte enregistré.".
+- **Shell:** a sheet over Comptes, with its own URL (`/settings/accounts/new`,
+  `/settings/accounts/{id}`): full screen on a phone, a panel from the right from `md` up,
+  so the list stays in view.
+- **Form practice** (SET-07): required fields carry an asterisk, with no legend (a web
+  convention); the opening date comes first and the opening balance sits under it, the
+  two joined by a line down their left side (`LinkedFields`); the balance reads "Solde à
+  l'ouverture"; no helper text; on a failed submit, focus moves to the first invalid field.
+- **Actions on the rows**, as icons beside each account (`IconButton`, shared with Devises):
+  "Archiver" (the interface word for closing, ACC-03; a dialog asks the date), undo
+  reopens an archived one, trash deletes ("Supprimer {name}" / "Cette action est
+  irréversible."). None of them is in the form, so the sheet only edits. On an open account
+  the balance and the icons are centred on the row; on an archived one the icons and the
+  "Archivé le …" date sit on the first line, level with the name. Rows end in a fixed-width action slot (`IconActions`); the
+  group header keeps its own layout, total then pencil. Names in
+  titles and labels are quoted: "Supprimer “Chèque”". The section reads "Comptes archivés ({count})".
 
 ## Institution form (ACC-05)
 
 - **Nom** required, unique per user. **Site web** optional, must be an `https://` URL.
-- Opened from a group's "…" menu. "Supprimer l'institution" only when no account uses it.
+- Opens in the same sheet as the account form, with its own URL
+  (`/settings/accounts/institutions/new`, `/settings/accounts/institutions/{id}`).
+  Created from the "Ajouter" menu on Comptes ("Un compte", "Une institution") or inline
+  from the account form; edited with the pencil on its card. "Supprimer l'institution"
+  only when no account uses it.
+- An institution with no open account still has its card, saying "Aucun compte ouvert.",
+  so it can always be found.
+- In the account form, the institution is typed into the field itself (`Combobox`): the
+  list filters as you type, "Créer « … »" adds a new one, and a small × clears the choice.
+  No institution shows an empty field.
+- Deleting an account or an institution asks first, in the shared `ConfirmDialog` (red
+  title, red button). "Supprimer l'institution" is disabled while any account, open or
+  closed, uses it.
 
 ## States
 
@@ -161,7 +188,8 @@ The `multi_currency` account type is dropped.
 | Pending line | dont {amount} en attente |
 | No institution option | Aucune |
 | Empty | Aucun compte pour l'instant. |
-| Add | Ajouter un compte, Enregistrer et ajouter |
+| Add | Ajouter, Un compte, Une institution, Ajouter un compte ici |
+| Save | Enregistrer, Enregistrement…, Compte créé., Compte enregistré. |
 | Form titles | Nouveau compte, Modifier le compte |
 | Fields | Nom, Type, Institution, Devise, Solde d'ouverture, Date d'ouverture |
 | Currency locked | La devise ne peut plus changer : le compte a des transactions. |
@@ -169,3 +197,22 @@ The `multi_currency` account type is dropped.
 | Close | Fermer le compte, Date de fermeture, Rouvrir le compte |
 | Delete | Supprimer le compte |
 | Institution form | Nouvelle institution, Modifier l'institution, Nom, Site web, Supprimer l'institution |
+
+## Build notes
+
+What the build does differently or leaves for later, for review:
+
+- **Layout follows the Devises feedback** (spec 10): "← Réglages" at the top left of the
+  page, then the title with "Trier" and "Ajouter" on the same line.
+- **Type and Devise are native selects** (ADR-011); Institution is a searchable sheet with
+  "Aucune" first and "Créer « … »" when nothing matches. All three share one trigger look
+  and the thin chevron (`selectControl`, `SelectChevron`).
+- **Until transactions exist** (specs 14 and 15): a balance is the opening balance, no
+  pending line shows, the currency is never locked, and "Supprimer le compte" is always
+  offered (with a confirmation). A row opens the account form.
+- **Converted totals** show `≈` and say "converted to {code}" to screen readers; the rate
+  details on tap come with the converted-amount marker of spec 14.
+- **A missing rate** in a group shows "Taux manquant" in the error colour, with the
+  explanation on hover.
+- **Institution names** are unique per user ignoring case, like account names.
+

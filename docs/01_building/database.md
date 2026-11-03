@@ -1,7 +1,7 @@
 # Database
 
-The schema, updated with every migration. `profiles`, `currencies`, `exchange_rates` and
-`user_currencies` exist so far; the rest is the design. IDs refer to [requirements.md](../00_briefing/requirements.md).
+The schema, updated with every migration. `profiles`, `currencies`, `exchange_rates`,
+`user_currencies`, `account_types`, `institutions` and `accounts` exist so far; the rest is the design. IDs refer to [requirements.md](../00_briefing/requirements.md).
 
 ## Conventions
 
@@ -50,14 +50,15 @@ column.
 | `currencies` | `code`, `name_fr`, `name_en`, `symbol`, `minor_units` | The 162 currencies in current use per ICU (Node 24 `Intl`), loaded by a migration. CUR-02 validates against HexaRate before a user can add one. |
 | `exchange_rates` | `base`, `quote`, `rate_date`, `rate`, `source` (`frankfurter`/`hexarate`) | Primary key (`base`, `quote`, `rate_date`). `base` is always EUR (a check), the ECB's; cross rates are computed. Backfilled to 2018 and filled daily by the rates job (ADR-009). |
 | function `exchange_rate(from, to, on_date)` | | Units of `to` for one `from`. Each leg takes the last rate on or before the date, so weekends and holidays use the previous business day. 1 for the same currency; null when a leg has no rate yet, never zero (ADR-004). |
-| `account_types`, `holding_types` | `code`, `country`, `kind`, `label_fr`, `label_en` | Region pack data (LOC-02). CSVs in `src/data/reference/`. |
+| `account_types` | `code`, `label_fr`, `label_en` | ACC-01. Loaded from `src/data/reference/account-types.csv`. |
+| `holding_types` | `code`, `country`, `kind`, `label_fr`, `label_en` | Region pack data (LOC-02). CSV in `src/data/reference/`. |
 
 ### Profile and currencies
 
 | Table | Columns | Req |
 |---|---|---|
 | `profiles` | `user_id` (PK), `locale` (`fr` or `en`, ADR-019), `default_currency`, `display_currency` (both CAD on sign-up, composite FKs to `user_currencies`), `transfer_fee_category_id`, `birth_date`, `home_country`, `show_budget_tooltips` | SET, CUR-05/06, BUD-06, TRX-04 |
-| `user_currencies` | `code`, `is_favourite`, `removed_at` | CUR-01..04. Unique (`user_id`, `code`). Five rows inserted by the sign-up trigger. Removing sets `removed_at`, so adding back skips the HexaRate check; there is no delete grant. Triggers refuse removing the default, move the display currency to the default when it is removed, and keep both profile currencies pointing at active rows. Open accounts will block removal once `accounts` exists. |
+| `user_currencies` | `code`, `is_favourite`, `removed_at` | CUR-01..04. Unique (`user_id`, `code`). Five rows inserted by the sign-up trigger. Removing sets `removed_at`, so adding back skips the HexaRate check; there is no delete grant. Triggers refuse removing the default or a currency an open account books in, move the display currency to the default when it is removed, and keep both profile currencies pointing at active rows. Open accounts will block removal once `accounts` exists. |
 
 Labels in reference tables come in pairs (`label_fr`, `label_en`; `name_fr`, `name_en`)
 per ADR-008. User-owned rows (categories, merchants, notes) store one string, as typed.
@@ -66,8 +67,10 @@ per ADR-008. User-owned rows (categories, merchants, notes) store one string, as
 
 | Table | Columns | Req |
 |---|---|---|
-| `institutions` | `name`, `website_url` | ACC-05 |
-| `accounts` | `institution_id` (nullable), `name`, `type` (→ `account_types`), `currency`, `opening_balance`, `opened_on`, `closed_on`, `hidden_for_new`, `last_reconciled_on` | ACC-01..04, 08. Also `unique (user_id, id, currency)`, the target of the transactions currency FK. An account's currency cannot change once it has transactions. |
+| `institutions` | `name`, `website_url` (`https://` only) | ACC-05. Names unique per user, ignoring case. Deleting one that accounts use fails on the foreign key. |
+| `accounts` | `institution_id` (nullable), `name`, `type` (→ `account_types`), `currency`, `opening_balance`, `opened_on`, `closed_on`, `hidden_for_new` | ACC-01..04. Names unique among open accounts, ignoring case. `(user_id, currency)` references `user_currencies`, so an account books in one of the user's currencies; a trigger keeps an open account off a removed currency. Also `unique (user_id, id, currency)`, the target of the transactions currency FK. An account's currency cannot change once it has transactions (with the transactions migration). `last_reconciled_on` comes with ACC-08 (phase 2). |
+| view `account_balances` | `account_id`, `currency`, `balance`, `pending`, `display_currency`, `display_balance` | ACC-06. The opening balance until transactions exist; the transactions migration adds their sum and the pending part. `display_balance` is in the profile's display currency at today's rate, null when a rate is missing. |
+| view `institution_totals` | `institution_id` (null: no institution), `display_currency`, `total`, `converted` | ACC-06, CUR-09. Open accounts only. One missing rate makes the total null, never a partial sum. |
 
 ### Categories
 

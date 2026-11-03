@@ -9,7 +9,12 @@ import { useTranslation } from 'react-i18next'
 import { AuthShell } from '#/components/auth-shell'
 import { FormAlert, FormField } from '#/components/form-field'
 import { Button } from '#/components/ui/button'
-import { formValues, useFieldValidation, validate } from '#/lib/form'
+import {
+  formValues,
+  useFieldValidation,
+  useFocusFirstError,
+  validate,
+} from '#/lib/form'
 import type { FieldErrors } from '#/lib/form'
 import { signInSchema } from '#/lib/schemas'
 import { signIn } from '#/server/session'
@@ -47,10 +52,16 @@ function SignIn() {
     initial,
   )
   const fields = useFieldValidation(signInSchema, state.errors)
+  const formRef = useFocusFirstError(state.errors)
 
   return (
     <AuthShell icon="log-in" title={t('signIn.title')}>
-      <form action={submit} noValidate className="flex flex-col gap-4">
+      <form
+        ref={formRef}
+        action={submit}
+        noValidate
+        className="flex flex-col gap-4"
+      >
         <FormField
           name="email"
           type="email"

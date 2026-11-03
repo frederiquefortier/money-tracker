@@ -12,6 +12,10 @@ export const VALIDATION_IDS = [
   'mismatch',
   'code',
   'invalid',
+  'amount',
+  'date',
+  'url',
+  'nameTaken',
 ] as const
 export type ValidationId = (typeof VALIDATION_IDS)[number]
 

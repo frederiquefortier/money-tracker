@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import type { z } from 'zod'
 import { PASSWORD_MIN_LENGTH, VALIDATION_IDS } from '#/lib/schemas'
@@ -84,4 +84,19 @@ export function useFieldValidation(
         check(event.target.name, event.target.value)
     },
   }
+}
+
+/**
+ * After a submit with errors, moves focus to the first invalid field (WCAG 3.3.1), so a
+ * keyboard or screen reader user lands on what needs fixing. Attach the ref to the form.
+ */
+export function useFocusFirstError(submitted: FieldErrors) {
+  const formRef = useRef<HTMLFormElement>(null)
+  useEffect(() => {
+    if (!Object.values(submitted).some(Boolean)) return
+    formRef.current
+      ?.querySelector<HTMLElement>('[aria-invalid="true"]')
+      ?.focus()
+  }, [submitted])
+  return formRef
 }

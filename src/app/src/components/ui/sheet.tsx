@@ -1,0 +1,76 @@
+import * as React from 'react'
+import { Dialog as SheetPrimitive } from 'radix-ui'
+import { Icon } from '#/components/icon'
+import { cn, focusRing } from '#/lib/utils'
+
+// Based on shadcn's sheet: full screen on phones, a panel from the right from md up, its
+// animations in styles.css (.sheet-panel). Built on the Radix dialog, so focus is trapped
+// and returns to the trigger on close. Content is a SheetBody that scrolls and a
+// SheetFooter that stays put; a form can wrap both.
+function Sheet(props: React.ComponentProps<typeof SheetPrimitive.Root>) {
+  return <SheetPrimitive.Root data-slot="sheet" {...props} />
+}
+
+function SheetContent({
+  title,
+  closeLabel,
+  children,
+  onCloseAutoFocus,
+}: {
+  title: string
+  closeLabel: string
+  children: React.ReactNode
+  /** Runs once the closing animation has finished. */
+  onCloseAutoFocus?: (event: Event) => void
+}) {
+  return (
+    <SheetPrimitive.Portal>
+      <SheetPrimitive.Overlay className="sheet-overlay fixed inset-0 z-50 bg-black/40" />
+      <SheetPrimitive.Content
+        aria-describedby={undefined}
+        onCloseAutoFocus={onCloseAutoFocus}
+        className="sheet-panel fixed inset-0 z-50 flex flex-col bg-card text-card-foreground outline-none md:left-auto md:w-full md:max-w-md md:border-l"
+      >
+        <header className="flex items-center gap-3 border-b px-5 pt-[calc(1rem+env(safe-area-inset-top))] pb-4 md:pt-4">
+          <SheetPrimitive.Title className="flex-1 font-mono text-lg font-bold tracking-wide uppercase">
+            {title}
+          </SheetPrimitive.Title>
+          <SheetPrimitive.Close
+            className={cn(
+              'rounded-lg p-1 text-muted-foreground hover:text-foreground',
+              focusRing,
+            )}
+          >
+            <Icon name="close" label={closeLabel} className="size-5" />
+          </SheetPrimitive.Close>
+        </header>
+        {children}
+      </SheetPrimitive.Content>
+    </SheetPrimitive.Portal>
+  )
+}
+
+function SheetBody({ className, ...props }: React.ComponentProps<'div'>) {
+  return (
+    <div
+      className={cn('min-h-0 flex-1 overflow-y-auto px-5 py-5', className)}
+      {...props}
+    />
+  )
+}
+
+function SheetFooter({ className, ...props }: React.ComponentProps<'div'>) {
+  return (
+    <div
+      className={cn(
+        'flex justify-end gap-2 border-t px-5 pt-4 pb-[calc(1rem+env(safe-area-inset-bottom))] md:pb-4',
+        className,
+      )}
+      {...props}
+    />
+  )
+}
+
+const SheetClose = SheetPrimitive.Close
+
+export { Sheet, SheetBody, SheetClose, SheetContent, SheetFooter }

@@ -8,12 +8,14 @@ import { getMyCurrencies } from '#/server/currencies'
 
 // UI guard only; RLS is the real one.
 export const Route = createFileRoute('/_authed')({
-  beforeLoad: async ({ context }) => {
+  beforeLoad: ({ context }) => {
     if (!context.session.user) throw redirect({ to: '/sign-in' })
     if (context.session.aal !== 'aal2') throw redirect({ to: '/mfa' })
-    // The display currency lives on the profile and reaches every screen here (ADR-011).
-    return { currencies: await getMyCurrencies() }
   },
+  // A loader, not beforeLoad: it runs beside the page's own loader instead of before it,
+  // and its result is cached until a write calls router.invalidate() (ADR-011).
+  loader: () => getMyCurrencies(),
+  staleTime: Infinity,
   component: AuthedLayout,
 })
 
@@ -23,11 +25,11 @@ function AuthedLayout() {
       <div className="min-h-dvh pb-[calc(4.5rem+env(safe-area-inset-bottom))] md:pb-0">
         <header className="sticky top-0 z-20 border-b bg-card/80 pt-[env(safe-area-inset-top)] backdrop-blur">
           <div className="flex items-center justify-between gap-4 px-4 py-3 md:px-6">
-            <Logo />
+            <Logo className="min-w-0" />
             <div className="hidden md:block">
               <AppNav variant="top" />
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex shrink-0 items-center gap-2">
               <DisplayCurrencySwitcher />
               <LocaleSwitcher />
             </div>

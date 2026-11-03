@@ -13,7 +13,7 @@ onto them.
 | # | Spec | Screens | Requirements | Status |
 |---|---|---|---|---|
 | 10 | [Settings and currencies](10-settings-currencies.md) | Réglages hub, Devises, display currency switcher in the header | CUR-01..07, SET-06 | Built |
-| 11 | [Accounts](11-accounts.md) | Accounts by institution, account form, institution form | ACC-01..07 | Reviewed |
+| 11 | [Accounts](11-accounts.md) | Accounts by institution, account form, institution form | ACC-01..07 | Built |
 | 12 | [Categories](12-categories.md) | Category tree, category form, icon picker, category picker | CAT-01..07 | Reviewed |
 | 13 | [Merchants](13-merchants.md) | Merchant list and form, merchant picker | MER-01, 05, TRX-05 | Reviewed |
 | 14 | [Transactions](14-transactions.md) | The list (home tab), day groups, converted-amount marker | TRX-04, 09, CUR-06, 07, 09 | Reviewed |

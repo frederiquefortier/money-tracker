@@ -38,6 +38,8 @@ copyrighted images, never committed).
   padding only.
 - **The language toggle lives in the header** (and top right on the signed-out screens),
   nowhere else.
+- **The app name never wraps in the header.** When it no longer fits on one line beside
+  the logo, it is hidden and the logo stays alone (the name remains for screen readers).
 - **The floating add button** arrives with the add-transaction screen (phase 1), on the
   Transactions tab only.
 

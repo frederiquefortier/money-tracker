@@ -14,6 +14,7 @@ project holds real data (ADR-017):
 | Link the project | `src/app` | `npx supabase --workdir .. link` |
 | Apply migrations | CI, on `main`, after the checks and a backup | `supabase db push` (ci.yml, `migrate` job) |
 | Apply migrations from the laptop, until real data exists (ADR-022) | `src/app` | `npm run db:push` |
+| Run the pgTAP tests against the linked project, no Docker | `src/app` | `npm run db:test` (each file rolls back) |
 | Push auth settings from `config.toml` | `src/app` | `npx supabase --workdir .. config push` |
 | Regenerate TypeScript types | `src/app` | `npx supabase --workdir .. gen types typescript --linked --schema public > src/lib/database.types.ts` |
 

@@ -4,7 +4,12 @@ import { useTranslation } from 'react-i18next'
 import { AuthShell } from '#/components/auth-shell'
 import { FormAlert, FormField } from '#/components/form-field'
 import { Button } from '#/components/ui/button'
-import { formValues, useFieldValidation, validate } from '#/lib/form'
+import {
+  formValues,
+  useFieldValidation,
+  useFocusFirstError,
+  validate,
+} from '#/lib/form'
 import type { FieldErrors } from '#/lib/form'
 import { PASSWORD_MIN_LENGTH, newPasswordSchema } from '#/lib/schemas'
 import { setPassword } from '#/server/password'
@@ -47,6 +52,7 @@ function SetPassword() {
     initial,
   )
   const fields = useFieldValidation(newPasswordSchema, state.errors)
+  const formRef = useFocusFirstError(state.errors)
 
   return (
     <AuthShell
@@ -54,7 +60,12 @@ function SetPassword() {
       title={t('setPassword.title')}
       description={t('setPassword.rule', { min: PASSWORD_MIN_LENGTH })}
     >
-      <form action={submit} noValidate className="flex flex-col gap-4">
+      <form
+        ref={formRef}
+        action={submit}
+        noValidate
+        className="flex flex-col gap-4"
+      >
         {/* For password managers. */}
         <input
           type="email"

@@ -5,7 +5,8 @@ import type { Currency, MyCurrencies } from '#/lib/currencies'
 import { fetchHexaRate } from '#/lib/rates'
 import { getSupabase } from '#/lib/supabase.server'
 
-export type CurrencyError = 'unavailable' | 'unknown' | 'isDefault' | 'failed'
+export type CurrencyError =
+  'unavailable' | 'unknown' | 'isDefault' | 'usedByAccount' | 'failed'
 type Result = { ok: true } | { ok: false; error: CurrencyError }
 
 const codeInput = z.object({ code: currencyCodeSchema })
@@ -67,15 +68,21 @@ export const getMyCurrencies = createServerFn({ method: 'GET' }).handler(
 export const getCurrencySettings = createServerFn({ method: 'GET' }).handler(
   async () => {
     const supabase = getSupabase()
-    const [catalog, mine] = await Promise.all([
+    const [catalog, mine, open] = await Promise.all([
       supabase
         .from('currencies')
         .select('code, name_fr, name_en, symbol')
         .order('code'),
       supabase.from('user_currencies').select('code').is('removed_at', null),
+      // An open account keeps its currency (CUR-04).
+      supabase
+        .from('accounts')
+        .select('name, currency')
+        .is('closed_on', null)
+        .order('name'),
     ])
-    if (catalog.error || mine.error) {
-      const code = (catalog.error ?? mine.error)?.code
+    if (catalog.error || mine.error || open.error) {
+      const code = (catalog.error ?? mine.error ?? open.error)?.code
       throw new Error(`Currencies could not be loaded (${code})`)
     }
 
@@ -99,6 +106,13 @@ export const getCurrencySettings = createServerFn({ method: 'GET' }).handler(
     return {
       catalog: catalog.data.map((row) => toCurrency(row.code, row)),
       ratesFrom: Object.fromEntries(firsts) as Record<string, string | null>,
+      openAccounts: open.data.reduce<Partial<Record<string, Array<string>>>>(
+        (byCode, account) => {
+          ;(byCode[account.currency] ??= []).push(account.name)
+          return byCode
+        },
+        {},
+      ),
     }
   },
 )
@@ -166,6 +180,9 @@ export const removeCurrency = createServerFn({ method: 'POST' })
       .is('removed_at', null)
     if (error?.message === 'default_currency_cannot_be_removed') {
       return { ok: false, error: 'isDefault' }
+    }
+    if (error?.message === 'currency_used_by_open_account') {
+      return { ok: false, error: 'usedByAccount' }
     }
     return error ? failed('remove', error.code) : { ok: true }
   })

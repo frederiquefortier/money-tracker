@@ -53,11 +53,11 @@ the transactions list (spec 14).
 │← Réglages                                │
 │ DEVISES           [+ AJOUTER UNE DEVISE] │
 │ ┌──────────────────────────────────────┐ │
-│ │ CAD Dollar c… [Par défaut]   $ ★ ⌂ x │ │
-│ │ CHF Franc suisse           CHF ☆ ⌂ x │ │
-│ │ EUR Euro                     € ☆ ⌂ x │ │
-│ │ GBP Livre sterling           £ ☆ ⌂ x │ │
-│ │ USD Dollar américain         $ ★ ⌂ x │ │
+│ │ CAD Dollar c… ($) [Par défaut] ★ ⌂ x │ │
+│ │ CHF Franc suisse (CHF)         ☆ ⌂ x │ │
+│ │ EUR Euro (€)                   ☆ ⌂ x │ │
+│ │ GBP Livre sterling (£)         ☆ ⌂ x │ │
+│ │ USD Dollar américain ($)       ★ ⌂ x │ │
 │ └──────────────────────────────────────┘ │
 └──────────────────────────────────────────┘
 ★ ☆ favourite   ⌂ use as default (muted on the default)   x remove (muted on the default)
@@ -66,9 +66,9 @@ the transactions list (spec 14).
 ### The list (CUR-01, 03, 05)
 
 - One line per user currency, alphabetical by code: the code in Inconsolata, the name in
-  the interface language (`name_fr` or `name_en`), then the symbol, styled like the code,
-  next to the actions. A long name truncates.
-- **Par défaut** is a small tag on the same line as the name of the default currency
+  the interface language (`name_fr` or `name_en`) followed by the symbol in parentheses,
+  as in "Dollar canadien ($)". A long name truncates; the symbol stays.
+- **Par défaut** is a small tag after the name and symbol of the default currency
   (CUR-05). Exactly one currency is the default.
 - Every action is on the row, as icon buttons on the right, each with a label naming the
   currency: **star** toggles favourite (CUR-03; favourites are not reordered here, they come
@@ -80,14 +80,15 @@ the transactions list (spec 14).
 
 ### Adding (CUR-02)
 
-- "Ajouter une devise" opens a searchable picker of the ISO 4217 list (`currencies`),
-  minus the ones already added. Search matches code and name in both languages. Each
-  result shows "CODE - Nom" and the symbol.
-- Choosing one calls the server, which checks it with HexaRate. The row shows a spinner
-  until it answers; nothing else is blocked.
-- **HexaRate down or slow:** the currency is not added. Message: "La validation des taux
-  est indisponible. Réessayez dans un moment." with a "Réessayer" button. Existing
-  currencies keep working.
+- "Ajouter une devise" opens the same sheet as the account form
+  (`/settings/currencies/add`), with one field: a `Combobox` over the ISO 4217 list
+  (`currencies`), minus the ones already added. Typing matches the code and the name in
+  both languages; each option reads "CODE - Nom (symbole)".
+- "Ajouter" checks the currency with HexaRate ("Validation…" while it waits), then closes
+  the sheet with a toast, "{code} ajoutée.".
+- **HexaRate down or slow:** the currency is not added; the sheet stays open with "La
+  validation des taux est indisponible. Réessayez dans un moment." Pressing "Ajouter"
+  again retries. Existing currencies keep working.
 - **A currency the ECB does not publish** (ADR-009): it is added, with a note under it:
   "Taux disponibles à partir du [date]". Older amounts in it show the missing-rate error
   (ADR-004), never zero.
@@ -99,7 +100,8 @@ the transactions list (spec 14).
 - **Used by an open account:** "Retirer" is disabled with the hint "Le compte {name} est en
   {code}." (the first one, "et 2 autres" if more). Every new transaction on that account is
   in its currency, so the currency must stay. Closed accounts do not block.
-- **Not used anywhere:** removed at once, with an "Annuler" toast for a few seconds.
+- **Not used anywhere:** "Retirer {code}" in the shared confirmation (`ConfirmDialog`),
+  without "Cette action est irréversible." since a removed currency can come back.
 - **Used by transactions:** a confirmation names the count: "12 transactions sont en EUR.
   Elles gardent leur devise ; EUR disparaît seulement des listes de choix." Buttons
   "Retirer" and "Annuler".
@@ -167,9 +169,12 @@ What the build does differently or adds, for review:
   (`getMyCurrencies`), so the server already renders the right currency first. The cookie
   would be a second copy to keep in step. Add it back if a screen ever needs the currency
   before the profile can be read.
-- **Not yet:** the open-account block and the transaction-count confirmation on
-  "Retirer". Both need tables that come with specs 11 and 14; removal is immediate with the
-  "Annuler" toast until then.
+- **Open accounts block removal** (built with spec 11): the trash is muted and tapping it
+  shows "Le compte {name} est en {code}." in a toast.
+- **Not yet:** the transaction count in the confirmation, which needs the transactions
+  table (spec 14).
+- **Favourite, default and remove** show at once and stay shown until the saved data comes
+  back, so a change never flashes back to the old state.
 - **Rows only appear as screens exist:** the hub shows Devises and Se déconnecter.
 - **Extra copy:**
 

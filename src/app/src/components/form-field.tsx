@@ -2,7 +2,7 @@ import { useId, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Icon } from '#/components/icon'
 import { Input } from '#/components/ui/input'
-import { Label } from '#/components/ui/label'
+import { FieldLabel } from '#/components/ui/field'
 import { cn, focusRing } from '#/lib/utils'
 
 type FormFieldProps = Omit<React.ComponentProps<typeof Input>, 'id'> & {
@@ -18,6 +18,7 @@ export function FormField({
   error,
   description,
   type,
+  required,
   className,
   ...input
 }: FormFieldProps) {
@@ -33,12 +34,15 @@ export function FormField({
 
   return (
     <div className="flex flex-col gap-2">
-      <Label htmlFor={id}>{label}</Label>
+      <FieldLabel htmlFor={id} required={required}>
+        {label}
+      </FieldLabel>
       <div className="relative">
         <Input
           id={id}
           name={name}
           type={isPassword && revealed ? 'text' : type}
+          required={required}
           aria-invalid={error ? true : undefined}
           aria-describedby={message ? messageId : undefined}
           className={cn(isPassword && 'pr-10', className)}
@@ -53,7 +57,7 @@ export function FormField({
             aria-label={toggleLabel}
             title={toggleLabel}
             className={cn(
-              'absolute inset-y-0 right-0 grid w-10 place-items-center rounded-r-md text-muted-foreground hover:text-primary',
+              'absolute inset-y-0 right-0 grid w-10 place-items-center rounded-r-field text-muted-foreground hover:text-primary',
               focusRing,
             )}
           >

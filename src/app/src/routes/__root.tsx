@@ -3,6 +3,7 @@ import { HeadContent, Scripts, createRootRoute } from '@tanstack/react-router'
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { TanStackDevtools } from '@tanstack/react-devtools'
 import { I18nextProvider } from 'react-i18next'
+import { RouteProgress } from '#/components/route-progress'
 import { createI18n } from '#/i18n'
 import { getSession } from '#/server/session'
 
@@ -35,7 +36,10 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <HeadContent />
       </head>
       <body className="min-h-screen bg-background text-foreground antialiased">
-        <I18nextProvider i18n={i18n}>{children}</I18nextProvider>
+        <I18nextProvider i18n={i18n}>
+          <RouteProgress />
+          {children}
+        </I18nextProvider>
         <TanStackDevtools
           config={{ position: 'bottom-right' }}
           plugins={[

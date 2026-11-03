@@ -36,21 +36,3 @@ export function pickerOrder<T extends UserCurrency>(
       a.code.localeCompare(b.code),
   )
 }
-
-const fold = (s: string) =>
-  s
-    .normalize('NFD')
-    .replace(/\p{Diacritic}/gu, '')
-    .toLowerCase()
-
-/** Matches the code and the name in both languages, accents ignored. */
-export function searchCurrencies<T extends Currency>(
-  currencies: ReadonlyArray<T>,
-  query: string,
-): Array<T> {
-  const q = fold(query.trim())
-  if (!q) return [...currencies]
-  return currencies.filter((c) =>
-    [c.code, c.nameFr, c.nameEn].some((field) => fold(field).includes(q)),
-  )
-}

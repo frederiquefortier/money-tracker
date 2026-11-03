@@ -4,6 +4,62 @@ Document new concepts, techniques, and knowledge gained. Reference this file to 
 
 <!-- Newest first: a new entry goes directly below this line. Template at the bottom. -->
 
+### 2026-11-03 - Sheet animations and TanStack Router loading
+
+**What Was New:**
+- Why the sheet slid in diagonally and closed without animating, and why each click felt
+  slow.
+
+**Key Points:**
+- tw-animate's `slide-in-from-bottom` and `md:slide-in-from-right` each set their own
+  translate variable; the `md` one does not cancel the other, so from `md` up the panel
+  moved on both axes. Plain keyframes picked by a media query avoid it.
+- Radix plays an exit animation only while the content stays mounted. Navigating away on
+  close unmounted it at once. Closing the sheet first and navigating in
+  `onCloseAutoFocus`, which fires after the animation, keeps it.
+- `beforeLoad` runs in series down the route tree, before any loader. A data fetch there
+  delays every page below it. A loader runs beside the child's loader and can be cached
+  with `staleTime`.
+- `defaultPreloadStaleTime: 0` treats data preloaded on hover as stale at once, so the
+  click loads it again.
+
+**Sources:**
+- TanStack Router guide, "Data Loading" (beforeLoad, staleTime, preloading)
+- Radix Dialog documentation, `onCloseAutoFocus` and animation
+
+**Where to Learn More:**
+- React documentation, `useActionState` and transitions
+
+**Applied In:**
+- `src/components/route-sheet.tsx`, `src/styles.css` (`.sheet-panel`), `src/routes/_authed.tsx`.
+
+### 2026-11-03 - Numeric over PostgREST, and pgTAP without Docker
+
+**What Was New:**
+- Two things met while building the accounts screens and testing them on the dev database.
+
+**Key Points:**
+- PostgREST sends `numeric` columns as JSON numbers, which JavaScript parses into floats.
+  Selecting `balance::text` returns the exact decimal string instead (ADR-004).
+- `supabase db query --linked` goes through the Management API and returns only the last
+  statement that produces rows, even when a `rollback` follows. A pgTAP file can still run
+  there: collect each TAP line into a temporary table and select it just before the
+  file's own `rollback`. `npm run db:test` does this.
+- The same command reads a leading `--` comment in an SQL argument as a flag; passing the
+  SQL as a file (`-f`) avoids it.
+- Tests that share the dev database must not assume a table is empty: delete what they
+  depend on inside their transaction (the rates tables in `02` and `03`).
+
+**Sources:**
+- PostgREST documentation, "Casting columns"
+- `supabase db query --help`
+
+**Where to Learn More:**
+- pgTAP documentation, "Using pgTAP" (plans, `finish`)
+
+**Applied In:**
+- `src/app/src/server/accounts.ts`, `src/app/scripts/db-test.ts`.
+
 ### 2026-11-03 - How Frankfurter and HexaRate answer
 
 **What Was New:**

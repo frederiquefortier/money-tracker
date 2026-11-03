@@ -12,11 +12,19 @@ export function Logo({
   className?: string
 }) {
   const { t } = useTranslation()
+  // The row is one badge tall and clips: when the name no longer fits beside the
+  // badge it wraps to a second row and disappears, leaving the badge alone.
   return (
-    <span className={cn('inline-flex items-center gap-2.5', className)}>
+    <span
+      className={cn(
+        'inline-flex flex-wrap items-center gap-x-2.5 overflow-hidden',
+        size === 'lg' ? 'h-20' : 'h-9',
+        className,
+      )}
+    >
       <span
         className={cn(
-          'grid place-items-center rounded-full bg-secondary text-primary ring-1 ring-primary/10',
+          'grid shrink-0 place-items-center rounded-full bg-secondary text-primary ring-1 ring-primary/10 ring-inset',
           size === 'lg' ? 'size-20' : 'size-9',
         )}
       >
@@ -27,7 +35,7 @@ export function Logo({
       </span>
       <span
         className={cn(
-          'font-mono text-lg font-bold tracking-wide uppercase',
+          'font-mono text-lg font-bold tracking-wide whitespace-nowrap uppercase',
           !showName && 'sr-only',
         )}
       >

@@ -28,7 +28,7 @@ English; this file is in English like every other meta-doc.
 | SET-04 | The interface is available in French and English, nothing regional (ADR-019). Dates and amounts use Canadian conventions in either language ("15 janvier 2024", "1 234,50 $" / "January 15, 2024", "$1,234.50"). | C10, brief | 0 |
 | SET-05 | The language is chosen at onboarding (defaulting to the browser's), saved on the profile, and switchable from any page. | brief | 0 |
 | SET-06 | Reference labels (account and holding types, currency names) exist in both languages. What the user types (their own category names, merchants, notes) is stored as typed and never translated. | brief | 1 |
-| SET-07 | Forms validate in the interface language: inline messages under each field on submit and when leaving a field, shared rules with the server (one Zod schema each), and typed values kept after a failed submit. Password fields have a show/hide button. | author | 0 |
+| SET-07 | Forms validate in the interface language: inline messages under each field on submit and when leaving a field, shared rules with the server (one Zod schema each), typed values kept after a failed submit, and focus on the first invalid field after a failed submit. Required fields carry an asterisk. Password fields have a show/hide button. | author | 0 |
 
 ## 2. Accounts and institutions (`ACC`)
 

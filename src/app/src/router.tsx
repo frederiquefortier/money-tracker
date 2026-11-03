@@ -11,8 +11,8 @@ export function getRouter() {
   const router = createTanStackRouter({
     routeTree,
     scrollRestoration: true,
+    // Data preloaded on hover is reused by the click (default preload stale time, 30 s).
     defaultPreload: 'intent',
-    defaultPreloadStaleTime: 0,
     ssr: { nonce: getNonce() },
   })
 

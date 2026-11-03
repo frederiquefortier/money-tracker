@@ -5,7 +5,12 @@ import { z } from 'zod'
 import { AuthShell } from '#/components/auth-shell'
 import { FormAlert, FormField } from '#/components/form-field'
 import { Button } from '#/components/ui/button'
-import { formValues, useFieldValidation, validate } from '#/lib/form'
+import {
+  formValues,
+  useFieldValidation,
+  useFocusFirstError,
+  validate,
+} from '#/lib/form'
 import type { FieldErrors } from '#/lib/form'
 import { totpFormSchema } from '#/lib/schemas'
 import { startTotpEnrollment, verifyTotp } from '#/server/session'
@@ -65,6 +70,7 @@ function Mfa() {
     initial,
   )
   const fields = useFieldValidation(totpFormSchema, state.errors)
+  const formRef = useFocusFirstError(state.errors)
 
   return (
     <AuthShell
@@ -84,7 +90,12 @@ function Mfa() {
       {enrollment && <EnrollmentKey enrollment={enrollment} />}
 
       {(!enrolling || enrollment) && (
-        <form action={verify} noValidate className="flex flex-col gap-4">
+        <form
+          ref={formRef}
+          action={verify}
+          noValidate
+          className="flex flex-col gap-4"
+        >
           <FormField
             name="code"
             inputMode="numeric"

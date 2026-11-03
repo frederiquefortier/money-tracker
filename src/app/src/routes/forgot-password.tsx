@@ -5,7 +5,12 @@ import { AuthShell } from '#/components/auth-shell'
 import { FormAlert, FormField } from '#/components/form-field'
 import { Icon } from '#/components/icon'
 import { Button } from '#/components/ui/button'
-import { formValues, useFieldValidation, validate } from '#/lib/form'
+import {
+  formValues,
+  useFieldValidation,
+  useFocusFirstError,
+  validate,
+} from '#/lib/form'
 import type { FieldErrors } from '#/lib/form'
 import { forgotPasswordSchema } from '#/lib/schemas'
 import { requestPasswordReset } from '#/server/password'
@@ -34,6 +39,7 @@ function ForgotPassword() {
     initial,
   )
   const fields = useFieldValidation(forgotPasswordSchema, state.errors)
+  const formRef = useFocusFirstError(state.errors)
 
   return (
     <AuthShell
@@ -45,7 +51,12 @@ function ForgotPassword() {
         // The same message whether or not the address has an account.
         <FormAlert tone="success">{t('forgotPassword.sent')}</FormAlert>
       ) : (
-        <form action={submit} noValidate className="flex flex-col gap-4">
+        <form
+          ref={formRef}
+          action={submit}
+          noValidate
+          className="flex flex-col gap-4"
+        >
           <FormField
             name="email"
             type="email"

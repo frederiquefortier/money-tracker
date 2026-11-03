@@ -7,6 +7,9 @@ insert into auth.users (id, email) values
   ('11111111-1111-1111-1111-111111111111', 'alice@example.test'),
   ('22222222-2222-2222-2222-222222222222', 'bruno@example.test');
 
+-- Only invented rates: the rollback restores whatever the database held.
+delete from public.exchange_rates;
+
 -- Invented rates, EUR base. Friday 2024-03-01 and Monday 2024-03-04; nothing on the weekend.
 insert into public.exchange_rates (quote, rate_date, rate, source) values
   ('CAD', '2024-03-01', 1.5000, 'frankfurter'),

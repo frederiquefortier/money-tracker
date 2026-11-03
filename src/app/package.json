@@ -17,6 +17,7 @@
     "verify": "npm run typecheck && npm run lint && npm run check && npm test",
     "generate-routes": "tsr generate",
     "rates": "node --env-file-if-exists=.env.local scripts/rates.ts",
+    "db:test": "node scripts/db-test.ts",
     "db:push": "sh -c 'set -a; [ -f .env.local ] && . ./.env.local; set +a; supabase --workdir .. db push --linked'"
   },
   "dependencies": {
