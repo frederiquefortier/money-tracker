@@ -7,7 +7,9 @@ import { foldForSearch } from '#/lib/utils'
  * `icon` shows before the label in the list. Options with the same `group` sit together
  * under its heading. `action` is an icon button at the end of the option. `tag` shows in
  * the field while the option is chosen. A `hidden` option can be the value but is never
- * listed (an archived category).
+ * listed (an archived category). In a tree, `depth` and `parent` (the parent option's
+ * value) place the option and draw its connectors, and the list shows `short` (the name)
+ * while the field shows `label` (the full path); a search keeps each match's parents.
  */
 export type ComboboxOption = {
   value: string
@@ -23,6 +25,9 @@ export type ComboboxOption = {
   }
   tag?: string
   hidden?: boolean
+  depth?: number
+  parent?: string
+  short?: string
 }
 
 export type Row =
@@ -35,12 +40,19 @@ function useRows(
   canCreate: boolean,
 ): Array<Row> {
   const q = foldForSearch(query)
-  const rows: Array<Row> = options
-    .filter(
-      (o) =>
-        !o.hidden &&
-        foldForSearch(`${o.label} ${o.keywords ?? ''}`).includes(q),
-    )
+  const visible = options.filter((o) => !o.hidden)
+  const keep = new Set(
+    visible.filter((o) =>
+      foldForSearch(`${o.short ?? o.label} ${o.keywords ?? ''}`).includes(q),
+    ),
+  )
+  for (const match of [...keep]) {
+    const parentOf = (o: ComboboxOption) =>
+      visible.find((p) => p.value === o.parent && p.group === o.group)
+    for (let p = parentOf(match); p; p = parentOf(p)) keep.add(p)
+  }
+  const rows: Array<Row> = visible
+    .filter((o) => keep.has(o))
     .map((option) => ({ kind: 'option', option }))
   if (canCreate && q && !options.some((o) => foldForSearch(o.label) === q)) {
     rows.push({ kind: 'create' })

@@ -70,11 +70,16 @@ describe('merchant filters', () => {
       merchant('Épicerie Tau', 'grocery'),
       merchant('Librairie', null),
     ]
-    expect(merchantFilters(only, tree, 'fr-CA')).toEqual([
-      'all',
-      'food',
-      'grocery',
-      'none',
+    const list = Object.entries(categories).map(([id, c]) => ({
+      id,
+      parentId: c?.parent ?? null,
+      name: c?.path.split(' > ').at(-1) ?? '',
+    }))
+    expect(merchantFilters(only, list, 'fr-CA')).toEqual([
+      { value: 'all', depth: 0 },
+      { value: 'food', depth: 0 },
+      { value: 'grocery', depth: 1 },
+      { value: 'none', depth: 0 },
     ])
   })
 

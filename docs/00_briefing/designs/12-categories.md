@@ -119,7 +119,7 @@ The form is a route sheet over the tree, like the account form: it only edits, w
   - Type: expense (default), income, investment. Only top-level categories choose; a
     sub-category takes its parent's type and the field is read-only.
   - Parent: the shared combobox, typed and filtered, listing active categories of the
-    type by full path with their icon. Empty means top level; a × empties it, as for the
+    type as the tree above (connectors, icon, name), the full path in the field once chosen. Empty means top level; a × empties it, as for the
     account's institution. A category cannot be moved under itself or its own children.
 - **Icône**, a labelled field like the others: the icon in its colour circle on the left.
   Tapping the circle opens the icon picker; a pencil appears on it on hover and focus, and

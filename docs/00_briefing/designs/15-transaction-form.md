@@ -111,13 +111,14 @@ second picker). It takes the transaction's type and date.
 │ (◉) Salaire                    ☆ │
 ```
 
-- **Favoris** first (CAT-06), each as its full path, with a filled star. They are not
-  repeated in the groups below.
-- Then one group per type, the transaction's own type first, each category by its full
-  path with its icon.
-- The star on every option toggles favourite in place (CAT-06); the option moves to or
-  from Favoris once the list closes, so it does not jump under the finger.
-- Typing matches any part of the path.
+- **Favoris** first (CAT-06), each as its full path, with a filled star. A favourite
+  also keeps its place in its tree below, so no branch loses its parent.
+- Then one group per type, the transaction's own type first, each drawn as the
+  Catégories tree: elbow connectors, the icon and the name. The field shows the full
+  path once chosen.
+- The star on every option toggles favourite in place (CAT-06); the option joins or
+  leaves Favoris once the list closes, so it does not jump under the finger.
+- Typing matches names; each match keeps its parents, so its place in the tree shows.
 - **Archived categories never appear** (CAT-04), as of the transaction's date: a category
   archived in March still appears for a February transaction.
 - **Editing an old transaction** whose category is archived: the field shows it with an

@@ -1,52 +1,15 @@
 import { Fragment, useId, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Icon } from '#/components/icon'
-import { IconButton } from '#/components/icon-button'
 import { useCombobox } from '#/components/use-combobox'
 import type { ComboboxOption, Row } from '#/components/use-combobox'
+import { GroupHeading, OptionContent } from '#/components/combobox-option'
 import { SelectChevron } from '#/components/select-field'
 import { Tag } from '#/components/tag'
 import { FieldLabel, fieldControl } from '#/components/ui/field'
 import { Popover, PopoverAnchor, PopoverContent } from '#/components/ui/popover'
+import { treeGuides } from '#/lib/tree'
 import { cn, focusRing } from '#/lib/utils'
-
-function OptionContent({
-  option,
-  selected,
-}: {
-  option: ComboboxOption
-  selected: boolean
-}) {
-  return (
-    <>
-      {option.icon}
-      <span className="flex-1 truncate">{option.label}</span>
-      {selected && <Icon name="check" className="size-4 text-primary" />}
-      {option.action && (
-        // The option is picked on click; its own button must not pick it.
-        <span onClick={(event) => event.stopPropagation()}>
-          <IconButton
-            icon={option.action.icon}
-            label={option.action.label}
-            pressed={option.action.pressed}
-            onClick={option.action.onClick}
-          />
-        </span>
-      )}
-    </>
-  )
-}
-
-function GroupHeading({ children }: { children: React.ReactNode }) {
-  return (
-    <li
-      role="presentation"
-      className="px-2 pt-3 pb-1 font-mono text-xs font-bold tracking-wide text-muted-foreground uppercase first:pt-1"
-    >
-      {children}
-    </li>
-  )
-}
 
 function ComboboxList({
   id,
@@ -65,6 +28,9 @@ function ComboboxList({
   createLabel?: (text: string) => string
   onPick: (row: Row) => void
 }) {
+  const guides = treeGuides(
+    rows.map((row) => (row.kind === 'option' ? (row.option.depth ?? 0) : 0)),
+  )
   return (
     <ul id={id} role="listbox" className="max-h-72 overflow-y-auto">
       {rows.map((row, i) => {
@@ -74,7 +40,13 @@ function ComboboxList({
           group !== undefined &&
           (previous?.kind !== 'option' || previous.option.group !== group)
         return (
-          <Fragment key={row.kind === 'option' ? row.option.value : 'create'}>
+          <Fragment
+            key={
+              row.kind === 'option'
+                ? `${group ?? ''}:${row.option.value}`
+                : 'create'
+            }
+          >
             {newGroup && <GroupHeading>{group}</GroupHeading>}
             <li
               id={`${id}-${i}`}
@@ -95,6 +67,7 @@ function ComboboxList({
                 <OptionContent
                   option={row.option}
                   selected={row.option.value === value}
+                  guide={guides[i]}
                 />
               ) : (
                 <>

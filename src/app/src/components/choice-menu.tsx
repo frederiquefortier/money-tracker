@@ -19,6 +19,7 @@ export function ChoiceMenu<TValue extends string>({
   value,
   options,
   labelOf,
+  renderOption,
   onChange,
 }: {
   icon: IconName
@@ -26,6 +27,8 @@ export function ChoiceMenu<TValue extends string>({
   value: TValue
   options: ReadonlyArray<TValue>
   labelOf: (value: TValue) => string
+  /** What a choice shows in the menu, when more than its label. */
+  renderOption?: (value: TValue, index: number) => React.ReactNode
   onChange: (value: TValue) => void
 }) {
   return (
@@ -45,9 +48,9 @@ export function ChoiceMenu<TValue extends string>({
             if (option) onChange(option)
           }}
         >
-          {options.map((option) => (
+          {options.map((option, i) => (
             <DropdownMenuRadioItem key={option} value={option}>
-              {labelOf(option)}
+              {renderOption ? renderOption(option, i) : labelOf(option)}
             </DropdownMenuRadioItem>
           ))}
         </DropdownMenuRadioGroup>

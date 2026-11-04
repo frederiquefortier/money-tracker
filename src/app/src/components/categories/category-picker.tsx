@@ -16,6 +16,7 @@ import {
 } from '#/lib/categories'
 import type { Category, Kind } from '#/lib/categories'
 import { todayIso } from '#/lib/format'
+import { treeOrder } from '#/lib/tree'
 import { useLocale } from '#/lib/use-locale'
 import { saveCategory, setCategoryFavourite } from '#/server/categories'
 
@@ -89,7 +90,10 @@ function useCreate(
   }
 }
 
-/** Favoris, then each type with `kind` first; within a group, by path. */
+/**
+ * Favoris by path, then one tree per type with `kind` first, drawn like the Catégories
+ * page. A favourite stays in its tree too, so no branch loses its parent.
+ */
 function groupedOptions(
   categories: ReadonlyArray<Category>,
   {
@@ -106,19 +110,22 @@ function groupedOptions(
     groupLabel: (kind: Kind | null) => string
   },
 ) {
-  const byPath = (a: ComboboxOption, b: ComboboxOption) =>
-    a.label.localeCompare(b.label, locale)
   const kinds = [kind, ...KINDS.filter((k) => k !== kind)]
   return [
     ...categories
       .filter((c) => favourites.has(c.id))
       .map((c) => option(c, groupLabel(null)))
-      .sort(byPath),
+      .sort((a, b) => a.label.localeCompare(b.label, locale)),
     ...kinds.flatMap((k) =>
-      categories
-        .filter((c) => c.kind === k && !favourites.has(c.id))
-        .map((c) => option(c, groupLabel(k)))
-        .sort(byPath),
+      treeOrder(
+        categories.filter((c) => c.kind === k),
+        locale,
+      ).map(({ item, depth }) => ({
+        ...option(item, groupLabel(k)),
+        depth,
+        parent: item.parentId ?? undefined,
+        short: item.name,
+      })),
     ),
   ]
 }

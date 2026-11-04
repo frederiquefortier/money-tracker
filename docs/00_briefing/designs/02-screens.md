@@ -35,10 +35,10 @@ component to use, so a screen is assembled, not redrawn.
   one `AddButton` per thing the screen adds: a plus and the noun, "+ Compte",
   "+ Catégorie", with "Ajouter un compte" as its accessible name, never an add menu. A
   menu opens at least as wide as its button, aligned to it, and grows to fit its labels
-  rather than cutting them. A list that filters has the filter beside the sort, the
-  same kind of button (`ChoiceMenu`): the `filter` icon and the current choice, "Tout"
-  when nothing is filtered, "Filtrer: …" as its accessible name. `SortMenu` is built on
-  it.
+  rather than cutting them. A list that filters has the filter before the sort, the
+  same kind of button (`ChoiceMenu`): an icon for what it filters and the current choice,
+  "Filtrer: …" as its accessible name. `SortMenu` is built on it. Order, left to right:
+  expand all, filter, sort, then the add buttons, so the sort always sits next to them.
 - **Lists:** cards (`ListCard`), one line per item where it fits. Tapping an item opens
   its form. A card header (an institution) toggles with `CollapseToggle` and edits with a
   pencil. In a tree, every row opens its form; a parent's chevron alone toggles its
@@ -67,7 +67,10 @@ component to use, so a screen is assembled, not redrawn.
   offers "Créer « … »" when that makes sense, and a × clears it. Nothing chosen is an
   empty field, never "Aucun(e)". Options can sit in labelled groups, end with one icon
   action (the star), and show a `Tag` in the field while chosen ("Archivée"). A category
-  is always chosen with `CategoryPicker`.
+  is always chosen with `CategoryPicker`. Categories are listed as the Catégories page
+  draws them, everywhere (the picker, Parent, the Marchands filter): a tree with elbow
+  connectors (`TreeGuides`), each with its icon and its name; the field shows the full
+  path once chosen. A search keeps each match's parents.
 - **Search:** only on lists that grow long (Marchands, Catégories, the icon picker), a
   `SearchField` above the list, filtering as you type, ignoring case and accents. The
   words are the same everywhere: "Rechercher" and "Aucun résultat.", never naming the

@@ -36,6 +36,7 @@ import {
 } from '#/lib/form'
 import type { FormState } from '#/lib/form'
 import { useLocale } from '#/lib/use-locale'
+import { treeOrder } from '#/lib/tree'
 import { saveCategory } from '#/server/categories'
 
 type State = FormState<{ name: string }>
@@ -60,7 +61,7 @@ function useCategorySubmit(
   )
 }
 
-/** Active categories of the same kind, by path; never the category or its branch. */
+/** Active categories of the same kind, as a tree; never the category or its branch. */
 function parentOptions(
   categories: ReadonlyArray<Category>,
   self: { id: string | undefined; kind: Category['kind'] },
@@ -70,20 +71,21 @@ function parentOptions(
   const branch = self.id
     ? descendantIds(self.id, childrenByParent(categories, locale))
     : new Set<string>()
-  return categories
-    .filter(
-      (c) =>
-        c.kind === self.kind &&
-        !isArchived(c) &&
-        c.id !== self.id &&
-        !branch.has(c.id),
-    )
-    .map((c) => ({
-      value: c.id,
-      label: categoryPath(c, byId),
-      icon: <CategoryBadge icon={c.icon} color={c.color} size="sm" />,
-    }))
-    .sort((a, b) => a.label.localeCompare(b.label, locale))
+  const eligible = categories.filter(
+    (c) =>
+      c.kind === self.kind &&
+      !isArchived(c) &&
+      c.id !== self.id &&
+      !branch.has(c.id),
+  )
+  return treeOrder(eligible, locale).map(({ item: c, depth }) => ({
+    value: c.id,
+    label: categoryPath(c, byId),
+    short: c.name,
+    depth,
+    parent: c.parentId ?? undefined,
+    icon: <CategoryBadge icon={c.icon} color={c.color} size="sm" />,
+  }))
 }
 
 /** Type, then the parent within it: only a top-level category chooses its type (CAT-02). */

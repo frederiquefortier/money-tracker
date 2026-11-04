@@ -22,7 +22,7 @@ evolution) phase 2.
 ```
 ┌──────────────────────────────────┐
 │ ← Réglages                       │
-│ MARCHANDS [Tri▾][Filtre▾][+ MARCHAND]│
+│ MARCHANDS [Filtre▾][Tri▾][+ MARCHAND]│
 │ [Rechercher                    ] │
 │ ┌──────────────────────────────┐ │
 │ │ IGA                      ⇉ 🗑 │ │
@@ -38,8 +38,9 @@ evolution) phase 2.
 - **Trier** (MER-06, `SortMenu`): Nom A–Z (the default), Nom Z–A, Catégorie (by the
   default category's path, merchants without one last, then by name). Kept per browser.
   "Plus utilisés" joins it with the transaction count.
-- **Filtrer** (MER-06, `ChoiceMenu` with the `filter` icon): "Tout", each
-  default category in use and its parents by path (a parent keeps its branch), and "Sans
+- **Filtrer** (MER-06, `ChoiceMenu` with the `tags` icon of Catégories, before the sort):
+  "Toutes les catégories", then each default category in use and its parents as the
+  category tree (connectors, icon, name; a parent keeps its branch), then "Sans
   catégorie". Shown once there is something to filter; not remembered.
 - A search field above the card that filters as you type, ignoring
   case and accents (`SearchField`). Nothing found: "Aucun résultat.".
@@ -113,7 +114,7 @@ Used by the transaction form (spec 15): the shared combobox.
 | Screen title | Marchands |
 | Search | Rechercher, Aucun résultat. (shared) |
 | Sort | Nom A–Z, Nom Z–A, Catégorie; Trier: … (accessible name) |
-| Filter | Tout (shared), Sans catégorie; Filtrer: … (accessible name) |
+| Filter | Toutes les catégories, Sans catégorie; Filtrer: … (accessible name) |
 | Empty | Aucun marchand pour l'instant. |
 | Add | Marchand (named Ajouter un marchand) |
 | Form titles | Nouveau marchand, Modifier le marchand |

@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { treeOrder } from '#/lib/tree'
 
 // Shared by the Marchands screens and the server functions (spec 13).
 
@@ -33,7 +34,10 @@ type Tree = {
   parentOf: (categoryId: string) => string | null | undefined
 }
 
-function withAncestors(categoryId: string, { parentOf }: Tree) {
+function withAncestors(
+  categoryId: string,
+  { parentOf }: Pick<Tree, 'parentOf'>,
+) {
   const ids: Array<string> = []
   for (
     let id: string | null | undefined = categoryId;
@@ -44,24 +48,35 @@ function withAncestors(categoryId: string, { parentOf }: Tree) {
   return ids
 }
 
-/** The filter's choices: every default category in use and its parents, by path. */
+/**
+ * The filter's choices with their depth: all, every default category in use and its
+ * parents as a tree, then none.
+ */
 export function merchantFilters(
   merchants: ReadonlyArray<Merchant>,
-  tree: Tree,
+  categories: ReadonlyArray<{
+    id: string
+    parentId: string | null
+    name: string
+  }>,
   locale: string,
-): Array<MerchantFilter> {
+): Array<{ value: MerchantFilter; depth: number }> {
+  const parentOf = (id: string) => categories.find((c) => c.id === id)?.parentId
   const used = new Set(
     merchants.flatMap((m) =>
-      m.defaultCategoryId ? withAncestors(m.defaultCategoryId, tree) : [],
+      m.defaultCategoryId
+        ? withAncestors(m.defaultCategoryId, { parentOf })
+        : [],
     ),
   )
-  const paths = [...used]
-    .filter((id) => tree.pathOf(id) !== undefined)
-    .sort((a, b) =>
-      (tree.pathOf(a) ?? '').localeCompare(tree.pathOf(b) ?? '', locale),
-    )
-  const none = merchants.some((m) => !m.defaultCategoryId) ? ['none'] : []
-  return ['all', ...paths, ...none]
+  const tree = treeOrder(
+    categories.filter((c) => used.has(c.id)),
+    locale,
+  ).map(({ item, depth }) => ({ value: item.id, depth }))
+  const none = merchants.some((m) => !m.defaultCategoryId)
+    ? [{ value: 'none', depth: 0 }]
+    : []
+  return [{ value: 'all', depth: 0 }, ...tree, ...none]
 }
 
 export function filterMerchants(

@@ -2,12 +2,14 @@ import { Outlet, createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { AddButton } from '#/components/add-button'
+import { CategoryBadge } from '#/components/categories/category-badge'
 import { ChoiceMenu } from '#/components/choice-menu'
 import { ListCard } from '#/components/list-card'
 import { MerchantRow } from '#/components/merchants/merchant-row'
 import { SearchField } from '#/components/search-field'
 import { SettingsPage } from '#/components/settings-page'
 import { SortMenu } from '#/components/sort-menu'
+import { TreeGuides } from '#/components/tree-guides'
 import { FORMAT_LOCALE } from '#/i18n/locales'
 import { categoryPath } from '#/lib/categories'
 import type { Category } from '#/lib/categories'
@@ -18,6 +20,8 @@ import {
   sortMerchants,
 } from '#/lib/merchants'
 import type { Merchant, MerchantFilter, MerchantSort } from '#/lib/merchants'
+import { treeGuides } from '#/lib/tree'
+import type { TreeGuide } from '#/lib/tree'
 import { useLocale } from '#/lib/use-locale'
 import { useStoredState } from '#/lib/use-stored-state'
 import { foldForSearch } from '#/lib/utils'
@@ -48,8 +52,30 @@ function useCategoryTree(categories: ReadonlyArray<Category>) {
   return {
     rows,
     pathOf: (id: string) => rows.get(id)?.path,
+    nameOf: (id: string) => byId.get(id)?.name,
     parentOf: (id: string) => byId.get(id)?.parentId,
   }
+}
+
+/** A filter choice drawn like the Catégories tree: connectors, badge, name. */
+function FilterOption({
+  category,
+  name,
+  guide,
+}: {
+  category: { icon: string; color: string } | undefined
+  name: string
+  guide: TreeGuide | undefined
+}) {
+  return (
+    <>
+      {guide && <TreeGuides guide={guide} className="-my-1.5" />}
+      {category && (
+        <CategoryBadge icon={category.icon} color={category.color} size="sm" />
+      )}
+      <span className="truncate">{name}</span>
+    </>
+  )
 }
 
 function MerchantList({
@@ -97,9 +123,10 @@ function Merchants() {
     parseSort,
   )
   const tree = useCategoryTree(categories)
-  const filters = merchantFilters(merchants, tree, locale)
+  const filters = merchantFilters(merchants, categories, locale)
+  const values = filters.map((f) => f.value)
   const [chosen, setFilter] = useState<MerchantFilter>('all')
-  const filter = filters.includes(chosen) ? chosen : 'all'
+  const filter = values.includes(chosen) ? chosen : 'all'
   const q = foldForSearch(query)
   const shown = sortMerchants(
     filterMerchants(merchants, filter, tree).filter((m) =>
@@ -107,8 +134,9 @@ function Merchants() {
     ),
     { sort, pathOf: tree.pathOf, locale },
   )
+  const guides = treeGuides(filters.map((f) => f.depth))
   const filterLabel = (f: MerchantFilter) => {
-    if (f === 'all') return t('common.all')
+    if (f === 'all') return t('merchants.filterAll')
     if (f === 'none') return t('merchants.filterNone')
     return tree.pathOf(f) ?? ''
   }
@@ -118,22 +146,29 @@ function Merchants() {
       title={t('merchants.title')}
       actions={
         <>
+          {filters.length > 2 && (
+            <ChoiceMenu
+              icon="tags"
+              label={t('common.filterLabel', { filter: filterLabel(filter) })}
+              value={filter}
+              options={values}
+              labelOf={filterLabel}
+              renderOption={(f, i) => (
+                <FilterOption
+                  category={tree.rows.get(f)}
+                  name={tree.nameOf(f) ?? filterLabel(f)}
+                  guide={guides[i]}
+                />
+              )}
+              onChange={setFilter}
+            />
+          )}
           <SortMenu
             sort={sort}
             options={MERCHANT_SORTS}
             labelOf={(option) => t(`merchants.sort.${option}`)}
             onChange={setSort}
           />
-          {filters.length > 2 && (
-            <ChoiceMenu
-              icon="filter"
-              label={t('common.filterLabel', { filter: filterLabel(filter) })}
-              value={filter}
-              options={filters}
-              labelOf={filterLabel}
-              onChange={setFilter}
-            />
-          )}
           <AddButton
             to="/settings/merchants/new"
             text={t('merchants.addShort')}
