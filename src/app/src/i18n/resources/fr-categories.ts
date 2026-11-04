@@ -15,6 +15,9 @@ export const categoriesFr = {
   type: 'Type',
   parent: 'Parent',
   clearParent: 'Retirer le parent',
+  clearCategory: 'Retirer la catégorie',
+  favourites: 'Favoris',
+  archivedTag: 'Archivée',
   color: 'Couleur',
   customColor: 'Couleur personnalisée',
   swatch: 'Couleur {{n}}',
@@ -26,6 +29,8 @@ export const categoriesFr = {
   archived: 'Catégories archivées ({{count}})',
   archivedOn: 'Archivée le {{date}}',
   from: 'À partir du',
+  until: 'Réactivée le',
+  pauseOverlaps: 'Cette période chevauche une autre période archivée.',
   archiveBranch_one: '{{count}} sous-catégorie sera archivée aussi.',
   archiveBranch_other: '{{count}} sous-catégories seront archivées aussi.',
   parentArchived: 'Réactivez d’abord “{{parent}}”.',
@@ -37,8 +42,6 @@ export const categoriesFr = {
   icon: {
     label: 'Icône',
     choose: 'Choisir une icône',
-    search: 'Rechercher une icône',
     suggested: 'Suggérée',
-    none: 'Aucune icône trouvée.',
   },
 }

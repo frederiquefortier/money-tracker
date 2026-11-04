@@ -1,12 +1,52 @@
-import { useId, useRef } from 'react'
+import { Fragment, useId, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Icon } from '#/components/icon'
+import { IconButton } from '#/components/icon-button'
 import { useCombobox } from '#/components/use-combobox'
 import type { ComboboxOption, Row } from '#/components/use-combobox'
 import { SelectChevron } from '#/components/select-field'
+import { Tag } from '#/components/tag'
 import { FieldLabel, fieldControl } from '#/components/ui/field'
 import { Popover, PopoverAnchor, PopoverContent } from '#/components/ui/popover'
 import { cn, focusRing } from '#/lib/utils'
+
+function OptionContent({
+  option,
+  selected,
+}: {
+  option: ComboboxOption
+  selected: boolean
+}) {
+  return (
+    <>
+      {option.icon}
+      <span className="flex-1 truncate">{option.label}</span>
+      {selected && <Icon name="check" className="size-4 text-primary" />}
+      {option.action && (
+        // The option is picked on click; its own button must not pick it.
+        <span onClick={(event) => event.stopPropagation()}>
+          <IconButton
+            icon={option.action.icon}
+            label={option.action.label}
+            pressed={option.action.pressed}
+            onClick={option.action.onClick}
+          />
+        </span>
+      )}
+    </>
+  )
+}
+
+function GroupHeading({ children }: { children: React.ReactNode }) {
+  return (
+    <li
+      role="presentation"
+      className="px-2 pt-3 pb-1 font-mono text-xs font-bold tracking-wide text-muted-foreground uppercase first:pt-1"
+    >
+      {children}
+    </li>
+  )
+}
 
 function ComboboxList({
   id,
@@ -26,38 +66,46 @@ function ComboboxList({
   onPick: (row: Row) => void
 }) {
   return (
-    <ul id={id} role="listbox" className="max-h-60 overflow-y-auto">
-      {rows.map((row, i) => (
-        <li
-          key={row.kind === 'option' ? row.option.value : 'create'}
-          id={`${id}-${i}`}
-          role="option"
-          aria-selected={row.kind === 'option' && row.option.value === value}
-          // Keep focus in the input while choosing with the mouse.
-          onMouseDown={(event) => event.preventDefault()}
-          onClick={() => onPick(row)}
-          className={cn(
-            'flex cursor-pointer items-center gap-2 rounded-lg px-2 py-2',
-            i === active && 'bg-accent text-accent-foreground',
-            row.kind === 'create' && 'font-semibold text-primary',
-          )}
-        >
-          {row.kind === 'option' ? (
-            <>
-              {row.option.icon}
-              <span className="flex-1 truncate">{row.option.label}</span>
-              {row.option.value === value && (
-                <Icon name="check" className="size-4 text-primary" />
+    <ul id={id} role="listbox" className="max-h-72 overflow-y-auto">
+      {rows.map((row, i) => {
+        const group = row.kind === 'option' ? row.option.group : undefined
+        const previous = i > 0 ? rows[i - 1] : undefined
+        const newGroup =
+          group !== undefined &&
+          (previous?.kind !== 'option' || previous.option.group !== group)
+        return (
+          <Fragment key={row.kind === 'option' ? row.option.value : 'create'}>
+            {newGroup && <GroupHeading>{group}</GroupHeading>}
+            <li
+              id={`${id}-${i}`}
+              role="option"
+              aria-selected={
+                row.kind === 'option' && row.option.value === value
+              }
+              // Keep focus in the input while choosing with the mouse.
+              onMouseDown={(event) => event.preventDefault()}
+              onClick={() => onPick(row)}
+              className={cn(
+                'flex cursor-pointer items-center gap-2 rounded-lg px-2 py-2',
+                i === active && 'bg-accent text-accent-foreground',
+                row.kind === 'create' && 'font-semibold text-primary',
               )}
-            </>
-          ) : (
-            <>
-              <Icon name="plus" className="size-4" />
-              {createLabel?.(query.trim())}
-            </>
-          )}
-        </li>
-      ))}
+            >
+              {row.kind === 'option' ? (
+                <OptionContent
+                  option={row.option}
+                  selected={row.option.value === value}
+                />
+              ) : (
+                <>
+                  <Icon name="plus" className="size-4" />
+                  {createLabel?.(query.trim())}
+                </>
+              )}
+            </li>
+          </Fragment>
+        )
+      })}
     </ul>
   )
 }
@@ -100,8 +148,17 @@ function ComboboxInput({
         onClick={() => state.setOpen(true)}
         onBlur={state.onBlur}
         onKeyDown={state.onKeyDown}
-        className={cn(fieldControl, hasValue ? 'pr-16' : 'pr-9')}
+        className={cn(
+          fieldControl,
+          hasValue ? 'pr-16' : 'pr-9',
+          state.tag && 'pr-36',
+        )}
       />
+      {state.tag && (
+        <Tag className="pointer-events-none absolute top-1/2 right-16 -translate-y-1/2">
+          {state.tag}
+        </Tag>
+      )}
       {hasValue && (
         <button
           type="button"
@@ -135,6 +192,7 @@ export function Combobox({
   clearLabel,
   createLabel,
   onCreate,
+  onOpenChange,
 }: {
   label: string
   options: ReadonlyArray<ComboboxOption>
@@ -144,11 +202,18 @@ export function Combobox({
   clearLabel: string
   createLabel?: (text: string) => string
   onCreate?: (text: string) => void
+  onOpenChange?: (open: boolean) => void
 }) {
   const { t } = useTranslation()
   const inputId = useId()
   const listId = useId()
-  const state = useCombobox({ options, value, onChange, onCreate })
+  const state = useCombobox({
+    options,
+    value,
+    onChange,
+    onCreate,
+    onOpenChange,
+  })
   const anchorRef = useRef<HTMLDivElement>(null)
 
   return (

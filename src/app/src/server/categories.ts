@@ -16,16 +16,19 @@ export type CategoryError =
   | 'inUse'
   | 'parentArchived'
   | 'beforePrevious'
+  | 'pauseOverlaps'
   | 'notFound'
   | 'failed'
 type CategoryResult<T = object> = Result<CategoryError, T>
 
 const idInput = z.object({ id: z.uuid() })
 
-// Raised by the triggers in the categories migration.
+// Raised by the triggers and functions in the categories migrations.
 const RAISED: Partial<Record<string, CategoryError>> = {
   category_parent_archived: 'parentArchived',
   category_event_before_previous: 'beforePrevious',
+  category_pause_overlaps: 'pauseOverlaps',
+  category_not_found: 'notFound',
 }
 
 function failure(
@@ -151,6 +154,19 @@ export const archiveCategory = createServerFn({ method: 'POST' })
       { category: data.id, archive_from: data.from },
     )
     return error ? failure('archive', error) : { ok: true, branch }
+  })
+
+/** A past archived period (CAT-03); returns how many sub-categories got it too. */
+export const addCategoryPause = createServerFn({ method: 'POST' })
+  .validator(
+    datedInput.extend({ until: z.iso.date() }).refine((d) => d.from < d.until),
+  )
+  .handler(async ({ data }): Promise<CategoryResult<{ branch: number }>> => {
+    const { data: branch, error } = await getSupabase().rpc(
+      'add_category_pause',
+      { category: data.id, archive_from: data.from, active_from: data.until },
+    )
+    return error ? failure('pause', error) : { ok: true, branch }
   })
 
 export const reactivateCategory = createServerFn({ method: 'POST' })

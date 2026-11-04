@@ -14,17 +14,20 @@ const parseBoolean = (v: unknown) => (typeof v === 'boolean' ? v : undefined)
 export function ArchivedCategories({
   archived,
   contextOf,
+  open = false,
 }: {
   archived: ReadonlyArray<{ category: Category; path: string }>
   contextOf: (category: Category) => RowContext
+  open?: boolean
 }) {
   const { t } = useTranslation()
   const locale = useLocale()
-  const [expanded, setExpanded] = useStoredState(
+  const [stored, setExpanded] = useStoredState(
     'categories.archivedExpanded',
     false,
     parseBoolean,
   )
+  const expanded = open || stored
   if (archived.length === 0) return null
 
   return (

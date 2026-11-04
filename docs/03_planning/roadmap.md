@@ -37,10 +37,10 @@ migration for `profiles.locale` is written (ADR-019).
 ## Phase 1: The ledger
 Replace daily use of the spreadsheet.
 
-**Status (2026-11-03):** currencies, the rates job and the Réglages and Devises screens
-(spec 10), then institutions and accounts (spec 11) are built and tried in local dev.
-Categories (spec 12) are built: the tree, the form, the icon picker and the category
-picker, not yet tried in a browser.
+**Status (2026-11-04):** currencies, the rates job and the Réglages and Devises screens
+(spec 10), institutions and accounts (spec 11), and categories (spec 12) are built and
+tried in local dev. Merchants (spec 13) are built with the category picker of spec 15;
+the transaction count and moving transactions on a merge wait for transactions.
 
 - Currencies, HexaRate validation, the Frankfurter rates job with a backfill to 2018,
   converted-amount markers. CUR-01..09 (ADR-009).

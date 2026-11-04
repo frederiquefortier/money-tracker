@@ -22,6 +22,7 @@ CAT-08 (emergency fund exclusion) is phase 2.
 │ ← Réglages                       │
 │ CATÉGORIES [⇕][Tri▾][+ CATÉGORIE]│
 │ [Dépenses][Revenus][Placements]  │
+│ [Rechercher                    ] │
 │ ┌──────────────────────────────┐ │
 │ │ ▾ (◉) Alimentation  + ☆ ▣ 🗑 │ │
 │ │ ├──── (◉) Épicerie  + ☆ ▣ 🗑 │ │
@@ -48,6 +49,10 @@ CAT-08 (emergency fund exclusion) is phase 2.
   level, the default) or Couleur (rainbow order from red at every level, greys last).
   Kept per browser. Sibling colours are always worked out in alphabetical order, so
   sorting never recolours a branch.
+- **Search** (`SearchField`) under the tabs, in the open tab, ignoring case and accents.
+  The tree keeps each matching category with its parents, opened so the match shows;
+  the archived section keeps the matches by name and opens. "Tout déplier" hides while
+  searching. Nothing found: "Aucun résultat.".
 - **Every row opens its form on tap**, with or without children, like an account row.
 - **A category with children** has a chevron before its icon (a leaf has the same space
   empty, so names line up). The chevron alone opens or closes the branch; expanded
@@ -65,7 +70,12 @@ CAT-08 (emergency fund exclusion) is phase 2.
   - **Archive** (CAT-03) asks for a date (default today) in the shared confirmation. From
     that date the category disappears from pickers; transactions before it keep it.
     Archiving a parent archives its whole branch from the same date; the confirmation
-    names how many sub-categories go with it.
+    names how many sub-categories go with it. An optional second date, "Réactivée le"
+    (today at most), makes it a past period instead: archived between the two dates and
+    active again after, for the years a category paused in the spreadsheet. The branch
+    gets the same period, each sub-category that was active throughout it. A period that
+    overlaps another archived one is refused ("Cette période chevauche une autre période
+    archivée.").
   - **Trash** deletes a category with no transactions and no children, confirmed in red.
     While it has children it is muted, and a tap says why in a toast.
   - A failed action says so in a toast.
@@ -226,12 +236,14 @@ clothes plum, beauty pink), and slate for everything else. Income and investment
 | Fields | Nom, Type, Parent, Icône, Couleur |
 | Colour | Couleur personnalisée (the custom circle's accessible name), Couleur {n}, déjà utilisée |
 | Expand | Tout déplier, Tout replier |
-| Sort | Trier: {sort}; Nom, Couleur |
+| Sort | Nom, Couleur; Trier: {sort} (accessible name) |
 | Types | Dépense, Revenu, Placement |
 | Clear parent | Retirer le parent |
-| Archive | À partir du (the verbs are the shared ones) |
+| Archive | À partir du, Réactivée le (the verbs are the shared ones) |
+| Past period | Cette période chevauche une autre période archivée. |
 | Archive branch | {count} sous-catégories seront archivées aussi. |
 | Parent archived | Réactivez d'abord “{parent}”. |
 | Has children | Cette catégorie a des sous-catégories. |
 | History | Historique, Archivée le {date}, Réactivée le {date} |
-| Icon picker | Choisir une icône, Rechercher une icône, Suggérée |
+| Search | Rechercher, Aucun résultat. (shared, also in the icon picker) |
+| Icon picker | Choisir une icône, Suggérée |

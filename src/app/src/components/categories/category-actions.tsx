@@ -10,6 +10,7 @@ import type { Category } from '#/lib/categories'
 import { formatDate, todayIso } from '#/lib/format'
 import { useLocale } from '#/lib/use-locale'
 import {
+  addCategoryPause,
   archiveCategory,
   deleteCategory,
   reactivateCategory,
@@ -36,32 +37,50 @@ function useFavourite(category: Category) {
   return { shown, toggle }
 }
 
-/** Archive or reactivate from a date (CAT-03); archiving takes the branch along. */
+type StatusMode = 'archive' | 'reactivate'
+
+function submitStatus(
+  mode: StatusMode,
+  { id, from, until }: { id: string; from: string; until: string },
+) {
+  if (mode === 'reactivate') return reactivateCategory({ data: { id, from } })
+  if (until) return addCategoryPause({ data: { id, from, until } })
+  return archiveCategory({ data: { id, from } })
+}
+
+/**
+ * Archive or reactivate from a date (CAT-03); archiving takes the branch along. A
+ * reactivation date makes it a past period.
+ */
 function StatusDialog({
   category,
   parent,
   branch,
+  mode,
   onClose,
 }: {
   category: Category
   parent: Category | undefined
   branch: number
+  mode: StatusMode
   onClose: () => void
 }) {
   const { t } = useTranslation()
   const locale = useLocale()
   const { run, busy } = useServerAction()
-  const [from, setFrom] = useState(todayIso)
+  const today = todayIso()
+  const [from, setFrom] = useState(today)
+  const [until, setUntil] = useState('')
   const { id, name } = category
-  const archived = isArchived(category)
   const last = category.history[0]?.effectiveOn
-  const verb = archived ? 'reactivate' : 'archive'
+  const datesOk = from !== '' && (!until || until > from)
 
   function failureText(error: string) {
     if (error === 'parentArchived')
       return t('categories.parentArchived', { parent: parent?.name ?? '' })
     if (error === 'beforePrevious' && last)
       return t('categories.beforePrevious', { date: formatDate(last, locale) })
+    if (error === 'pauseOverlaps') return t('categories.pauseOverlaps')
     return undefined
   }
 
@@ -69,19 +88,16 @@ function StatusDialog({
     <ConfirmDialog
       open
       tone="default"
-      title={t(`common.${verb}Name`, { name })}
-      confirmLabel={t(`common.${verb}`)}
+      title={t(`common.${mode}Name`, { name })}
+      confirmLabel={t(`common.${mode}`)}
       busy={busy}
-      canConfirm={from !== ''}
+      canConfirm={datesOk}
       onCancel={onClose}
       onConfirm={() =>
-        run(
-          () =>
-            archived
-              ? reactivateCategory({ data: { id, from } })
-              : archiveCategory({ data: { id, from } }),
-          { onResult: onClose, failureText },
-        )
+        run(() => submitStatus(mode, { id, from, until }), {
+          onResult: onClose,
+          failureText,
+        })
       }
     >
       <FormField
@@ -92,7 +108,18 @@ function StatusDialog({
         value={from}
         onChange={(event) => setFrom(event.target.value)}
       />
-      {!archived && branch > 0 && (
+      {mode !== 'reactivate' && (
+        <FormField
+          name="until"
+          type="date"
+          label={t('categories.until')}
+          value={until}
+          min={from || undefined}
+          max={today}
+          onChange={(event) => setUntil(event.target.value)}
+        />
+      )}
+      {mode !== 'reactivate' && branch > 0 && (
         <p className="text-sm">
           {t('categories.archiveBranch', { count: branch })}
         </p>
@@ -150,7 +177,7 @@ export function CategoryActions({
   const { t } = useTranslation()
   const toast = useToast()
   const favourite = useFavourite(category)
-  const [dialog, setDialog] = useState<'status' | 'delete' | null>(null)
+  const [dialog, setDialog] = useState<StatusMode | 'delete' | null>(null)
   const { name } = category
   const archived = isArchived(category)
   const close = () => setDialog(null)
@@ -176,10 +203,8 @@ export function CategoryActions({
       )}
       <IconButton
         icon={archived ? 'undo' : 'archive'}
-        label={t(archived ? 'common.reactivateName' : 'common.archiveName', {
-          name,
-        })}
-        onClick={() => setDialog('status')}
+        label={t(`common.${archived ? 'reactivate' : 'archive'}Name`, { name })}
+        onClick={() => setDialog(archived ? 'reactivate' : 'archive')}
       />
       <IconButton
         icon="trash-full"
@@ -195,16 +220,13 @@ export function CategoryActions({
             : setDialog('delete')
         }
       />
-      {dialog === 'status' && (
-        <StatusDialog
-          category={category}
-          parent={parent}
-          branch={branch}
-          onClose={close}
-        />
-      )}
       {dialog === 'delete' && (
         <DeleteDialog category={category} onClose={close} />
+      )}
+      {dialog && dialog !== 'delete' && (
+        <StatusDialog
+          {...{ category, parent, branch, mode: dialog, onClose: close }}
+        />
       )}
     </IconActions>
   )

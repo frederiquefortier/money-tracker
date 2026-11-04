@@ -96,9 +96,9 @@ are the shared ones, in this order.
 
 ### Category picker (CAT-04, 06)
 
-The shared `Combobox`, as for the parent on the category form, with two additions to the
-shared component (no second picker): options in labelled groups, and an action button at
-the end of an option.
+`CategoryPicker` (built with spec 13, first used for a merchant's default category): the
+shared `Combobox` with labelled groups and an action button at the end of an option (no
+second picker). It takes the transaction's type and date.
 
 ```
 │ Catégorie *  [resto            ✕]│

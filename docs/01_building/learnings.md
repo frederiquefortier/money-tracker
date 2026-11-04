@@ -4,6 +4,30 @@ Document new concepts, techniques, and knowledge gained. Reference this file to 
 
 <!-- Newest first: a new entry goes directly below this line. Template at the bottom. -->
 
+### 2026-11-04 - Accent-insensitive unique names in Postgres
+
+**What Was New:**
+- Merchant names are unique ignoring case and accents, so "Café Olimpico" and "cafe
+  olimpico" are one merchant, checked by the database itself.
+
+**Key Points:**
+- `unaccent()` is only `stable` (its dictionary is looked up by name at run time), so an
+  index expression cannot use it directly.
+- The usual fix is an `immutable` SQL wrapper that names the dictionary explicitly,
+  `unaccent('extensions.unaccent'::regdictionary, …)`, with an empty search path. The
+  index is then on `(user_id, fold_name(name))`.
+- `on delete set null (default_category_id)` (Postgres 15+) clears one column of a
+  composite foreign key; plain `set null` would also null `user_id`.
+
+**Sources:**
+- PostgreSQL documentation, F.48 unaccent; CREATE TABLE, referential actions
+
+**Where to Learn More:**
+- PostgreSQL documentation, Function Volatility Categories
+
+**Applied In:**
+- `src/supabase/migrations/20261104120000_merchants.sql` and its pgTAP test.
+
 ### 2026-11-03 - OKLCH for colour variations, WCAG contrast for icons
 
 **What Was New:**

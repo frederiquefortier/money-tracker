@@ -92,6 +92,12 @@ Functions: `category_status(id)` gives the status after all events.
 `archive_category(id, from)` archives a category and every active category in its branch
 from the same date, and returns how many sub-categories went with it (ADR-012).
 Reactivating is a single insert into `category_status_events`.
+`add_category_pause(id, archive_from, active_from)` adds a past archived period to a
+category and its branch, and returns how many sub-categories got it. It refuses a period
+that is not strictly inside one active period, ends in the future, or reactivates under
+an archived parent. The insert trigger refuses events before the last one, so the
+function sets `money.category_pause` for its own transaction and the trigger lets its
+rows through; the function has done the checks.
 `recolor_categories(colors)` writes the automatic colours the server computed for a
 branch, in one statement; a colour picked by hand is never touched (ADR-012).
 
@@ -99,8 +105,14 @@ branch, in one statement; a colour picked by hand is never touched (ADR-012).
 
 | Table | Columns | Req |
 |---|---|---|
-| `merchants` | `name`, `default_category_id`, `country` | MER-01, 03 |
-| `merchant_aliases` | `merchant_id`, `pattern` | MER-02, **later** (with the import wizard). Not created in v1. |
+| `merchants` | `name`, `default_category_id` (nullable, composite FK with `user_id`, cleared when the category is deleted) | MER-01. Names unique per user ignoring case and accents: a unique index on `fold_name(name)`. `country` comes with MER-03 (phase 5). |
+| `merchant_aliases` | `merchant_id`, `pattern` | MER-02, **later** (with the import wizard). Not created in v1. `merge_merchants` then moves the source's aliases to the target and adds the source's name as one. |
+
+`fold_name(text)` is `lower(unaccent(text))`, marked immutable so an index can use it
+(`unaccent` itself is only stable; the wrapper names its dictionary so it cannot change
+with the search path). `merge_merchants(source, target)` deletes the source and keeps the
+target's name and default category (MER-05); the transactions migration makes it move the
+source's transactions first, in the same call (ADR-012).
 
 ### Transactions
 

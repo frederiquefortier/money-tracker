@@ -31,7 +31,7 @@ export function InstitutionPicker({
       value={value}
       onChange={(id) => onChange(id)}
       clearLabel={t('accounts.clearInstitution')}
-      createLabel={(text) => t('accounts.createInstitution', { text })}
+      createLabel={(text) => t('common.createText', { text })}
       onCreate={(name) => void create(name)}
     />
   )

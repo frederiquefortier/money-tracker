@@ -15,9 +15,9 @@ onto them.
 | 10 | [Settings and currencies](10-settings-currencies.md) | Réglages hub, Devises, display currency switcher in the header | CUR-01..07, SET-06 | Built |
 | 11 | [Accounts](11-accounts.md) | Accounts by institution, account form, institution form | ACC-01..07 | Built |
 | 12 | [Categories](12-categories.md) | Category tree, category form, icon picker | CAT-01..03, 05, 07 | Built |
-| 13 | [Merchants](13-merchants.md) | Merchant list and form, merchant picker | MER-01, 05, TRX-05 | Reviewed |
+| 13 | [Merchants](13-merchants.md) | Merchant list and form, merchant picker | MER-01, 05, TRX-05 | Built (the picker with spec 15) |
 | 14 | [Transactions](14-transactions.md) | The list (home tab), day groups, converted-amount marker | TRX-04, 09, CUR-06, 07, 09 | Reviewed |
-| 15 | [Transaction form](15-transaction-form.md) | Expense and income, splits, foreign currency, the add button, the category picker | TRX-01, 02, 05, 06, 09, 10, CUR-08, CAT-04, 06, MER-01 | Reviewed |
+| 15 | [Transaction form](15-transaction-form.md) | Expense and income, splits, foreign currency, the add button, the category picker (built with spec 13) | TRX-01, 02, 05, 06, 09, 10, CUR-08, CAT-04, 06, MER-01 | Reviewed |
 | 16 | [Transfer and adjustment](16-transfer-adjustment.md) | Transfer form (fee, two currencies), balance adjustment | TRX-03, 04, 11 | Reviewed |
 | 17 | [First run](17-first-run.md) | Language, currencies, first accounts and categories | SET-01 | Reviewed |
 | 18 | [Import and export](18-import-export.md) | File check, summary, commit, undo, export | IMP-01, 04, 05, 06, SEC-04 | Reviewed |
@@ -29,12 +29,16 @@ and a spec that disagrees is wrong until the author says otherwise. Each names t
 component to use, so a screen is assembled, not redrawn.
 
 - **Page:** `SettingsPage` (or the tab's own page): "← Réglages" top left, the title with
-  its buttons beside it, never a button under the list: expand all, "Trier: …"
-  (`SortMenu`, an outline button with a chevron, like a select; kept per browser), then
+  its buttons beside it, never a button under the list: expand all, the sort
+  (`SortMenu`, an outline button with a chevron, like a select, showing the sort icon and
+  the current order, "Trier: …" as its accessible name; kept per browser), then
   one `AddButton` per thing the screen adds: a plus and the noun, "+ Compte",
   "+ Catégorie", with "Ajouter un compte" as its accessible name, never an add menu. A
   menu opens at least as wide as its button, aligned to it, and grows to fit its labels
-  rather than cutting them.
+  rather than cutting them. A list that filters has the filter beside the sort, the
+  same kind of button (`ChoiceMenu`): the `filter` icon and the current choice, "Tout"
+  when nothing is filtered, "Filtrer: …" as its accessible name. `SortMenu` is built on
+  it.
 - **Lists:** cards (`ListCard`), one line per item where it fits. Tapping an item opens
   its form. A card header (an institution) toggles with `CollapseToggle` and edits with a
   pencil. In a tree, every row opens its form; a parent's chevron alone toggles its
@@ -61,7 +65,14 @@ component to use, so a screen is assembled, not redrawn.
   `LinkedFields`). `LinkedFields` wraps only the sub-field, never the field it belongs to. Required fields carry an asterisk, no legend, no "(facultatif)".
 - **Choosing from the user's own items:** `Combobox`, typed into the field: it filters,
   offers "Créer « … »" when that makes sense, and a × clears it. Nothing chosen is an
-  empty field, never "Aucun(e)".
+  empty field, never "Aucun(e)". Options can sit in labelled groups, end with one icon
+  action (the star), and show a `Tag` in the field while chosen ("Archivée"). A category
+  is always chosen with `CategoryPicker`.
+- **Search:** only on lists that grow long (Marchands, Catégories, the icon picker), a
+  `SearchField` above the list, filtering as you type, ignoring case and accents. The
+  words are the same everywhere: "Rechercher" and "Aucun résultat.", never naming the
+  thing searched.
+- **Tags:** a short status beside a name ("Par défaut", "Archivée") is a `Tag`.
 - **No helper text:** no hints under fields, legends or explanatory sentences. If a field
   needs explaining, fix its label or the layout. A reason for something unavailable goes
   in the toast on tap.

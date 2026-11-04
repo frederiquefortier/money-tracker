@@ -165,7 +165,7 @@ The `multi_currency` account type is dropped.
 | Key | Français |
 |---|---|
 | Screen title | Comptes |
-| Sort | Trier: {sort}; Nom, Type, Devise, Solde −, Solde + |
+| Sort | Nom, Type, Devise, Solde −, Solde +; Trier: {sort} (accessible name) |
 | Add buttons | Institution, Compte (named Ajouter une institution, Ajouter un compte) |
 | Archived section | Comptes archivés ({count}), Archivé le {date} |
 | Hidden label | Masqué des nouvelles transactions |

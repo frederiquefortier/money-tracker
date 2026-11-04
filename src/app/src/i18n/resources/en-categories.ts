@@ -16,6 +16,9 @@ export const categoriesEn: typeof categoriesFr = {
   type: 'Type',
   parent: 'Parent',
   clearParent: 'Remove the parent',
+  clearCategory: 'Remove the category',
+  favourites: 'Favourites',
+  archivedTag: 'Archived',
   color: 'Colour',
   customColor: 'Custom colour',
   swatch: 'Colour {{n}}',
@@ -27,6 +30,8 @@ export const categoriesEn: typeof categoriesFr = {
   archived: 'Archived categories ({{count}})',
   archivedOn: 'Archived on {{date}}',
   from: 'From',
+  until: 'Reactivated on',
+  pauseOverlaps: 'This period overlaps another archived period.',
   archiveBranch_one: '{{count}} subcategory will be archived too.',
   archiveBranch_other: '{{count}} subcategories will be archived too.',
   parentArchived: 'Reactivate “{{parent}}” first.',
@@ -38,8 +43,6 @@ export const categoriesEn: typeof categoriesFr = {
   icon: {
     label: 'Icon',
     choose: 'Choose an icon',
-    search: 'Search icons',
     suggested: 'Suggested',
-    none: 'No icon found.',
   },
 }

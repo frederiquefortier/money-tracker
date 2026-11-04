@@ -80,23 +80,24 @@ English; this file is in English like every other meta-doc.
 |---|---|---|---|
 | CAT-01 | Categories nest with no depth limit. | v1, ai | 1 |
 | CAT-02 | A category has a kind: expense (default), income, or investment. | v1, ai | 1 |
-| CAT-03 | Archive a category from a chosen date; reactivate from a chosen date. The full history is viewable as a timeline. Archiving a parent archives its branch; a sub-category cannot be reactivated under an archived parent. | v1, ai, add, C10 | 1 |
+| CAT-03 | Archive a category from a chosen date; reactivate from a chosen date. A past archived period (two dates) can be added afterwards, from the archive action. The full history is viewable as a timeline. Archiving a parent archives its branch; a sub-category cannot be reactivated under an archived parent. | v1, ai, add, C10 | 1 |
 | CAT-04 | Archived categories are absent from every picker. Editing an old transaction still shows its archived category with a badge and lets you change it. | add, C8 | 1 |
 | CAT-05 | The category page shows active categories first and archived ones in a collapsed section with a count and "archivée depuis [date]". | add, C9 | 1 |
 | CAT-06 | Favourite categories sit in a "Favoris" group at the top of the picker, shown as "Parent > Enfant", toggled with a star inside the picker. They are not repeated below. | v1, ai, add, C7 | 1 |
 | CAT-07 | A category has a coolicons icon, chosen in a searchable picker of a curated subset of the set (ADR-020). A default is suggested from the name; picking the suggested icon returns to it. Each category has its own colour, chosen freely; a sub-category starts from a variation of its parent's colour. | v1, ai, add, C11 | 1 |
 | CAT-08 | A category can be excluded from the emergency-fund calculation. | v1, ai | 2 |
-| CAT-09 | The category tree sorts by name or by colour (rainbow order), kept per browser. One button opens or closes every branch, in every tab. | author | 1 |
+| CAT-09 | The category tree sorts by name or by colour (rainbow order), kept per browser. One button opens or closes every branch, in every tab. A search filters the open tab by name, keeping each match's parents. | author | 1 |
 
 ## 6. Merchants (`MER`)
 
 | ID | Requirement | Source | Phase |
 |---|---|---|---|
 | MER-01 | A merchant can have a default category, prefilled on new transactions. | v1, ai | 1 |
-| MER-02 | A merchant has aliases, used to match bank-CSV descriptions on import. | v1, ai | later (with IMP-03) |
+| MER-02 | A merchant has aliases, used to match bank-CSV descriptions on import. A merge (MER-05) keeps the source's name and aliases as aliases of the target. | v1, ai | later (with IMP-03) |
 | MER-03 | A merchant has a country of origin. | v1 | 5 |
 | MER-04 | For one merchant, see how the bill has changed over time, in percent. | v1, ai | 2 |
-| MER-05 | Merge two merchants: the transactions of one move to the other, which keeps its name and default category. | author | 1 |
+| MER-06 | The merchant list sorts by name (A–Z, Z–A) or by category, kept per browser, and filters by default category (a parent keeps its branch) or none. | author | 1 |
+| MER-05 | Merge two merchants: the transactions of one move to the other, which keeps its name and default category; the source's name becomes an alias (MER-02). | author | 1 |
 
 ## 7. Tags (`TAG`)
 

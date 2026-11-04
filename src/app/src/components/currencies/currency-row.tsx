@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { IconActions, IconButton } from '#/components/icon-button'
+import { Tag } from '#/components/tag'
 import { RATES_HISTORY_START, currencyName } from '#/lib/currencies'
 import type { Currency, UserCurrency } from '#/lib/currencies'
 import { formatDate } from '#/lib/format'
@@ -23,11 +24,7 @@ function CurrencyLabel({
           <span className="truncate">{currencyName(currency, locale)}</span>
           <span className="shrink-0">({currency.symbol})</span>
         </span>
-        {isDefault && (
-          <span className="shrink-0 rounded-md bg-secondary px-1.5 py-0.5 text-xs font-semibold text-primary">
-            {t('currencies.defaultBadge')}
-          </span>
-        )}
+        {isDefault && <Tag>{t('currencies.defaultBadge')}</Tag>}
       </span>
     </>
   )

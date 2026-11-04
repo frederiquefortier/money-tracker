@@ -277,6 +277,41 @@ export type Database = {
         }
         Relationships: []
       }
+      merchants: {
+        Row: {
+          created_at: string
+          default_category_id: string | null
+          id: string
+          name: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          default_category_id?: string | null
+          id?: string
+          name: string
+          updated_at?: string
+          user_id?: string
+        }
+        Update: {
+          created_at?: string
+          default_category_id?: string | null
+          id?: string
+          name?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "merchants_user_id_default_category_id_fkey"
+            columns: ["user_id", "default_category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["user_id", "id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           created_at: string
@@ -389,14 +424,27 @@ export type Database = {
       }
     }
     Functions: {
+      add_category_pause: {
+        Args: { active_from: string; archive_from: string; category: string }
+        Returns: number
+      }
       archive_category: {
         Args: { archive_from: string; category: string }
         Returns: number
+      }
+      category_active_through: {
+        Args: { category: string; ends: string; starts: string }
+        Returns: boolean
       }
       category_status: { Args: { category: string }; Returns: string }
       exchange_rate: {
         Args: { from_currency: string; on_date: string; to_currency: string }
         Returns: number
+      }
+      fold_name: { Args: { name: string }; Returns: string }
+      merge_merchants: {
+        Args: { source: string; target: string }
+        Returns: undefined
       }
       recolor_categories: { Args: { colors: Json }; Returns: undefined }
     }

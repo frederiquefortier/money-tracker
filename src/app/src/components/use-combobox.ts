@@ -1,15 +1,28 @@
 import { useState } from 'react'
+import type { IconName } from '#/components/icon'
 import { foldForSearch } from '#/lib/utils'
 
 /**
  * `keywords` are matched too, for what the label does not show (another language).
- * `icon` shows before the label in the list.
+ * `icon` shows before the label in the list. Options with the same `group` sit together
+ * under its heading. `action` is an icon button at the end of the option. `tag` shows in
+ * the field while the option is chosen. A `hidden` option can be the value but is never
+ * listed (an archived category).
  */
 export type ComboboxOption = {
   value: string
   label: string
   keywords?: string
   icon?: React.ReactNode
+  group?: string
+  action?: {
+    icon: IconName
+    label: string
+    pressed?: boolean
+    onClick: () => void
+  }
+  tag?: string
+  hidden?: boolean
 }
 
 export type Row =
@@ -23,7 +36,11 @@ function useRows(
 ): Array<Row> {
   const q = foldForSearch(query)
   const rows: Array<Row> = options
-    .filter((o) => foldForSearch(`${o.label} ${o.keywords ?? ''}`).includes(q))
+    .filter(
+      (o) =>
+        !o.hidden &&
+        foldForSearch(`${o.label} ${o.keywords ?? ''}`).includes(q),
+    )
     .map((option) => ({ kind: 'option', option }))
   if (canCreate && q && !options.some((o) => foldForSearch(o.label) === q)) {
     rows.push({ kind: 'create' })
@@ -37,17 +54,24 @@ export function useCombobox({
   value,
   onChange,
   onCreate,
+  onOpenChange,
 }: {
   options: ReadonlyArray<ComboboxOption>
   value: string | null
   onChange: (value: string | null) => void
   onCreate?: (text: string) => void
+  onOpenChange?: (open: boolean) => void
 }) {
   const selected = options.find((o) => o.value === value)
   const [query, setQuery] = useState<string | null>(null)
-  const [open, setOpen] = useState(false)
+  const [open, setOpenState] = useState(false)
   const [active, setActive] = useState(0)
   const rows = useRows(options, query ?? '', Boolean(onCreate))
+
+  function setOpen(next: boolean) {
+    if (next !== open) onOpenChange?.(next)
+    setOpenState(next)
+  }
 
   function close() {
     setOpen(false)
@@ -80,6 +104,7 @@ export function useCombobox({
 
   return {
     text: query ?? selected?.label ?? '',
+    tag: query === null ? selected?.tag : undefined,
     query: query ?? '',
     rows,
     active,

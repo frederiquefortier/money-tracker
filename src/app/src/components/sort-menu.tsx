@@ -1,15 +1,7 @@
 import { useTranslation } from 'react-i18next'
-import { Icon } from '#/components/icon'
-import { Button } from '#/components/ui/button'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
-  DropdownMenuTrigger,
-} from '#/components/ui/dropdown-menu'
+import { ChoiceMenu } from '#/components/choice-menu'
 
-/** "Trier: …" beside a list's title: an outline button with a chevron, like a select. */
+/** The sort beside a list's title: the icon and the current order, "Trier: …" for screen readers. */
 export function SortMenu<TSort extends string>({
   sort,
   options,
@@ -23,29 +15,13 @@ export function SortMenu<TSort extends string>({
 }) {
   const { t } = useTranslation()
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="outline">
-          <Icon name="sort-ascending" className="size-4" />
-          {t('common.sortLabel', { sort: labelOf(sort) })}
-          <Icon name="chevron-down" className="size-4" />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        <DropdownMenuRadioGroup
-          value={sort}
-          onValueChange={(value) => {
-            const next = options.find((option) => option === value)
-            if (next) onChange(next)
-          }}
-        >
-          {options.map((option) => (
-            <DropdownMenuRadioItem key={option} value={option}>
-              {labelOf(option)}
-            </DropdownMenuRadioItem>
-          ))}
-        </DropdownMenuRadioGroup>
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <ChoiceMenu
+      icon="sort-ascending"
+      label={t('common.sortLabel', { sort: labelOf(sort) })}
+      value={sort}
+      options={options}
+      labelOf={labelOf}
+      onChange={onChange}
+    />
   )
 }

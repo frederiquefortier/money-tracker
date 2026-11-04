@@ -1,6 +1,7 @@
 # Merchants
 
-**Status:** reviewed 2026-11-03; aligned with the built screens 2026-11-03. Shared rules:
+**Status:** built 2026-11-04, before transactions: the count and the moving of transactions
+come with the transactions migration. Shared rules:
 [02-screens.md](02-screens.md#shared-patterns).
 
 ## Purpose
@@ -12,41 +13,55 @@ created inline from the transaction form.
 
 ## Requirements
 
-MER-01, MER-05 (merge). TRX-05 (linking a transaction to a merchant) is the picker below.
-MER-03 (country) is phase 5, MER-04 (price evolution) phase 2.
+MER-01, MER-05 (merge), MER-06 (sort and filter). TRX-05 (linking a transaction to a merchant) is the picker below,
+built with the transaction form (spec 15). MER-03 (country) is phase 5, MER-04 (price
+evolution) phase 2.
 
 ## Marchands
 
 ```
 ┌──────────────────────────────────┐
 │ ← Réglages                       │
-│ MARCHANDS              [+ MARCHAND]│
-│ [Rechercher un marchand        ] │
+│ MARCHANDS [Tri▾][Filtre▾][+ MARCHAND]│
+│ [Rechercher                    ] │
 │ ┌──────────────────────────────┐ │
-│ │ IGA                  84  ⇉ 🗑 │ │
+│ │ IGA                      ⇉ 🗑 │ │
 │ │ (◉) Épicerie                  │ │
-│ │ Hydro-Québec         12  ⇉ 🗑 │ │
-│ │ (◉) Électricité               │ │
-│ │ Librairie Pantoute    3  ⇉ 🗑 │ │
+│ │ Hydro-Québec             ⇉ 🗑 │ │
+│ │ (◉) Logement > Électricité    │ │
+│ │ Librairie Pantoute       ⇉ 🗑 │ │
 │ └──────────────────────────────┘ │
 └──────────────────────────────────┘
 ⇉ merge into another   🗑 delete
 ```
 
-- Alphabetical, with a search field above the card that filters as you type.
-- Each row: the name, then on the second line its default category (icon and name), left
-  empty when there is none; on the right the number of transactions, then the actions.
+- **Trier** (MER-06, `SortMenu`): Nom A–Z (the default), Nom Z–A, Catégorie (by the
+  default category's path, merchants without one last, then by name). Kept per browser.
+  "Plus utilisés" joins it with the transaction count.
+- **Filtrer** (MER-06, `ChoiceMenu` with the `filter` icon): "Tout", each
+  default category in use and its parents by path (a parent keeps its branch), and "Sans
+  catégorie". Shown once there is something to filter; not remembered.
+- A search field above the card that filters as you type, ignoring
+  case and accents (`SearchField`). Nothing found: "Aucun résultat.".
+- Each row: the name, then on the second line its default category (icon and full path),
+  left out when there is none; on the right the actions. The number of transactions
+  joins them, before the actions, with the transactions migration.
 - Tapping a row opens the form.
 
 ### Row actions
 
-- **Fusionner** (MER-05): a dialog with one field, the merchant combobox (below, without
-  "Créer"), then "Les {count} transactions de “{source}” passeront à “{target}”, puis
+- **Fusionner** (MER-05, the `merge` icon): `ConfirmDialog` in red with one field,
+  "Fusionner avec" (the shared `Combobox` over the other merchants, without "Créer"), then
+  once a merchant is chosen "Les transactions de “{source}” passeront à “{target}”, puis
   “{source}” sera supprimé." The target keeps its own name and default category. Used to
-  clean up duplicates after the import.
-- **Trash:** "Supprimer “{name}”". With no transactions: "Cette action est
-  irréversible.". With transactions: "Les {count} transactions gardent leur catégorie et
-  perdent le marchand."
+  clean up duplicates after the import. A duplicate is an alias: once aliases exist
+  (MER-02, with the import wizard), the merge also keeps the source's name as an alias of
+  the target and moves the source's aliases to it, so a later import that would have
+  matched the source finds the target. Muted when there is no other merchant; a tap says
+  "Il faut au moins un autre marchand.".
+- **Trash:** "Supprimer “{name}”" and "Cette action est irréversible.". With the
+  transactions migration, a merchant with transactions says "Les {count} transactions
+  gardent leur catégorie et perdent le marchand." instead.
 
 ## Merchant form
 
@@ -54,10 +69,11 @@ A route sheet over Marchands (`/settings/merchants/new`, `/settings/merchants/{i
 only edits.
 
 - **Nom** required, unique per user, compared without case or accents ("Café Olimpico"
-  and "cafe olimpico" are the same merchant). A duplicate shows "Ce marchand existe
-  déjà." under the field.
-- **Catégorie par défaut** (MER-01): the category picker (spec 15), optional, empty with a
-  × to clear. Changing it affects new transactions only; past ones keep their category.
+  and "cafe olimpico" are the same merchant). A duplicate shows the shared "Ce nom est
+  déjà utilisé." under the field.
+- **Catégorie par défaut** (MER-01): `CategoryPicker` (spec 15, built with this screen),
+  optional, empty with a × to clear. Its "Créer « … »" makes a top-level expense
+  category. Changing it affects new transactions only; past ones keep their category.
 - Saving closes the sheet with a toast, "Marchand créé." or "Marchand enregistré.".
 
 ## Merchant picker (TRX-05)
@@ -79,28 +95,33 @@ Used by the transaction form (spec 15): the shared combobox.
 
 ## Data
 
-- Reads: `merchants` with the default category and a transaction count per merchant.
+- Reads: `merchants` and the categories (for the rows and the picker). The transaction
+  count per merchant comes with the transactions migration.
 - Writes, each a server function with the user's session: `saveMerchant`,
-  `deleteMerchant`, `mergeMerchants(source, target)`. The merge is one SQL function (moves
-  the transactions, deletes the source) with a pgTAP test, like other multi-row writes
-  (ADR-012). The inline create in the picker calls `saveMerchant`.
-- `merchants.default_category_id` is a composite foreign key with `user_id` (ADR-005).
-  Deleting a merchant sets `transactions.merchant_id` to null.
-- Uniqueness ignoring case and accents: a unique index on a normalised name.
+  `deleteMerchant`, `mergeMerchants(source, target)`. The merge is one SQL function,
+  `merge_merchants`, with a pgTAP test (ADR-012); today it deletes the source, and the
+  transactions migration makes it move the transactions first. The inline create in the picker calls `saveMerchant`.
+- `merchants.default_category_id` is a composite foreign key with `user_id` (ADR-005);
+  deleting the category clears it. Deleting a merchant will set
+  `transactions.merchant_id` to null.
+- Uniqueness ignoring case and accents: a unique index on `fold_name(name)`.
 
 ## Copy
 
 | Key | Français |
 |---|---|
 | Screen title | Marchands |
-| Search | Rechercher un marchand |
+| Search | Rechercher, Aucun résultat. (shared) |
+| Sort | Nom A–Z, Nom Z–A, Catégorie; Trier: … (accessible name) |
+| Filter | Tout (shared), Sans catégorie; Filtrer: … (accessible name) |
 | Empty | Aucun marchand pour l'instant. |
 | Add | Marchand (named Ajouter un marchand) |
 | Form titles | Nouveau marchand, Modifier le marchand |
 | Fields | Nom, Catégorie par défaut |
 | Clear category | Retirer la catégorie |
+| Settings row | Marchands (the `store` icon) |
 | Saved | Marchand créé., Marchand enregistré. |
-| Duplicate | Ce marchand existe déjà. |
-| Delete | Supprimer “{name}”, Cette action est irréversible., Les {count} transactions gardent leur catégorie et perdent le marchand. |
+| Duplicate | Ce nom est déjà utilisé. (shared) |
+| Delete | Supprimer “{name}”, Cette action est irréversible.; with transactions: Les {count} transactions gardent leur catégorie et perdent le marchand. |
 | Inline create | Créer « {text} » |
-| Merge | Fusionner “{name}”, Fusionner avec, Les {count} transactions de “{source}” passeront à “{target}”, puis “{source}” sera supprimé. |
+| Merge | Fusionner, Fusionner “{name}”, Fusionner avec, Les transactions de “{source}” passeront à “{target}”, puis “{source}” sera supprimé., Il faut au moins un autre marchand. |

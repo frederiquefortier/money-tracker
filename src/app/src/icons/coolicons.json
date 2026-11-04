@@ -127,6 +127,15 @@
     },
     "unfold-less": {
       "body": "<path fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"m8 5l4 4l4-4m0 14l-4-4l-4 4\"/>"
+    },
+    "merge": {
+      "body": "<path fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"m5 5l7 7l7-7M9 16l3 3l3-3m-3 3v-7\"/>"
+    },
+    "store": {
+      "body": "<path fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M3 5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Zm2 4v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V9m-9 12v-4a2 2 0 1 1 4 0v4M9 3v6m6-6v6\"/>"
+    },
+    "filter": {
+      "body": "<path fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M12 4h7a1 1 0 0 1 1 1v1l-6 6v6l-4 2v-8L4 6V5a1 1 0 0 1 1-1z\"/>"
     }
   }
 }

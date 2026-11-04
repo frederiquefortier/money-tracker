@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { CategoryBadge } from '#/components/categories/category-badge'
-import { Input } from '#/components/ui/input'
+import { SearchField } from '#/components/search-field'
 import { Sheet, SheetBody, SheetContent } from '#/components/ui/sheet'
 import { searchIcons } from '#/lib/categories'
 import { cn, focusRing } from '#/lib/utils'
@@ -42,18 +42,12 @@ export function IconPicker({
         closeLabel={t('common.close')}
       >
         <div className="border-b px-5 py-3">
-          <Input
-            type="search"
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder={t('categories.icon.search')}
-            aria-label={t('categories.icon.search')}
-          />
+          <SearchField value={query} onChange={setQuery} />
         </div>
         <SheetBody>
           {icons.length === 0 && (
             <p className="py-6 text-center text-muted-foreground">
-              {t('categories.icon.none')}
+              {t('common.noMatch')}
             </p>
           )}
           <ul className="grid grid-cols-[repeat(auto-fill,minmax(4rem,1fr))] gap-2">
