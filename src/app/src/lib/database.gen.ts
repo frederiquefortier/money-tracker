@@ -422,7 +422,6 @@ export type Database = {
           kind: string
           merchant_id: string | null
           note: string | null
-          occurred_at_time: string | null
           occurred_on: string
           original_amount: number | null
           original_currency: string | null
@@ -440,7 +439,6 @@ export type Database = {
           kind: string
           merchant_id?: string | null
           note?: string | null
-          occurred_at_time?: string | null
           occurred_on: string
           original_amount?: number | null
           original_currency?: string | null
@@ -458,7 +456,6 @@ export type Database = {
           kind?: string
           merchant_id?: string | null
           note?: string | null
-          occurred_at_time?: string | null
           occurred_on?: string
           original_amount?: number | null
           original_currency?: string | null
@@ -550,12 +547,27 @@ export type Database = {
         }
         Relationships: []
       }
+      frequent_categories: {
+        Row: {
+          category_id: string | null
+          kind: string | null
+          rank: number | null
+        }
+        Relationships: []
+      }
       institution_totals: {
         Row: {
           converted: boolean | null
           display_currency: string | null
           institution_id: string | null
           total: number | null
+        }
+        Relationships: []
+      }
+      merchant_usage: {
+        Row: {
+          merchant_id: string | null
+          transaction_count: number | null
         }
         Relationships: []
       }
@@ -592,6 +604,10 @@ export type Database = {
         Args: { from_currency: string; on_date: string; to_currency: string }
         Returns: number
       }
+      exchange_rate_text: {
+        Args: { from_currency: string; on_date: string; to_currency: string }
+        Returns: string
+      }
       fold_name: { Args: { name: string }; Returns: string }
       merge_merchants: {
         Args: { source: string; target: string }
@@ -614,7 +630,6 @@ export type Database = {
           kind: string
           merchant_id?: string
           note?: string
-          occurred_at_time?: string
           occurred_on: string
           original_amount?: number
           original_currency?: string
@@ -632,7 +647,6 @@ export type Database = {
           from_account: string
           from_pending?: boolean
           note?: string
-          occurred_at_time?: string
           occurred_on: string
           received?: number
           to_account: string

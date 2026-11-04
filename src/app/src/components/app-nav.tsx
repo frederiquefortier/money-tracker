@@ -6,7 +6,7 @@ import { cn, focusRing } from '#/lib/utils'
 
 const TABS = [
   {
-    to: '/',
+    to: '/transactions',
     label: 'nav.transactions',
     icon: 'receipt',
     activeIcon: 'receipt-fill',
@@ -50,7 +50,6 @@ export function AppNav({ variant }: { variant: 'bottom' | 'top' }) {
         <Link
           key={tab.to}
           to={tab.to}
-          activeOptions={{ exact: tab.to === '/' }}
           className={cn(
             'rounded-full text-muted-foreground transition-colors hover:text-primary',
             focusRing,

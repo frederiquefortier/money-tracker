@@ -47,7 +47,7 @@ English; this file is in English like every other meta-doc.
 
 | ID | Requirement | Source | Phase |
 |---|---|---|---|
-| TRX-01 | Add an expense or an income, with a date and an optional time. | v1, ai, misc | 1 |
+| TRX-01 | Add an expense or an income, with a date. A calendar date only, no time: a date typed as 17.08.2026 reads 17.08.2026 everywhere, never shifted by a time zone. The optional time was dropped on 2026-11-04. | v1, ai, misc | 1 |
 | TRX-02 | Currency is required on every transaction, prefilled from the account. The amount booked is always in the account's currency; choosing another currency records it as the original price (CUR-08). | add, C6 | 1 |
 | TRX-03 | Balance adjustment: set an account to a known balance; the app records the difference. | v1, ai | 1 |
 | TRX-04 | Transfer between two accounts. Optional fee, recorded as an expense on the source account in the category chosen once in settings. Edit and delete act on all legs together, with a confirmation before delete. List shows "Transfert: A → B". | add, C5 | 1 |

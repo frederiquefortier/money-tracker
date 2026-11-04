@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { ConfirmDialog } from '#/components/confirm-dialog'
 import { FormField } from '#/components/form-field'
 import { IconActions, IconButton } from '#/components/icon-button'
+import type { ActionPlacement } from '#/components/icon-button'
 import { useServerAction } from '#/components/use-server-action'
 import { todayIso } from '#/lib/format'
 import { closeAccount, deleteAccount, reopenAccount } from '#/server/accounts'
@@ -10,12 +11,14 @@ import type { Account } from '#/server/accounts'
 
 type RowAccount = Pick<Account, 'id' | 'name' | 'currency' | 'closedOn'>
 
-/** Close or reopen (ACC-03) and delete, as icons on the account's row. */
+/** Close or reopen (ACC-03) and delete, as icons on the account's row or its sheet. */
 export function AccountActions({
   account,
+  placement,
   className,
 }: {
   account: RowAccount
+  placement?: ActionPlacement
   className?: string
 }) {
   const { t } = useTranslation()
@@ -40,7 +43,7 @@ export function AccountActions({
   }
 
   return (
-    <IconActions slots={2} className={className}>
+    <IconActions slots={2} placement={placement} className={className}>
       {account.closedOn ? (
         <IconButton
           icon="undo"

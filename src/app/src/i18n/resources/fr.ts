@@ -1,5 +1,6 @@
 // French is the source language (ADR-008). en.ts is typed against this shape.
 import { categoriesFr } from './fr-categories'
+import { transactionsFr } from './fr-transactions'
 
 export const fr = {
   app: {
@@ -38,6 +39,8 @@ export const fr = {
     filterLabel: 'Filtrer: {{filter}}',
     search: 'Rechercher',
     noMatch: 'Aucun résultat.',
+    discardTitle: 'Abandonner les modifications?',
+    discard: 'Abandonner',
   },
   displayCurrency: {
     label: 'Devise d’affichage: {{code}}',
@@ -54,6 +57,9 @@ export const fr = {
     date: 'Entrez une date valide.',
     url: 'L’adresse doit commencer par https://.',
     nameTaken: 'Ce nom est déjà utilisé.',
+    splitsSum: 'Répartissez tout le montant.',
+    percentTotal: 'Les pourcentages doivent totaliser 100.',
+    duplicateCategory: 'Chaque catégorie une seule fois.',
   },
   signIn: {
     title: 'Connexion',
@@ -183,6 +189,7 @@ export const fr = {
     inUse: 'Des comptes utilisent encore cette institution.',
   },
   categories: categoriesFr,
+  transactions: transactionsFr,
   merchants: {
     title: 'Marchands',
     empty: 'Aucun marchand pour l’instant.',
@@ -202,6 +209,9 @@ export const fr = {
     created: 'Marchand créé.',
     updated: 'Marchand enregistré.',
     merge: 'Fusionner',
+    deleteKeeps_one: 'La transaction garde sa catégorie et perd le marchand.',
+    deleteKeeps_other:
+      'Les {{count}} transactions gardent leur catégorie et perdent le marchand.',
     mergeName: 'Fusionner “{{name}}”',
     mergeInto: 'Fusionner avec',
     mergeEffect:

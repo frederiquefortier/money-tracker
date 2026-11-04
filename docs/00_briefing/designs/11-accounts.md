@@ -63,7 +63,9 @@ ACC-01, 02, 03, 04, 05, 06, 07. ACC-08 (last reconciled, last transaction) is ph
 - **Pending:** when the account has pending transactions, a third line under the balance,
   muted, says "dont 45,00 $ en attente". The text carries the meaning; colour alone would
   not.
-- **Actions** in the row's action slot: archive (asks the date, default today) and trash.
+- **Actions** in the row's action slot from `md` up, in the account sheet's header on
+  phones: archive (asks the date, default today) and trash. The institution's trash
+  moves the same way; its pencil stays on the card header.
 - Tapping a row opens the account form. Once the transactions list exists (spec 14), it
   opens that list filtered to the account, with a pencil in its header for the form.
 

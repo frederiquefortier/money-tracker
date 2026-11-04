@@ -71,7 +71,7 @@ export function CurrencyRow({
     <li className="py-2.5 pr-2 pl-4">
       <div className="flex items-center gap-3">
         <CurrencyLabel currency={currency} isDefault={isDefault} />
-        <IconActions slots={3}>
+        <IconActions slots={3} placement="always">
           <IconButton
             icon={currency.isFavourite ? 'star-fill' : 'star'}
             label={t('currencies.favourite', { code })}

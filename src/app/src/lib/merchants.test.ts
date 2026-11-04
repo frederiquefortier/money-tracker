@@ -20,6 +20,7 @@ const merchant = (
   id: name,
   name,
   defaultCategoryId,
+  transactionCount: 0,
 })
 const merchants = [
   merchant('Zoo Bistro', 'food'),

@@ -187,6 +187,26 @@ export function descendantIds(
   return found
 }
 
+/**
+ * What a category's actions need from the rest of the tree: its parent, whether it has
+ * children (delete waits), and how many active sub-categories archiving takes along.
+ */
+export function categoryContext(
+  categories: ReadonlyArray<Category>,
+  locale: string,
+) {
+  const byId = new Map(categories.map((c) => [c.id, c]))
+  const children = childrenByParent(categories, locale)
+  return (category: Category) => ({
+    parent: category.parentId ? byId.get(category.parentId) : undefined,
+    hasChildren: children.has(category.id),
+    branch: [...descendantIds(category.id, children)].filter((id) => {
+      const c = byId.get(id)
+      return c !== undefined && !isArchived(c)
+    }).length,
+  })
+}
+
 type Colored = Pick<
   Category,
   'id' | 'parentId' | 'name' | 'color' | 'colorIsAuto'

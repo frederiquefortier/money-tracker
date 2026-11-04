@@ -18,6 +18,7 @@ export const categoriesEn: typeof categoriesFr = {
   clearParent: 'Remove the parent',
   clearCategory: 'Remove the category',
   archivedTag: 'Archived',
+  frequent: 'Frequent',
   color: 'Colour',
   customColor: 'Custom colour',
   swatch: 'Colour {{n}}',

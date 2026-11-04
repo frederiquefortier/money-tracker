@@ -1,4 +1,5 @@
 import { categoriesEn } from './en-categories'
+import { transactionsEn } from './en-transactions'
 import type { Messages } from './fr'
 
 export const en: Messages = {
@@ -38,6 +39,8 @@ export const en: Messages = {
     filterLabel: 'Filter: {{filter}}',
     search: 'Search',
     noMatch: 'No results.',
+    discardTitle: 'Discard your changes?',
+    discard: 'Discard',
   },
   displayCurrency: {
     label: 'Display currency: {{code}}',
@@ -54,6 +57,9 @@ export const en: Messages = {
     date: 'Enter a valid date.',
     url: 'The address must start with https://.',
     nameTaken: 'This name is already used.',
+    splitsSum: 'Split the whole amount.',
+    percentTotal: 'Percentages must total 100.',
+    duplicateCategory: 'Each category only once.',
   },
   signIn: {
     title: 'Sign in',
@@ -181,6 +187,7 @@ export const en: Messages = {
     inUse: 'Accounts still use this institution.',
   },
   categories: categoriesEn,
+  transactions: transactionsEn,
   merchants: {
     title: 'Merchants',
     empty: 'No merchants yet.',
@@ -200,6 +207,10 @@ export const en: Messages = {
     created: 'Merchant created.',
     updated: 'Merchant saved.',
     merge: 'Merge',
+    deleteKeeps_one:
+      'The transaction keeps its category and loses the merchant.',
+    deleteKeeps_other:
+      'The {{count}} transactions keep their category and lose the merchant.',
     mergeName: 'Merge “{{name}}”',
     mergeInto: 'Merge into',
     mergeEffect:

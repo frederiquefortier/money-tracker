@@ -120,7 +120,7 @@ Deleting a merchant clears it on its transactions.
 
 | Table | Columns | Req |
 |---|---|---|
-| `transactions` | `account_id`, `kind` (`expense`/`income`/`transfer`/`adjustment`), `occurred_on`, `occurred_at_time` (nullable), `amount`, `currency`, `original_amount`, `original_currency` (both nullable), `status` (`pending`/`cleared`), `merchant_id` (cleared when the merchant is deleted), `note`, `transfer_id`; later with their tables: `event_id`, `recurring_rule_id`, `treated_count`, `treated_amount`, `expected_reimbursement`, `holding_id`, `source`, `import_ref`, `import_batch_id` | TRX-01..05, 09..11, CUR-08, PPL-04, NW-03. Checks: an expense is negative, an income positive, a transfer leg or adjustment non-zero; `original_*` only on expenses and incomes, in another currency than the account's (a composite FK to `user_currencies`), signed like `amount`; a `transfer` row has a `transfer_id`, and only transfers and their fee carry one. |
+| `transactions` | `account_id`, `kind` (`expense`/`income`/`transfer`/`adjustment`), `occurred_on` (a `date`, no time, decided 2026-11-04: `occurred_at_time` was dropped so no time zone can shift a date), `amount`, `currency`, `original_amount`, `original_currency` (both nullable), `status` (`pending`/`cleared`), `merchant_id` (cleared when the merchant is deleted), `note`, `transfer_id`; later with their tables: `event_id`, `recurring_rule_id`, `treated_count`, `treated_amount`, `expected_reimbursement`, `holding_id`, `source`, `import_ref`, `import_batch_id` | TRX-01..05, 09..11, CUR-08, PPL-04, NW-03. Checks: an expense is negative, an income positive, a transfer leg or adjustment non-zero; `original_*` only on expenses and incomes, in another currency than the account's (a composite FK to `user_currencies`), signed like `amount`; a `transfer` row has a `transfer_id`, and only transfers and their fee carry one. |
 | `transaction_splits` | `transaction_id`, `category_id`, `input_mode` (`amount`/`share`/`percent`), `input_value`, `amount` | TRX-06. Every `expense` and `income` transaction has at least one split; transfers and adjustments have none. One input mode per transaction, one split per category, each signed like the transaction. A deferred constraint trigger checks the splits sum to the transaction amount, so transaction and splits are written together by `save_transaction` (ADR-012). A category with splits cannot be deleted. |
 | `reimbursements` | `expense_id`, `income_id`, `amount` | TRX-07, DSH-05 |
 | `recurring_rules` | `account_id`, `category_id`, `merchant_id`, `kind`, `frequency` (`weekly`/`monthly`/`yearly`), `interval`, `day_of_month`, `starts_on`, `ends_on` | TRX-08. `ends_on` set = recurrence stopped. Plain columns rather than an iCal RRULE string, which would need a parsing library for schedules this simple. |
@@ -160,6 +160,13 @@ Notes:
   `check_transaction_splits` (above) and `check_transfer` (one leg out, one leg in, two
   accounts, at most one fee on the departure account, mirrored amounts in one currency).
   A direct write that breaks a transfer, like deleting one leg, fails at commit.
+- **Usage** (spec 13, spec 15). View `merchant_usage` (`merchant_id`,
+  `transaction_count`) ranks the merchant picker; view `frequent_categories` (`kind`,
+  `category_id`, `rank`) gives, per kind, the five categories with the most splits over
+  the last 90 days, ties to the one used last, transfer fees left out (CAT-06). Both
+  `security_invoker`. Counted in SQL because PostgREST returns at most 1,000 rows.
+  `exchange_rate_text(from, to, on_date)` is `exchange_rate` as text: PostgREST sends a
+  numeric result as a JSON number, which the browser would read as a float (ADR-004).
 - `import_ref` is unique per user, so re-running an import is idempotent.
   `import_batch_id` lets a whole import be undone; `import_batches` is described in
   [import.md](import.md#data-model).

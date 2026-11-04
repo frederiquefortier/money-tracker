@@ -55,12 +55,23 @@ function isValidationId(value: string): value is ValidationId {
   return (VALIDATION_IDS as ReadonlyArray<string>).includes(value)
 }
 
+/** A validation id's message; undefined when there is no error. */
+export function useValidationMessage() {
+  const { t } = useTranslation()
+  return (id: string | null | undefined): string | undefined =>
+    id
+      ? t(`validation.${isValidationId(id) ? id : 'invalid'}`, {
+          min: PASSWORD_MIN_LENGTH,
+        })
+      : undefined
+}
+
 /** Submit errors, rechecked per field on blur and while the user corrects one. */
 export function useFieldValidation(
   schema: z.ZodObject,
   submitted: FieldErrors,
 ) {
-  const { t } = useTranslation()
+  const message = useValidationMessage()
   const [live, setLive] = useState<FieldErrors>({})
   const [lastSubmitted, setLastSubmitted] = useState(submitted)
   // A new submit drops the per-field results (state adjusted during render).
@@ -87,11 +98,7 @@ export function useFieldValidation(
 
   return {
     error(name: string): string | undefined {
-      const id = current(name)
-      if (!id) return undefined
-      return t(`validation.${isValidationId(id) ? id : 'invalid'}`, {
-        min: PASSWORD_MIN_LENGTH,
-      })
+      return message(current(name))
     },
     onBlur(event: React.FocusEvent<HTMLInputElement>) {
       // Not an empty field the user only tabbed through.

@@ -1,0 +1,61 @@
+import { z } from 'zod'
+import { currencyCodeSchema } from '#/lib/currencies'
+
+// Shared by the transaction form (spec 15) and its server functions.
+
+export const TRANSACTION_KINDS = ['expense', 'income'] as const
+export type TransactionKind = (typeof TRANSACTION_KINDS)[number]
+
+export const SPLIT_MODES = ['amount', 'share', 'percent'] as const
+export type SplitMode = (typeof SPLIT_MODES)[number]
+
+export type FormAccount = {
+  id: string
+  name: string
+  currency: string
+  institution: string | null
+  closedOn: string | null
+  hiddenForNew: boolean
+}
+
+/** A saved expense or income as the form loads it; amounts signed, as stored. */
+export type Transaction = {
+  id: string
+  accountId: string
+  kind: TransactionKind
+  occurredOn: string
+  amount: string
+  originalAmount: string | null
+  originalCurrency: string | null
+  pending: boolean
+  merchantId: string | null
+  note: string | null
+  splitMode: SplitMode
+  splits: Array<{ categoryId: string; value: string }>
+}
+
+const positiveDecimal = z
+  .string()
+  .regex(/^\d{1,15}(\.\d{1,4})?$/)
+  .refine((value) => /[1-9]/.test(value))
+
+export const transactionInputSchema = z
+  .object({
+    id: z.uuid().optional(),
+    accountId: z.uuid(),
+    kind: z.enum(TRANSACTION_KINDS),
+    occurredOn: z.iso.date(),
+    amount: positiveDecimal,
+    originalAmount: positiveDecimal.nullable(),
+    originalCurrency: currencyCodeSchema.nullable(),
+    pending: z.boolean(),
+    merchantId: z.uuid().nullable(),
+    note: z.string().trim().max(1000),
+    splitMode: z.enum(SPLIT_MODES),
+    splits: z
+      .array(z.object({ categoryId: z.uuid(), value: positiveDecimal }))
+      .min(1)
+      .max(50),
+  })
+  .refine((t) => (t.originalAmount === null) === (t.originalCurrency === null))
+export type TransactionInput = z.input<typeof transactionInputSchema>

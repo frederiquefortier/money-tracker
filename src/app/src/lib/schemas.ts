@@ -16,6 +16,9 @@ export const VALIDATION_IDS = [
   'date',
   'url',
   'nameTaken',
+  'splitsSum',
+  'percentTotal',
+  'duplicateCategory',
 ] as const
 export type ValidationId = (typeof VALIDATION_IDS)[number]
 

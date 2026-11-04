@@ -1,5 +1,6 @@
 import { Navigate, createFileRoute } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
+import { AccountActions } from '#/components/accounts/account-actions'
 import { AccountForm } from '#/components/accounts/account-form'
 import { RouteSheet } from '#/components/route-sheet'
 import { useToast } from '#/components/toaster'
@@ -21,7 +22,11 @@ function EditAccount() {
   if (!account) return <Navigate to="/settings/accounts" />
 
   return (
-    <RouteSheet to="/settings/accounts" title={t('accounts.editTitle')}>
+    <RouteSheet
+      to="/settings/accounts"
+      title={t('accounts.editTitle')}
+      actions={<AccountActions account={account} placement="sheet" />}
+    >
       <AccountForm
         key={account.id}
         accountId={account.id}

@@ -7,6 +7,7 @@ export type Merchant = {
   id: string
   name: string
   defaultCategoryId: string | null
+  transactionCount: number
 }
 
 export const merchantFormSchema = z.object({

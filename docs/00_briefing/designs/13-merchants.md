@@ -51,6 +51,9 @@ evolution) phase 2.
 
 ### Row actions
 
+On the row from `md` up, in the sheet header on phones (shared patterns).
+
+
 - **Fusionner** (MER-05, the `merge` icon): `ConfirmDialog` in red with one field,
   "Fusionner avec" (the shared `Combobox` over the other merchants, without "Créer"), then
   once a merchant is chosen "Les transactions de “{source}” passeront à “{target}”, puis
@@ -60,14 +63,14 @@ evolution) phase 2.
   the target and moves the source's aliases to it, so a later import that would have
   matched the source finds the target. Muted when there is no other merchant; a tap says
   "Il faut au moins un autre marchand.".
-- **Trash:** "Supprimer “{name}”" and "Cette action est irréversible.". With the
-  transactions migration, a merchant with transactions says "Les {count} transactions
-  gardent leur catégorie et perdent le marchand." instead.
+- **Trash:** "Supprimer “{name}”" and "Cette action est irréversible.". A merchant with
+  transactions also says "Les {count} transactions gardent leur catégorie et perdent le
+  marchand.".
 
 ## Merchant form
 
-A route sheet over Marchands (`/settings/merchants/new`, `/settings/merchants/{id}`). It
-only edits.
+A route sheet over Marchands (`/settings/merchants/new`, `/settings/merchants/{id}`). Its
+body only edits.
 
 - **Nom** required, unique per user, compared without case or accents ("Café Olimpico"
   and "cafe olimpico" are the same merchant). A duplicate shows the shared "Ce nom est

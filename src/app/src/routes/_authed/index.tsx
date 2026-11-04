@@ -1,15 +1,8 @@
-import { createFileRoute } from '@tanstack/react-router'
-import { useTranslation } from 'react-i18next'
-import { ComingSoon } from '#/components/coming-soon'
+import { createFileRoute, redirect } from '@tanstack/react-router'
 
-export const Route = createFileRoute('/_authed/')({ component: Transactions })
-
-function Transactions() {
-  const { t } = useTranslation()
-  return (
-    <ComingSoon
-      title={t('nav.transactions')}
-      text={t('comingSoon.transactions')}
-    />
-  )
-}
+// The Transactions tab is the home; its forms open at /transactions/… (spec 15).
+export const Route = createFileRoute('/_authed/')({
+  beforeLoad: () => {
+    throw redirect({ to: '/transactions' })
+  },
+})

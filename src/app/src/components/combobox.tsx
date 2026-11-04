@@ -4,6 +4,7 @@ import { Icon } from '#/components/icon'
 import { useCombobox } from '#/components/use-combobox'
 import type { ComboboxOption, Row } from '#/components/use-combobox'
 import { GroupHeading, OptionContent } from '#/components/combobox-option'
+import { FieldMessage } from '#/components/form-field'
 import { SelectChevron } from '#/components/select-field'
 import { Tag } from '#/components/tag'
 import { FieldLabel, fieldControl } from '#/components/ui/field'
@@ -95,6 +96,7 @@ function ComboboxInput({
   hasValue,
   clearLabel,
   onClear,
+  errorId,
   ...anchor
 }: React.ComponentProps<'div'> & {
   id: string
@@ -103,6 +105,7 @@ function ComboboxInput({
   hasValue: boolean
   clearLabel: string
   onClear: () => void
+  errorId?: string
 }) {
   return (
     <div {...anchor} className="relative">
@@ -118,6 +121,8 @@ function ComboboxInput({
             : undefined
         }
         autoComplete="off"
+        aria-invalid={errorId ? true : undefined}
+        aria-describedby={errorId}
         value={state.text}
         onChange={(event) => state.onType(event.target.value)}
         onFocus={() => state.setOpen(true)}
@@ -168,6 +173,9 @@ export function Combobox({
   clearLabel,
   createLabel,
   onCreate,
+  typedOrder,
+  error,
+  labelHidden = false,
 }: {
   label: string
   options: ReadonlyArray<ComboboxOption>
@@ -177,21 +185,26 @@ export function Combobox({
   clearLabel: string
   createLabel?: (text: string) => string
   onCreate?: (text: string) => void
+  /** How matches are ordered while typing, when not as listed (merchants: by name). */
+  typedOrder?: (a: ComboboxOption, b: ComboboxOption) => number
+  /** A validation message under the field (SET-07). */
+  error?: string
+  /** The label for screen readers only, in a row of like fields (split lines). */
+  labelHidden?: boolean
 }) {
   const { t } = useTranslation()
   const inputId = useId()
   const listId = useId()
-  const state = useCombobox({
-    options,
-    value,
-    onChange,
-    onCreate,
-  })
+  const state = useCombobox({ options, value, onChange, onCreate, typedOrder })
   const anchorRef = useRef<HTMLDivElement>(null)
 
   return (
     <div className="flex flex-col gap-2">
-      <FieldLabel htmlFor={inputId} required={required}>
+      <FieldLabel
+        htmlFor={inputId}
+        required={required}
+        className={labelHidden ? 'sr-only' : undefined}
+      >
         {label}
       </FieldLabel>
       <Popover open={state.expanded} onOpenChange={state.setOpen}>
@@ -200,10 +213,11 @@ export function Combobox({
             ref={anchorRef}
             id={inputId}
             listId={listId}
+            errorId={error ? `${inputId}-error` : undefined}
             state={state}
             hasValue={value !== null}
             clearLabel={clearLabel}
-            onClear={() => onChange(null)}
+            onClear={state.clear}
           />
         </PopoverAnchor>
         <PopoverContent
@@ -227,6 +241,7 @@ export function Combobox({
           />
         </PopoverContent>
       </Popover>
+      {error && <FieldMessage id={`${inputId}-error`}>{error}</FieldMessage>}
     </div>
   )
 }

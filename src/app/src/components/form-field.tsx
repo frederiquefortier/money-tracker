@@ -66,18 +66,35 @@ export function FormField({
         )}
       </div>
       {message && (
-        <p
-          id={messageId}
-          className={cn(
-            'flex items-start gap-1.5 text-sm',
-            error ? 'text-destructive' : 'text-muted-foreground',
-          )}
-        >
-          {error && <Icon name="circle-warning" className="mt-0.5 size-4" />}
+        <FieldMessage id={messageId} error={Boolean(error)}>
           {message}
-        </p>
+        </FieldMessage>
       )}
     </div>
+  )
+}
+
+/** The line under a field: a validation error, or a description. */
+export function FieldMessage({
+  id,
+  error = true,
+  children,
+}: {
+  id?: string
+  error?: boolean
+  children: React.ReactNode
+}) {
+  return (
+    <p
+      id={id}
+      className={cn(
+        'flex items-start gap-1.5 text-sm',
+        error ? 'text-destructive' : 'text-muted-foreground',
+      )}
+    >
+      {error && <Icon name="circle-warning" className="mt-0.5 size-4" />}
+      {children}
+    </p>
   )
 }
 

@@ -62,7 +62,7 @@ account and date already typed. The same route sheet as spec 15.
 
 ### Details
 
-- **Date**, **Heure**, **Note**: as in spec 15.
+- **Date** and **Note**: as in spec 15 (no time).
 - **En attente**, one checkbox per side (TRX-09): "au départ" for the De account, "à
   l'arrivée" for the Vers account, since money can leave one bank days before it lands in the other.
   The fee follows the départ side.
@@ -72,9 +72,10 @@ account and date already typed. The same route sheet as spec 15.
 ### Edit and delete
 
 - Tapping a transfer in the list opens this form with every part loaded: both legs and
-  the fee. Saving rewrites them together. The sheet only edits.
-- **Deleting** a transfer deletes every part, wherever delete lives (spec 15, open
-  question), after "Supprimer le transfert" / "Le transfert et ses frais seront
+  the fee. Saving updates them together, in place. Its body only edits; on phones delete
+  is in its header (spec 15).
+- **Deleting** a transfer deletes every part, from its row or its sheet header (spec 15),
+  after "Supprimer le transfert" / "Le transfert et ses frais seront
   supprimés." (TRX-04)
 
 ### Saving
@@ -109,7 +110,7 @@ account and date already typed. The same route sheet as spec 15.
   difference (database.md), so a transaction added meanwhile cannot make it wrong.
 - An écart of zero is a validation error under Solde réel: "Le solde correspond déjà."
 - **Editing** an adjustment from the list shows its stored écart, editable. Deleting it
-  follows the transactions (spec 15, open question).
+  follows the transactions: on its row, or in its sheet header on phones (spec 15).
 - Adjustments count neither as expenses nor as incomes and have no category.
 
 ## States

@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { Combobox } from '#/components/combobox'
 import { ConfirmDialog } from '#/components/confirm-dialog'
 import { IconActions, IconButton } from '#/components/icon-button'
+import type { ActionPlacement } from '#/components/icon-button'
 import { useToast } from '#/components/toaster'
 import { useServerAction } from '#/components/use-server-action'
 import { FORMAT_LOCALE } from '#/i18n/locales'
@@ -66,13 +67,15 @@ function MergeDialog({
   )
 }
 
-/** Merge and delete, as icons on the merchant's row (spec 13). */
+/** Merge and delete, as icons on the merchant's row or its sheet (spec 13). */
 export function MerchantActions({
   merchant,
   merchants,
+  placement,
 }: {
   merchant: Merchant
   merchants: ReadonlyArray<Merchant>
+  placement?: ActionPlacement
 }) {
   const { t } = useTranslation()
   const toast = useToast()
@@ -83,7 +86,7 @@ export function MerchantActions({
   const close = () => setDialog(null)
 
   return (
-    <IconActions slots={2}>
+    <IconActions slots={2} placement={placement}>
       <IconButton
         icon="merge"
         label={t('merchants.mergeName', { name })}
@@ -115,7 +118,13 @@ export function MerchantActions({
         onConfirm={() =>
           run(() => deleteMerchant({ data: { id } }), { onResult: close })
         }
-      />
+      >
+        {merchant.transactionCount > 0 && (
+          <p className="text-sm">
+            {t('merchants.deleteKeeps', { count: merchant.transactionCount })}
+          </p>
+        )}
+      </ConfirmDialog>
     </IconActions>
   )
 }

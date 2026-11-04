@@ -6,7 +6,8 @@ import { cn, focusRing } from '#/lib/utils'
 // Based on shadcn's sheet: full screen on phones, a panel from the right from md up, its
 // animations in styles.css (.sheet-panel). Built on the Radix dialog, so focus is trapped
 // and returns to the trigger on close. Content is a SheetBody that scrolls and a
-// SheetFooter that stays put; a form can wrap both.
+// SheetFooter that stays put; a form can wrap both. `actions` are the item's row actions,
+// shown in the header on phones only, where rows do not carry them.
 function Sheet(props: React.ComponentProps<typeof SheetPrimitive.Root>) {
   return <SheetPrimitive.Root data-slot="sheet" {...props} />
 }
@@ -14,11 +15,13 @@ function Sheet(props: React.ComponentProps<typeof SheetPrimitive.Root>) {
 function SheetContent({
   title,
   closeLabel,
+  actions,
   children,
   onCloseAutoFocus,
 }: {
   title: string
   closeLabel: string
+  actions?: React.ReactNode
   children: React.ReactNode
   /** Runs once the closing animation has finished. */
   onCloseAutoFocus?: (event: Event) => void
@@ -35,6 +38,9 @@ function SheetContent({
           <SheetPrimitive.Title className="flex-1 font-mono text-lg font-bold tracking-wide uppercase">
             {title}
           </SheetPrimitive.Title>
+          {actions && (
+            <div className="flex items-center md:hidden">{actions}</div>
+          )}
           <SheetPrimitive.Close
             className={cn(
               'rounded-lg p-1 text-muted-foreground hover:text-foreground',

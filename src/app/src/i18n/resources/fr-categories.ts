@@ -17,6 +17,7 @@ export const categoriesFr = {
   clearParent: 'Retirer le parent',
   clearCategory: 'Retirer la catégorie',
   archivedTag: 'Archivée',
+  frequent: 'Fréquentes',
   color: 'Couleur',
   customColor: 'Couleur personnalisée',
   swatch: 'Couleur {{n}}',

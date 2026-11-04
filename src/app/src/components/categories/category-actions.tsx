@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { ConfirmDialog } from '#/components/confirm-dialog'
 import { FormField } from '#/components/form-field'
 import { IconActions, IconButton, IconLink } from '#/components/icon-button'
+import type { ActionPlacement } from '#/components/icon-button'
 import { useToast } from '#/components/toaster'
 import { useServerAction } from '#/components/use-server-action'
 import { isArchived } from '#/lib/categories'
@@ -134,7 +135,7 @@ function DeleteDialog({
 
 /**
  * Add a sub-category (in the tree only, through `onAddChild`), archive or reactivate
- * (CAT-03) and delete, as icons on the category's row. Delete stays muted
+ * (CAT-03) and delete, as icons on the category's row or its sheet. Delete stays muted
  * while the category has sub-categories.
  */
 export function CategoryActions({
@@ -143,6 +144,7 @@ export function CategoryActions({
   hasChildren,
   branch,
   onAddChild,
+  placement,
   className,
 }: {
   category: Category
@@ -151,6 +153,7 @@ export function CategoryActions({
   /** Active sub-categories that archiving takes along. */
   branch: number
   onAddChild?: () => void
+  placement?: ActionPlacement
   className?: string
 }) {
   const { t } = useTranslation()
@@ -161,7 +164,11 @@ export function CategoryActions({
   const close = () => setDialog(null)
 
   return (
-    <IconActions slots={onAddChild ? 3 : 2} className={className}>
+    <IconActions
+      slots={onAddChild ? 3 : 2}
+      placement={placement}
+      className={className}
+    >
       {onAddChild && (
         <IconLink
           icon="plus"

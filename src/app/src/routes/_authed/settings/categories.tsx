@@ -14,9 +14,9 @@ import type { Locale } from '#/i18n/locales'
 import {
   CATEGORY_SORTS,
   KINDS,
+  categoryContext,
   categoryPath,
   childrenByParent,
-  descendantIds,
   isArchived,
   sortSiblings,
 } from '#/lib/categories'
@@ -71,7 +71,6 @@ function shape(
 ) {
   const collator = FORMAT_LOCALE[locale]
   const byId = new Map(categories.map((c) => [c.id, c]))
-  const allChildren = childrenByParent(categories, collator)
   const ofKind = categories.filter((c) => c.kind === kind)
   const activeOfKind = ofKind.filter((c) => !isArchived(c))
   const found = query ? matchesWithParents(activeOfKind, query, byId) : null
@@ -80,14 +79,7 @@ function shape(
     .filter((c) => !query || foldForSearch(c.name).includes(query))
     .map((category) => ({ category, path: categoryPath(category, byId) }))
     .sort((a, b) => a.path.localeCompare(b.path, collator))
-  const contextOf = (category: Category) => ({
-    parent: category.parentId ? byId.get(category.parentId) : undefined,
-    hasChildren: allChildren.has(category.id),
-    branch: [...descendantIds(category.id, allChildren)].filter((id) => {
-      const c = byId.get(id)
-      return c !== undefined && !isArchived(c)
-    }).length,
-  })
+  const contextOf = categoryContext(categories, collator)
   const active = childrenByParent(
     categories.filter((c) => !isArchived(c)),
     collator,

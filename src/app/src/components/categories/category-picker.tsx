@@ -81,8 +81,9 @@ function treeOptions(
 }
 
 /**
- * CAT-04 (spec 15): one group per type with `kind` first, each a tree. Only categories active on `date` are listed; a chosen one
- * that is not stays in the field, tagged "Archivée".
+ * CAT-04, 06 (spec 15): "Fréquentes" first while nothing is typed, each by its full path,
+ * then one group per type with `kind` first, each a tree. Only categories active on `date`
+ * are listed; a chosen one that is not stays in the field, tagged "Archivée".
  */
 export function CategoryPicker({
   label,
@@ -91,7 +92,10 @@ export function CategoryPicker({
   onChange,
   kind = 'expense',
   date = todayIso(),
+  frequent = [],
   required = false,
+  error,
+  labelHidden,
 }: {
   label: string
   categories: ReadonlyArray<Category>
@@ -99,7 +103,11 @@ export function CategoryPicker({
   onChange: (id: string | null) => void
   kind?: Kind
   date?: string
+  /** The most used category ids of `kind`, most used first. */
+  frequent?: ReadonlyArray<string>
   required?: boolean
+  error?: string
+  labelHidden?: boolean
 }) {
   const { t } = useTranslation()
   const locale = FORMAT_LOCALE[useLocale()]
@@ -127,12 +135,30 @@ export function CategoryPicker({
       tag: active ? undefined : t('categories.archivedTag'),
     }
   }
-  const options = treeOptions(categories, { kind, locale, option })
+  const frequentOptions = frequent.flatMap((id) => {
+    const category = byId.get(id)
+    if (!category || !isActiveOn(category, date)) return []
+    const o = option(category)
+    return [
+      {
+        ...o,
+        short: o.label,
+        group: t('categories.frequent'),
+        browseOnly: true,
+      },
+    ]
+  })
+  const options = [
+    ...frequentOptions,
+    ...treeOptions(categories, { kind, locale, option }),
+  ]
 
   return (
     <Combobox
       label={label}
       required={required}
+      error={error}
+      labelHidden={labelHidden}
       options={options}
       value={value}
       onChange={onChange}

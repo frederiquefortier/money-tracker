@@ -8,15 +8,18 @@ import { deleteInstitution } from '#/server/accounts'
 import type { Institution } from '#/server/accounts'
 
 /**
- * Edit and delete on the institution's card header, after the total. Delete waits until
- * no account, open or closed, uses it (ACC-05).
+ * Edit and delete on the institution's card header, after the total; on phones delete is
+ * in the institution's sheet (`placement="sheet"`, delete alone). Delete waits until no
+ * account, open or closed, uses it (ACC-05).
  */
 export function InstitutionActions({
   institution,
   inUse,
+  placement = 'row',
 }: {
   institution: Institution
   inUse: boolean
+  placement?: 'row' | 'sheet'
 }) {
   const { t } = useTranslation()
   const toast = useToast()
@@ -26,22 +29,28 @@ export function InstitutionActions({
 
   return (
     <div className="flex items-center">
-      <IconLink
-        icon="pencil"
-        label={t('common.editName', { name })}
-        to="/settings/accounts/institutions/$institutionId"
-        params={{ institutionId: id }}
-      />
-      <IconButton
-        icon="trash-full"
-        label={
-          inUse ? t('institutions.inUse') : t('common.deleteName', { name })
-        }
-        muted={inUse}
-        onClick={() =>
-          inUse ? toast({ text: t('institutions.inUse') }) : setConfirming(true)
-        }
-      />
+      {placement === 'row' && (
+        <IconLink
+          icon="pencil"
+          label={t('common.editName', { name })}
+          to="/settings/accounts/institutions/$institutionId"
+          params={{ institutionId: id }}
+        />
+      )}
+      <div className={placement === 'row' ? 'hidden md:flex' : 'flex'}>
+        <IconButton
+          icon="trash-full"
+          label={
+            inUse ? t('institutions.inUse') : t('common.deleteName', { name })
+          }
+          muted={inUse}
+          onClick={() =>
+            inUse
+              ? toast({ text: t('institutions.inUse') })
+              : setConfirming(true)
+          }
+        />
+      </div>
       <ConfirmDialog
         open={confirming}
         title={t('common.deleteName', { name })}

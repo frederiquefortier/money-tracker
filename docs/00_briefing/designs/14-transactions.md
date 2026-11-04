@@ -68,7 +68,7 @@ above it.
 
 - A header per day, newest first: the weekday and date ("Lundi 3 novembre"), and on the
   right the day's net (incomes minus expenses) in the display currency.
-- Inside a day: transactions with a time first, latest first, then those without.
+- Inside a day: the last entered first. Transactions have no time (spec 15).
 
 ### Rows
 

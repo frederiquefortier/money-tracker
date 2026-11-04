@@ -61,8 +61,8 @@ CAT-08 (emergency fund exclusion) is phase 2.
   line down from the parent's chevron, then across to the child's chevron (or its icon
   when it has no children). The line continues to the next sibling and stops at the last
   one. Drawn in the plum of the linked-field line.
-- **Row actions** (the sheet only edits), as icons in the fixed slot at the end of every
-  row: add a sub-category, archive, and trash. (A favourite star was here until
+- **Row actions** (in the sheet header on phones, shared patterns), as icons in the fixed
+  slot at the end of every row: add a sub-category, archive, and trash. (A favourite star was here until
   2026-11-04; the picker's "Fréquentes" replaced it, spec 15.)
   - **Add** (the +) opens the form with this category as the parent, so a child is added
     where it goes without scrolling back to the top. The branch opens, so the new child
@@ -110,8 +110,8 @@ CAT-08 (emergency fund exclusion) is phase 2.
 └──────────────────────────────┘
 ```
 
-The form is a route sheet over the tree, like the account form: it only edits, with one
-"Enregistrer" at the bottom.
+The form is a route sheet over the tree, like the account form: its body only edits, with
+one "Enregistrer" at the bottom.
 
 - **Nom** required, unique among siblings (two "Autres" under different parents is fine).
 - **Type** (CAT-02), then **Parent** as its sub-field, indented under it with a line down
@@ -129,7 +129,7 @@ The form is a route sheet over the tree, like the account form: it only edits, w
   "Réinitialiser" returns to the variation.
 - **Historique** (CAT-03), when the category has one: the archive and reactivation
   events, newest first, as text: "Archivée le 3 mars 2024", "Réactivée le 1 janvier
-  2025". Archive, reactivate and delete are row actions, never in the sheet.
+  2025". Archive, reactivate and delete are row actions, never among the sheet's fields.
 
 ### Colours
 

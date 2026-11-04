@@ -15,9 +15,9 @@ onto them.
 | 10 | [Settings and currencies](10-settings-currencies.md) | Réglages hub, Devises, display currency switcher in the header | CUR-01..07, SET-06 | Built |
 | 11 | [Accounts](11-accounts.md) | Accounts by institution, account form, institution form | ACC-01..07 | Built |
 | 12 | [Categories](12-categories.md) | Category tree, category form, icon picker | CAT-01..03, 05, 07 | Built |
-| 13 | [Merchants](13-merchants.md) | Merchant list and form, merchant picker | MER-01, 05, TRX-05 | Built (the picker with spec 15) |
+| 13 | [Merchants](13-merchants.md) | Merchant list and form, merchant picker | MER-01, 05, TRX-05 | Built |
 | 14 | [Transactions](14-transactions.md) | The list (home tab), day groups, converted-amount marker | TRX-04, 09, CUR-06, 07, 09 | Reviewed |
-| 15 | [Transaction form](15-transaction-form.md) | Expense and income, splits, foreign currency, the add button, the category picker (built with spec 13) | TRX-01, 02, 05, 06, 09, 10, CUR-08, CAT-04, 06, MER-01 | Reviewed |
+| 15 | [Transaction form](15-transaction-form.md) | Expense and income, splits, foreign currency, the add button, the category picker (built with spec 13) | TRX-01, 02, 05, 06, 09, 10, CUR-08, CAT-04, 06, MER-01 | Built |
 | 16 | [Transfer and adjustment](16-transfer-adjustment.md) | Transfer form (fee, two currencies), balance adjustment | TRX-03, 04, 11 | Reviewed |
 | 17 | [First run](17-first-run.md) | Language, currencies, first accounts and categories | SET-01 | Reviewed |
 | 18 | [Import and export](18-import-export.md) | File check, summary, commit, undo, export | IMP-01, 04, 05, 06, SEC-04 | Reviewed |
@@ -48,7 +48,10 @@ component to use, so a screen is assembled, not redrawn.
   browser (`useStoredState`).
 - **Row actions:** icons in a fixed slot at the end of the row (`IconActions`,
   `IconButton`): add (a child, in a tree), star (currencies), archive or reactivate, trash, in that
-  order. Delete is always the `trash-full` icon. A change shows at once and
+  order. On phones the rows carry none: the same icons sit in the item's sheet header,
+  beside the ✕ (`RouteSheet` `actions`, `placement="sheet"`), so a row keeps its width for
+  the name and the amount. A row whose item has no sheet (currencies) keeps them at every
+  width. Delete is always the `trash-full` icon. A change shows at once and
   stays until the saved data comes back. An action that cannot apply is muted, and a tap
   says why in a toast. Any failure is a toast.
 - **Archive:** the interface word is "Archiver"; a dialog asks the date (default today).
@@ -57,8 +60,9 @@ component to use, so a screen is assembled, not redrawn.
 - **Confirmations:** `ConfirmDialog`, red title and button: "Supprimer “{name}”" and
   "Cette action est irréversible.", or a sentence naming what else is affected.
 - **Forms:** a route sheet over the list (`RouteSheet`, `SheetForm`) with its own URL:
-  full screen on a phone, a panel from the right from `md` up. It only edits: no archive
-  or delete buttons inside. Annuler and one "Enregistrer" in the footer; saving closes it
+  full screen on a phone, a panel from the right from `md` up. Its body only edits: no
+  archive or delete buttons among the fields (on phones they are in the header, above).
+  Closing with something typed or chosen asks "Abandonner les modifications?" first. Annuler and one "Enregistrer" in the footer; saving closes it
   with a toast. Errors from the server show in the sheet above the buttons; validation
   stays under each field, and focus moves to the first one (SET-07).
 - **Fields:** the shared ones (`FormField`, `SelectField`, `CheckboxField`,

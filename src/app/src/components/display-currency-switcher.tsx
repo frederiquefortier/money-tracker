@@ -1,17 +1,8 @@
 import { useOptimistic } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Icon } from '#/components/icon'
+import { CurrencyChip } from '#/components/currency-chip'
 import { useServerAction } from '#/components/use-server-action'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
-  DropdownMenuTrigger,
-} from '#/components/ui/dropdown-menu'
-import { pickerOrder } from '#/lib/currencies'
 import { useMyCurrencies } from '#/lib/use-my-currencies'
-import { cn, focusRing } from '#/lib/utils'
 import { setDisplayCurrency } from '#/server/currencies'
 
 /** CUR-06: the currency every amount is shown in, saved on the profile. */
@@ -31,29 +22,11 @@ export function DisplayCurrencySwitcher() {
   }
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger
-        aria-label={t('displayCurrency.label', { code: shown })}
-        className={cn(
-          'inline-flex items-center gap-1 rounded-full bg-secondary px-3 py-1.5 font-mono text-sm font-semibold text-secondary-foreground',
-          focusRing,
-        )}
-      >
-        {shown}
-        <Icon name="chevron-down" className="size-4" />
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        <DropdownMenuRadioGroup value={shown} onValueChange={choose}>
-          {pickerOrder(currencies.currencies).map((currency) => (
-            <DropdownMenuRadioItem key={currency.code} value={currency.code}>
-              <span className="font-mono font-semibold">{currency.code}</span>
-              {currency.isFavourite && (
-                <Icon name="star-fill" className="size-3.5 text-primary" />
-              )}
-            </DropdownMenuRadioItem>
-          ))}
-        </DropdownMenuRadioGroup>
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <CurrencyChip
+      value={shown}
+      label={t('displayCurrency.label', { code: shown })}
+      currencies={currencies.currencies}
+      onChange={choose}
+    />
   )
 }

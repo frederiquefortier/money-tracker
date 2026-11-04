@@ -17,12 +17,15 @@ import { Route as SignInRouteImport } from './routes/sign-in'
 import { Route as AuthedIndexRouteImport } from './routes/_authed/index'
 import { Route as AuthedBudgetRouteImport } from './routes/_authed/budget'
 import { Route as AuthedDashboardRouteImport } from './routes/_authed/dashboard'
+import { Route as AuthedTransactionsRouteImport } from './routes/_authed/transactions'
 import { Route as AuthConfirmRouteImport } from './routes/auth/confirm'
 import { Route as AuthedSettingsIndexRouteImport } from './routes/_authed/settings/index'
 import { Route as AuthedSettingsAccountsRouteImport } from './routes/_authed/settings/accounts'
 import { Route as AuthedSettingsCategoriesRouteImport } from './routes/_authed/settings/categories'
 import { Route as AuthedSettingsCurrenciesRouteImport } from './routes/_authed/settings/currencies'
 import { Route as AuthedSettingsMerchantsRouteImport } from './routes/_authed/settings/merchants'
+import { Route as AuthedTransactionsTransactionIdRouteImport } from './routes/_authed/transactions/$transactionId'
+import { Route as AuthedTransactionsNewRouteImport } from './routes/_authed/transactions/new'
 import { Route as AuthedSettingsAccountsAccountIdRouteImport } from './routes/_authed/settings/accounts/$accountId'
 import { Route as AuthedSettingsAccountsNewRouteImport } from './routes/_authed/settings/accounts/new'
 import { Route as AuthedSettingsCategoriesCategoryIdRouteImport } from './routes/_authed/settings/categories/$categoryId'
@@ -72,6 +75,11 @@ const AuthedDashboardRoute = AuthedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthedRoute,
 } as any)
+const AuthedTransactionsRoute = AuthedTransactionsRouteImport.update({
+  id: '/transactions',
+  path: '/transactions',
+  getParentRoute: () => AuthedRoute,
+} as any)
 const AuthConfirmRoute = AuthConfirmRouteImport.update({
   id: '/auth/confirm',
   path: '/auth/confirm',
@@ -103,6 +111,17 @@ const AuthedSettingsMerchantsRoute = AuthedSettingsMerchantsRouteImport.update({
   id: '/settings/merchants',
   path: '/settings/merchants',
   getParentRoute: () => AuthedRoute,
+} as any)
+const AuthedTransactionsTransactionIdRoute =
+  AuthedTransactionsTransactionIdRouteImport.update({
+    id: '/$transactionId',
+    path: '/$transactionId',
+    getParentRoute: () => AuthedTransactionsRoute,
+  } as any)
+const AuthedTransactionsNewRoute = AuthedTransactionsNewRouteImport.update({
+  id: '/new',
+  path: '/new',
+  getParentRoute: () => AuthedTransactionsRoute,
 } as any)
 const AuthedSettingsAccountsAccountIdRoute =
   AuthedSettingsAccountsAccountIdRouteImport.update({
@@ -167,11 +186,14 @@ export interface FileRoutesByFullPath {
   '/sign-in': typeof SignInRoute
   '/budget': typeof AuthedBudgetRoute
   '/dashboard': typeof AuthedDashboardRoute
+  '/transactions': typeof AuthedTransactionsRouteWithChildren
   '/auth/confirm': typeof AuthConfirmRoute
   '/settings/accounts': typeof AuthedSettingsAccountsRouteWithChildren
   '/settings/categories': typeof AuthedSettingsCategoriesRouteWithChildren
   '/settings/currencies': typeof AuthedSettingsCurrenciesRouteWithChildren
   '/settings/merchants': typeof AuthedSettingsMerchantsRouteWithChildren
+  '/transactions/$transactionId': typeof AuthedTransactionsTransactionIdRoute
+  '/transactions/new': typeof AuthedTransactionsNewRoute
   '/settings/': typeof AuthedSettingsIndexRoute
   '/settings/accounts/$accountId': typeof AuthedSettingsAccountsAccountIdRoute
   '/settings/accounts/new': typeof AuthedSettingsAccountsNewRoute
@@ -190,12 +212,15 @@ export interface FileRoutesByTo {
   '/sign-in': typeof SignInRoute
   '/budget': typeof AuthedBudgetRoute
   '/dashboard': typeof AuthedDashboardRoute
+  '/transactions': typeof AuthedTransactionsRouteWithChildren
   '/auth/confirm': typeof AuthConfirmRoute
   '/': typeof AuthedIndexRoute
   '/settings/accounts': typeof AuthedSettingsAccountsRouteWithChildren
   '/settings/categories': typeof AuthedSettingsCategoriesRouteWithChildren
   '/settings/currencies': typeof AuthedSettingsCurrenciesRouteWithChildren
   '/settings/merchants': typeof AuthedSettingsMerchantsRouteWithChildren
+  '/transactions/$transactionId': typeof AuthedTransactionsTransactionIdRoute
+  '/transactions/new': typeof AuthedTransactionsNewRoute
   '/settings': typeof AuthedSettingsIndexRoute
   '/settings/accounts/$accountId': typeof AuthedSettingsAccountsAccountIdRoute
   '/settings/accounts/new': typeof AuthedSettingsAccountsNewRoute
@@ -216,12 +241,15 @@ export interface FileRoutesById {
   '/sign-in': typeof SignInRoute
   '/_authed/budget': typeof AuthedBudgetRoute
   '/_authed/dashboard': typeof AuthedDashboardRoute
+  '/_authed/transactions': typeof AuthedTransactionsRouteWithChildren
   '/auth/confirm': typeof AuthConfirmRoute
   '/_authed/': typeof AuthedIndexRoute
   '/_authed/settings/accounts': typeof AuthedSettingsAccountsRouteWithChildren
   '/_authed/settings/categories': typeof AuthedSettingsCategoriesRouteWithChildren
   '/_authed/settings/currencies': typeof AuthedSettingsCurrenciesRouteWithChildren
   '/_authed/settings/merchants': typeof AuthedSettingsMerchantsRouteWithChildren
+  '/_authed/transactions/$transactionId': typeof AuthedTransactionsTransactionIdRoute
+  '/_authed/transactions/new': typeof AuthedTransactionsNewRoute
   '/_authed/settings/': typeof AuthedSettingsIndexRoute
   '/_authed/settings/accounts/$accountId': typeof AuthedSettingsAccountsAccountIdRoute
   '/_authed/settings/accounts/new': typeof AuthedSettingsAccountsNewRoute
@@ -243,11 +271,14 @@ export interface FileRouteTypes {
     | '/sign-in'
     | '/budget'
     | '/dashboard'
+    | '/transactions'
     | '/auth/confirm'
     | '/settings/accounts'
     | '/settings/categories'
     | '/settings/currencies'
     | '/settings/merchants'
+    | '/transactions/$transactionId'
+    | '/transactions/new'
     | '/settings/'
     | '/settings/accounts/$accountId'
     | '/settings/accounts/new'
@@ -266,12 +297,15 @@ export interface FileRouteTypes {
     | '/sign-in'
     | '/budget'
     | '/dashboard'
+    | '/transactions'
     | '/auth/confirm'
     | '/'
     | '/settings/accounts'
     | '/settings/categories'
     | '/settings/currencies'
     | '/settings/merchants'
+    | '/transactions/$transactionId'
+    | '/transactions/new'
     | '/settings'
     | '/settings/accounts/$accountId'
     | '/settings/accounts/new'
@@ -291,12 +325,15 @@ export interface FileRouteTypes {
     | '/sign-in'
     | '/_authed/budget'
     | '/_authed/dashboard'
+    | '/_authed/transactions'
     | '/auth/confirm'
     | '/_authed/'
     | '/_authed/settings/accounts'
     | '/_authed/settings/categories'
     | '/_authed/settings/currencies'
     | '/_authed/settings/merchants'
+    | '/_authed/transactions/$transactionId'
+    | '/_authed/transactions/new'
     | '/_authed/settings/'
     | '/_authed/settings/accounts/$accountId'
     | '/_authed/settings/accounts/new'
@@ -376,6 +413,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthedDashboardRouteImport
       parentRoute: typeof AuthedRoute
     }
+    '/_authed/transactions': {
+      id: '/_authed/transactions'
+      path: '/transactions'
+      fullPath: '/transactions'
+      preLoaderRoute: typeof AuthedTransactionsRouteImport
+      parentRoute: typeof AuthedRoute
+    }
     '/auth/confirm': {
       id: '/auth/confirm'
       path: '/auth/confirm'
@@ -417,6 +461,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/settings/merchants'
       preLoaderRoute: typeof AuthedSettingsMerchantsRouteImport
       parentRoute: typeof AuthedRoute
+    }
+    '/_authed/transactions/$transactionId': {
+      id: '/_authed/transactions/$transactionId'
+      path: '/$transactionId'
+      fullPath: '/transactions/$transactionId'
+      preLoaderRoute: typeof AuthedTransactionsTransactionIdRouteImport
+      parentRoute: typeof AuthedTransactionsRoute
+    }
+    '/_authed/transactions/new': {
+      id: '/_authed/transactions/new'
+      path: '/new'
+      fullPath: '/transactions/new'
+      preLoaderRoute: typeof AuthedTransactionsNewRouteImport
+      parentRoute: typeof AuthedTransactionsRoute
     }
     '/_authed/settings/accounts/$accountId': {
       id: '/_authed/settings/accounts/$accountId'
@@ -483,6 +541,19 @@ declare module '@tanstack/react-router' {
     }
   }
 }
+
+interface AuthedTransactionsRouteChildren {
+  AuthedTransactionsTransactionIdRoute: typeof AuthedTransactionsTransactionIdRoute
+  AuthedTransactionsNewRoute: typeof AuthedTransactionsNewRoute
+}
+
+const AuthedTransactionsRouteChildren: AuthedTransactionsRouteChildren = {
+  AuthedTransactionsTransactionIdRoute: AuthedTransactionsTransactionIdRoute,
+  AuthedTransactionsNewRoute: AuthedTransactionsNewRoute,
+}
+
+const AuthedTransactionsRouteWithChildren =
+  AuthedTransactionsRoute._addFileChildren(AuthedTransactionsRouteChildren)
 
 interface AuthedSettingsAccountsRouteChildren {
   AuthedSettingsAccountsAccountIdRoute: typeof AuthedSettingsAccountsAccountIdRoute
@@ -557,6 +628,7 @@ const AuthedSettingsMerchantsRouteWithChildren =
 interface AuthedRouteChildren {
   AuthedBudgetRoute: typeof AuthedBudgetRoute
   AuthedDashboardRoute: typeof AuthedDashboardRoute
+  AuthedTransactionsRoute: typeof AuthedTransactionsRouteWithChildren
   AuthedIndexRoute: typeof AuthedIndexRoute
   AuthedSettingsAccountsRoute: typeof AuthedSettingsAccountsRouteWithChildren
   AuthedSettingsCategoriesRoute: typeof AuthedSettingsCategoriesRouteWithChildren
@@ -568,6 +640,7 @@ interface AuthedRouteChildren {
 const AuthedRouteChildren: AuthedRouteChildren = {
   AuthedBudgetRoute: AuthedBudgetRoute,
   AuthedDashboardRoute: AuthedDashboardRoute,
+  AuthedTransactionsRoute: AuthedTransactionsRouteWithChildren,
   AuthedIndexRoute: AuthedIndexRoute,
   AuthedSettingsAccountsRoute: AuthedSettingsAccountsRouteWithChildren,
   AuthedSettingsCategoriesRoute: AuthedSettingsCategoriesRouteWithChildren,

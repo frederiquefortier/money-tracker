@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useMarkChanged } from '#/components/route-sheet'
 import { foldForSearch } from '#/lib/utils'
 
 /**
@@ -18,6 +19,8 @@ export type ComboboxOption = {
   group?: string
   tag?: string
   hidden?: boolean
+  /** Listed only while nothing is typed (CAT-06, Fréquentes). */
+  browseOnly?: boolean
   depth?: number
   parent?: string
   short?: string
@@ -30,10 +33,16 @@ export type Row =
 function useRows(
   options: ReadonlyArray<ComboboxOption>,
   query: string,
-  canCreate: boolean,
+  {
+    canCreate,
+    typedOrder,
+  }: {
+    canCreate: boolean
+    typedOrder?: (a: ComboboxOption, b: ComboboxOption) => number
+  },
 ): Array<Row> {
   const q = foldForSearch(query)
-  const visible = options.filter((o) => !o.hidden)
+  const visible = options.filter((o) => !o.hidden && !(q && o.browseOnly))
   const keep = new Set(
     visible.filter((o) =>
       foldForSearch(`${o.short ?? o.label} ${o.keywords ?? ''}`).includes(q),
@@ -44,9 +53,9 @@ function useRows(
       visible.find((p) => p.value === o.parent && p.group === o.group)
     for (let p = parentOf(match); p; p = parentOf(p)) keep.add(p)
   }
-  const rows: Array<Row> = visible
-    .filter((o) => keep.has(o))
-    .map((option) => ({ kind: 'option', option }))
+  const matches = visible.filter((o) => keep.has(o))
+  if (q && typedOrder) matches.sort(typedOrder)
+  const rows: Array<Row> = matches.map((option) => ({ kind: 'option', option }))
   if (canCreate && q && !options.some((o) => foldForSearch(o.label) === q)) {
     rows.push({ kind: 'create' })
   }
@@ -59,18 +68,30 @@ export function useCombobox({
   value,
   onChange,
   onCreate,
+  typedOrder,
 }: {
   options: ReadonlyArray<ComboboxOption>
   value: string | null
   onChange: (value: string | null) => void
   onCreate?: (text: string) => void
+  typedOrder?: (a: ComboboxOption, b: ComboboxOption) => number
 }) {
-  const selected = options.find((o) => o.value === value)
+  const markChanged = useMarkChanged()
+  const selected = options.find((o) => o.value === value && !o.browseOnly)
   const [query, setQuery] = useState<string | null>(null)
   const [open, setOpen] = useState(false)
   // No highlight until the arrows move it or typing narrows the list (-1 is none).
   const [active, setActive] = useState(-1)
-  const rows = useRows(options, query ?? '', Boolean(onCreate))
+  const rows = useRows(options, query ?? '', {
+    canCreate: Boolean(onCreate),
+    typedOrder,
+  })
+
+  // A choice is a change the enclosing sheet asks about before closing.
+  function choose(next: string | null) {
+    markChanged()
+    onChange(next)
+  }
 
   function close() {
     setOpen(false)
@@ -80,7 +101,7 @@ export function useCombobox({
 
   function pick(row: Row | undefined) {
     if (!row) return
-    if (row.kind === 'option') onChange(row.option.value)
+    if (row.kind === 'option') choose(row.option.value)
     else onCreate?.((query ?? '').trim())
     close()
   }
@@ -114,6 +135,7 @@ export function useCombobox({
     expanded: open && rows.length > 0,
     setOpen,
     pick,
+    clear: () => choose(null),
     onKeyDown,
     onType(text: string) {
       setQuery(text)
@@ -122,7 +144,7 @@ export function useCombobox({
     },
     onBlur() {
       // Erasing the text and leaving the field empties it.
-      if (query !== null && query.trim() === '') onChange(null)
+      if (query !== null && query.trim() === '') choose(null)
       close()
     },
   }

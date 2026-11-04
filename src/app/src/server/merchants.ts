@@ -21,14 +21,23 @@ function failure(
 
 export const getMerchants = createServerFn({ method: 'GET' }).handler(
   async (): Promise<Array<Merchant>> => {
-    const { data, error } = await getSupabase()
-      .from('merchants')
-      .select('id, name, default_category_id')
-    if (error) throw new Error(`Merchants could not be loaded (${error.code})`)
-    return data.map((m) => ({
+    const supabase = getSupabase()
+    const [merchants, usage] = await Promise.all([
+      supabase.from('merchants').select('id, name, default_category_id'),
+      supabase.from('merchant_usage').select('merchant_id, transaction_count'),
+    ])
+    if (merchants.error || usage.error) {
+      const code = (merchants.error ?? usage.error)?.code
+      throw new Error(`Merchants could not be loaded (${code})`)
+    }
+    const counts = new Map(
+      usage.data.map((u) => [u.merchant_id, u.transaction_count ?? 0]),
+    )
+    return merchants.data.map((m) => ({
       id: m.id,
       name: m.name,
       defaultCategoryId: m.default_category_id,
+      transactionCount: counts.get(m.id) ?? 0,
     }))
   },
 )

@@ -1,7 +1,7 @@
 begin;
 create extension if not exists pgtap with schema extensions;
 
-select plan(39);
+select plan(40);
 
 insert into auth.users (id, email) values
   ('11111111-1111-1111-1111-111111111111', 'alice@example.test'),
@@ -44,6 +44,13 @@ grant execute on function pg_temp.check_now() to authenticated;
 set local role authenticated;
 select set_config('request.jwt.claims',
   '{"sub": "11111111-1111-1111-1111-111111111111", "role": "authenticated", "aal": "aal2"}', true);
+
+-- A calendar date only, so no time zone can move it (spec 15)
+select is_empty(
+  $$ select 1 from information_schema.columns
+     where table_schema = 'public' and table_name = 'transactions' and data_type in ('time without time zone', 'time with time zone') $$,
+  'transactions have no time column'
+);
 
 -- Expenses and incomes (TRX-01, 02, 05)
 select lives_ok(
