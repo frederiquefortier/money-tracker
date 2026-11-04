@@ -72,14 +72,18 @@ component to use, so a screen is assembled, not redrawn.
   empty field, never "Aucun(e)". The chosen option is checked on the left, in a slot
   every option keeps, as in the dropdown menus. Options can sit in labelled groups and
   show a `Tag` in the field while chosen ("Archivée"). A category is always chosen with
-  `CategoryPicker`. Categories are listed as the Catégories page
-  draws them, everywhere (the picker, Parent, the Marchands filter): a tree with elbow
+  `CategoryPicker`, except the transaction form, whose category row opens a full-screen list (spec 15). Categories are listed as the Catégories page
+  draws them, everywhere (the picker, Parent, the Magasins filter): a tree with elbow
   connectors (`TreeGuides`), each with its icon and its name; the field shows the full
   path once chosen. A search keeps each match's parents.
-- **Search:** only on lists that grow long (Marchands, Catégories, the icon picker), a
+- **Search:** only on lists that grow long (Magasins, Catégories, the icon picker), a
   `SearchField` above the list, filtering as you type, ignoring case and accents. The
   words are the same everywhere: "Rechercher" and "Aucun résultat.", never naming the
   thing searched.
+- **Round pickers:** a round button that opens a picker (a category's icon) shows a
+  small badge in its corner, `EditHint`: a pencil when it holds a choice, on hover and
+  focus and always on touch screens; a plus on an empty dashed circle, always, its border
+  darkening to the primary colour on hover and focus.
 - **Tags:** a short status beside a name ("Par défaut", "Archivée") is a `Tag`.
 - **No helper text:** no hints under fields, legends or explanatory sentences. If a field
   needs explaining, fix its label or the layout. A reason for something unavailable goes

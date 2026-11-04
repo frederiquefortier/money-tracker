@@ -26,137 +26,167 @@ TRX-01, 02, 05, 06, 09, 10, CUR-08, CAT-04, 06 (the category picker, below), MER
 
 ## Layout
 
+One form: the receipt says what and how much, the fields under it say where, from which
+account and when (decided 2026-11-04, after a step-by-step version was tried and dropped;
+process.md).
+
 ```
 ┌──────────────────────────────┐
 │ NOUVELLE TRANSACTION       ✕ │
-│ [Dépense][Revenu][Transfert] │
-│                              │
-│        84,12   [CAD ▾]       │
-│                              │
-│ Compte *     [Chèque       ▾]│
+│ [ Dépense ][ Revenu ][Transf.]│
+│ ┌──────────────────────────┐ │
+│ │ (◉)      15,00   (EUR ▾) │ │
+│ │ RÉPARTIR                 │ │
+│ │ - - - - - - - - - - - - -│ │
+│ │ DÉBITÉ          22,54 CAD│ │
+│ │ TAUX   1 EUR = 1,4952 CAD│ │
+│ │ FRAIS      0,11 $ (0,5 %)│ │
+│ │ - - - - - - - - - - - - -│ │
+│ │ EN ATTENTE             ☐ │ │
+│ └╲╱╲╱╲╱╲╱╲╱╲╱╲╱╲╱╲╱╲╱╲╱╲╱╲┘ │
+│ Magasin      [IGA          ✕]│
+│ Compte *  [Chèque · Desjardins▾]│
 │ Date *       [2026-11-03    ]│
-│              Aujourd'hui Hier│
-│ Marchand     [IGA          ✕]│
-│ Catégorie *  [(◉) Épicerie ✕]│
-│              Répartir        │
 │ Note         [              ]│
-│ ☐ En attente                 │
+│              [              ]│
 │          Annuler  Enregistrer│
 └──────────────────────────────┘
 ```
 
-The shared sheet: full screen on a phone, a panel from the right from `md` up. The fields
-are the shared ones, in this order.
+The shared sheet: full screen on a phone, a panel from the right from `md` up.
 
 ## Content and behaviour
 
 ### Kind
 
-- Three tabs: Dépense (default), Revenu, Transfert, the same tab list as Catégories.
-  Transfert switches to the transfer form (spec 16), keeping the amount, account and date.
-  Until spec 16 is built, Transfert is muted and a tap says "Les transferts arrivent avec
+- Three tabs first: Dépense (default), Revenu, Transfert, the shared `TabList`. The kind
+  is the first decision: money out, money in, or moved.
+- Transfert switches to the transfer form (spec 16), keeping the amount, account and
+  date. Until spec 16 is built it is muted and a tap says "Les transferts arrivent avec
   le prochain écran.".
 - The amount is always typed positive; the kind gives the sign.
 
-### Amount and currency (TRX-02, CUR-08)
+### The receipt (TRX-02, 06, 09, CUR-08)
 
-- The amount is large, in Inconsolata, focused on open with the decimal keypad
-  (`inputmode="decimal"`). It accepts the locale's separator: `84,12` in French, `84.12`
-  in English.
-- The currency chip is prefilled with the account's currency and follows it when the
-  account changes. Its menu lists the user's currencies, favourites first (CUR-03).
-- **Foreign currency:** choosing a currency other than the account's turns the amount
-  into the original price, and two fields appear under it, joined by a line down their
-  left side (`LinkedFields`):
+A slip of paper: Inconsolata throughout, labels in capitals on the left and values on
+the right, its sections spaced apart by dashed rules, and a torn bottom edge (the `receipt`
+utility, a mask, so it works in both themes). Its small text (Taux, the computed shares,
+Répartir, the remaining line) is 13px, one step under its 14px lines. Top to bottom:
 
-  ```
-          15,00 € [EUR ▾]
-    │ Payé      [ 22,54 $ ]
-    │ Frais     0,11 $ (0,5 %)
-    │           1 € = 1,4952 $ au 3 nov. 2026
-  ```
-
-  - **Payé** is in the account's currency, prefilled with the original price at that
-    day's rate, and editable: type what the statement shows.
-  - **Frais** is read-only: what was paid minus the market value (CUR-08), with the rate
-    used. Negative fees show as they are; a missing rate shows "Taux manquant" and no fee
-    (ADR-004).
+- **The category's round icon**, then **the amount**, then **the currency chip**. The
+  icon is the category's in its colour, or an empty dashed circle; tapping it opens the
+  category list (below). Every round category control answers the same way: a small
+  badge in its corner, a pencil on a category icon (shown on hover and focus, always on
+  touch screens, as on the category form's icon), a plus on an empty circle (always
+  shown, the circle's only sign), whose dashed border also turns the full primary colour
+  on hover and focus; the shared `EditHint`, scaled to the circle. Its name, and "Remboursement" for an income on an expense
+  or placement category, is its tooltip and accessible name. The amount has no visible
+  label; it is large, focused when a new transaction opens, with the decimal keypad, and
+  accepts the locale's separator (`84,12`, `84.12`). The chip is prefilled with the
+  account's currency and follows it when the account changes; its menu lists the user's
+  currencies, favourites first (CUR-03). Errors for the category or the amount show
+  under this line.
+- **Répartir**, once a category is chosen: it itemizes the slip (Splits, below). Split,
+  the same place reads **Ne pas répartir** and goes back to one category, the first
+  line's.
+- **In another currency** than the account's, the amount is the original price and the
+  slip goes on after a rule:
+  - **Débité**, in the account's currency, prefilled at that day's rate and editable:
+    type what the statement shows. **Taux** sits close under it, smaller and muted
+    ("1 EUR = 1,4952 CAD"), so the two read as one.
+  - **Frais**, read-only: what was debited minus the market value (CUR-08), with its
+    percentage. Negative fees show as they are; a missing rate shows "Taux manquant" and
+    no fee (ADR-004).
   - The transaction is booked in the account's currency (`amount`), the original kept
     beside it (`original_amount`, `original_currency`).
-
-### Details
-
-- **Compte**: open accounts not hidden from new transactions (ACC-03, 04). Prefilled with
-  the account last used (remembered per browser). A list filtered to one account
-  prefills that account.
-- **Date** (TRX-01): today by default, "Aujourd'hui" and "Hier" as shortcuts beside the
-  field. No time: a transaction has a calendar date only, stored as a `date`, read and
-  shown without a time zone, so 17.08.2026 is 17.08.2026 on every screen (decided
-  2026-11-04).
-- **Marchand** (TRX-05): the merchant picker (spec 13). Choosing one fills the category
-  from its default (MER-01) unless a category was already chosen by hand.
-- **Catégorie**: the category picker, below.
-- **Note** (TRX-10): free text, one line that grows.
-- **En attente** (TRX-09): a checkbox, off by default (cleared).
-
-### Category picker (CAT-04, 06)
-
-`CategoryPicker` (built with spec 13, first used for a merchant's default category): the
-shared `Combobox` with labelled groups (no second picker). It takes the transaction's type
-and date.
-
-```
-│ Catégorie *  [                 ▾]│
-│ FRÉQUENTES                       │
-│ (◉) Alimentation > Épicerie      │
-│ (◉) Transport > Essence          │
-│ DÉPENSES                         │
-│ (◉) Alimentation                 │
-│ ├─ (◉) Épicerie                  │
-│ └─ (◉) Restaurants               │
-│ REVENUS                          │
-│ (◉) Salaire                      │
-```
-
-- **Fréquentes** first (CAT-06), built with this form: the five categories of the
-  transaction's type used most over the last 90 days, by count, each as its full path.
-  Worked out from the transactions, nothing to keep up by hand. Hidden until there are
-  transactions, and while typing. A frequent category also keeps its place in its tree
-  below, so no branch loses its parent.
-- Then one group per type, the transaction's own type first, each drawn as the
-  Catégories tree: elbow connectors, the icon and the name. The field shows the full
-  path once chosen.
-- Typing matches names; each match keeps its parents, so its place in the tree shows.
-- **Archived categories never appear** (CAT-04), as of the transaction's date: a category
-  archived in March still appears for a February transaction.
-- **Editing an old transaction** whose category is archived: the field shows it with an
-  "Archivée" tag, and the list opens without it, so it can be changed (CAT-04).
-- Parents are selectable too: spending can sit on "Alimentation" itself.
-- **No category yet:** "Créer « {texte} »" creates a top-level category of the
-  transaction's type, with a suggested icon and colour (spec 12).
+- **En attente** (TRX-09), always after a rule: the label on the left, a checkbox on the
+  right, off by default (cleared).
 
 ### Splits (TRX-06)
 
-"Répartir" under the category replaces the single category with lines:
+"Répartir" itemizes the slip: the round icon beside the amount goes away and, after a
+rule, the slip lists the categories, the first one starting with the category chosen.
 
 ```
-  Répartir par  [Montant][Parts][%]
-  [(◉) Épicerie     ✕] [ 60,00 ]
-  [(◉) Maison       ✕] [ 24,12 ]
-  + Ajouter une catégorie
-  Reste à répartir    0,00 $
+│ (empty)        84,12  (CAD ▾) │
+│ - - - - - - - - - - - - - - - │
+│ PAR  [Montant][Parts][  %  ]  │
+│ (◉) Épicerie          60,00 ✕ │
+│ (◉) Maison            24,12 ✕ │
+│ ( )+                          │
+│           ✓ Tout est réparti │
 ```
 
-- One mode for the whole transaction: Montant, Parts or Pourcentage.
-- **Montant:** each line in the transaction's currency; "Reste à répartir" must reach
-  zero to save.
-- **Parts** (1, 2, 1) and **Pourcentage** (must total 100, and never more: a value above
-  what the other lines leave is cut to it as it is typed): the amounts are computed, and
-  the last line takes the rounding cent, so the lines always sum exactly to the total.
-- Each line's computed amount shows muted beside its input in Parts and % mode.
-- Clearing lines down to one returns to the single category field.
+- One mode for the whole transaction: Montant, Parts or %.
+- Each line: the category's round icon and its full path, one button with the gap
+  between them (both open the same category list), its value typed on the slip, and a ✕
+  to remove it. An empty dashed circle with its plus, no label ("Ajouter une catégorie"
+  as its accessible name), adds a line and opens the category list for it.
+- **The remaining line** closes the lines, small and right-aligned: "✓ Tout est
+  réparti" once everything is shared; a warning icon and "Reste 12,00 $ à répartir"
+  while something is left, or "Dépasse le montant de 3,00 $" when the lines go over. In
+  % mode it counts in percent ("Reste 10 % à répartir") and is always there; in
+  Montant once there is an amount; not in Parts, which always share everything.
+- **Montant:** each line in the account's currency; everything must be shared to save.
+- **Parts** (1, 2, 1) and **%** (must total 100, and never more: a value above what the
+  other lines leave is cut to it as it is typed): the amounts are computed, and the last
+  line takes the rounding cent, so the lines always sum exactly to the total. Each
+  line's computed amount shows small under its value.
+- Removing lines down to one, or "Ne pas répartir", returns to the single category
+  beside the amount.
 - Previews in the browser use integer minor units (ADR-004); the server recomputes and
   the database checks the sum (database.md, deferred constraint).
+
+### Under the receipt
+
+- **Magasin** (TRX-05; "Merchant" in English; the screen is Magasins, spec 13), full
+  width like every field: the merchant picker. Choosing one fills its default category
+  (MER-01) unless a category was chosen by hand or there are splits.
+- **Compte**: open accounts not hidden from new transactions (ACC-03, 04), grouped by
+  institution. Names can repeat across institutions, so the field shows "Chèque ·
+  Desjardins" once chosen. Prefilled with the account last used (remembered per
+  browser). A list filtered to one account prefills that account.
+- **Date** (TRX-01): today by default; no shortcuts (removed 2026-11-04). No time: a
+  transaction has a calendar date only, stored as a `date`, read and shown without a
+  time zone, so 17.08.2026 is 17.08.2026 on every screen (decided 2026-11-04).
+- **Note** (TRX-10): free text, three lines high, growing as it is typed.
+
+### Category list (CAT-04, 06)
+
+A category's round icon, on the receipt or on a split line, opens the list over the
+whole sheet, its header included: a back arrow and "CATÉGORIE", no ✕. The form stays as
+it was underneath; "←" or Escape goes back without choosing.
+
+```
+┌──────────────────────────────┐
+│ ← CATÉGORIE                  │
+│                  [⇕] [⇅ Nom▾]│
+│ [Rechercher                 ]│
+│ [Dépenses][Revenus][Placem.] │
+│ Fréquemment utilisées        │
+│  (◉)    (◉)    (◉)    (◉)    │
+│ Épicer. Café  Essence Resto  │
+│ ┌──────────────────────────┐ │
+│ │▾ (◉) Alimentation        │ │
+│ │  └─ (◉) Épicerie         │ │
+│ │▸ (◉) Transport           │ │
+│ └──────────────────────────┘ │
+└──────────────────────────────┘
+```
+
+- What applies to every type comes first: "Tout déplier" and the sort on the right, as
+  on the list pages; then **Rechercher**, full width, which takes focus. Then the type
+  tabs (`KindTabs`, as on Catégories), the transaction's type selected.
+- **Fréquemment utilisées** (CAT-06): the five categories of the selected type used most over the
+  last 90 days, by count, under "Fréquemment utilisées", as a row of round icons with
+  their names under them. Hidden while searching and until there are transactions.
+- Then the type's tree, the shared `CategoryTree` as on Catégories: elbow connectors,
+  parents opened and closed by their chevron, open branches remembered per browser and
+  shared with that page, the same sort. A search shows every match with its parents.
+- A category of another type is allowed: an expense category chosen for a revenue is a
+  refund, which lowers that category's spending (database.md).
+- Parents are choosable too. **Archived categories never appear** (CAT-04), as of the
+  transaction's date; an archived one already chosen stays on its icon.
 
 ### Edit
 
@@ -203,11 +233,11 @@ and date.
 |---|---|
 | Titles | Nouvelle transaction, Modifier la transaction |
 | Kinds | Dépense, Revenu, Transfert; until spec 16: Les transferts arrivent avec le prochain écran. |
-| Fields | Compte, Date, Marchand, Catégorie, Note, En attente |
-| Date shortcuts | Aujourd'hui, Hier |
-| Foreign | Payé, Frais, 1 {from} = {rate} {to} au {date} |
-| Picker | Fréquentes, Archivée, Retirer la catégorie, Créer « {text} » |
-| Splits | Répartir, Répartir par, Montant, Parts, %, Ajouter une catégorie, Retirer la ligne, Reste à répartir |
+| Receipt | Montant (accessible name), Répartir, Ne pas répartir, Débité, Taux, Frais, 1 {from} = {rate} {to}, Taux manquant, En attente |
+| Category | Catégorie, Choisir une catégorie, Remboursement, Retour au formulaire, Fréquemment utilisées, Dépenses, Revenus, Placements, Rechercher, Aucun résultat. |
+| Fields | Magasin, Compte, Date, Note |
+| Picker | Fréquemment utilisées, Archivée, Retirer la catégorie, Créer « {text} » |
+| Splits | Répartir, Ne pas répartir, Par, Montant, Parts, %, Ajouter une catégorie, Retirer la ligne, Tout est réparti, Reste {amount} à répartir, Dépasse le montant de {amount} |
 | Split errors | Répartissez tout le montant., Les pourcentages doivent totaliser 100., Chaque catégorie une seule fois. |
 | Imported | Importée le {date} |
 | Delete | Supprimer la transaction, Cette action est irréversible. |

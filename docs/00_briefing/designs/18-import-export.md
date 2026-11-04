@@ -78,7 +78,7 @@ Reached from Réglages, and from the empty transactions list (spec 14).
 │ 212 déjà importées, ignorées       │
 │ Comptes: 6 existants, 1 nouveau ▸  │
 │ Catégories: 3 nouvelles ▸          │
-│ Marchands: 418 nouveaux ▸          │
+│ Magasins: 418 nouveaux ▸          │
 │ [ Importer 9 600 transactions ]    │
 ```
 
@@ -138,10 +138,10 @@ Reached from Réglages, and from the empty transactions list (spec 14).
 ## Imports and undo (IMP-05)
 
 - One row per batch, newest first: the date, then the transaction count and what it
-  created ("1 compte, 3 catégories, 418 marchands") on the second line.
+  created ("1 compte, 3 catégories, 418 magasins") on the second line.
 - **Annuler l'import** is the undo icon in the row's action slot. The confirmation says
   what goes: "9 600 transactions seront
-  supprimées, ainsi que les comptes, catégories et marchands créés par cet import qui ne
+  supprimées, ainsi que les comptes, catégories et magasins créés par cet import qui ne
   servent plus ailleurs." If some of its transactions were edited since, it adds "dont
   {n} modifiées depuis".
 - An undone batch stays in the list, muted, with "Annulé le {date}" on the first line and

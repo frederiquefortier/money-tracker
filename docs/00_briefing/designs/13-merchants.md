@@ -17,12 +17,15 @@ MER-01, MER-05 (merge), MER-06 (sort and filter). TRX-05 (linking a transaction 
 built with the transaction form (spec 15). MER-03 (country) is phase 5, MER-04 (price
 evolution) phase 2.
 
-## Marchands
+## Magasins
+
+The French interface says "Magasin" (decided 2026-11-04, process.md); the code and these
+docs keep "merchant".
 
 ```
 ┌──────────────────────────────────┐
 │ ← Réglages                       │
-│ MARCHANDS [Filtre▾][Tri▾][+ MARCHAND]│
+│ MAGASINS [Filtre▾][Tri▾][+ MAGASIN]│
 │ [Rechercher                    ] │
 │ ┌──────────────────────────────┐ │
 │ │ IGA                      ⇉ 🗑 │ │
@@ -62,14 +65,14 @@ On the row from `md` up, in the sheet header on phones (shared patterns).
   (MER-02, with the import wizard), the merge also keeps the source's name as an alias of
   the target and moves the source's aliases to it, so a later import that would have
   matched the source finds the target. Muted when there is no other merchant; a tap says
-  "Il faut au moins un autre marchand.".
+  "Il faut au moins un autre magasin.".
 - **Trash:** "Supprimer “{name}”" and "Cette action est irréversible.". A merchant with
   transactions also says "Les {count} transactions gardent leur catégorie et perdent le
-  marchand.".
+  magasin.".
 
 ## Merchant form
 
-A route sheet over Marchands (`/settings/merchants/new`, `/settings/merchants/{id}`). Its
+A route sheet over Magasins (`/settings/merchants/new`, `/settings/merchants/{id}`). Its
 body only edits.
 
 - **Nom** required, unique per user, compared without case or accents ("Café Olimpico"
@@ -78,7 +81,7 @@ body only edits.
 - **Catégorie par défaut** (MER-01): `CategoryPicker` (spec 15, built with this screen),
   optional, empty with a × to clear. Its "Créer « … »" makes a top-level expense
   category. Changing it affects new transactions only; past ones keep their category.
-- Saving closes the sheet with a toast, "Marchand créé." or "Marchand enregistré.".
+- Saving closes the sheet with a toast, "Magasin créé." or "Magasin enregistré.".
 
 ## Merchant picker (TRX-05)
 
@@ -94,7 +97,7 @@ Used by the transaction form (spec 15): the shared combobox.
 
 ## States
 
-- **No merchant yet:** "Aucun marchand pour l'instant." under the title.
+- **No merchant yet:** "Aucun magasin pour l'instant." under the title.
 - **Save fails:** values kept, the error above the sheet's buttons (SET-07).
 
 ## Data
@@ -115,18 +118,18 @@ Used by the transaction form (spec 15): the shared combobox.
 
 | Key | Français |
 |---|---|
-| Screen title | Marchands |
+| Screen title | Magasins |
 | Search | Rechercher, Aucun résultat. (shared) |
 | Sort | Nom A–Z, Nom Z–A, Catégorie; Trier: … (accessible name) |
 | Filter | Toutes les catégories, Sans catégorie; Filtrer: … (accessible name) |
-| Empty | Aucun marchand pour l'instant. |
-| Add | Marchand (named Ajouter un marchand) |
-| Form titles | Nouveau marchand, Modifier le marchand |
+| Empty | Aucun magasin pour l'instant. |
+| Add | Magasin (named Ajouter un magasin) |
+| Form titles | Nouveau magasin, Modifier le magasin |
 | Fields | Nom, Catégorie par défaut |
 | Clear category | Retirer la catégorie |
-| Settings row | Marchands (the `store` icon) |
-| Saved | Marchand créé., Marchand enregistré. |
+| Settings row | Magasins (the `store` icon) |
+| Saved | Magasin créé., Magasin enregistré. |
 | Duplicate | Ce nom est déjà utilisé. (shared) |
-| Delete | Supprimer “{name}”, Cette action est irréversible.; with transactions: Les {count} transactions gardent leur catégorie et perdent le marchand. |
+| Delete | Supprimer “{name}”, Cette action est irréversible.; with transactions: Les {count} transactions gardent leur catégorie et perdent le magasin. |
 | Inline create | Créer « {text} » |
-| Merge | Fusionner, Fusionner “{name}”, Fusionner avec, Les transactions de “{source}” passeront à “{target}”, puis “{source}” sera supprimé., Il faut au moins un autre marchand. |
+| Merge | Fusionner, Fusionner “{name}”, Fusionner avec, Les transactions de “{source}” passeront à “{target}”, puis “{source}” sera supprimé., Il faut au moins un autre magasin. |

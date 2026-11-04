@@ -2,10 +2,8 @@ import { useId } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Combobox } from '#/components/combobox'
 import { FieldMessage, FormField } from '#/components/form-field'
-import { Button } from '#/components/ui/button'
 import { FieldLabel, fieldControl } from '#/components/ui/field'
 import { FORMAT_LOCALE } from '#/i18n/locales'
-import { todayIso } from '#/lib/format'
 import type { FormAccount } from '#/lib/transactions'
 import { useLocale } from '#/lib/use-locale'
 import { cn } from '#/lib/utils'
@@ -38,7 +36,9 @@ export function AccountPicker({
     )
     .map((a) => ({
       value: a.id,
-      label: a.name,
+      // Names repeat across institutions: the field says which once chosen.
+      label: a.institution ? `${a.name} · ${a.institution}` : a.name,
+      short: a.name,
       keywords: `${a.institution ?? ''} ${a.currency}`,
       group: group(a),
     }))
@@ -56,12 +56,7 @@ export function AccountPicker({
   )
 }
 
-function shiftDays(iso: string, days: number) {
-  const [year = 0, month = 1, day = 1] = iso.split('-').map(Number)
-  return todayIso(new Date(year, month - 1, day + days))
-}
-
-/** TRX-01: the date, with "Aujourd'hui" and "Hier". */
+/** TRX-01: the date, today by default. */
 export function DateField({
   date,
   error,
@@ -72,41 +67,20 @@ export function DateField({
   onChange: (date: string) => void
 }) {
   const { t } = useTranslation()
-  const today = todayIso()
-  const shortcuts = [
-    { label: t('transactions.today'), value: today },
-    { label: t('transactions.yesterday'), value: shiftDays(today, -1) },
-  ]
   return (
-    <div className="flex flex-col gap-1">
-      <FormField
-        name="occurredOn"
-        type="date"
-        required
-        label={t('transactions.date')}
-        value={date}
-        error={error}
-        onChange={(event) => onChange(event.target.value)}
-      />
-      <div className="flex gap-1">
-        {shortcuts.map((s) => (
-          <Button
-            key={s.label}
-            type="button"
-            variant="ghost"
-            size="sm"
-            aria-pressed={date === s.value}
-            onClick={() => onChange(s.value)}
-          >
-            {s.label}
-          </Button>
-        ))}
-      </div>
-    </div>
+    <FormField
+      name="occurredOn"
+      type="date"
+      required
+      label={t('transactions.date')}
+      value={date}
+      error={error}
+      onChange={(event) => onChange(event.target.value)}
+    />
   )
 }
 
-/** TRX-10: free text, one line that grows as it is typed. */
+/** TRX-10: free text, three lines high, growing as it is typed. */
 export function NoteField({
   value,
   error,
@@ -123,14 +97,14 @@ export function NoteField({
       <FieldLabel htmlFor={id}>{t('transactions.note')}</FieldLabel>
       <textarea
         id={id}
-        rows={1}
+        rows={3}
         maxLength={1000}
         value={value}
         aria-invalid={error ? true : undefined}
         onChange={(event) => onChange(event.target.value)}
         className={cn(
           fieldControl,
-          'h-auto min-h-11 field-sizing-content py-2 md:min-h-9',
+          'h-auto min-h-24 field-sizing-content py-2 md:h-auto',
         )}
       />
       {error && <FieldMessage>{error}</FieldMessage>}

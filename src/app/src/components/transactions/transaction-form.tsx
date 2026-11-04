@@ -2,20 +2,18 @@ import { useActionState, useId, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useCloseSheet, useMarkChanged } from '#/components/route-sheet'
 import { SheetForm } from '#/components/sheet-form'
-import { TabList } from '#/components/tab-list'
 import { useToast } from '#/components/toaster'
-import {
-  AmountField,
-  ForeignFields,
-} from '#/components/transactions/amount-fields'
+import { TabList } from '#/components/tab-list'
+import { CategoryScreen } from '#/components/transactions/category-screen'
+import { ReceiptAmount } from '#/components/transactions/receipt-amount'
+import type { PickTarget } from '#/components/transactions/receipt-amount'
 import { Details } from '#/components/transactions/transaction-details'
 import type { Category } from '#/lib/categories'
 import { useFocusFirstError, useValidationMessage } from '#/lib/form'
 import type { FieldErrors } from '#/lib/form'
 import type { Merchant } from '#/lib/merchants'
-import { validateDraft } from '#/lib/transaction-draft'
+import { validateDraft, withPicked } from '#/lib/transaction-draft'
 import type { Draft } from '#/lib/transaction-draft'
-import { bookedMinor } from '#/lib/transaction-preview'
 import type { FormAccount } from '#/lib/transactions'
 import { useMyCurrencies } from '#/lib/use-my-currencies'
 import { useRate } from '#/lib/use-rate'
@@ -29,10 +27,7 @@ export type TransactionFormData = {
   frequent: FrequentCategories
 }
 
-// Shared with the details, which take the same loader data.
 type State = { errors: FieldErrors; failed: boolean; submitted: boolean }
-
-const TABS = ['expense', 'income', 'transfer'] as const
 
 /** The draft, the account it books on, and that day's rate when the currencies differ. */
 function useDraft(initial: Draft, accounts: ReadonlyArray<FormAccount>) {
@@ -45,13 +40,7 @@ function useDraft(initial: Draft, accounts: ReadonlyArray<FormAccount>) {
     markChanged()
     setDraft((d) => ({ ...d, ...changes }))
   }
-  return {
-    draft,
-    update,
-    accountCurrency,
-    rate: rate ?? null,
-    loading: rate === undefined,
-  }
+  return { draft, update, accountCurrency, rate }
 }
 
 function useSubmit({
@@ -76,7 +65,43 @@ function useSubmit({
   )
 }
 
-/** Spec 15: an expense or income, new (`id` undefined) or edited. */
+const TABS = ['expense', 'income', 'transfer'] as const
+
+/** The kind first (spec 15); Transfert waits for spec 16 and says so. */
+function KindTabs({
+  kind,
+  panelId,
+  onChange,
+}: {
+  kind: Draft['kind']
+  panelId: string
+  onChange: (kind: Draft['kind']) => void
+}) {
+  const { t } = useTranslation()
+  const toast = useToast()
+  return (
+    <TabList
+      label={t('transactions.kindsLabel')}
+      tabs={TABS}
+      value={kind}
+      labelOf={(k) => t(`transactions.kinds.${k}`)}
+      panelId={panelId}
+      idPrefix="kind"
+      muted={(k) => k === 'transfer'}
+      onSelect={(k) =>
+        k === 'transfer'
+          ? toast({ text: t('transactions.transferSoon') })
+          : onChange(k)
+      }
+    />
+  )
+}
+
+/**
+ * Spec 15: an expense or income, new (`id` undefined) or edited. A category's round
+ * icon, on the receipt or a split line, opens the category list over the whole sheet;
+ * the form stays as it was underneath.
+ */
 export function TransactionForm({
   id,
   initial,
@@ -89,21 +114,21 @@ export function TransactionForm({
   onSaved: (accountId: string) => void
 }) {
   const { t } = useTranslation()
-  const toast = useToast()
   const message = useValidationMessage()
   const { currencies } = useMyCurrencies()
   const panelId = useId()
+  const [picking, setPicking] = useState<PickTarget | null>(null)
   const { draft, update, accountCurrency, rate } = useDraft(
     initial,
     data.accounts,
   )
-  const check = () => validateDraft(draft, { id, accountCurrency, rate })
+  const check = () =>
+    validateDraft(draft, { id, accountCurrency, rate: rate ?? null })
   const [state, submit, pending] = useSubmit({ check, onSaved })
   // After a first submit, errors follow the fields as they are corrected.
   const errors = state.submitted ? (check().errors ?? {}) : {}
   const error = (name: string) => message(errors[name])
   const formRef = useFocusFirstError(state.errors)
-  const foreign = accountCurrency !== null && draft.currency !== accountCurrency
 
   return (
     <SheetForm
@@ -112,47 +137,42 @@ export function TransactionForm({
       pending={pending}
       error={state.failed && t('common.saveFailed')}
     >
-      <TabList
-        label={t('transactions.kindsLabel')}
-        tabs={TABS}
-        value={draft.kind}
-        labelOf={(k) => t(`transactions.kinds.${k}`)}
+      {picking !== null && (
+        <CategoryScreen
+          categories={data.categories}
+          kind={draft.kind}
+          frequent={data.frequent}
+          date={draft.occurredOn}
+          onPick={(category) => {
+            update(withPicked(draft, picking, category.id))
+            setPicking(null)
+          }}
+          onBack={() => setPicking(null)}
+        />
+      )}
+      <KindTabs
+        kind={draft.kind}
         panelId={panelId}
-        idPrefix="kind"
-        muted={(k) => k === 'transfer'}
-        onSelect={(k) =>
-          k === 'transfer'
-            ? toast({ text: t('transactions.transferSoon') })
-            : update({ kind: k })
-        }
+        onChange={(kind) => update({ kind })}
       />
       <div id={panelId} className="flex flex-col gap-5">
-        <AmountField
+        <ReceiptAmount
           draft={draft}
+          categories={data.categories}
+          accountCurrency={accountCurrency}
           currencies={currencies}
-          error={error('amount')}
+          rate={rate}
+          errors={{
+            amount: error('amount'),
+            category: error('categoryId'),
+            paid: error('paid'),
+            splits: error('splits'),
+          }}
           autoFocus={id === undefined}
           onChange={update}
+          onPick={setPicking}
         />
-        {foreign && (
-          <ForeignFields
-            draft={draft}
-            accountCurrency={accountCurrency}
-            rate={rate}
-            error={error('paid')}
-            onChange={update}
-          />
-        )}
-        <Details
-          draft={draft}
-          data={data}
-          accountCurrency={accountCurrency}
-          total={
-            accountCurrency ? bookedMinor(draft, accountCurrency, rate) : null
-          }
-          error={error}
-          onChange={update}
-        />
+        <Details draft={draft} data={data} error={error} onChange={update} />
       </div>
     </SheetForm>
   )

@@ -175,7 +175,6 @@ export function Combobox({
   onCreate,
   typedOrder,
   error,
-  labelHidden = false,
 }: {
   label: string
   options: ReadonlyArray<ComboboxOption>
@@ -189,8 +188,6 @@ export function Combobox({
   typedOrder?: (a: ComboboxOption, b: ComboboxOption) => number
   /** A validation message under the field (SET-07). */
   error?: string
-  /** The label for screen readers only, in a row of like fields (split lines). */
-  labelHidden?: boolean
 }) {
   const { t } = useTranslation()
   const inputId = useId()
@@ -200,11 +197,7 @@ export function Combobox({
 
   return (
     <div className="flex flex-col gap-2">
-      <FieldLabel
-        htmlFor={inputId}
-        required={required}
-        className={labelHidden ? 'sr-only' : undefined}
-      >
+      <FieldLabel htmlFor={inputId} required={required}>
         {label}
       </FieldLabel>
       <Popover open={state.expanded} onOpenChange={state.setOpen}>

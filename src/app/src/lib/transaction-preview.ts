@@ -101,3 +101,15 @@ export function splitPreview(
   }
   return { amounts: splitMinor(total, known), remaining: 0n }
 }
+
+/**
+ * In % mode, what the typed percentages leave of 100, in units of 0.0001 %; negative when
+ * they go over. Lines not yet a number count as zero.
+ */
+export function percentLeft(values: ReadonlyArray<string>): bigint {
+  const typed = values.reduce((sum, value) => {
+    const weight = typedWeight(value)
+    return sum + (weight === null ? 0n : (toMinor(weight, 4) ?? 0n))
+  }, 0n)
+  return 1000000n - typed
+}

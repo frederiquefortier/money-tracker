@@ -5,9 +5,11 @@ import { Input } from '#/components/ui/input'
 export function SearchField({
   value,
   onChange,
+  autoFocus,
 }: {
   value: string
   onChange: (value: string) => void
+  autoFocus?: boolean
 }) {
   const { t } = useTranslation()
   return (
@@ -15,6 +17,7 @@ export function SearchField({
       type="search"
       value={value}
       onChange={(event) => onChange(event.target.value)}
+      autoFocus={autoFocus}
       placeholder={t('common.search')}
       aria-label={t('common.search')}
     />

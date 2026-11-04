@@ -55,8 +55,9 @@ function BranchToggle({
 }
 
 /**
- * One category in a list. Every row opens the form; a parent also has a chevron for its
- * branch (`toggle`). `aside` sits before the actions (the archive date).
+ * One category in a list. Every row opens the form, or chooses the category with
+ * `onPick` (no actions then); a parent also has a chevron for its branch (`toggle`).
+ * `aside` sits before the actions (the archive date).
  */
 export function CategoryRow({
   category,
@@ -65,14 +66,26 @@ export function CategoryRow({
   context,
   toggle,
   aside,
+  onPick,
 }: {
   category: Category
   label: string
   depth?: number
-  context: RowContext
+  context?: RowContext
   toggle?: { expanded: boolean; onToggle: () => void }
   aside?: React.ReactNode
+  onPick?: (category: Category) => void
 }) {
+  const rowContent = (
+    <>
+      <Label category={category} label={label} />
+      {aside && <span className="ml-auto pl-3">{aside}</span>}
+    </>
+  )
+  const target = cn(
+    'flex min-w-0 flex-1 items-center gap-1.5 py-2.5 text-left',
+    focusRing,
+  )
   return (
     <div
       className={cn('flex items-center gap-1.5 pr-2', rowHover)}
@@ -83,24 +96,32 @@ export function CategoryRow({
       ) : (
         <span className="w-5 shrink-0" />
       )}
-      <Link
-        to="/settings/categories/$categoryId"
-        params={{ categoryId: category.id }}
-        className={cn(
-          'flex min-w-0 flex-1 items-center gap-1.5 py-2.5',
-          focusRing,
-        )}
-      >
-        <Label category={category} label={label} />
-        {aside && <span className="ml-auto pl-3">{aside}</span>}
-      </Link>
-      <CategoryActions
-        category={category}
-        parent={context.parent}
-        hasChildren={context.hasChildren}
-        branch={context.branch}
-        onAddChild={context.onAddChild}
-      />
+      {onPick ? (
+        <button
+          type="button"
+          className={target}
+          onClick={() => onPick(category)}
+        >
+          {rowContent}
+        </button>
+      ) : (
+        <Link
+          to="/settings/categories/$categoryId"
+          params={{ categoryId: category.id }}
+          className={target}
+        >
+          {rowContent}
+        </Link>
+      )}
+      {context && (
+        <CategoryActions
+          category={category}
+          parent={context.parent}
+          hasChildren={context.hasChildren}
+          branch={context.branch}
+          onAddChild={context.onAddChild}
+        />
+      )}
     </div>
   )
 }

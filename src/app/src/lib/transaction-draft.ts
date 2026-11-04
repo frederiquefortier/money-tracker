@@ -1,4 +1,6 @@
+import type { Category } from '#/lib/categories'
 import type { FieldErrors } from '#/lib/form'
+import type { Merchant } from '#/lib/merchants'
 import { fromMinor, minorDigits, toMinor } from '#/lib/money'
 import {
   bookedMinor,
@@ -57,6 +59,32 @@ export function emptyDraft(
     lines: [],
     note: '',
     pending: false,
+  }
+}
+
+/** A category chosen in the list, for the transaction (`main`) or a split line's key. */
+export function withPicked(
+  draft: Pick<Draft, 'lines'>,
+  target: 'main' | number,
+  categoryId: string,
+): Partial<Draft> {
+  if (target === 'main') return { categoryId, categoryByHand: true }
+  return {
+    lines: draft.lines.map((l) =>
+      l.key === target ? { ...l, categoryId } : l,
+    ),
+  }
+}
+
+/** A merchant chosen in the form fills its default category, if still there (MER-01). */
+export function withMerchant(
+  merchant: Pick<Merchant, 'id' | 'defaultCategoryId'>,
+  categories: ReadonlyArray<Pick<Category, 'id'>>,
+): Partial<Draft> {
+  const found = categories.some((c) => c.id === merchant.defaultCategoryId)
+  return {
+    merchantId: merchant.id,
+    ...(found ? { categoryId: merchant.defaultCategoryId } : {}),
   }
 }
 

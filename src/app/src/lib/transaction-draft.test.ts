@@ -1,12 +1,18 @@
 import { describe, expect, it } from 'vitest'
 import {
   capPercent,
+  withMerchant,
+  withPicked,
   draftFromTransaction,
   emptyDraft,
   forInput,
   validateDraft,
 } from '#/lib/transaction-draft'
-import { foreignPreview, splitPreview } from '#/lib/transaction-preview'
+import {
+  foreignPreview,
+  percentLeft,
+  splitPreview,
+} from '#/lib/transaction-preview'
 import type { Draft } from '#/lib/transaction-draft'
 import type { FormAccount } from '#/lib/transactions'
 
@@ -213,5 +219,39 @@ describe('capPercent', () => {
   it('keeps what is not a number yet', () => {
     expect(capPercent(lines, { key: 1, value: '33,' }, 'fr')).toBe('33,')
     expect(capPercent(lines, { key: 1, value: '' }, 'fr')).toBe('')
+  })
+})
+
+describe('withMerchant', () => {
+  it('fills a merchant’s default category, if it still exists', () => {
+    const categories = [{ id: GROCERIES }]
+    expect(
+      withMerchant({ id: 'iga', defaultCategoryId: GROCERIES }, categories),
+    ).toEqual({ merchantId: 'iga', categoryId: GROCERIES })
+    expect(
+      withMerchant({ id: 'old', defaultCategoryId: HOUSE }, categories),
+    ).toEqual({ merchantId: 'old' })
+  })
+})
+
+describe('withPicked', () => {
+  it('sets the transaction’s category, or one split line’s', () => {
+    const lines = [
+      { key: 0, categoryId: GROCERIES, value: '1' },
+      { key: 1, categoryId: null, value: '1' },
+    ]
+    expect(withPicked({ lines }, 'main', HOUSE)).toEqual({
+      categoryId: HOUSE,
+      categoryByHand: true,
+    })
+    expect(withPicked({ lines }, 1, HOUSE).lines?.[1]?.categoryId).toBe(HOUSE)
+  })
+})
+
+describe('percentLeft', () => {
+  it('is what the percentages leave of 100, in 0.0001 % units', () => {
+    expect(percentLeft(['60', '30'])).toBe(100000n)
+    expect(percentLeft(['33,5', ''])).toBe(665000n)
+    expect(percentLeft(['60', '50'])).toBe(-100000n)
   })
 })

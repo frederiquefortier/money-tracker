@@ -95,7 +95,6 @@ export function CategoryPicker({
   frequent = [],
   required = false,
   error,
-  labelHidden,
 }: {
   label: string
   categories: ReadonlyArray<Category>
@@ -107,7 +106,6 @@ export function CategoryPicker({
   frequent?: ReadonlyArray<string>
   required?: boolean
   error?: string
-  labelHidden?: boolean
 }) {
   const { t } = useTranslation()
   const locale = FORMAT_LOCALE[useLocale()]
@@ -158,7 +156,6 @@ export function CategoryPicker({
       label={label}
       required={required}
       error={error}
-      labelHidden={labelHidden}
       options={options}
       value={value}
       onChange={onChange}

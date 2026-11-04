@@ -157,6 +157,20 @@
 }
 
 /* Page change bar (RouteProgress): a sunset sliver that sweeps across the top. */
+/* A slip of paper torn along the bottom (spec 15, the transaction amount). The teeth are
+   a mask, so the slip keeps its own background in both themes. */
+@utility receipt {
+  --tooth: 0.875rem;
+  padding-bottom: calc(var(--tooth) + 0.5rem);
+  mask: conic-gradient(
+      from -45deg at bottom,
+      #0000,
+      #000 1deg 89deg,
+      #0000 90deg
+    )
+    50% / var(--tooth) 100%;
+}
+
 @utility route-progress {
   background-image: linear-gradient(
     to right,

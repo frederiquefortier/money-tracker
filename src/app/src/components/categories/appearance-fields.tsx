@@ -2,7 +2,7 @@ import { useId, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { CategoryBadge } from '#/components/categories/category-badge'
 import { IconPicker } from '#/components/categories/icon-picker'
-import { Icon } from '#/components/icon'
+import { EditHint } from '#/components/edit-hint'
 import type { CategoryDraft } from '#/components/categories/use-category-draft'
 import { Button } from '#/components/ui/button'
 import { FieldLabel } from '#/components/ui/field'
@@ -28,10 +28,7 @@ export function IconField({ draft }: { draft: CategoryDraft }) {
         )}
       >
         <CategoryBadge icon={draft.icon} color={draft.color} size="lg" />
-        {/* Shown on hover and focus; always on touch screens, which have no hover. */}
-        <span className="absolute -right-1 -bottom-1 grid size-7 place-items-center rounded-full border bg-card opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100 [@media(hover:none)]:opacity-100">
-          <Icon name="pencil" className="size-4" />
-        </span>
+        <EditHint />
       </button>
       {picking && (
         <IconPicker

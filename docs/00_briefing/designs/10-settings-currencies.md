@@ -26,7 +26,7 @@ the transactions list (spec 14).
 │ ┌──────────────────────────┐ │
 │ │ ◫ Comptes              › │ │
 │ │ ◫ Catégories           › │ │
-│ │ ◫ Marchands            › │ │
+│ │ ◫ Magasins            › │ │
 │ │ ◫ Devises              › │ │
 │ └──────────────────────────┘ │
 │ ┌──────────────────────────┐ │
@@ -149,7 +149,7 @@ the transactions list (spec 14).
 | Key | Français |
 |---|---|
 | Hub title | Réglages |
-| Hub rows | Comptes, Catégories, Marchands, Devises, Importer et exporter, Se déconnecter |
+| Hub rows | Comptes, Catégories, Magasins, Devises, Importer et exporter, Se déconnecter |
 | Screen title | Devises |
 | Default badge | Par défaut |
 | Add button | Devise (named Ajouter une devise, also the sheet title) |

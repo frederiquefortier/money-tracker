@@ -18,6 +18,7 @@ function SheetContent({
   actions,
   children,
   onCloseAutoFocus,
+  onEscapeKeyDown,
 }: {
   title: string
   closeLabel: string
@@ -25,6 +26,7 @@ function SheetContent({
   children: React.ReactNode
   /** Runs once the closing animation has finished. */
   onCloseAutoFocus?: (event: Event) => void
+  onEscapeKeyDown?: (event: KeyboardEvent) => void
 }) {
   return (
     <SheetPrimitive.Portal>
@@ -32,6 +34,7 @@ function SheetContent({
       <SheetPrimitive.Content
         aria-describedby={undefined}
         onCloseAutoFocus={onCloseAutoFocus}
+        onEscapeKeyDown={onEscapeKeyDown}
         className="sheet-panel fixed inset-0 z-50 flex flex-col bg-card text-card-foreground outline-none md:left-auto md:w-full md:max-w-md md:border-l"
       >
         <header className="flex items-center gap-3 border-b px-5 pt-[calc(1rem+env(safe-area-inset-top))] pb-4 md:pt-4">
@@ -56,10 +59,14 @@ function SheetContent({
   )
 }
 
+// Children never shrink: once the body scrolls, a flex column would squeeze the fields.
 function SheetBody({ className, ...props }: React.ComponentProps<'div'>) {
   return (
     <div
-      className={cn('min-h-0 flex-1 overflow-y-auto px-5 py-5', className)}
+      className={cn(
+        'min-h-0 flex-1 overflow-y-auto px-5 py-5 [&>*]:shrink-0',
+        className,
+      )}
       {...props}
     />
   )

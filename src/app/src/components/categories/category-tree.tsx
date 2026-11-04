@@ -6,10 +6,12 @@ import { cn } from '#/lib/utils'
 
 type TreeProps = {
   childrenOf: ReadonlyMap<string | null, ReadonlyArray<Category>>
-  contextOf: (category: Category) => RowContext
+  /** The row actions' context; without it the tree only picks (`onPick`). */
+  contextOf?: (category: Category) => RowContext
   expanded: ReadonlySet<string>
   onToggle: (id: string) => void
-  onExpand: (id: string) => void
+  onExpand?: (id: string) => void
+  onPick?: (category: Category) => void
 }
 
 const line = 'pointer-events-none absolute z-10 border-primary/30'
@@ -77,11 +79,14 @@ function CategoryList({
               category={category}
               label={category.name}
               depth={depth}
-              context={{
-                ...tree.contextOf(category),
-                // The new child shows once saved.
-                onAddChild: () => tree.onExpand(category.id),
-              }}
+              context={
+                tree.contextOf && {
+                  ...tree.contextOf(category),
+                  // The new child shows once saved.
+                  onAddChild: () => tree.onExpand?.(category.id),
+                }
+              }
+              onPick={tree.onPick}
               toggle={
                 children.length > 0
                   ? {
@@ -107,7 +112,10 @@ function CategoryList({
   )
 }
 
-/** CAT-01: active categories of one kind, each level alphabetical, parents expandable. */
+/**
+ * CAT-01: active categories of one kind, each level alphabetical, parents expandable. With
+ * `onPick` each row chooses its category instead of opening it (spec 15).
+ */
 export function CategoryTree({
   roots,
   ...tree
