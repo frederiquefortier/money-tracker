@@ -59,6 +59,7 @@ function ComboboxList({
               onClick={() => onPick(row)}
               className={cn(
                 'flex cursor-pointer items-center gap-2 rounded-lg px-2 py-2',
+                'hover:bg-accent hover:text-accent-foreground',
                 i === active && 'bg-accent text-accent-foreground',
                 row.kind === 'create' && 'font-semibold text-primary',
               )}
@@ -112,7 +113,9 @@ function ComboboxInput({
         aria-controls={listId}
         aria-autocomplete="list"
         aria-activedescendant={
-          state.expanded ? `${listId}-${state.active}` : undefined
+          state.expanded && state.active >= 0
+            ? `${listId}-${state.active}`
+            : undefined
         }
         autoComplete="off"
         value={state.text}

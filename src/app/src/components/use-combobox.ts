@@ -68,13 +68,14 @@ export function useCombobox({
   const selected = options.find((o) => o.value === value)
   const [query, setQuery] = useState<string | null>(null)
   const [open, setOpen] = useState(false)
-  const [active, setActive] = useState(0)
+  // No highlight until the arrows move it or typing narrows the list (-1 is none).
+  const [active, setActive] = useState(-1)
   const rows = useRows(options, query ?? '', Boolean(onCreate))
 
   function close() {
     setOpen(false)
     setQuery(null)
-    setActive(0)
+    setActive(-1)
   }
 
   function pick(row: Row | undefined) {
@@ -90,7 +91,11 @@ export function useCombobox({
     if (move !== undefined) {
       event.preventDefault()
       setOpen(true)
-      setActive((i) => (i + move + rows.length) % Math.max(rows.length, 1))
+      // From no highlight, Down starts at the top and Up at the bottom.
+      setActive((i) => {
+        const from = i < 0 && move > 0 ? -1 : Math.max(i, 0)
+        return (from + move + rows.length) % Math.max(rows.length, 1)
+      })
     } else if (event.key === 'Enter' && open) {
       event.preventDefault()
       pick(rows[active])
