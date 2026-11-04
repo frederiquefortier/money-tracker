@@ -1,11 +1,10 @@
 import { useState } from 'react'
-import type { IconName } from '#/components/icon'
 import { foldForSearch } from '#/lib/utils'
 
 /**
  * `keywords` are matched too, for what the label does not show (another language).
  * `icon` shows before the label in the list. Options with the same `group` sit together
- * under its heading. `action` is an icon button at the end of the option. `tag` shows in
+ * under its heading. `tag` shows in
  * the field while the option is chosen. A `hidden` option can be the value but is never
  * listed (an archived category). In a tree, `depth` and `parent` (the parent option's
  * value) place the option and draw its connectors, and the list shows `short` (the name)
@@ -17,12 +16,6 @@ export type ComboboxOption = {
   keywords?: string
   icon?: React.ReactNode
   group?: string
-  action?: {
-    icon: IconName
-    label: string
-    pressed?: boolean
-    onClick: () => void
-  }
   tag?: string
   hidden?: boolean
   depth?: number
@@ -66,24 +59,17 @@ export function useCombobox({
   value,
   onChange,
   onCreate,
-  onOpenChange,
 }: {
   options: ReadonlyArray<ComboboxOption>
   value: string | null
   onChange: (value: string | null) => void
   onCreate?: (text: string) => void
-  onOpenChange?: (open: boolean) => void
 }) {
   const selected = options.find((o) => o.value === value)
   const [query, setQuery] = useState<string | null>(null)
-  const [open, setOpenState] = useState(false)
+  const [open, setOpen] = useState(false)
   const [active, setActive] = useState(0)
   const rows = useRows(options, query ?? '', Boolean(onCreate))
-
-  function setOpen(next: boolean) {
-    if (next !== open) onOpenChange?.(next)
-    setOpenState(next)
-  }
 
   function close() {
     setOpen(false)

@@ -12,7 +12,7 @@ spec 15. Reached from Réglages.
 
 ## Requirements
 
-CAT-01, 02, 03, 05, 06 (the star), 07, 09. CAT-04 and the picker side of CAT-06 are spec 15.
+CAT-01, 02, 03, 05, 07, 09. CAT-04 and CAT-06 (Fréquentes, in the picker) are spec 15.
 CAT-08 (emergency fund exclusion) is phase 2.
 
 ## Catégories
@@ -24,11 +24,11 @@ CAT-08 (emergency fund exclusion) is phase 2.
 │ [Dépenses][Revenus][Placements]  │
 │ [Rechercher                    ] │
 │ ┌──────────────────────────────┐ │
-│ │ ▾ (◉) Alimentation  + ☆ ▣ 🗑 │ │
-│ │ ├──── (◉) Épicerie  + ☆ ▣ 🗑 │ │
-│ │ └──── (◉) Restaurants + ★ ▣ 🗑│ │
-│ │ ▸ (◉) Logement      + ☆ ▣ 🗑 │ │
-│ │   (◉) Loisirs       + ☆ ▣ 🗑 │ │
+│ │ ▾ (◉) Alimentation    + ▣ 🗑 │ │
+│ │ ├──── (◉) Épicerie    + ▣ 🗑 │ │
+│ │ └──── (◉) Restaurants + ▣ 🗑 │ │
+│ │ ▸ (◉) Logement        + ▣ 🗑 │ │
+│ │   (◉) Loisirs         + ▣ 🗑 │ │
 │ └──────────────────────────────┘ │
 │ ▸ Catégories archivées (3)       │
 └──────────────────────────────────┘
@@ -62,8 +62,8 @@ CAT-08 (emergency fund exclusion) is phase 2.
   when it has no children). The line continues to the next sibling and stops at the last
   one. Drawn in the plum of the linked-field line.
 - **Row actions** (the sheet only edits), as icons in the fixed slot at the end of every
-  row: add a sub-category, the favourite star (CAT-06, changes in place, the only place
-  it is set here), archive, and trash.
+  row: add a sub-category, archive, and trash. (A favourite star was here until
+  2026-11-04; the picker's "Fréquentes" replaced it, spec 15.)
   - **Add** (the +) opens the form with this category as the parent, so a child is added
     where it goes without scrolling back to the top. The branch opens, so the new child
     shows once saved. Archived rows have no +.
@@ -111,7 +111,7 @@ CAT-08 (emergency fund exclusion) is phase 2.
 ```
 
 The form is a route sheet over the tree, like the account form: it only edits, with one
-"Enregistrer" at the bottom. The favourite is the star on the row, not a field.
+"Enregistrer" at the bottom.
 
 - **Nom** required, unique among siblings (two "Autres" under different parents is fine).
 - **Type** (CAT-02), then **Parent** as its sub-field, indented under it with a line down
@@ -214,8 +214,8 @@ clothes plum, beauty pink), and slate for everything else. Income and investment
 - Reads: `categories`, `category_active_periods` (the view pickers and charts share),
   `category_status_events` for the history.
 - Writes, each a server function with the user's session: `saveCategory`,
-  `archiveCategory(id, from)`, `reactivateCategory(id, from)`, `setCategoryFavourite`,
-  `deleteCategory`.
+  `archiveCategory(id, from)`, `reactivateCategory(id, from)`,
+  `addCategoryPause(id, from, until)`, `deleteCategory`.
 - `categories.color` stores a hex colour (`#rrggbb`, checked by a constraint);
   `color_is_auto` tells whether it still follows the parent. `icon_is_auto` tells the form whether the name
   still drives the icon.

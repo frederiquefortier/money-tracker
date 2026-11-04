@@ -52,7 +52,7 @@ export const getCategories = createServerFn({ method: 'GET' }).handler(
       supabase
         .from('categories')
         .select(
-          'id, parent_id, name, kind, icon, icon_is_auto, color, color_is_auto, is_favourite',
+          'id, parent_id, name, kind, icon, icon_is_auto, color, color_is_auto',
         ),
       supabase
         .from('category_status_events')
@@ -86,7 +86,6 @@ export const getCategories = createServerFn({ method: 'GET' }).handler(
       iconIsAuto: c.icon_is_auto,
       color: c.color,
       colorIsAuto: c.color_is_auto,
-      isFavourite: c.is_favourite,
       history: history.get(c.id) ?? [],
       periods: periods.data
         .filter((p) => p.category_id === c.id)
@@ -180,16 +179,6 @@ export const reactivateCategory = createServerFn({ method: 'POST' })
         effective_on: data.from,
       })
     return error ? failure('reactivate', error) : { ok: true }
-  })
-
-export const setCategoryFavourite = createServerFn({ method: 'POST' })
-  .validator(idInput.extend({ on: z.boolean() }))
-  .handler(async ({ data }): Promise<CategoryResult> => {
-    const { error } = await getSupabase()
-      .from('categories')
-      .update({ is_favourite: data.on })
-      .eq('id', data.id)
-    return error ? failure('favourite', error) : { ok: true }
   })
 
 /** Children block it on the foreign key; transactions will too, with their migration. */

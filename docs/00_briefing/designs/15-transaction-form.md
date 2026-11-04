@@ -97,27 +97,30 @@ are the shared ones, in this order.
 ### Category picker (CAT-04, 06)
 
 `CategoryPicker` (built with spec 13, first used for a merchant's default category): the
-shared `Combobox` with labelled groups and an action button at the end of an option (no
-second picker). It takes the transaction's type and date.
+shared `Combobox` with labelled groups (no second picker). It takes the transaction's type
+and date.
 
 ```
-│ Catégorie *  [resto            ✕]│
-│ FAVORIS                          │
-│ (◉) Alimentation > Restaurants ★ │
+│ Catégorie *  [                 ▾]│
+│ FRÉQUENTES                       │
+│ (◉) Alimentation > Épicerie      │
+│ (◉) Transport > Essence          │
 │ DÉPENSES                         │
-│ (◉) Alimentation               ☆ │
-│ (◉) Alimentation > Épicerie    ☆ │
+│ (◉) Alimentation                 │
+│ ├─ (◉) Épicerie                  │
+│ └─ (◉) Restaurants               │
 │ REVENUS                          │
-│ (◉) Salaire                    ☆ │
+│ (◉) Salaire                      │
 ```
 
-- **Favoris** first (CAT-06), each as its full path, with a filled star. A favourite
-  also keeps its place in its tree below, so no branch loses its parent.
+- **Fréquentes** first (CAT-06), built with this form: the five categories of the
+  transaction's type used most over the last 90 days, by count, each as its full path.
+  Worked out from the transactions, nothing to keep up by hand. Hidden until there are
+  transactions, and while typing. A frequent category also keeps its place in its tree
+  below, so no branch loses its parent.
 - Then one group per type, the transaction's own type first, each drawn as the
   Catégories tree: elbow connectors, the icon and the name. The field shows the full
   path once chosen.
-- The star on every option toggles favourite in place (CAT-06); the option joins or
-  leaves Favoris once the list closes, so it does not jump under the finger.
 - Typing matches names; each match keeps its parents, so its place in the tree shows.
 - **Archived categories never appear** (CAT-04), as of the transaction's date: a category
   archived in March still appears for a February transaction.
@@ -176,7 +179,7 @@ second picker). It takes the transaction's type and date.
 
 - Reads: open accounts, the user's currencies, the category and merchant pickers' data,
   the rate for (original currency, account currency, date) for the prefill and the fee.
-- Writes: `saveTransaction`, `deleteTransaction`, `setCategoryFavourite` (spec 12). The
+- Writes: `saveTransaction`, `deleteTransaction`. The
   fee is never stored; it is computed from the rate (database.md, Foreign currency).
 
 ## Copy
@@ -188,7 +191,7 @@ second picker). It takes the transaction's type and date.
 | Fields | Compte, Date, Heure, Marchand, Catégorie, Note, En attente |
 | Date shortcuts | Aujourd'hui, Hier |
 | Foreign | Payé, Frais, 1 {from} = {rate} {to} au {date} |
-| Picker | Favoris, Archivée, Retirer la catégorie, Créer « {text} » |
+| Picker | Fréquentes, Archivée, Retirer la catégorie, Créer « {text} » |
 | Splits | Répartir, Répartir par, Montant, Parts, %, Ajouter une catégorie, Reste à répartir |
 | Imported | Importée le {date} |
 | Delete | Supprimer la transaction, Cette action est irréversible. |

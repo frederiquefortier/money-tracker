@@ -51,7 +51,7 @@ the transaction count and moving transactions on a merge wait for transactions.
   [00-layout-reference.md](../00_briefing/designs/00-layout-reference.md) (TravelSpend patterns); the look
   follows [01-visual-direction.md](../00_briefing/designs/01-visual-direction.md).
 - Institutions and accounts. ACC-01..07.
-- Categories with archive history, favourites, coolicons icons, sort and expand all. CAT-01..07, 09.
+- Categories with archive history, coolicons icons, sort, search and expand all. CAT-01..05, 07, 09; CAT-06 (Fréquentes) comes with the transaction form.
 - Merchants with default category, and merging. MER-01, 05.
 - Transactions: expense, income, adjustment, transfer with fee (including between
   currencies), splits, status, notes. TRX-01..06, 09..11. Multi-row writes as SQL functions

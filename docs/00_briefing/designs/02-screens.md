@@ -47,7 +47,7 @@ component to use, so a screen is assembled, not redrawn.
   every tab (`ExpandAllButton`, "Tout déplier", "Tout replier"). Collapsed state is remembered per
   browser (`useStoredState`).
 - **Row actions:** icons in a fixed slot at the end of the row (`IconActions`,
-  `IconButton`): add (a child, in a tree), star, archive or reactivate, trash, in that
+  `IconButton`): add (a child, in a tree), star (currencies), archive or reactivate, trash, in that
   order. Delete is always the `trash-full` icon. A change shows at once and
   stays until the saved data comes back. An action that cannot apply is muted, and a tap
   says why in a toast. Any failure is a toast.
@@ -65,9 +65,10 @@ component to use, so a screen is assembled, not redrawn.
   `LinkedFields`). `LinkedFields` wraps only the sub-field, never the field it belongs to. Required fields carry an asterisk, no legend, no "(facultatif)".
 - **Choosing from the user's own items:** `Combobox`, typed into the field: it filters,
   offers "Créer « … »" when that makes sense, and a × clears it. Nothing chosen is an
-  empty field, never "Aucun(e)". Options can sit in labelled groups, end with one icon
-  action (the star), and show a `Tag` in the field while chosen ("Archivée"). A category
-  is always chosen with `CategoryPicker`. Categories are listed as the Catégories page
+  empty field, never "Aucun(e)". The chosen option is checked on the left, in a slot
+  every option keeps, as in the dropdown menus. Options can sit in labelled groups and
+  show a `Tag` in the field while chosen ("Archivée"). A category is always chosen with
+  `CategoryPicker`. Categories are listed as the Catégories page
   draws them, everywhere (the picker, Parent, the Marchands filter): a tree with elbow
   connectors (`TreeGuides`), each with its icon and its name; the field shows the full
   path once chosen. A search keeps each match's parents.

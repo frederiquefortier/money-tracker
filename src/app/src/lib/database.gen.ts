@@ -107,7 +107,6 @@ export type Database = {
           icon: string
           icon_is_auto: boolean
           id: string
-          is_favourite: boolean
           kind: string
           name: string
           parent_id: string | null
@@ -121,7 +120,6 @@ export type Database = {
           icon?: string
           icon_is_auto?: boolean
           id?: string
-          is_favourite?: boolean
           kind?: string
           name: string
           parent_id?: string | null
@@ -135,7 +133,6 @@ export type Database = {
           icon?: string
           icon_is_auto?: boolean
           id?: string
-          is_favourite?: boolean
           kind?: string
           name?: string
           parent_id?: string | null

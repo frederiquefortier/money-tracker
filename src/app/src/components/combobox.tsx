@@ -165,7 +165,6 @@ export function Combobox({
   clearLabel,
   createLabel,
   onCreate,
-  onOpenChange,
 }: {
   label: string
   options: ReadonlyArray<ComboboxOption>
@@ -175,7 +174,6 @@ export function Combobox({
   clearLabel: string
   createLabel?: (text: string) => string
   onCreate?: (text: string) => void
-  onOpenChange?: (open: boolean) => void
 }) {
   const { t } = useTranslation()
   const inputId = useId()
@@ -185,7 +183,6 @@ export function Combobox({
     value,
     onChange,
     onCreate,
-    onOpenChange,
   })
   const anchorRef = useRef<HTMLDivElement>(null)
 

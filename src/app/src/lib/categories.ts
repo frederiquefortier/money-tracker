@@ -27,7 +27,6 @@ export type Category = {
   iconIsAuto: boolean
   color: string
   colorIsAuto: boolean
-  isFavourite: boolean
   /** Newest first. */
   history: Array<CategoryEvent>
   periods: Array<Period>

@@ -14,28 +14,7 @@ import {
   archiveCategory,
   deleteCategory,
   reactivateCategory,
-  setCategoryFavourite,
 } from '#/server/categories'
-
-/** The star flips at once and stays until refreshed data includes it (as on Devises). */
-function useFavourite(category: Category) {
-  const { run } = useServerAction()
-  const [change, setChange] = useState<{ on: boolean; from: boolean } | null>(
-    null,
-  )
-  const shown =
-    change && change.from === category.isFavourite
-      ? change.on
-      : category.isFavourite
-  function toggle() {
-    const on = !shown
-    setChange({ on, from: category.isFavourite })
-    run(() => setCategoryFavourite({ data: { id: category.id, on } }), {
-      onResult: (ok) => !ok && setChange(null),
-    })
-  }
-  return { shown, toggle }
-}
 
 type StatusMode = 'archive' | 'reactivate'
 
@@ -154,8 +133,8 @@ function DeleteDialog({
 }
 
 /**
- * Add a sub-category (in the tree only, through `onAddChild`), favourite (CAT-06), archive
- * or reactivate (CAT-03) and delete, as icons on the category's row. Delete stays muted
+ * Add a sub-category (in the tree only, through `onAddChild`), archive or reactivate
+ * (CAT-03) and delete, as icons on the category's row. Delete stays muted
  * while the category has sub-categories.
  */
 export function CategoryActions({
@@ -176,14 +155,13 @@ export function CategoryActions({
 }) {
   const { t } = useTranslation()
   const toast = useToast()
-  const favourite = useFavourite(category)
   const [dialog, setDialog] = useState<StatusMode | 'delete' | null>(null)
   const { name } = category
   const archived = isArchived(category)
   const close = () => setDialog(null)
 
   return (
-    <IconActions slots={onAddChild ? 4 : 3} className={className}>
+    <IconActions slots={onAddChild ? 3 : 2} className={className}>
       {onAddChild && (
         <IconLink
           icon="plus"
@@ -191,14 +169,6 @@ export function CategoryActions({
           to="/settings/categories/new"
           search={{ kind: category.kind, parent: category.id }}
           onClick={onAddChild}
-        />
-      )}
-      {!archived && (
-        <IconButton
-          icon={favourite.shown ? 'star-fill' : 'star'}
-          label={t('categories.favouriteName', { name })}
-          pressed={favourite.shown}
-          onClick={favourite.toggle}
         />
       )}
       <IconButton
