@@ -97,13 +97,14 @@ Used by the transaction form (spec 15): the shared combobox.
 ## Data
 
 - Reads: `merchants` and the categories (for the rows and the picker). The transaction
-  count per merchant comes with the transactions migration.
+  count per merchant is counted from `transactions` (the table exists; the count on the
+  screen comes with the transactions screens).
 - Writes, each a server function with the user's session: `saveMerchant`,
   `deleteMerchant`, `mergeMerchants(source, target)`. The merge is one SQL function,
-  `merge_merchants`, with a pgTAP test (ADR-012); today it deletes the source, and the
-  transactions migration makes it move the transactions first. The inline create in the picker calls `saveMerchant`.
+  `merge_merchants`, with a pgTAP test (ADR-012): it moves the source's transactions to
+  the target, then deletes the source. The inline create in the picker calls `saveMerchant`.
 - `merchants.default_category_id` is a composite foreign key with `user_id` (ADR-005);
-  deleting the category clears it. Deleting a merchant will set
+  deleting the category clears it. Deleting a merchant sets
   `transactions.merchant_id` to null.
 - Uniqueness ignoring case and accents: a unique index on `fold_name(name)`.
 

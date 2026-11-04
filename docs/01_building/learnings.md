@@ -4,6 +4,36 @@ Document new concepts, techniques, and knowledge gained. Reference this file to 
 
 <!-- Newest first: a new entry goes directly below this line. Template at the bottom. -->
 
+### 2026-11-04 - Deferred constraint triggers, and testing them
+
+**What Was New:**
+- A transaction and its splits must sum to the same amount, but they are written by
+  separate statements. A constraint trigger declared `deferrable initially deferred`
+  waits until the commit to check, so the rows can arrive in any order.
+
+**Key Points:**
+- Only constraint triggers (`create constraint trigger ... after ... for each row`) can be
+  deferred; plain triggers fire at the end of each statement, even inside a function.
+- The trigger re-reads the current rows rather than trusting `new`, so it does not matter
+  which of several queued events fires last.
+- A pgTAP file rolls back, so deferred checks never run on their own in a test.
+  `set constraints all immediate` runs every queued check at once; switching back to
+  `deferred` right after keeps the next statements behaving as in a real request. The
+  tests wrap both in a temporary `pg_temp.check_now()`.
+- Unnamed check constraints on `transactions` are named `transactions_check`,
+  `transactions_check1`, and so on, and a trigger cannot reuse that name.
+- `results_eq` takes a single query; `throws_ok` and `lives_ok` accept several statements.
+
+**Sources:**
+- PostgreSQL documentation, CREATE TRIGGER (constraint triggers) and SET CONSTRAINTS
+
+**Where to Learn More:**
+- pgTAP documentation, throws_ok and results_eq
+
+**Applied In:**
+- `src/supabase/migrations/20261104150000_transactions.sql` and
+  `src/supabase/tests/database/07_transactions.test.sql`.
+
 ### 2026-11-04 - Accent-insensitive unique names in Postgres
 
 **What Was New:**

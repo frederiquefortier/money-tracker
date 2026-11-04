@@ -39,8 +39,10 @@ Replace daily use of the spreadsheet.
 
 **Status (2026-11-04):** currencies, the rates job and the Réglages and Devises screens
 (spec 10), institutions and accounts (spec 11), and categories (spec 12) are built and
-tried in local dev. Merchants (spec 13) are built with the category picker of spec 15;
-the transaction count and moving transactions on a merge wait for transactions.
+tried in local dev. Merchants (spec 13) are built with the category picker of spec 15.
+The transactions migration is pushed to dev: transactions, splits, transfers with fee,
+adjustments and real balances, with 39 pgTAP tests; a merge now moves transactions. The
+screens (specs 15, 14, 16) come next.
 
 - Currencies, HexaRate validation, the Frankfurter rates job with a backfill to 2018,
   converted-amount markers. CUR-01..09 (ADR-009).

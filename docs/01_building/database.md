@@ -1,7 +1,9 @@
 # Database
 
 The schema, updated with every migration. `profiles`, `currencies`, `exchange_rates`,
-`user_currencies`, `account_types`, `institutions` and `accounts` exist so far; the rest is the design. IDs refer to [requirements.md](../00_briefing/requirements.md).
+`user_currencies`, `account_types`, `institutions`, `accounts`, `categories`,
+`category_status_events`, `merchants`, `transactions` and `transaction_splits` exist so
+far; the rest is the design. IDs refer to [requirements.md](../00_briefing/requirements.md).
 
 ## Conventions
 
@@ -19,7 +21,7 @@ and the RLS policies from [security.md](security.md#database). Foreign keys to o
 tables are composite: `foreign key (user_id, account_id) references accounts (user_id, id)`.
 
 Grants follow [security.md](security.md#database), rule 8. `profiles` grants `select` and
-`update (locale, default_currency, display_currency)`: a new user-editable profile column
+`update (locale, default_currency, display_currency, transfer_fee_category_id)`: a new user-editable profile column
 joins that grant in its migration.
 
 The app's types come from the schema: `npm run db:types` after every migration, and a
@@ -60,7 +62,7 @@ column.
 
 | Table | Columns | Req |
 |---|---|---|
-| `profiles` | `user_id` (PK), `locale` (`fr` or `en`, ADR-019), `default_currency`, `display_currency` (both CAD on sign-up, composite FKs to `user_currencies`), `transfer_fee_category_id`, `birth_date`, `home_country`, `show_budget_tooltips` | SET, CUR-05/06, BUD-06, TRX-04 |
+| `profiles` | `user_id` (PK), `locale` (`fr` or `en`, ADR-019), `default_currency`, `display_currency` (both CAD on sign-up, composite FKs to `user_currencies`), `transfer_fee_category_id` (the fee category used last, set by `save_transfer`; cleared when the category is deleted), `birth_date`, `home_country`, `show_budget_tooltips` | SET, CUR-05/06, BUD-06, TRX-04 |
 | `user_currencies` | `code`, `is_favourite`, `removed_at` | CUR-01..04. Unique (`user_id`, `code`). Five rows inserted by the sign-up trigger. Removing sets `removed_at`, so adding back skips the HexaRate check; there is no delete grant. Triggers refuse removing the default or a currency an open account books in, move the display currency to the default when it is removed, and keep both profile currencies pointing at active rows. Open accounts will block removal once `accounts` exists. |
 
 Labels in reference tables come in pairs (`label_fr`, `label_en`; `name_fr`, `name_en`)
@@ -71,8 +73,8 @@ per ADR-008. User-owned rows (categories, merchants, notes) store one string, as
 | Table | Columns | Req |
 |---|---|---|
 | `institutions` | `name`, `website_url` (`https://` only) | ACC-05. Names unique per user, ignoring case. Deleting one that accounts use fails on the foreign key. |
-| `accounts` | `institution_id` (nullable), `name`, `type` (→ `account_types`), `currency`, `opening_balance`, `opened_on`, `closed_on`, `hidden_for_new` | ACC-01..04. Names unique among open accounts of the same institution, ignoring case; accounts with no institution count as one group. `(user_id, currency)` references `user_currencies`, so an account books in one of the user's currencies; a trigger keeps an open account off a removed currency. Also `unique (user_id, id, currency)`, the target of the transactions currency FK. An account's currency cannot change once it has transactions (with the transactions migration). `last_reconciled_on` comes with ACC-08 (phase 2). |
-| view `account_balances` | `account_id`, `currency`, `balance`, `pending`, `display_currency`, `display_balance` | ACC-06. The opening balance until transactions exist; the transactions migration adds their sum and the pending part. `display_balance` is in the profile's display currency at today's rate, null when a rate is missing. |
+| `accounts` | `institution_id` (nullable), `name`, `type` (→ `account_types`), `currency`, `opening_balance`, `opened_on`, `closed_on`, `hidden_for_new` | ACC-01..04. Names unique among open accounts of the same institution, ignoring case; accounts with no institution count as one group. `(user_id, currency)` references `user_currencies`, so an account books in one of the user's currencies; a trigger keeps an open account off a removed currency. Also `unique (user_id, id, currency)`, the target of the transactions currency FK. An account's currency cannot change once it has transactions: the transactions' composite key to `(user_id, id, currency)` refuses it. An account with transactions cannot be deleted. `last_reconciled_on` comes with ACC-08 (phase 2). |
+| view `account_balances` | `account_id`, `currency`, `balance`, `pending`, `display_currency`, `display_balance` | ACC-06. The opening balance plus every transaction, pending included; `pending` is the pending part alone. `display_balance` is in the profile's display currency at today's rate, null when a rate is missing. |
 | view `institution_totals` | `institution_id` (null: no institution), `display_currency`, `total`, `converted` | ACC-06, CUR-09. Open accounts only. One missing rate makes the total null, never a partial sum. |
 
 ### Categories
@@ -110,16 +112,16 @@ branch, in one statement; a colour picked by hand is never touched (ADR-012).
 
 `fold_name(text)` is `lower(unaccent(text))`, marked immutable so an index can use it
 (`unaccent` itself is only stable; the wrapper names its dictionary so it cannot change
-with the search path). `merge_merchants(source, target)` deletes the source and keeps the
-target's name and default category (MER-05); the transactions migration makes it move the
-source's transactions first, in the same call (ADR-012).
+with the search path). `merge_merchants(source, target)` moves the source's transactions to the target, then
+deletes the source; the target keeps its name and default category (MER-05, ADR-012).
+Deleting a merchant clears it on its transactions.
 
 ### Transactions
 
 | Table | Columns | Req |
 |---|---|---|
-| `transactions` | `account_id`, `kind` (`expense`/`income`/`transfer`/`adjustment`), `occurred_on`, `occurred_at_time` (nullable), `amount`, `currency`, `original_amount`, `original_currency` (both nullable), `status` (`pending`/`cleared`), `merchant_id`, `event_id`, `note`, `transfer_id`, `recurring_rule_id`, `treated_count`, `treated_amount`, `expected_reimbursement`, `holding_id`, `source`, `import_ref`, `import_batch_id` | TRX-01..05, 09..11, CUR-08, PPL-04, NW-03 |
-| `transaction_splits` | `transaction_id`, `category_id`, `input_mode` (`amount`/`share`/`percent`), `input_value`, `amount` | TRX-06. Every `expense` and `income` transaction has at least one split; transfers and adjustments have none. A deferred constraint trigger checks the splits sum to the transaction amount, so transaction and splits are written together by `save_transaction` (ADR-012). |
+| `transactions` | `account_id`, `kind` (`expense`/`income`/`transfer`/`adjustment`), `occurred_on`, `occurred_at_time` (nullable), `amount`, `currency`, `original_amount`, `original_currency` (both nullable), `status` (`pending`/`cleared`), `merchant_id` (cleared when the merchant is deleted), `note`, `transfer_id`; later with their tables: `event_id`, `recurring_rule_id`, `treated_count`, `treated_amount`, `expected_reimbursement`, `holding_id`, `source`, `import_ref`, `import_batch_id` | TRX-01..05, 09..11, CUR-08, PPL-04, NW-03. Checks: an expense is negative, an income positive, a transfer leg or adjustment non-zero; `original_*` only on expenses and incomes, in another currency than the account's (a composite FK to `user_currencies`), signed like `amount`; a `transfer` row has a `transfer_id`, and only transfers and their fee carry one. |
+| `transaction_splits` | `transaction_id`, `category_id`, `input_mode` (`amount`/`share`/`percent`), `input_value`, `amount` | TRX-06. Every `expense` and `income` transaction has at least one split; transfers and adjustments have none. One input mode per transaction, one split per category, each signed like the transaction. A deferred constraint trigger checks the splits sum to the transaction amount, so transaction and splits are written together by `save_transaction` (ADR-012). A category with splits cannot be deleted. |
 | `reimbursements` | `expense_id`, `income_id`, `amount` | TRX-07, DSH-05 |
 | `recurring_rules` | `account_id`, `category_id`, `merchant_id`, `kind`, `frequency` (`weekly`/`monthly`/`yearly`), `interval`, `day_of_month`, `starts_on`, `ends_on` | TRX-08. `ends_on` set = recurrence stopped. Plain columns rather than an iCal RRULE string, which would need a parsing library for schedules this simple. |
 | `recurring_rule_amounts` | `rule_id`, `amount`, `currency`, `effective_from` | TRX-08 history: changing the amount inserts a row. |
@@ -141,6 +143,23 @@ Notes:
 - **Opening balance** lives on `accounts`, not as a fake transaction.
 - **Adjustment** (TRX-03): the form takes the real balance; the server computes and stores
   the difference.
+- **Functions** (ADR-012), all `security invoker`. Amounts come in positive; the kind
+  gives the sign, and an amount finer than the currency's minor unit is refused.
+  - `save_transaction(transaction_id, account_id, kind, occurred_on, amount, splits, …)`
+    creates or edits an expense or income. `splits` is `[{category_id, input_mode,
+    input_value}]`; for shares and percentages the server computes the amounts and the
+    last line takes the rounding. Editing replaces the splits. It refuses a transfer leg
+    or fee.
+  - `save_transfer(transfer_id, from_account, to_account, amount, occurred_on, received,
+    fee, fee_category, …, from_pending, to_pending)` creates or edits the legs and the fee
+    in place, and remembers the fee category on the profile. `delete_transfer(transfer_id)`.
+  - `save_adjustment(account_id, real_balance, occurred_on, note)` stores the difference
+    with `account_balance_on(account_id, on_date)`, the balance at the end of that day,
+    pending included. A saved adjustment is edited with a plain update.
+- **Deferred checks.** Constraint triggers on both tables run at commit:
+  `check_transaction_splits` (above) and `check_transfer` (one leg out, one leg in, two
+  accounts, at most one fee on the departure account, mirrored amounts in one currency).
+  A direct write that breaks a transfer, like deleting one leg, fails at commit.
 - `import_ref` is unique per user, so re-running an import is idempotent.
   `import_batch_id` lets a whole import be undone; `import_batches` is described in
   [import.md](import.md#data-model).

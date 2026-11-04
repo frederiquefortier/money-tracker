@@ -315,6 +315,7 @@ export type Database = {
           default_currency: string
           display_currency: string
           locale: string
+          transfer_fee_category_id: string | null
           updated_at: string
           user_id: string
         }
@@ -323,6 +324,7 @@ export type Database = {
           default_currency?: string
           display_currency?: string
           locale?: string
+          transfer_fee_category_id?: string | null
           updated_at?: string
           user_id: string
         }
@@ -331,6 +333,7 @@ export type Database = {
           default_currency?: string
           display_currency?: string
           locale?: string
+          transfer_fee_category_id?: string | null
           updated_at?: string
           user_id?: string
         }
@@ -345,6 +348,143 @@ export type Database = {
           {
             foreignKeyName: "profiles_display_currency_fkey"
             columns: ["user_id", "display_currency"]
+            isOneToOne: false
+            referencedRelation: "user_currencies"
+            referencedColumns: ["user_id", "code"]
+          },
+          {
+            foreignKeyName: "profiles_user_id_transfer_fee_category_id_fkey"
+            columns: ["user_id", "transfer_fee_category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["user_id", "id"]
+          },
+        ]
+      }
+      transaction_splits: {
+        Row: {
+          amount: number
+          category_id: string
+          created_at: string
+          id: string
+          input_mode: string
+          input_value: number
+          transaction_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          category_id: string
+          created_at?: string
+          id?: string
+          input_mode: string
+          input_value: number
+          transaction_id: string
+          updated_at?: string
+          user_id?: string
+        }
+        Update: {
+          amount?: number
+          category_id?: string
+          created_at?: string
+          id?: string
+          input_mode?: string
+          input_value?: number
+          transaction_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "transaction_splits_user_id_category_id_fkey"
+            columns: ["user_id", "category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["user_id", "id"]
+          },
+          {
+            foreignKeyName: "transaction_splits_user_id_transaction_id_fkey"
+            columns: ["user_id", "transaction_id"]
+            isOneToOne: false
+            referencedRelation: "transactions"
+            referencedColumns: ["user_id", "id"]
+          },
+        ]
+      }
+      transactions: {
+        Row: {
+          account_id: string
+          amount: number
+          created_at: string
+          currency: string
+          id: string
+          kind: string
+          merchant_id: string | null
+          note: string | null
+          occurred_at_time: string | null
+          occurred_on: string
+          original_amount: number | null
+          original_currency: string | null
+          status: string
+          transfer_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          account_id: string
+          amount: number
+          created_at?: string
+          currency: string
+          id?: string
+          kind: string
+          merchant_id?: string | null
+          note?: string | null
+          occurred_at_time?: string | null
+          occurred_on: string
+          original_amount?: number | null
+          original_currency?: string | null
+          status?: string
+          transfer_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Update: {
+          account_id?: string
+          amount?: number
+          created_at?: string
+          currency?: string
+          id?: string
+          kind?: string
+          merchant_id?: string | null
+          note?: string | null
+          occurred_at_time?: string | null
+          occurred_on?: string
+          original_amount?: number | null
+          original_currency?: string | null
+          status?: string
+          transfer_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "transactions_user_id_account_id_currency_fkey"
+            columns: ["user_id", "account_id", "currency"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["user_id", "id", "currency"]
+          },
+          {
+            foreignKeyName: "transactions_user_id_merchant_id_fkey"
+            columns: ["user_id", "merchant_id"]
+            isOneToOne: false
+            referencedRelation: "merchants"
+            referencedColumns: ["user_id", "id"]
+          },
+          {
+            foreignKeyName: "transactions_user_id_original_currency_fkey"
+            columns: ["user_id", "original_currency"]
             isOneToOne: false
             referencedRelation: "user_currencies"
             referencedColumns: ["user_id", "code"]
@@ -421,6 +561,10 @@ export type Database = {
       }
     }
     Functions: {
+      account_balance_on: {
+        Args: { account_id: string; on_date: string }
+        Returns: number
+      }
       add_category_pause: {
         Args: { active_from: string; archive_from: string; category: string }
         Returns: number
@@ -434,6 +578,16 @@ export type Database = {
         Returns: boolean
       }
       category_status: { Args: { category: string }; Returns: string }
+      check_money_amount: {
+        Args: { amount: number; currency: string }
+        Returns: undefined
+      }
+      check_transaction_splits: {
+        Args: { transaction: string }
+        Returns: undefined
+      }
+      check_transfer: { Args: { transfer: string }; Returns: undefined }
+      delete_transfer: { Args: { transfer_id: string }; Returns: undefined }
       exchange_rate: {
         Args: { from_currency: string; on_date: string; to_currency: string }
         Returns: number
@@ -444,6 +598,49 @@ export type Database = {
         Returns: undefined
       }
       recolor_categories: { Args: { colors: Json }; Returns: undefined }
+      save_adjustment: {
+        Args: {
+          account_id: string
+          note?: string
+          occurred_on: string
+          real_balance: number
+        }
+        Returns: string
+      }
+      save_transaction: {
+        Args: {
+          account_id: string
+          amount: number
+          kind: string
+          merchant_id?: string
+          note?: string
+          occurred_at_time?: string
+          occurred_on: string
+          original_amount?: number
+          original_currency?: string
+          splits: Json
+          status?: string
+          transaction_id: string
+        }
+        Returns: string
+      }
+      save_transfer: {
+        Args: {
+          amount: number
+          fee?: number
+          fee_category?: string
+          from_account: string
+          from_pending?: boolean
+          note?: string
+          occurred_at_time?: string
+          occurred_on: string
+          received?: number
+          to_account: string
+          to_pending?: boolean
+          transfer_id: string
+        }
+        Returns: string
+      }
     }
     Enums: {
       [_ in never]: never
