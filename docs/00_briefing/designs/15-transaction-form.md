@@ -62,8 +62,8 @@ The shared sheet: full screen on a phone, a panel from the right from `md` up.
 - Three tabs first: Dépense (default), Revenu, Transfert, the shared `TabList`. The kind
   is the first decision: money out, money in, or moved.
 - Transfert switches to the transfer form (spec 16), keeping the amount, account and
-  date. Until spec 16 is built it is muted and a tap says "Les transferts arrivent avec
-  le prochain écran.".
+  date. Editing a saved expense or income shows only Dépense and Revenu: it cannot
+  become a transfer.
 - The amount is always typed positive; the kind gives the sign.
 
 ### The receipt (TRX-02, 06, 09, CUR-08)
@@ -94,8 +94,9 @@ Répartir, the remaining line) is 13px, one step under its 14px lines. Top to bo
   - **Débité**, in the account's currency, prefilled at that day's rate and editable:
     type what the statement shows. **Taux** sits close under it, smaller and muted
     ("1 EUR = 1,4952 CAD"), so the two read as one.
-  - **Frais**, read-only: what was debited minus the market value (CUR-08), with its
-    percentage. Negative fees show as they are; a missing rate shows "Taux manquant" and
+  - **Frais de conversion**, read-only: what was debited minus the market value
+    (CUR-08), with its percentage. Named like the transfer's line (spec 16), and counted
+    as spending on the dashboard in the fee category marked in Catégories (database.md). Negative fees show as they are; a missing rate shows "Taux manquant" and
     no fee (ADR-004).
   - The transaction is booked in the account's currency (`amount`), the original kept
     beside it (`original_amount`, `original_currency`).
@@ -238,8 +239,8 @@ it was underneath; "←" or Escape goes back without choosing.
 | Key | Français |
 |---|---|
 | Titles | Nouvelle transaction, Modifier la transaction |
-| Kinds | Dépense, Revenu, Transfert; until spec 16: Les transferts arrivent avec le prochain écran. |
-| Receipt | Montant (accessible name), Répartir, Ne pas répartir, Débité, Taux, Frais, 1 {from} = {rate} {to}, Taux manquant, En attente |
+| Kinds | Dépense, Revenu, Transfert |
+| Receipt | Montant (accessible name), Répartir, Ne pas répartir, Débité, Taux, Frais de conversion, 1 {from} = {rate} {to}, Taux manquant, En attente |
 | Category | Catégorie, Choisir une catégorie, Remboursement, Retour au formulaire, Fréquemment utilisées, Dépenses, Revenus, Placements, Rechercher, Aucun résultat. |
 | Fields | Magasin, Compte, Date, Note |
 | Picker | Fréquemment utilisées, Archivée, Retirer la catégorie, Créer « {text} » |

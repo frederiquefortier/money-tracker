@@ -25,7 +25,8 @@ import {
 } from '#/lib/transaction-list'
 import { useLocale } from '#/lib/use-locale'
 import { useMyCurrencies } from '#/lib/use-my-currencies'
-import { listTransactions } from '#/server/transactions'
+import { listTransactions } from '#/server/transaction-list'
+import { getFeeCategory } from '#/server/transfers'
 
 const KEPT = [
   'period',
@@ -37,6 +38,7 @@ const KEPT = [
   'category',
   'merchant',
   'q',
+  'pending',
 ] as const
 
 const ids = z.array(z.uuid()).max(100).optional().catch(undefined)
@@ -52,6 +54,7 @@ export const Route = createFileRoute('/_authed/transactions')({
     category: ids,
     merchant: ids,
     q: z.string().max(200).optional().catch(undefined),
+    pending: z.boolean().optional().catch(undefined),
   }),
   // The forms open over the list and close back to the same period, filters and search.
   search: { middlewares: [retainSearchParams([...KEPT])] },
@@ -63,6 +66,7 @@ export const Route = createFileRoute('/_authed/transactions')({
     const start = search.start ?? recent.start
     const end = search.end ?? recent.end
     const period = search.period ?? 'all'
+    const pendingOnly = search.pending === true
     return {
       period,
       month,
@@ -73,10 +77,20 @@ export const Route = createFileRoute('/_authed/transactions')({
       categoryIds: search.category ?? [],
       merchantIds: search.merchant ?? [],
       search: search.q?.trim() || undefined,
-      ...periodRange(period, { month, year, start, end }),
+      pendingOnly,
+      // What is pending shows at any date, as its bubble counts.
+      ...(pendingOnly
+        ? { from: null, to: null }
+        : periodRange(period, { month, year, start, end })),
     }
   },
-  loader: ({ deps }) => listTransactions({ data: deps }),
+  loader: async ({ deps }) => {
+    const [page, feeCategory] = await Promise.all([
+      listTransactions({ data: deps }),
+      getFeeCategory(),
+    ])
+    return { ...page, feeCategory }
+  },
   component: Transactions,
 })
 
@@ -87,7 +101,7 @@ function useEmptyText() {
   const { period } = deps
   const filtered =
     deps.accountIds.length + deps.categoryIds.length + deps.merchantIds.length
-  if (deps.search || filtered) return t('common.noMatch')
+  if (deps.search || filtered || deps.pendingOnly) return t('common.noMatch')
   if (period === 'month')
     return t('transactions.list.empty.month', {
       period: formatMonth(deps.month, locale),
@@ -127,7 +141,12 @@ function useListNavigation() {
           year: c.period === 'year' ? c.year : undefined,
           start: c.period === 'custom' ? c.start : undefined,
           end: c.period === 'custom' ? c.end : undefined,
+          pending: undefined,
         }),
+      }),
+    pending: (on: boolean) =>
+      void navigate({
+        search: (prev) => ({ ...prev, pending: on || undefined }),
       }),
     filters: (f: FilterValues) =>
       void navigate({
@@ -165,10 +184,12 @@ function Transactions() {
         filters={deps}
         names={data.filters}
         total={data.total}
+        pending={{ count: data.pendingCount, on: deps.pendingOnly }}
         search={text}
         loading={switching}
         onPeriod={go.period}
         onFilters={go.filters}
+        onPending={go.pending}
         onSearch={setText}
       />
       <div className="mt-2 flex flex-col gap-4">
@@ -181,6 +202,7 @@ function Transactions() {
               day={day}
               displayCurrency={displayCurrency}
               filtered={deps.accountIds.length > 0}
+              feeCategory={data.feeCategory}
             />
           ))
         )}

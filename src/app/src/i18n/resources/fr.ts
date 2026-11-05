@@ -1,5 +1,6 @@
 // French is the source language (ADR-008). en.ts is typed against this shape.
 import { categoriesFr } from './fr-categories'
+import { merchantsFr } from './fr-merchants'
 import { transactionsFr } from './fr-transactions'
 
 export const fr = {
@@ -62,6 +63,8 @@ export const fr = {
     splitsSum: 'Répartissez tout le montant.',
     percentTotal: 'Les pourcentages doivent totaliser 100.',
     duplicateCategory: 'Chaque catégorie une seule fois.',
+    feeCategoryUnset: 'Choisissez d’abord la catégorie des frais dans',
+    sameAccount: 'Choisissez un autre compte que celui de départ.',
   },
   signIn: {
     title: 'Connexion',
@@ -198,33 +201,7 @@ export const fr = {
   },
   categories: categoriesFr,
   transactions: transactionsFr,
-  merchants: {
-    title: 'Magasins',
-    empty: 'Aucun magasin pour l’instant.',
-    add: 'Ajouter un magasin',
-    sort: {
-      nameAsc: 'Nom A–Z',
-      nameDesc: 'Nom Z–A',
-      category: 'Catégorie',
-    },
-    filterAll: 'Toutes les catégories',
-    filterNone: 'Sans catégorie',
-    newTitle: 'Nouveau magasin',
-    editTitle: 'Modifier le magasin',
-    name: 'Nom',
-    defaultCategory: 'Catégorie par défaut',
-    created: 'Magasin créé.',
-    updated: 'Magasin enregistré.',
-    merge: 'Fusionner',
-    deleteKeeps_one: 'La transaction garde sa catégorie et perd le magasin.',
-    deleteKeeps_other:
-      'Les {{count}} transactions gardent leur catégorie et perdent le magasin.',
-    mergeName: 'Fusionner “{{name}}”',
-    mergeInto: 'Fusionner avec',
-    mergeEffect:
-      'Les transactions de “{{source}}” passeront à “{{target}}”, puis “{{source}}” sera supprimé.',
-    mergeAlone: 'Il faut au moins un autre magasin.',
-  },
+  merchants: merchantsFr,
   currencies: {
     title: 'Devises',
     defaultBadge: 'Par défaut',

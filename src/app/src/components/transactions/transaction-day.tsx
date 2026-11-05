@@ -2,7 +2,7 @@ import { ListCard } from '#/components/list-card'
 import { MissingRate, Money } from '#/components/money'
 import { TransactionRow } from '#/components/transactions/transaction-row'
 import { formatDay } from '#/lib/format'
-import type { TransactionDay } from '#/lib/transaction-list'
+import type { ListedCategory, TransactionDay } from '#/lib/transaction-list'
 import { useLocale } from '#/lib/use-locale'
 
 /** A day's header with its net, then its transactions in one card (spec 14). */
@@ -10,10 +10,12 @@ export function TransactionDayGroup({
   day,
   displayCurrency,
   filtered,
+  feeCategory,
 }: {
   day: TransactionDay
   displayCurrency: string
   filtered: boolean
+  feeCategory: ListedCategory | null
 }) {
   const locale = useLocale()
   return (
@@ -34,6 +36,7 @@ export function TransactionDayGroup({
             row={row}
             displayCurrency={displayCurrency}
             filtered={filtered}
+            feeCategory={feeCategory}
           />
         ))}
       </ListCard>

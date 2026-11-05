@@ -81,6 +81,12 @@ export type ListedTransaction = {
   /** In the display currency; null when the rate is missing. */
   displayAmount: string | null
   rate: string | null
+  /** A transfer's fee, on its departure row (spec 16). */
+  fee: { amount: string; category: string | null } | null
+  /** What arrived in another currency, and its value back in this row's (TRX-11). */
+  arrival: { amount: string; currency: string; value: string | null } | null
+  /** Money lost to the exchange, in this row's currency; null in one currency. */
+  conversionCost: string | null
 }
 
 export type TransactionDay = {
@@ -104,6 +110,7 @@ export type ListQuery = {
   categoryIds?: Array<string>
   merchantIds?: Array<string>
   search?: string
+  pendingOnly?: boolean
 }
 
 /** The filters in use with their names, for their chips; gone ones are left out. */

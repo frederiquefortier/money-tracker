@@ -5,6 +5,7 @@ import { CategoryBadge } from '#/components/categories/category-badge'
 import { Icon } from '#/components/icon'
 import { iconHover } from '#/components/icon-button'
 import { rowHover } from '#/components/list-card'
+import { Tag } from '#/components/tag'
 import type { Category } from '#/lib/categories'
 import { cn, focusRing } from '#/lib/utils'
 
@@ -21,10 +22,12 @@ export type RowContext = {
 export const indentOf = (depth: number) => `${0.75 + depth * 1.75}rem`
 
 function Label({ category, label }: { category: Category; label: string }) {
+  const { t } = useTranslation()
   return (
     <span className="flex min-w-0 items-center gap-3">
       <CategoryBadge icon={category.icon} color={category.color} />
       <span className="truncate font-semibold">{label}</span>
+      {category.isFee && <Tag>{t('categories.feeTag')}</Tag>}
     </span>
   )
 }

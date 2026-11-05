@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useToast } from '#/components/toaster'
 import type { ListQuery, TransactionPage } from '#/lib/transaction-list'
-import { listTransactions } from '#/server/transactions'
+import { listTransactions } from '#/server/transaction-list'
 
 /**
  * The loader's first page, then older ones fetched as the end of the list comes into
@@ -21,7 +21,15 @@ export function useTransactionPages(first: TransactionPage, query: ListQuery) {
 
   const pages = state.first === first ? [first, ...state.older] : [first]
   const cursor = pages.at(-1)?.cursor ?? null
-  const { from, to, accountIds, categoryIds, merchantIds, search } = query
+  const {
+    from,
+    to,
+    accountIds,
+    categoryIds,
+    merchantIds,
+    search,
+    pendingOnly,
+  } = query
 
   useEffect(() => {
     const target = sentinel.current
@@ -38,6 +46,7 @@ export function useTransactionPages(first: TransactionPage, query: ListQuery) {
           categoryIds,
           merchantIds,
           search,
+          pendingOnly,
           before: cursor,
         },
       })
@@ -61,6 +70,7 @@ export function useTransactionPages(first: TransactionPage, query: ListQuery) {
     categoryIds,
     merchantIds,
     search,
+    pendingOnly,
     toast,
     t,
   ])

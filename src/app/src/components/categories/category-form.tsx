@@ -2,6 +2,7 @@ import { useId } from 'react'
 import { useTranslation } from 'react-i18next'
 import { AppearanceFields } from '#/components/categories/appearance-fields'
 import { CategoryBadge } from '#/components/categories/category-badge'
+import { FeeField } from '#/components/categories/fee-field'
 import { KindTabs } from '#/components/categories/kind-tabs'
 import { NecessityRadios } from '#/components/categories/necessity-radios'
 import { useCategoryDraft } from '#/components/categories/use-category-draft'
@@ -166,6 +167,13 @@ export function CategoryForm({
           categoryId={categoryId}
         />
         <NecessityField draft={draft} categories={categories} />
+        {draft.kind === 'expense' && (
+          <FeeField
+            checked={draft.isFee}
+            locked={initial.isFee === true}
+            onChange={draft.setFee}
+          />
+        )}
       </div>
       {children}
     </SheetForm>

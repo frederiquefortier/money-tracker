@@ -1,6 +1,11 @@
 import type { categoriesFr } from './fr-categories'
 
 export const categoriesEn: typeof categoriesFr = {
+  feeCategory: 'Assigned to fees',
+  feeCategoryAbout: 'About the fee category',
+  feeCategoryHelp:
+    'Conversion fees, paid when a transaction or a transfer changes currency, and the transaction fees of a transfer all go to this category.',
+  feeTag: 'Fees',
   title: 'Categories',
   kindsLabel: 'Category type',
   kinds: { expense: 'Expenses', income: 'Income', investment: 'Investments' },

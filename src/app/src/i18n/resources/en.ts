@@ -1,4 +1,5 @@
 import { categoriesEn } from './en-categories'
+import { merchantsEn } from './en-merchants'
 import { transactionsEn } from './en-transactions'
 import type { Messages } from './fr'
 
@@ -62,6 +63,8 @@ export const en: Messages = {
     splitsSum: 'Split the whole amount.',
     percentTotal: 'Percentages must total 100.',
     duplicateCategory: 'Each category only once.',
+    feeCategoryUnset: 'First choose the fee category in',
+    sameAccount: 'Choose another account than the one it leaves.',
   },
   signIn: {
     title: 'Sign in',
@@ -196,34 +199,7 @@ export const en: Messages = {
   },
   categories: categoriesEn,
   transactions: transactionsEn,
-  merchants: {
-    title: 'Merchants',
-    empty: 'No merchants yet.',
-    add: 'Add a merchant',
-    sort: {
-      nameAsc: 'Name A–Z',
-      nameDesc: 'Name Z–A',
-      category: 'Category',
-    },
-    filterAll: 'All categories',
-    filterNone: 'No category',
-    newTitle: 'New merchant',
-    editTitle: 'Edit merchant',
-    name: 'Name',
-    defaultCategory: 'Default category',
-    created: 'Merchant created.',
-    updated: 'Merchant saved.',
-    merge: 'Merge',
-    deleteKeeps_one:
-      'The transaction keeps its category and loses the merchant.',
-    deleteKeeps_other:
-      'The {{count}} transactions keep their category and lose the merchant.',
-    mergeName: 'Merge “{{name}}”',
-    mergeInto: 'Merge into',
-    mergeEffect:
-      'The transactions of “{{source}}” will move to “{{target}}”, then “{{source}}” will be deleted.',
-    mergeAlone: 'You need at least one other merchant.',
-  },
+  merchants: merchantsEn,
   currencies: {
     title: 'Currencies',
     defaultBadge: 'Default',

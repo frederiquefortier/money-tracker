@@ -11,8 +11,8 @@ The organized feature list. It merges four sources and removes the duplicates be
 | `sheet` | Something the current spreadsheets do that the notes never mention ([reference-sheets.md](reference-sheets.md)) |
 
 Each requirement has a stable ID (`ACC-03`) so ADRs, issues and commits can point at it.
-**Phase** refers to [roadmap.md](../03_planning/roadmap.md). **v1 is phases 0 to 2**: the
-point where the spreadsheet can be retired. Phases 3 and 4 are v2, phase 5 is v3, and
+**Phase** refers to [roadmap.md](../03_planning/roadmap.md). **v1 is phases 0 to 3**: the
+point where the spreadsheet can be retired. Phase 4 is v2, phase 5 is v3, and
 `later` is tracked in [improvements.md](../03_planning/improvements.md). The UI ships in French and
 English; this file is in English like every other meta-doc.
 
@@ -55,9 +55,9 @@ English; this file is in English like every other meta-doc.
 | TRX-06 | Split a transaction across several categories by amount, share or percentage. | v1, ai | 1 |
 | TRX-07 | Link an income to an expense as its reimbursement. | v1, ai | 3 |
 | TRX-08 | Recurring transactions. Changing the amount keeps the old amount and the change date as history. The recurrence can be stopped. | v1, ai | 2 |
-| TRX-09 | Status: pending or cleared, so a pending card charge does not count as reconciled. | sheet | 1 |
+| TRX-09 | Status: pending or cleared, so a pending card charge does not count as reconciled. Pending rows stand out in the list (blue, as in the spreadsheet) and can be listed alone. | sheet | 1 |
 | TRX-10 | A transaction can carry a free-text note (the memo). | sheet | 1 |
-| TRX-11 | A transfer between accounts in different currencies records what left one and what arrived in the other; the gap against that day's market rate shows as the conversion cost. | net-worth data (CAD to CHF) | 1 |
+| TRX-11 | A transfer between accounts in different currencies records what left one and what arrived in the other; the gap against that day's market rate shows as the conversion cost, which counts as spending. | net-worth data (CAD to CHF) | 1 |
 | TRX-12 | Search transactions by text in anything a row shows: merchant, note, categories, account and institution (both sides of a transfer), ignoring case and accents. | author | 1 |
 | TRX-13 | The transactions list shows a chosen period: everything (loaded as you scroll), a year, a month, or custom days from a start to an end. Each day shows its net. Totals by category belong to the dashboard. | author | 1 |
 | TRX-14 | Filter the transactions list by accounts, categories (sub-categories included, a split matching on any of its categories) and merchants, several of each at once. | author | 1 |
@@ -73,7 +73,7 @@ English; this file is in English like every other meta-doc.
 | CUR-05 | A default currency, used to prefill forms. | ai | 1 |
 | CUR-06 | A display currency switchable from any page (header dropdown, like a language switcher). Every amount re-renders in it. | ai, add, C4 | 1 |
 | CUR-07 | Conversion uses the rate on the transaction date, or today's rate when the amount has no date. An amount already in the display currency is never converted. | v1, ai | 1 |
-| CUR-08 | A foreign-currency transaction has two editable fields, original price and price paid, and a read-only fee: the gap between what was paid and the market rate that day. | v1, ai | 1 |
+| CUR-08 | A foreign-currency transaction has two editable fields, original price and price paid, and a read-only fee: the gap between what was paid and the market rate that day. The fee counts as spending in the fee category, the purchase's categories keeping its market value. | v1, ai | 1 |
 | CUR-09 | It is always clear which amounts were converted. A converted amount shows its original amount and currency under it; the rate used is one hover or tap away. Native amounts show plain. Totals that mix both say so, except a day's net in the transactions list (decided 2026-11-05). | Q1 answer | 1 |
 
 ## 5. Categories (`CAT`)
@@ -106,9 +106,9 @@ English; this file is in English like every other meta-doc.
 
 | ID | Requirement | Source | Phase |
 |---|---|---|---|
-| TAG-01 | Create tags; a transaction can have several. | v1, ai | 2 |
-| TAG-02 | A tag can carry a date range and categories. In that range, it attaches itself to every transaction in at least one of those categories. Automatic tags are marked as such and can be removed by hand. | ai | 2 |
-| TAG-03 | Per tag: most and least expensive transactions. | misc ("Tag + expensive, less expensive") | 2 |
+| TAG-01 | Create tags; a transaction can have several. | v1, ai | 3 |
+| TAG-02 | A tag can carry a date range and categories. In that range, it attaches itself to every transaction in at least one of those categories. Automatic tags are marked as such and can be removed by hand. | ai | 3 |
+| TAG-03 | Per tag: most and least expensive transactions. | misc ("Tag + expensive, less expensive") | 3 |
 
 ## 8. People and groups (`PPL`)
 
@@ -161,9 +161,9 @@ English; this file is in English like every other meta-doc.
 
 | ID | Requirement | Source | Phase |
 |---|---|---|---|
-| NW-01 | Holdings: investment accounts, debts and other assets, each with a type (TFSA/CELI, RRSP/REER, FHSA/CELIAPP, DPSP, 2nd pillar, 3a, life-insurance buyout...) and an institution and country. | v1, ai | 4 |
+| NW-01 | Holdings: investment accounts, debts and other assets, each with a type (TFSA/CELI, RRSP/REER, FHSA/CELIAPP, DPSP, 2nd pillar, 3a, life-insurance buyout...) and an institution and country. | v1, ai | 3 |
 | NW-02 | Dated value snapshots per holding. Months with no snapshot can be hidden in charts. | v1, ai | 4 |
-| NW-03 | Contributions per holding, split between my money (transactions linked to the holding) and employer or other money (entered on the holding). Shows amount placed and profit in amount and percent. | v1, ai, net-worth data | 4 |
+| NW-03 | Contributions per holding, split between my money (transactions linked to the holding) and employer or other money (entered on the holding). Shows amount placed and profit in amount and percent. | v1, ai, net-worth data | 3, 4 |
 | NW-04 | Net worth chart (total, investments, debts) and percent change over any range; default is account start to today. | v1, ai | 4 |
 | NW-05 | A holding can be excluded from the net worth total (the life insurance "with/without" line). | net-worth data | 4 |
 | NW-06 | Projections at fixed growth rates (5, 7, 10 %) or custom inputs. | v1, ai | later |
@@ -196,12 +196,12 @@ The "Canada" section, generalised because the data already spans Canada and Swit
 
 | ID | Requirement | Source | Phase |
 |---|---|---|---|
-| IMP-01 | Import from one fixed, documented CSV format (accounts, transactions, optional splits). The user prepares their data beforehand. Missing categories, accounts and merchants are created and listed before commit. Files are read in the browser and never stored. See [import.md](../01_building/import.md). | sheet, ADR-010 | 1 |
+| IMP-01 | Import from one fixed, documented CSV format (accounts, transactions, optional splits). The user prepares their data beforehand. Missing categories, accounts and merchants are created and listed before commit. Files are read in the browser and never stored. See [import.md](../01_building/import.md). | sheet, ADR-010 | 3 |
 | IMP-02 | Net-worth history through the same format (optional holdings and snapshots files). | net-worth data | 4 |
 | IMP-03 | Import wizard: source profiles, column and category mapping, merchant-alias matching, suggested transfer pairs and reimbursements. | v1 misc ("Csv importer visual"), MER-02 | later |
-| IMP-04 | Export my data in the import format; export then import reproduces it. This is the export half of SEC-04. | ADR-010, SEC-04 | 1 |
-| IMP-05 | Each import is one all-or-nothing batch that can be undone in one action. Re-importing a row with a known `ref` is skipped. | ADR-010 | 1 |
-| IMP-06 | Before an import commits, each category it would create is decided: created as written, or merged into another category (existing, from the same import, or new under another name). The choices apply to that import only. | author | 1 |
+| IMP-04 | Export my data in the import format; export then import reproduces it. This is the export half of SEC-04. | ADR-010, SEC-04 | 3 |
+| IMP-05 | Each import is one all-or-nothing batch that can be undone in one action. Re-importing a row with a known `ref` is skipped. | ADR-010 | 3 |
+| IMP-06 | Before an import commits, each category it would create is decided: created as written, or merged into another category (existing, from the same import, or new under another name). The choices apply to that import only. | author | 3 |
 
 ## 16. Demo and portfolio (`DEM`)
 
@@ -221,7 +221,7 @@ Not in the notes, required by the brief. Details in [security.md](../01_building
 | SEC-01 | Multiple users, each seeing only their own data, enforced in the database. | brief | 0 |
 | SEC-02 | Sign-up closed while the app is private; accounts by invitation. The invite email leads to a page that sets the password, then to MFA enrolment. A password change sends a notification email. | brief | 0 |
 | SEC-03 | TOTP two-factor authentication, required to read financial data. | brief | 0 |
-| SEC-04 | Full export of a user's data in an open format (IMP-04, phase 1), and full account deletion (phase 2). | brief | 1, 2 |
+| SEC-04 | Full export of a user's data in an open format (IMP-04, phase 3), and full account deletion (phase 2). | brief | 2, 3 |
 | SEC-05 | Password reset by email, through the same landing page as invitations. If the account has TOTP, the code is required before the new password is saved. | brief | 0 |
 
 ---

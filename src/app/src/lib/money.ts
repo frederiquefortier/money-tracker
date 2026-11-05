@@ -65,6 +65,19 @@ export function convertMinor(
   )
 }
 
+/** The reverse of convertMinor at the same rate: an amount in `to` back into `from`. */
+export function convertBackMinor(
+  minor: bigint,
+  rate: string,
+  { from, to }: { from: number; to: number },
+): bigint {
+  const r = scaled(rate)
+  return divideRounded(
+    minor * TEN ** BigInt(from + r.scale),
+    r.value * TEN ** BigInt(to),
+  )
+}
+
 /**
  * TRX-06: `total` shared in proportion to `weights` (shares or percentages, decimal
  * strings); the last line takes what rounding left, so the lines always sum to the total.

@@ -1,7 +1,7 @@
 begin;
 create extension if not exists pgtap with schema extensions;
 
-select plan(40);
+select plan(44);
 
 insert into auth.users (id, email) values
   ('11111111-1111-1111-1111-111111111111', 'alice@example.test'),
@@ -168,10 +168,22 @@ select throws_ok(
 );
 
 -- Transfers (TRX-04, 11)
+select throws_ok(
+  $$ select public.save_transfer(null, 'a2000000-0000-0000-0000-000000000001', 'a2000000-0000-0000-0000-000000000003',
+       10, '2026-11-03', fee => 1) $$,
+  '23514', 'transfer_fee_category_required', 'a fee needs the category set in Réglages'
+);
+select throws_ok(
+  $$ select public.set_transfer_fee_category('a0000000-0000-0000-0000-000000000004') $$,
+  'P0002', 'category_not_found', 'the fee category is an expense category'
+);
+select lives_ok(
+  $$ select public.set_transfer_fee_category('a0000000-0000-0000-0000-000000000002') $$,
+  'the fee category is set once'
+);
 select lives_ok(
   $$ select public.save_transfer(null, 'a2000000-0000-0000-0000-000000000001', 'a2000000-0000-0000-0000-000000000003',
-       500, '2026-11-03', fee => 2.5, fee_category => 'a0000000-0000-0000-0000-000000000003',
-       note => 'Épargne novembre', to_pending => true);
+       500, '2026-11-03', fee => 2.5, note => 'Épargne novembre', to_pending => true);
      select pg_temp.check_now() $$,
   'a transfer saves with its fee'
 );
@@ -182,10 +194,16 @@ select results_eq(
   $$ values ('transfer', -500::numeric, 'cleared'), ('expense', -2.5, 'cleared'), ('transfer', 500, 'pending') $$,
   'two mirrored legs and a fee on the departure side, each with its own status'
 );
-select is(
-  (select transfer_fee_category_id from public.profiles),
-  'a0000000-0000-0000-0000-000000000003'::uuid,
-  'the fee category is remembered on the profile'
+select lives_ok(
+  $$ select public.set_transfer_fee_category('a0000000-0000-0000-0000-000000000003') $$,
+  'the fee category changes'
+);
+select results_eq(
+  $$ select s.category_id from public.transaction_splits s
+     join public.transactions t on t.id = s.transaction_id
+     where t.kind = 'expense' and t.transfer_id is not null $$,
+  $$ values ('a0000000-0000-0000-0000-000000000003'::uuid) $$,
+  'changing the fee category moves the fees already saved'
 );
 select throws_ok(
   $$ delete from public.transactions where note = 'Épargne novembre' and amount > 0;

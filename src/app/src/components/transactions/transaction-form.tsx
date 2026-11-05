@@ -3,8 +3,8 @@ import { useTranslation } from 'react-i18next'
 import { useCloseSheet, useMarkChanged } from '#/components/route-sheet'
 import { SheetForm } from '#/components/sheet-form'
 import { useToast } from '#/components/toaster'
-import { TabList } from '#/components/tab-list'
 import { CategoryScreen } from '#/components/transactions/category-screen'
+import { EntryTabs } from '#/components/transactions/entry-tabs'
 import { ReceiptAmount } from '#/components/transactions/receipt-amount'
 import type { PickTarget } from '#/components/transactions/receipt-amount'
 import { Details } from '#/components/transactions/transaction-details'
@@ -59,42 +59,11 @@ function useSubmit({
   )
 }
 
-const TABS = ['expense', 'income', 'transfer'] as const
-
-/** The kind first (spec 15); Transfert waits for spec 16 and says so. */
-function KindTabs({
-  kind,
-  panelId,
-  onChange,
-}: {
-  kind: Draft['kind']
-  panelId: string
-  onChange: (kind: Draft['kind']) => void
-}) {
-  const { t } = useTranslation()
-  const toast = useToast()
-  return (
-    <TabList
-      label={t('transactions.kindsLabel')}
-      tabs={TABS}
-      value={kind}
-      labelOf={(k) => t(`transactions.kinds.${k}`)}
-      panelId={panelId}
-      idPrefix="kind"
-      muted={(k) => k === 'transfer'}
-      onSelect={(k) =>
-        k === 'transfer'
-          ? toast({ text: t('transactions.transferSoon') })
-          : onChange(k)
-      }
-    />
-  )
-}
-
 /**
  * Spec 15: an expense or income, new (`id` undefined) or edited. A category's round
  * icon, on the receipt or a split line, opens the category list over the whole sheet;
- * the form stays as it was underneath.
+ * the form stays as it was underneath. `onTransfer` offers the Transfert tab (spec 16),
+ * handing over what was typed.
  */
 export function TransactionForm({
   id,
@@ -102,12 +71,14 @@ export function TransactionForm({
   data,
   savedText,
   onSaved,
+  onTransfer,
 }: {
   id?: string
   initial: Draft
   data: TransactionFormData
   savedText: string
   onSaved?: (accountId: string) => void
+  onTransfer?: (draft: Draft) => void
 }) {
   const { t } = useTranslation()
   const message = useValidationMessage()
@@ -146,10 +117,13 @@ export function TransactionForm({
           onBack={() => setPicking(null)}
         />
       )}
-      <KindTabs
+      <EntryTabs
         kind={draft.kind}
+        tabs={onTransfer ? undefined : ['expense', 'income']}
         panelId={panelId}
-        onChange={(kind) => update({ kind })}
+        onChange={(kind) =>
+          kind === 'transfer' ? onTransfer?.(draft) : update({ kind })
+        }
       />
       <div id={panelId} className="flex flex-col gap-5">
         <ReceiptAmount

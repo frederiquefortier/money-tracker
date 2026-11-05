@@ -62,7 +62,7 @@ column.
 
 | Table | Columns | Req |
 |---|---|---|
-| `profiles` | `user_id` (PK), `locale` (`fr` or `en`, ADR-019), `default_currency`, `display_currency` (both CAD on sign-up, composite FKs to `user_currencies`), `transfer_fee_category_id` (the fee category used last, set by `save_transfer`; cleared when the category is deleted), `birth_date`, `home_country`, `show_budget_tooltips` | SET, CUR-05/06, BUD-06, TRX-04 |
+| `profiles` | `user_id` (PK), `locale` (`fr` or `en`, ADR-019), `default_currency`, `display_currency` (both CAD on sign-up, composite FKs to `user_currencies`), `transfer_fee_category_id` (the one category of every transfer fee, marked in Catégories, set by `set_transfer_fee_category`; cleared when the category is deleted), `birth_date`, `home_country`, `show_budget_tooltips` | SET, CUR-05/06, BUD-06, TRX-04 |
 | `user_currencies` | `code`, `removed_at` (`is_favourite` dropped 2026-11-05, CUR-03) | CUR-01..04. Unique (`user_id`, `code`). Five rows inserted by the sign-up trigger. Removing sets `removed_at`, so adding back skips the HexaRate check; there is no delete grant. Triggers refuse removing the default or a currency an open account books in, move the display currency to the default when it is removed, and keep both profile currencies pointing at active rows. Open accounts will block removal once `accounts` exists. |
 
 Labels in reference tables come in pairs (`label_fr`, `label_en`; `name_fr`, `name_en`)
@@ -145,6 +145,12 @@ Notes:
 - **Foreign currency** (CUR-08): `amount`/`currency` is what was paid, `original_amount`/
   `original_currency` is the receipt price. The fee is computed, not stored:
   `amount - original_amount × rate(original→paid, occurred_on)`.
+- **Conversion cost** (CUR-08, TRX-11, decided 2026-11-05). Money lost to the exchange is
+  spending wherever it happens. On a purchase it is the fee above; on a transfer between
+  currencies, what was sent minus what arrived valued back at that day's rate. Neither
+  is stored: the balances are already right, and the cost follows from the rates. The
+  dashboard (phase 2) counts it in `profiles.transfer_fee_category_id`'s category, and a
+  purchase's own categories count only its market value, so nothing is counted twice.
 - **Opening balance** lives on `accounts`, not as a fake transaction.
 - **Adjustment** (TRX-03): the form takes the real balance; the server computes and stores
   the difference.
@@ -156,8 +162,10 @@ Notes:
     last line takes the rounding. Editing replaces the splits. It refuses a transfer leg
     or fee.
   - `save_transfer(transfer_id, from_account, to_account, amount, occurred_on, received,
-    fee, fee_category, …, from_pending, to_pending)` creates or edits the legs and the fee
-    in place, and remembers the fee category on the profile. `delete_transfer(transfer_id)`.
+    fee, note, from_pending, to_pending)` creates or edits the legs and the fee in place;
+    the fee goes to the profile's fee category and is refused without one.
+    `delete_transfer(transfer_id)`. `set_transfer_fee_category(category)` sets that
+    category (an expense one) and moves every transfer fee already saved to it.
   - `save_adjustment(account_id, real_balance, occurred_on, note)` stores the difference
     with `account_balance_on(account_id, on_date)`, the balance at the end of that day,
     pending included. A saved adjustment is edited with a plain update.
@@ -173,7 +181,7 @@ Notes:
   `exchange_rate_text(from, to, on_date)` is `exchange_rate` as text: PostgREST sends a
   numeric result as a JSON number, which the browser would read as a float (ADR-004).
 - **The list** (spec 14, TRX-12..14). `list_transactions(from_date, to_date,
-  account_ids, category_ids, merchant_ids, search, before, max_rows)` returns the
+  account_ids, category_ids, merchant_ids, search, before, pending_only, max_rows)` returns the
   transactions between two dates (either open), newest day first and the last entered
   first within a day, every amount converted to the profile's display currency at the
   rate of its date (CUR-07), as text. Each list keeps the transactions matching any of
@@ -184,9 +192,16 @@ Notes:
   through `fold_name`. A page holds about `max_rows` (150) rows and always whole days; `more`
   says older rows remain, and the next page asks for the days `before` the page's last
   one. `total` counts every row matched before the page is cut (and before `before`),
-  for the filter sheet's "Voir 128 résultats". Without accounts, a transfer is one row (its outgoing leg, unsigned, pending while
-  either leg is) with its fee under it; with them, each row is a chosen account's own
-  leg. Rows carry the account's institution (both of a transfer's), and `categories`,
+  for the filter sheet's "Voir 128 résultats". `pending_only` keeps what is pending;
+  `pending_count` counts the pending rows the filters and search match at any date (TRX-09).
+  Without accounts, a transfer is one row (its outgoing leg, unsigned, pending while
+  either leg is); with them, each row is a chosen account's own leg. A fee rides on the
+  departure leg's row (`fee_amount`, `fee_category`) and counts in the day net; it has
+  its own row only when filtering on categories, naming both accounts. The departure
+  row between two currencies carries `received_amount`, `received_currency` and
+  `received_value` (its value in the departure currency). `conversion_cost`, in the
+  row's currency, is set on that row and on any expense or income paid in another
+  currency. Rows carry the account's institution (both of a transfer's), and `categories`,
   every split's category as JSON, the largest share first. The day net (expenses and
   incomes as listed) is computed in SQL and null when it includes a missing rate.
   `security invoker`.

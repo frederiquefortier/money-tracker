@@ -627,6 +627,7 @@ export type Database = {
           from_date?: string
           max_rows?: number
           merchant_ids?: string[]
+          pending_only?: boolean
           search?: string
           to_date?: string
         }
@@ -634,9 +635,12 @@ export type Database = {
           account_name: string
           amount: string
           categories: Json
+          conversion_cost: string
           currency: string
           day_net: string
           display_amount: string
+          fee_amount: string
+          fee_category: string
           from_account: string
           from_institution: string
           id: string
@@ -647,7 +651,11 @@ export type Database = {
           note: string
           occurred_on: string
           pending: boolean
+          pending_count: number
           rate: string
+          received_amount: string
+          received_currency: string
+          received_value: string
           to_account: string
           to_institution: string
           total: number
@@ -692,7 +700,6 @@ export type Database = {
         Args: {
           amount: number
           fee?: number
-          fee_category?: string
           from_account: string
           from_pending?: boolean
           note?: string
@@ -703,6 +710,10 @@ export type Database = {
           transfer_id: string
         }
         Returns: string
+      }
+      set_transfer_fee_category: {
+        Args: { category: string }
+        Returns: undefined
       }
     }
     Enums: {

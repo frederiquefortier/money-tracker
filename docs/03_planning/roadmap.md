@@ -5,8 +5,8 @@ Each phase ends with something usable on real data. No dates: this is a personal
 
 | Release | Phases | Done when |
 |---|---|---|
-| **v1** | 0, 1, 2 | The spreadsheet can be retired |
-| v2 | 3, 4 | Social layer and net worth |
+| **v1** | 0, 1, 2, 3 | The spreadsheet can be retired |
+| v2 | 4 | Net worth |
 | v3 | 5 | The yearly review |
 
 # v1
@@ -48,7 +48,10 @@ and every screen adds through one round + bottom right. Expense categories take 
 or want mark (CAT-10). The list (spec 14) is built: a chosen period (TRX-13: everything as
 you scroll, a year, a month, custom days), search (TRX-12) and filters by account,
 category and merchant (TRX-14), day groups with their net in SQL, splits as stacked
-icons. Transfers and adjustments (spec 16) come next.
+icons. Transfers (spec 16) are built: the Transfert tab of the form, the received amount
+and conversion cost between currencies, the fee and its category, a pending box per
+side, and editing or deleting every part together. Balance adjustments come next. The
+import moved to the end of phase 3 (2026-11-05).
 
 - Currencies, HexaRate validation, the Frankfurter rates job with a backfill to 2018,
   converted-amount markers. CUR-01..09 (ADR-009).
@@ -72,30 +75,38 @@ icons. Transfers and adjustments (spec 16) come next.
 - **Gate before the spreadsheet is retired** (met 2026-11-02): backup workflow enabled, one
   restore tested, the first monthly copy on the offline drive, and the private key in the
   password manager and on paper (security.md, Backups).
-- **CSV import and export in the fixed format** (IMP-01, 04, 05, 06, SEC-04 export, ADR-010). This is the
-  milestone: eight years of history in the app.
-  1. Settle the new category tree (worked out together from the old Aspire names).
-  2. Convert the Aspire export to the format, outside the app.
-  3. Import, read the summary, undo and re-import until it is right.
 
 ## Phase 2: Seeing it
 - Dashboard: range picker, filters, per-category stats, tiles, ranking, needs, wants and
   savings. DSH-01..04, 06..09.
 - Budgets and the emergency fund. BUD-01..04, 06, CAT-08.
-- Tags with automatic rules. TAG-01..03.
 - Recurring transactions. TRX-08.
 - Merchant price evolution. MER-04.
 - Delete my account and all its data. SEC-04.
 
-# v2
+## Phase 3: What a transaction carries, then the import
+Everything the owner's current use can set on a transaction exists before the import, so
+the eight years of history are prepared in one pass, not one per feature (decided
+2026-11-05).
 
-## Phase 3: The social layer
+- Tags with automatic rules. TAG-01..03.
 - People and groups, roles on transactions, anonymous treat/reimbursement. PPL-01..05.
 - Reimbursement links and their dashboard treatment. TRX-07, DSH-05.
 - Events, calendar, comparison, event budgets. EVT-01..06.
+- Holdings, and transactions linked to the holding they pay into (the `holding` column
+  of the import). NW-01, and the my-money part of NW-03.
+- **CSV import and export in the fixed format** (IMP-01, 04, 05, 06, SEC-04 export, ADR-010). This is the
+  milestone: eight years of history in the app.
+  1. Settle the new category tree (worked out together from the old Aspire names).
+  2. Convert the Aspire export to the format, outside the app, tags, people, events,
+     reimbursement links and holdings included.
+  3. Import, read the summary, undo and re-import until it is right.
+
+# v2
 
 ## Phase 4: Net worth
-- Holdings, snapshots, contributions, employers and salaries. NW-01..05, 09.
+- Snapshots, contributions with employer money and profit, employers and salaries.
+  NW-02..05, 09 (holdings come in phase 3).
 - Net-worth files in the import format. IMP-02.
 
 # v3

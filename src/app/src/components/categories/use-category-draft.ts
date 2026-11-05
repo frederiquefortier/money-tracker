@@ -13,6 +13,7 @@ export type CategoryValues = Pick<
   | 'color'
   | 'colorIsAuto'
   | 'necessity'
+  | 'isFee'
 >
 
 /**
@@ -39,6 +40,7 @@ export function useCategoryDraft(
       ? autoColor(categories, { id, parentId: parent.id, name })
       : draft.color
   const necessity = kind === 'expense' ? draft.necessity : null
+  const isFee = kind === 'expense' && draft.isFee === true
   const update = (change: Partial<typeof draft>) =>
     setDraft((prev) => ({ ...prev, ...change }))
 
@@ -53,6 +55,7 @@ export function useCategoryDraft(
     colorIsAuto,
     canResetColor: parent !== undefined && draft.handPicked,
     necessity,
+    isFee,
     setName,
     setKind: (next: Kind) => update({ kind: next }),
     // Leaving the parent keeps the colour and kind it had.
@@ -62,6 +65,7 @@ export function useCategoryDraft(
     pickIcon: (next: string) =>
       update({ icon: next, iconIsAuto: next === suggestIcon(name) }),
     setNecessity: (next: Necessity | null) => update({ necessity: next }),
+    setFee: (next: boolean) => update({ isFee: next }),
     pickColor: (next: string) => update({ color: next, handPicked: true }),
     resetColor: () => update({ handPicked: false }),
     input: (typedName: string): CategoryInput => ({
@@ -74,6 +78,7 @@ export function useCategoryDraft(
       color,
       colorIsAuto,
       necessity,
+      isFee,
     }),
   }
 }

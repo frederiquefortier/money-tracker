@@ -80,6 +80,9 @@ const row = (id: string, occurredOn: string): ListedTransaction => ({
   currency: 'CAD',
   displayAmount: '-1.00',
   rate: '1',
+  fee: null,
+  arrival: null,
+  conversionCost: null,
 })
 
 const pageRow = (r: ListedTransaction, dayNet: string): PageRow => ({

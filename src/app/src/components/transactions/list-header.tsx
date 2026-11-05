@@ -110,7 +110,35 @@ function AllFiltersButton({
 }
 
 /**
- * The title, the search, then one row: the period with its arrows and a button per
+ * TRX-09: "3 en attente" in the spreadsheet's blue while something is pending, at any
+ * date; pressed, the list keeps only those.
+ */
+function PendingButton({
+  count,
+  on,
+  onToggle,
+}: {
+  count: number | null
+  on: boolean
+  onToggle: (on: boolean) => void
+}) {
+  const { t } = useTranslation()
+  if (!on && !count) return null
+  return (
+    <button
+      type="button"
+      aria-pressed={on}
+      onClick={() => onToggle(!on)}
+      className={cn(chip, 'bg-pending', on && inUse)}
+    >
+      <Icon name="clock" className="size-4" />
+      {t('transactions.list.pendingCount', { count: count ?? 0 })}
+    </button>
+  )
+}
+
+/**
+ * The title, the search, then one row: what is pending, the period with its arrows and a button per
  * filter (spec 14), or on phones a single Filtres button. The row scrolls sideways when
  * it runs out of room, fading at the edge.
  */
@@ -119,10 +147,12 @@ export function ListHeader({
   filters,
   names,
   total,
+  pending,
   search,
   loading,
   onPeriod,
   onFilters,
+  onPending,
   onSearch,
 }: {
   choice: PeriodChoice
@@ -130,10 +160,12 @@ export function ListHeader({
   names: ListFilters | null
   /** How many rows the list matches, for the sheet's button. */
   total: number | null
+  pending: { count: number | null; on: boolean }
   search: string
   loading: boolean
   onPeriod: (choice: PeriodChoice) => void
   onFilters: (values: FilterValues) => void
+  onPending: (on: boolean) => void
   onSearch: (text: string) => void
 }) {
   const { t } = useTranslation()
@@ -147,6 +179,11 @@ export function ListHeader({
       <SearchField value={search} onChange={onSearch} />
       <div className="-mx-4 -my-1 overflow-x-auto px-4 py-1 [scrollbar-width:none] max-md:[mask-image:linear-gradient(to_right,black_calc(100%-1rem),transparent)] md:mx-0 md:px-0">
         <div className="flex w-max items-center gap-2">
+          <PendingButton
+            count={pending.count}
+            on={pending.on}
+            onToggle={onPending}
+          />
           <PeriodPicker
             choice={choice}
             disabled={loading}

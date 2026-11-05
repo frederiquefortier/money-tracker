@@ -47,7 +47,7 @@ export type Transaction = {
   splits: Array<{ categoryId: string; value: string }>
 }
 
-const positiveDecimal = z
+export const positiveDecimal = z
   .string()
   .regex(/^\d{1,15}(\.\d{1,4})?$/)
   .refine((value) => /[1-9]/.test(value))

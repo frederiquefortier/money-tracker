@@ -150,6 +150,13 @@ appearance first, need or want as radios.
     classée" under an unmarked branch. Following keeps up with later changes to the
     parent.
   - Then Besoin and Envie, the category's own mark.
+- **Assignée aux frais** (TRX-04, CUR-08, decided 2026-11-05), on the Dépense tab only:
+  a checkbox, then a round info button opening a popover (tap or click): "Les frais de
+  conversion, payés quand une transaction ou un transfert change de devise, et les frais
+  de transaction d'un transfert vont tous dans cette catégorie." One category holds the
+  role: ticking it on another takes it over on save and moves the transfer fees already
+  saved; the one holding it shows it ticked and disabled. In the tree, that row has a
+  "Frais" tag after its name, like Devises' "Par défaut".
   - Tried first the same day: a select, a pill with house and heart icons, unlabelled
     chips, then two field-styled buttons (with the inherited one dashed, then with the
     parent's icon, then with "Comme {parent}" under the word). Two buttons cannot show
@@ -270,6 +277,7 @@ clothes plum, beauty pink), and slate for everything else. Income and investment
 | Empty | Aucune catégorie pour l'instant. |
 | Add | Catégorie (named Ajouter une catégorie, also the sheet title) |
 | Form titles | Nouvelle catégorie, Modifier la catégorie |
+| Fee category | Assignée aux frais, À propos de la catégorie des frais, the popover's text above, tag Frais |
 | Fields | Nom, Parent, Priorité; Couleur as the colour group's name for screen readers |
 | Need or want | Non classée, Comme {parent} ({value}), non classée, Besoin, Envie |
 | Colour | Couleur personnalisée (the custom circle's accessible name), Couleur {n}, déjà utilisée |

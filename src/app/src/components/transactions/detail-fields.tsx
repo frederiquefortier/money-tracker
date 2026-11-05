@@ -10,16 +10,20 @@ import { cn } from '#/lib/utils'
 
 /**
  * ACC-03, 04: open accounts not hidden from new transactions, grouped by institution. The
- * account a transaction already has stays choosable.
+ * account a transaction already has stays choosable. A transfer's Vers leaves out its De.
  */
 export function AccountPicker({
   accounts,
   value,
+  label,
+  exclude = null,
   error,
   onChange,
 }: {
   accounts: ReadonlyArray<FormAccount>
   value: string | null
+  label?: string
+  exclude?: string | null
   error: string | undefined
   onChange: (account: FormAccount | null) => void
 }) {
@@ -28,7 +32,10 @@ export function AccountPicker({
   const group = (a: FormAccount) =>
     a.institution ?? t('transactions.noInstitution')
   const options = accounts
-    .filter((a) => a.id === value || (!a.closedOn && !a.hiddenForNew))
+    .filter(
+      (a) =>
+        a.id === value || (!a.closedOn && !a.hiddenForNew && a.id !== exclude),
+    )
     .sort(
       (a, b) =>
         group(a).localeCompare(group(b), locale) ||
@@ -45,7 +52,7 @@ export function AccountPicker({
 
   return (
     <Combobox
-      label={t('transactions.account')}
+      label={label ?? t('transactions.account')}
       required
       options={options}
       value={value}

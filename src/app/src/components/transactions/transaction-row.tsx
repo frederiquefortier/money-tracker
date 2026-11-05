@@ -1,18 +1,16 @@
-import { Link } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { CategoryBadge } from '#/components/categories/category-badge'
 import { Icon } from '#/components/icon'
 import type { IconName } from '#/components/icon'
-import { IconActions } from '#/components/icon-button'
 import { rowHover } from '#/components/list-card'
 import { MissingRate, Money } from '#/components/money'
-import { useToast } from '#/components/toaster'
-import { TransactionActions } from '#/components/transactions/transaction-actions'
+import { RowActions, RowLink } from '#/components/transactions/row-actions'
+import { FeeLines, feeLine, hasFees } from '#/components/transactions/fee-lines'
+import { useRowText } from '#/components/transactions/row-text'
 import { FORMAT_LOCALE } from '#/i18n/locales'
 import { formatDate, formatMoney } from '#/lib/format'
-import { accountLabel } from '#/lib/accounts'
 import { absDecimal } from '#/lib/money'
-import type { ListedTransaction } from '#/lib/transaction-list'
+import type { ListedCategory, ListedTransaction } from '#/lib/transaction-list'
 import { useLocale } from '#/lib/use-locale'
 import { cn, focusRing } from '#/lib/utils'
 
@@ -62,37 +60,6 @@ function RowBadge({ row }: { row: ListedTransaction }) {
       ))}
     </span>
   )
-}
-
-/** The title, then the muted line: categories, account and note (spec 14). */
-function useRowText(row: ListedTransaction) {
-  const { t } = useTranslation()
-  const categories = row.categories.map((c) => c.name).join(', ')
-  if (row.transfer)
-    return {
-      title: t('transactions.list.transfer', {
-        from: accountLabel(row.transfer.from),
-        to: accountLabel(row.transfer.to),
-      }),
-      details: row.note ?? '',
-    }
-  if (row.kind === 'adjustment')
-    return {
-      title: t('transactions.list.adjustment'),
-      details: [accountLabel(row.account), row.note]
-        .filter(Boolean)
-        .join(' · '),
-    }
-  return {
-    title: row.merchant ?? categories,
-    details: [
-      row.merchant ? categories : '',
-      accountLabel(row.account),
-      row.note,
-    ]
-      .filter(Boolean)
-      .join(' · '),
-  }
 }
 
 /**
@@ -147,6 +114,20 @@ function RowAmount({
           className="text-sm text-muted-foreground"
         />
       )}
+      {/* What arrived, after the arrow of the transfer's title. */}
+      {row.arrival && (
+        <span className="text-sm whitespace-nowrap text-muted-foreground">
+          <span aria-hidden="true">→ </span>
+          <Money amount={row.arrival.amount} currency={row.arrival.currency} />
+        </span>
+      )}
+      {/* The receipt's dashed rule, as wide as the amounts, before the fee lines. */}
+      {hasFees(row) && (
+        <span
+          aria-hidden="true"
+          className="mt-1 w-full border-t border-dashed border-border"
+        />
+      )}
     </span>
   )
 }
@@ -155,102 +136,90 @@ function RowContent({
   row,
   displayCurrency,
   signed,
+  feeCategory,
 }: {
   row: ListedTransaction
   displayCurrency: string
   signed: boolean
+  feeCategory: ListedCategory | null
 }) {
   const { t } = useTranslation()
   const { title, details } = useRowText(row)
   return (
     <>
-      <RowBadge row={row} />
-      <span className="flex min-w-0 flex-1 flex-col">
-        <span className="truncate font-semibold">{title}</span>
-        {(details || row.pending) && (
-          <span className="flex items-center gap-2 text-sm text-muted-foreground">
-            {details && <span className="truncate">{details}</span>}
-            {row.pending && (
-              <span className="inline-flex shrink-0 items-center gap-1">
-                <Icon name="clock" className="size-4" />
-                {t('transactions.pending')}
-              </span>
-            )}
-          </span>
-        )}
+      <span className="flex items-center gap-3">
+        <span className="relative flex items-center self-stretch">
+          <RowBadge row={row} />
+          {hasFees(row) && (
+            <span
+              aria-hidden="true"
+              className={cn(
+                feeLine,
+                'top-[calc(50%+1.375rem)] -bottom-1 left-[21px] border-l-2',
+              )}
+            />
+          )}
+        </span>
+        <span className="flex min-w-0 flex-1 flex-col">
+          <span className="truncate font-semibold">{title}</span>
+          {details && (
+            <span className="truncate text-sm text-muted-foreground">
+              {details}
+            </span>
+          )}
+          {/* The blue row and the bubble show it; screen readers still hear it. */}
+          {row.pending && (
+            <span className="sr-only">{t('transactions.pending')}</span>
+          )}
+        </span>
+        <RowAmount
+          row={row}
+          displayCurrency={displayCurrency}
+          signed={signed}
+        />
       </span>
-      <RowAmount row={row} displayCurrency={displayCurrency} signed={signed} />
+      <FeeLines row={row} feeCategory={feeCategory} />
     </>
   )
 }
 
-const rowLayout = 'flex min-w-0 flex-1 items-center gap-3 py-3 pl-4 text-left'
+const rowLayout = 'flex min-w-0 flex-1 flex-col gap-1 py-3 pl-4 text-left'
 
 /**
- * One transaction. An expense or income opens its form; a transfer, its fee and an
- * adjustment wait for spec 16, so a tap says so.
+ * One transaction. An expense or income opens its form, and a transfer or its fee the
+ * transfer's (spec 16); an adjustment waits for its form, so a tap says so.
  */
 export function TransactionRow({
   row,
   displayCurrency,
   filtered,
+  feeCategory,
 }: {
   row: ListedTransaction
   displayCurrency: string
   /** Filtered to one account, a transfer shows that account's leg with its sign. */
   filtered: boolean
+  /** The fee category set in Réglages, drawn small on each fee line. */
+  feeCategory: ListedCategory | null
 }) {
-  const { t } = useTranslation()
-  const toast = useToast()
   const signed = row.kind !== 'transfer' || filtered
-  const content = (
-    <RowContent row={row} displayCurrency={displayCurrency} signed={signed} />
-  )
-  const editable =
-    (row.kind === 'expense' || row.kind === 'income') && !row.transferId
-
   return (
-    <li className={cn('flex items-center pr-2', rowHover)}>
-      {editable ? (
-        <Link
-          to="/transactions/$transactionId"
-          params={{ transactionId: row.id }}
-          className={cn(rowLayout, focusRing)}
-        >
-          {content}
-        </Link>
-      ) : (
-        <button
-          type="button"
-          onClick={() =>
-            toast({
-              text: t(
-                row.kind === 'adjustment'
-                  ? 'transactions.list.adjustSoon'
-                  : 'transactions.transferSoon',
-              ),
-            })
-          }
-          className={cn(rowLayout, focusRing)}
-        >
-          {content}
-        </button>
+    <li
+      className={cn(
+        'flex items-center pr-2',
+        row.pending && 'bg-pending',
+        rowHover,
       )}
-      {editable ? (
-        <TransactionActions
-          summary={{
-            id: row.id,
-            occurredOn: row.occurredOn,
-            amount: row.amount,
-            currency: row.currency,
-            merchant: row.merchant,
-            categories: row.categories.map((c) => c.name),
-            account: row.account,
-          }}
+    >
+      <RowLink row={row} className={cn(rowLayout, focusRing)}>
+        <RowContent
+          row={row}
+          displayCurrency={displayCurrency}
+          signed={signed}
+          feeCategory={feeCategory}
         />
-      ) : (
-        <IconActions slots={1} />
-      )}
+      </RowLink>
+      <RowActions row={row} />
     </li>
   )
 }

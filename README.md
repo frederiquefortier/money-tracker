@@ -14,7 +14,7 @@ work is split, and where I changed the assistant's proposals, is in
 
 Live at https://ff-money-tracker.netlify.app (invite-only). Phase 0 is in place: sign-in
 with MFA, invitations, password reset, FR and EN, and the row-level security pattern with
-its tests. v1 is [phases 0 to 2](docs/03_planning/roadmap.md), when the spreadsheet can be
+its tests. v1 is [phases 0 to 3](docs/03_planning/roadmap.md), when the spreadsheet can be
 retired.
 
 ## Stack

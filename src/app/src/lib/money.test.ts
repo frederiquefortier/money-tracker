@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import {
   amountForInput,
   compareDecimal,
+  convertBackMinor,
   convertMinor,
   fromMinor,
   minorDigits,
@@ -27,6 +28,14 @@ describe('minor units', () => {
     expect(fromMinor(8412n, 2)).toBe('84.12')
     expect(fromMinor(-5n, 2)).toBe('-0.05')
     expect(fromMinor(1500n, 0)).toBe('1500')
+  })
+})
+
+describe('convertBackMinor', () => {
+  it('values an amount back at the same rate', () => {
+    // 287,10 CHF at 0,5788 CHF per dollar is 496,0263 $, so 496,03 $.
+    expect(convertBackMinor(28710n, '0.5788', { from: 2, to: 2 })).toBe(49603n)
+    expect(convertBackMinor(500n, '110.5', { from: 2, to: 0 })).toBe(452n)
   })
 })
 

@@ -43,7 +43,7 @@ const isNecessity = isOneOf(NECESSITIES)
 export const getCategories = createServerFn({ method: 'GET' }).handler(
   async (): Promise<Array<Category>> => {
     const supabase = getSupabase()
-    const [categories, events, periods] = loaded(
+    const [categories, events, periods, profile] = loaded(
       'Categories',
       ...(await Promise.all([
         supabase
@@ -59,6 +59,7 @@ export const getCategories = createServerFn({ method: 'GET' }).handler(
         supabase
           .from('category_active_periods')
           .select('category_id, active_from, active_to'),
+        supabase.from('profiles').select('transfer_fee_category_id').single(),
       ])),
     )
 
@@ -86,6 +87,7 @@ export const getCategories = createServerFn({ method: 'GET' }).handler(
       periods: periods
         .filter((p) => p.category_id === c.id)
         .map((p) => ({ from: p.active_from, to: p.active_to })),
+      isFee: c.id === profile.transfer_fee_category_id,
     }))
   },
 )
@@ -133,6 +135,14 @@ export const saveCategory = createServerFn({ method: 'POST' })
     // The category is saved; a failed recolour only leaves a colour behind until the next save.
     const recolorError = await recolor()
     if (recolorError) failed('categories', 'recolor', recolorError.code)
+    // Becoming the fee category also moves the transfer fees already saved to it.
+    if (data.isFee && data.kind === 'expense') {
+      const { error: feeError } = await getSupabase().rpc(
+        'set_transfer_fee_category',
+        { category: saved.id },
+      )
+      if (feeError) return failure('fee category', feeError)
+    }
     return { ok: true, id: saved.id }
   })
 

@@ -1,7 +1,7 @@
 begin;
 create extension if not exists pgtap with schema extensions;
 
-select plan(24);
+select plan(29);
 
 insert into auth.users (id, email) values
   ('11111111-1111-1111-1111-111111111111', 'alice@example.test'),
@@ -37,7 +37,9 @@ insert into public.merchants (id, user_id, name) values
 
 -- October: groceries, a coffee in CHF, a transfer with its fee, a refund, a salary, a
 -- purchase split between groceries and an investment, an adjustment. November: a
--- purchase in USD, which has no rate. And one of Bruno's.
+-- purchase in USD, which has no rate. December: a transfer from CAD to CHF, 100 $ sent
+-- and 61 CHF received (62,50 CHF at the rate), and 10 CHF paid 16,50 $ from Chèque (16 $
+-- at the rate). And one of Bruno's.
 insert into public.transactions (id, user_id, account_id, kind, occurred_on, amount, currency, status, merchant_id, note, transfer_id, created_at) values
   ('a3000000-0000-0000-0000-000000000001', '11111111-1111-1111-1111-111111111111', 'a2000000-0000-0000-0000-000000000001',
    'expense', '2026-10-03', -84.12, 'CAD', 'cleared', 'a1000000-0000-0000-0000-000000000001', null, null, '2026-10-03 10:00'),
@@ -59,8 +61,15 @@ insert into public.transactions (id, user_id, account_id, kind, occurred_on, amo
    'adjustment', '2026-10-02', 5, 'CAD', 'cleared', null, null, null, '2026-10-02 09:00'),
   ('a3000000-0000-0000-0000-000000000010', '11111111-1111-1111-1111-111111111111', 'a2000000-0000-0000-0000-000000000004',
    'expense', '2026-11-02', -10, 'USD', 'cleared', null, null, null, '2026-11-02 09:00'),
+  ('a3000000-0000-0000-0000-000000000011', '11111111-1111-1111-1111-111111111111', 'a2000000-0000-0000-0000-000000000001',
+   'transfer', '2026-12-04', -100, 'CAD', 'cleared', null, null, 'a4000000-0000-0000-0000-000000000002', '2026-12-04 09:00'),
+  ('a3000000-0000-0000-0000-000000000012', '11111111-1111-1111-1111-111111111111', 'a2000000-0000-0000-0000-000000000002',
+   'transfer', '2026-12-04', 61, 'CHF', 'cleared', null, null, 'a4000000-0000-0000-0000-000000000002', '2026-12-04 09:00'),
   ('b3000000-0000-0000-0000-000000000001', '22222222-2222-2222-2222-222222222222', 'b2000000-0000-0000-0000-000000000001',
    'expense', '2026-10-03', -12, 'CAD', 'cleared', null, null, null, '2026-10-03 09:00');
+insert into public.transactions (id, user_id, account_id, kind, occurred_on, amount, currency, original_amount, original_currency, created_at) values
+  ('a3000000-0000-0000-0000-000000000013', '11111111-1111-1111-1111-111111111111', 'a2000000-0000-0000-0000-000000000001',
+   'expense', '2026-12-05', -16.50, 'CAD', -10, 'CHF', '2026-12-05 09:00');
 insert into public.transaction_splits (user_id, transaction_id, category_id, input_mode, input_value, amount) values
   ('11111111-1111-1111-1111-111111111111', 'a3000000-0000-0000-0000-000000000001', 'a0000000-0000-0000-0000-000000000001', 'amount', 84.12, -84.12),
   ('11111111-1111-1111-1111-111111111111', 'a3000000-0000-0000-0000-000000000002', 'a0000000-0000-0000-0000-000000000005', 'amount', 4.20, -4.20),
@@ -79,17 +88,17 @@ select set_config('request.jwt.claims',
 
 select results_eq(
   $$ select id from public.list_transactions('2026-10-01', '2026-10-31') $$,
-  $$ values ('a3000000-0000-0000-0000-000000000003'::uuid), ('a3000000-0000-0000-0000-000000000005'::uuid),
+  $$ values ('a3000000-0000-0000-0000-000000000003'::uuid),
             ('a3000000-0000-0000-0000-000000000002'::uuid), ('a3000000-0000-0000-0000-000000000001'::uuid),
             ('a3000000-0000-0000-0000-000000000009'::uuid), ('a3000000-0000-0000-0000-000000000006'::uuid),
             ('a3000000-0000-0000-0000-000000000008'::uuid), ('a3000000-0000-0000-0000-000000000007'::uuid) $$,
-  'newest day first, the last entered first, a transfer once with its fee under it, another user''s left out'
+  'newest day first, the last entered first, a transfer once with its fee on it, another user''s left out'
 );
 select results_eq(
-  $$ select pending, from_account, from_institution, to_account, to_institution, amount
+  $$ select pending, from_account, from_institution, to_account, to_institution, amount, fee_amount, fee_category
      from public.list_transactions('2026-10-01', '2026-10-31') where kind = 'transfer' $$,
-  $$ values (true, 'Chèque', 'Caisse Lumière', 'Épargne', null, '500.0000') $$,
-  'a transfer names both accounts and their institutions, unsigned, pending while a side is'
+  $$ values (true, 'Chèque', 'Caisse Lumière', 'Épargne', null, '500.0000', '2.0000', 'Épicerie') $$,
+  'a transfer names both accounts and their institutions, unsigned, pending while a side is, with its fee'
 );
 select results_eq(
   $$ select account_name, institution, display_amount, rate from public.list_transactions('2026-10-01', '2026-10-31')
@@ -107,7 +116,7 @@ select results_eq(
 select results_eq(
   $$ select distinct occurred_on, day_net from public.list_transactions('2026-10-01', '2026-10-31') order by occurred_on desc $$,
   $$ values ('2026-10-03'::date, '-92.84'), ('2026-10-02'::date, '10.00'), ('2026-10-01'::date, '2800.00') $$,
-  'each day nets its expenses and incomes, without transfers or adjustments'
+  'each day nets its expenses, incomes and transfer fees, without transfers or adjustments'
 );
 select results_eq(
   $$ select id, amount, pending from public.list_transactions('2026-10-01', '2026-10-31', array['a2000000-0000-0000-0000-000000000003'::uuid]) $$,
@@ -126,7 +135,7 @@ select is_empty(
 );
 select is(
   (select count(*)::int from public.list_transactions()),
-  9, 'with no bounds, every transaction comes'
+  10, 'with no bounds, every transaction comes'
 );
 select results_eq(
   $$ select distinct occurred_on, more from public.list_transactions('2026-10-01', '2026-10-31', max_rows => 3) $$,
@@ -173,7 +182,7 @@ select results_eq(
   $$ select id, amount from public.list_transactions('2026-10-03', '2026-10-03',
        array['a2000000-0000-0000-0000-000000000001', 'a2000000-0000-0000-0000-000000000003']::uuid[]) $$,
   $$ values ('a3000000-0000-0000-0000-000000000003'::uuid, '-500.0000'), ('a3000000-0000-0000-0000-000000000004'::uuid, '500.0000'),
-            ('a3000000-0000-0000-0000-000000000005'::uuid, '-2.0000'), ('a3000000-0000-0000-0000-000000000001'::uuid, '-84.1200') $$,
+            ('a3000000-0000-0000-0000-000000000001'::uuid, '-84.1200') $$,
   'several accounts show each one''s legs, so a transfer between two of them shows both'
 );
 
@@ -184,24 +193,52 @@ select results_eq(
 );
 select is(
   (select count(*)::int from public.list_transactions(search => 'lumiere')),
-  6, 'search finds an institution, through its account'
+  7, 'search finds an institution, through its account'
 );
 select results_eq(
   $$ select id from public.list_transactions(search => 'épargne') $$,
-  $$ values ('a3000000-0000-0000-0000-000000000003'::uuid), ('a3000000-0000-0000-0000-000000000005'::uuid),
-            ('a3000000-0000-0000-0000-000000000009'::uuid) $$,
+  $$ values ('a3000000-0000-0000-0000-000000000003'::uuid), ('a3000000-0000-0000-0000-000000000009'::uuid) $$,
   'search finds an account, a transfer by either side'
 );
 
 select results_eq(
   $$ select distinct total from public.list_transactions('2026-10-01', '2026-10-31', max_rows => 3) $$,
-  $$ values (8::bigint) $$,
+  $$ values (7::bigint) $$,
   'the total counts every row of the period, past the page'
 );
 select results_eq(
   $$ select distinct total from public.list_transactions(category_ids => array['a0000000-0000-0000-0000-000000000001'::uuid]) $$,
   $$ values (6::bigint) $$,
   'the total counts what the filters match, sub-categories included'
+);
+
+select results_eq(
+  $$ select from_account, to_account from public.list_transactions(
+       category_ids => array['a0000000-0000-0000-0000-000000000001'::uuid])
+     where id = 'a3000000-0000-0000-0000-000000000005' $$,
+  $$ values ('Chèque', 'Épargne') $$,
+  'filtered on its category, a fee has its own row naming both accounts'
+);
+select results_eq(
+  $$ select received_amount, received_currency, received_value, conversion_cost
+     from public.list_transactions('2026-12-01', '2026-12-31') where kind = 'transfer' $$,
+  $$ values ('61.0000', 'CHF', '97.60', '2.4000') $$,
+  'between two currencies, the departure row carries what arrived, its value and the conversion cost (TRX-11)'
+);
+select results_eq(
+  $$ select conversion_cost from public.list_transactions('2026-12-01', '2026-12-31') where kind = 'expense' $$,
+  $$ values ('0.5000') $$,
+  'an expense paid in another currency carries what it cost above the market value (CUR-08)'
+);
+select results_eq(
+  $$ select id from public.list_transactions(pending_only => true) $$,
+  $$ values ('a3000000-0000-0000-0000-000000000003'::uuid) $$,
+  'pending_only keeps what is pending'
+);
+select results_eq(
+  $$ select distinct pending_count from public.list_transactions('2026-12-01', '2026-12-31') $$,
+  $$ values (1::bigint) $$,
+  'the pending count looks past the period'
 );
 
 -- Bruno sees only his own

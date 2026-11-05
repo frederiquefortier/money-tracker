@@ -151,20 +151,46 @@ From `md` up: the same list, centred, at most 48rem wide.
   no underline. On hover and for screen readers: "4,20 € converti au taux du 3 nov. 2026
   (1 EUR = 1,4952 CAD)", the rate written as on the transaction form. A tap opens the
   row, whose form shows the rate.
-- **Pending** (TRX-09): a small "En attente" label with a clock icon at the end of the
-  second line.
+- **Pending** (TRX-09): the row on a light blue background, the spreadsheet's colour
+  (`--pending`), with no label: the colour and the bubble say it, and screen readers
+  hear "En attente" (hidden text). It stays in its day, so the day's net
+  still matches its rows. While anything is pending, a blue "3 en attente" bubble starts
+  the row of controls; pressed, the list keeps only what is pending, at any date, and
+  choosing a period lets go of it. The count follows the filters and the search, not the
+  period.
 - **Transfer** (TRX-04): a transfer icon, the title "Transfert: Chèque (Desjardins) →
   Épargne", the amount neutral (no sign). One row per transfer, even though it is two
-  legs. "En attente" shows while either side is pending (spec 16). A fee shows as its own
-  expense row, right under it. In an account-filtered list, the row shows that account's
-  leg with its sign.
+  legs. "En attente" shows while either side is pending (spec 16). Between two
+  currencies, what arrived sits under the amount, muted, after the title's arrow
+  ("→ 60,00 €"), below the amount as booked when that is converted too.
+- **Fees** (TRX-04, 11, CUR-08), drawn apart from those amounts: under the row, inside
+  the same row, after the receipt's dashed rule under the amounts (as wide as their
+  column), one tight line per fee, joined to the row's icon by the category tree's
+  elbow line. Each has the fee category's icon (marked in Catégories) at a smaller size, its
+  name, "Frais de conversion" (lost to the exchange, in the departure or account
+  currency) or "Frais de transaction" (a transfer's fee, which still counts in the day's
+  net), and its amount on the right, under the row's own. Both read unsigned, as costs;
+  a gain on the exchange, rare, shows as a negative fee.
+```
+│ (⇄) Transfert: Chèque → Wise    100,00 $ │
+│  │  Note du transfert       → 62,00 CHF │
+│  │                          - - - - - - │
+│  ├─(•) Frais de conversion       2,00 $ │
+│  └─(•) Frais de transaction      2,50 $ │
+``` The second line on the left keeps only the note. The fee has its own row only when filtering on
+  categories, where the transfer itself never shows; it reads "Frais du transfert:
+  Chèque (Desjardins) → Épargne". In an account-filtered list, the row shows that
+  account's leg with its sign, and the departure leg keeps the money parts.
+- **Paid in another currency** (CUR-08): a "Frais de conversion" fee line, what the
+  purchase cost above the market value, in the account's currency.
 - **Adjustment** (TRX-03): a scale icon, "Ajustement de solde", the account on the
   second line, the signed difference.
-- Tapping a row opens it in its form (spec 15 or 16), a route sheet over the list.
-  Until spec 16, a transfer, its fee and an adjustment answer a tap with a toast saying
-  they come with the next screen.
-- From `md` up, an expense or income has the trash in its row's action slot; on phones
-  it is in the sheet header (shared patterns).
+- Tapping a row opens it in its form (spec 15 or 16), a route sheet over the list. A
+  transfer's fee opens the transfer. Until the adjustment form is built, an adjustment
+  answers a tap with a toast saying it comes with the next screen.
+- From `md` up, an expense, an income or a transfer has the trash in its row's action
+  slot; on phones it is in the sheet header (shared patterns). A transfer's fee has none:
+  it goes with its transfer.
 
 ## States
 
@@ -198,11 +224,13 @@ From `md` up: the same list, centred, at most 48rem wide.
 | Period | Tabs Tout, Année, Mois, Personnalisée; Toutes les dates; Période: {period}; Du, Au; Mois précédent, Mois suivant |
 | Filters | Filtres, Filtres · {count}, Comptes, Catégories, Magasins, {name} · {count}; Rechercher un compte, une catégorie, un magasin; Tout, Aucun, Tout cocher dans “{name}”, Tout décocher dans “{name}”; Effacer, Voir {count} résultat(s), Voir les résultats, Aucun résultat |
 | Converted detail | {original} converti au taux du {date} ({rate}) |
-| Pending | En attente |
+| Pending | En attente, {count} en attente |
+| Fee lines | Frais de conversion, Frais de transaction |
+| Transfer fee | Frais du transfert: {from} → {to} |
 | Transfer | Transfert: {from} → {to} |
 | Adjustment | Ajustement de solde |
 | Empty | Aucune transaction en {period}. Aucune transaction du {start} au {end}. Aucune transaction pour l'instant. Aucun résultat. |
 | Actions | Importer un historique, Ajuster le solde |
 | Missing rate | Taux manquant |
 | Grids | Année précédente, Année suivante, Années précédentes, Années suivantes |
-| Until spec 16 | Les ajustements arrivent avec le prochain écran. (transfers reuse the form's line) |
+| Until the adjustment form | Les ajustements arrivent avec le prochain écran. |

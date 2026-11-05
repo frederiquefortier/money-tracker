@@ -36,6 +36,8 @@ export type Category = {
   /** Newest first. */
   history: Array<CategoryEvent>
   periods: Array<Period>
+  /** The one category of every fee, conversion and transaction (TRX-04, CUR-08). */
+  isFee?: boolean
 }
 
 export function isArchived(category: Pick<Category, 'history'>) {
@@ -284,5 +286,6 @@ export const categoryInputSchema = categoryFormSchema.extend({
   color: z.string().regex(HEX_COLOR),
   colorIsAuto: z.boolean(),
   necessity: z.enum(NECESSITIES).nullable(),
+  isFee: z.boolean().optional(),
 })
 export type CategoryInput = z.input<typeof categoryInputSchema>

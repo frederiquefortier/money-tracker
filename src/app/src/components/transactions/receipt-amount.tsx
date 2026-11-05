@@ -25,7 +25,7 @@ type Update = (changes: Partial<Draft>) => void
 /** Which category the list is choosing: the transaction's, or a split line's (by key). */
 export type PickTarget = 'main' | number
 
-const rule = <hr className="my-1 border-dashed border-border" />
+export const rule = <hr className="my-1 border-dashed border-border" />
 
 /**
  * CUR-08: what left the account, prefilled at the day's rate and editable, with the rate
@@ -87,7 +87,7 @@ function ForeignLines({
         )}
       </div>
       {error && <FieldMessage>{error}</FieldMessage>}
-      <ReceiptLine label={t('transactions.fee')}>
+      <ReceiptLine label={t('transactions.conversionFee')}>
         {rate === null && <MissingRate />}
         {rate !== null && preview.fee !== null && (
           <>
@@ -102,7 +102,7 @@ function ForeignLines({
 }
 
 /** The large amount, typed positive in the chip's currency (TRX-02). */
-function AmountInput({
+export function AmountInput({
   value,
   invalid,
   autoFocus,

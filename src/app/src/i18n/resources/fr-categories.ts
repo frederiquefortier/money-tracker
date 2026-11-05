@@ -1,5 +1,10 @@
 // The Catégories screens (spec 12), apart to keep fr.ts readable.
 export const categoriesFr = {
+  feeCategory: 'Assignée aux frais',
+  feeCategoryAbout: 'À propos de la catégorie des frais',
+  feeCategoryHelp:
+    'Les frais de conversion, payés quand une transaction ou un transfert change de devise, et les frais de transaction d’un transfert vont tous dans cette catégorie.',
+  feeTag: 'Frais',
   title: 'Catégories',
   kindsLabel: 'Type de catégorie',
   kinds: { expense: 'Dépenses', income: 'Revenus', investment: 'Placements' },
