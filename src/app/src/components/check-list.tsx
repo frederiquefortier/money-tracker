@@ -44,7 +44,7 @@ function CheckRow({
   onToggle: () => void
 }) {
   return (
-    <label className="flex min-h-12 cursor-pointer items-center gap-3 px-3 hover:bg-secondary/50">
+    <label className="flex min-h-12 cursor-pointer items-center gap-3 px-3 hover:bg-secondary/50 hover:[--row-bg:color-mix(in_oklab,var(--secondary)_50%,var(--card))]">
       {node.icon}
       <span
         className={cn(

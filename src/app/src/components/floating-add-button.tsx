@@ -1,6 +1,14 @@
 import { Link } from '@tanstack/react-router'
 import type { LinkProps } from '@tanstack/react-router'
-import { useCallback, useEffect, useId, useState } from 'react'
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useId,
+  useState,
+} from 'react'
+import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { Icon } from '#/components/icon'
 import type { IconName } from '#/components/icon'
@@ -38,20 +46,49 @@ function offset(i: number) {
   }
 }
 
+const Slot = createContext<HTMLElement | null>(null)
+const SetSlot = createContext<(slot: HTMLElement | null) => void>(() => {})
+
+/**
+ * Each page draws its own +, but it is rendered at `AddButtonTarget`, the start of the
+ * page's content, so it is the content's first stop when tabbing (decided 2026-11-05).
+ * It is fixed in place, so where it sits in the document changes nothing on screen.
+ */
+export function AddButtonSlot({ children }: { children: React.ReactNode }) {
+  const [slot, setSlot] = useState<HTMLElement | null>(null)
+  return (
+    <Slot value={slot}>
+      <SetSlot value={setSlot}>{children}</SetSlot>
+    </Slot>
+  )
+}
+
+export function AddButtonTarget() {
+  return <div ref={useContext(SetSlot)} />
+}
+
+// In place until the slot exists (the server's render, the first one in the browser).
+function InSlot({ children }: { children: React.ReactNode }) {
+  const slot = useContext(Slot)
+  return slot ? createPortal(children, slot) : children
+}
+
 /** The round add button of a screen that adds one thing: straight to its form. */
 export function FloatingAddLink({
   label,
   ...target
 }: Target & { label: string }) {
   return (
-    <Link
-      {...target}
-      aria-label={label}
-      title={label}
-      className={cn(position, round)}
-    >
-      <Icon name="plus" className="size-6" />
-    </Link>
+    <InSlot>
+      <Link
+        {...target}
+        aria-label={label}
+        title={label}
+        className={cn(position, round)}
+      >
+        <Icon name="plus" className="size-6" />
+      </Link>
+    </InSlot>
   )
 }
 
@@ -125,7 +162,7 @@ export function FloatingAddButton({
 
   const toggleLabel = open ? t('common.close') : label
   return (
-    <>
+    <InSlot>
       {open && (
         <div
           aria-hidden="true"
@@ -163,6 +200,6 @@ export function FloatingAddButton({
           ))}
         </ul>
       </div>
-    </>
+    </InSlot>
   )
 }

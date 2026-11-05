@@ -34,7 +34,13 @@ component to use, so a screen is assembled, not redrawn.
   (`SortMenu`, an outline button with a chevron, like a select, showing the sort icon and
   the current order, "Trier: …" as its accessible name; kept per browser). Adding is
   never beside the title: every screen, at every width, has one round + button bottom
-  right, above the tab bar on phones, with "Ajouter un compte" as its accessible name. A
+  right, above the tab bar on phones, with "Ajouter un compte" as its accessible name,
+  and the first stop when tabbing into a page's content, after the header and menu
+  (`AddButtonTarget` at the start of `main`). Every focusable element shows the shared
+  outline (`focusRing`); inside a container that clips (a card, a row scrolling
+  sideways) it is drawn within the element (`insetFocus`), so it is never cut. Stacked
+  icons (a split's categories, a group's members) are separated by a ring of the row's
+  own colour, white, purple on hover, blue when pending (`stackRing`). A
   screen that adds one thing goes straight to its form (`FloatingAddLink`); one that
   adds several (`FloatingAddButton`) (Comptes: Compte, Institution) turns the + into a ✕ and fans the choices
   out one after another on a quarter circle, from its left upwards, as round icons only, the noun as tooltip and accessible name. Escape, a tap

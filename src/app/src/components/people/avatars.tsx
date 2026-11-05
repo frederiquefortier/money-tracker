@@ -1,3 +1,4 @@
+import { stackRing } from '#/components/list-card'
 import { initialOf } from '#/lib/people'
 import { useFormatLocale } from '#/lib/use-locale'
 import { cn } from '#/lib/utils'
@@ -70,16 +71,14 @@ export function GroupAvatars({
           key={`${name}-${i}`}
           name={name}
           size={small ? 'sm' : 'md'}
-          className={cn(
-            'ring-2 ring-card',
-            i > 0 && (small ? '-ml-2' : '-ml-2.5'),
-          )}
+          className={cn(stackRing, i > 0 && (small ? '-ml-2' : '-ml-2.5'))}
         />
       ))}
       {more > 0 && (
         <span
           className={cn(
-            'grid shrink-0 place-items-center rounded-full bg-muted font-bold text-muted-foreground ring-2 ring-card',
+            'grid shrink-0 place-items-center rounded-full bg-muted font-bold text-muted-foreground',
+            stackRing,
             small ? '-ml-2 size-6 text-[0.6rem]' : '-ml-2.5 size-8 text-xs',
           )}
         >

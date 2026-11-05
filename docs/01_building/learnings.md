@@ -4,6 +4,29 @@ Document new concepts, techniques, and knowledge gained. Reference this file to 
 
 <!-- Newest first: a new entry goes directly below this line. Template at the bottom. -->
 
+### 2026-11-05 - Tailwind 4 outlines take their style from a variable
+
+**What Was New:**
+- Every focus outline in the app was invisible (bugs.md, same day).
+
+**Key Points:**
+- In Tailwind 4, `outline-none` sets `--tw-outline-style: none` as well as
+  `outline-style: none`, and the width utilities (`outline-2`) set
+  `outline-style: var(--tw-outline-style)`. On the same element, the width alone never
+  brings the outline back: add `outline-solid` in the same variant.
+- An element without `outline-none` gets `solid`, the variable's initial value, which is
+  why the colour swatch's wrapper (`has-[:focus-visible]:outline-2`) showed its outline.
+
+**Sources:**
+- The CSS `tailwindcss` compiles for `outline-none` and `focus-visible:outline-2`,
+  checked with its `compile` API.
+
+**Where to Learn More:**
+- Tailwind CSS docs, "outline-style" and "outline-width".
+
+**Applied In:**
+- `focusRing` in `src/app/src/lib/utils.ts`, the button in `components/ui/button.tsx`.
+
 ### 2026-11-04 - Deferred constraint triggers, and testing them
 
 **What Was New:**

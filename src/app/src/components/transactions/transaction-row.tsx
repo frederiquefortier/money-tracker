@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next'
 import { CategoryBadge } from '#/components/categories/category-badge'
 import { Icon } from '#/components/icon'
 import type { IconName } from '#/components/icon'
-import { rowHover } from '#/components/list-card'
+import { rowHover, stackRing } from '#/components/list-card'
 import { MissingRate, Money } from '#/components/money'
 import { RowActions, RowLink } from '#/components/transactions/row-actions'
 import { FeeLines, feeLine, hasFees } from '#/components/transactions/fee-lines'
@@ -46,7 +46,7 @@ function RowBadge({ row }: { row: ListedTransaction }) {
           key={category.name}
           className={cn(
             'relative rounded-full',
-            row.categories.length > 1 && 'ring-2 ring-card',
+            row.categories.length > 1 && stackRing,
             i > 0 && '-ml-7',
           )}
           style={{ zIndex: row.categories.length - i }}
@@ -207,8 +207,8 @@ export function TransactionRow({
     <li
       className={cn(
         'flex items-center pr-2',
-        row.pending && 'bg-pending',
         rowHover,
+        row.pending && 'bg-pending [--row-bg:var(--pending)]',
       )}
     >
       <RowLink row={row} className={cn(rowLayout, focusRing)}>

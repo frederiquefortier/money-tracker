@@ -17,7 +17,7 @@ import type { Category, CategorySort, Kind } from '#/lib/categories'
 import { categoryChildren, frequentCategories } from '#/lib/category-list'
 import { useFormatLocale } from '#/lib/use-locale'
 import { useStoredState } from '#/lib/use-stored-state'
-import { cn, focusRing, indexById, oneOf } from '#/lib/utils'
+import { cn, focusRing, indexById, insetFocus, oneOf } from '#/lib/utils'
 import type { FrequentCategories } from '#/lib/transactions'
 
 const parseSort = oneOf(CATEGORY_SORTS)
@@ -42,7 +42,7 @@ function Frequent({
       <h3 className="px-1 text-sm font-semibold text-muted-foreground">
         {t('categories.frequent')}
       </h3>
-      <ul className="flex gap-1 overflow-x-auto">
+      <ul className={cn('flex gap-1 overflow-x-auto', insetFocus)}>
         {categories.map((category) => {
           const path = categoryPath(category, byId)
           return (
