@@ -1,5 +1,6 @@
 import { categoriesEn } from './en-categories'
 import { merchantsEn } from './en-merchants'
+import { peopleEn } from './en-people'
 import { transactionsEn } from './en-transactions'
 import type { Messages } from './fr'
 
@@ -27,6 +28,7 @@ export const en: Messages = {
     editName: 'Edit “{{name}}”',
     reset: 'Reset',
     remove: 'Remove',
+    removeName: 'Remove “{{name}}”',
     archive: 'Archive',
     archiveName: 'Archive “{{name}}”',
     reactivate: 'Reactivate',
@@ -145,6 +147,7 @@ export const en: Messages = {
     categories: 'Categories',
     currencies: 'Currencies',
     merchants: 'Merchants',
+    people: 'People',
   },
   money: {
     converted: 'About {{amount}}, converted to {{currency}}',
@@ -199,6 +202,7 @@ export const en: Messages = {
   categories: categoriesEn,
   transactions: transactionsEn,
   merchants: merchantsEn,
+  people: peopleEn,
   currencies: {
     title: 'Currencies',
     defaultBadge: 'Default',

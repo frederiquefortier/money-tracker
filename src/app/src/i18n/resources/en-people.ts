@@ -1,0 +1,31 @@
+import type { peopleFr } from './fr-people'
+
+export const peopleEn: typeof peopleFr = {
+  title: 'People',
+  tabsLabel: 'People or groups',
+  tabs: {
+    people: 'People',
+    groups: 'Groups',
+  },
+  empty: 'No people yet.',
+  emptyGroups: 'No groups yet.',
+  addPerson: 'Add a person',
+  addGroup: 'Add a group',
+  newPerson: 'New person',
+  editPerson: 'Edit person',
+  newGroup: 'New group',
+  editGroup: 'Edit group',
+  name: 'Name',
+  groups: 'Groups',
+  members: 'Members',
+  aliases: 'Aliases',
+  newAlias: 'New alias',
+  personCreated: 'Person created.',
+  personUpdated: 'Person saved.',
+  groupCreated: 'Group created.',
+  groupUpdated: 'Group saved.',
+  archivedPeople: 'Archived people ({{count}})',
+  archivedGroups: 'Archived groups ({{count}})',
+  archivedOn: 'Archived on {{date}}',
+  archivedOnField: 'Archive date',
+}

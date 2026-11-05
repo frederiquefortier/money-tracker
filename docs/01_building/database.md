@@ -227,9 +227,10 @@ went to events (EVT-07). Kept as the draft for when they come back.
 
 | Table | Columns | Req |
 |---|---|---|
-| `people` | `name`, `icon`, `archived_at` | PPL-01, 02 |
-| `person_groups` | `name`, `icon`, `archived_at` | PPL-01, 02 |
-| `person_group_members` | `group_id`, `person_id` | |
+| `people` | `name`, `archived_on` | PPL-01, 02. Built 2026-11-05. No icon: the avatar is the name's first letter (spec 19). Names unique ignoring case and accents (`fold_name`). |
+| `person_groups` | `name`, `archived_on` | PPL-01, 02. Built 2026-11-05. Its icon is its members' avatars. Names unique the same way. |
+| `person_aliases` | `person_id`, `alias` | PPL-06. Built 2026-11-05. Unique per user on `fold_name(alias)`. Triggers refuse an alias equal to any person's name or another alias, and a name equal to an alias, so an import match points to one person. Written by `save_person`, which replaces the list; deleted with the person. |
+| `person_group_members` | `group_id`, `person_id` | PPL-01. Composite keys with `user_id` to both (ADR-005), deleted with either side. Written with the person or the group by `save_person` and `save_person_group` (ADR-012). |
 | `transaction_people` | `transaction_id`, `person_id` or `group_id` (exactly one), `role` (`invited`/`owes`), `input_mode`, `input_value`, `amount`, `settled_by_id` (→ `reimbursements`) | PPL-03, 05. The share comes off each split proportionally (Q5); view `my_split_amounts` gives "my share per category", which the dashboard uses by default. |
 | `event_types` | `name`, `icon` | EVT-01 |
 | `events` | `type_id`, `name`, `starts_on`, `ends_on` | EVT-02 |

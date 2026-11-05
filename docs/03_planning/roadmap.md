@@ -52,7 +52,8 @@ icons. Transfers (spec 16) are built: the Transfert tab of the form, the receive
 and conversion cost between currencies, the fee and its category, a pending box per
 side, and editing or deleting every part together. Balance adjustments (TRX-03) are
 built: tapping an account's balance on Comptes opens them, and the list opens a saved
-one. Phase 1 is complete once the author has tried them. The import moved after people,
+one. Phase 1 is complete once the author has tried them. Phase 2 started: Proches (spec 19,
+PPL-01, 02) are built, in the Réglages menu (2026-11-05). The import moved after people,
 tags and events (2026-11-05).
 
 - Currencies, HexaRate validation, the Frankfurter rates job with a backfill to 2018,
@@ -84,7 +85,8 @@ the eight years of history are prepared in one pass, not one per feature (decide
 2026-11-05). In this order (author, 2026-11-05): proches, then events. Tags moved to
 later; events took their automatic linking (2026-11-05).
 
-- People and groups, roles on transactions, anonymous treat/reimbursement. PPL-01..05.
+- People and groups, roles on transactions, anonymous treat/reimbursement, aliases for
+  the import. PPL-01..06.
 - Reimbursement links. TRX-07.
 - Events, linked by hand or automatically by date range and categories, shown as a tag
   on the transaction; calendar, comparison, event budgets. EVT-01..07.

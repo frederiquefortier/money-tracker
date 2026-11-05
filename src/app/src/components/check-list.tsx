@@ -6,7 +6,10 @@ import { Button } from '#/components/ui/button'
 import { Checkbox } from '#/components/ui/checkbox'
 import { cn, focusRing } from '#/lib/utils'
 
-// Checkboxes in cards, several ticked at once: the transactions filters (spec 14).
+// Checkboxes in cards, several ticked at once: the transactions filters (spec 14) and a
+// person's groups or a group's members (spec 19). The cards take a form field's radius
+// and border, so they read as fields.
+export const fieldCard = cn(cardSurface, 'rounded-field border-input')
 
 export type CheckNode = {
   id: string
@@ -109,7 +112,7 @@ function GroupCard({
     (node) => ticks.stateOf(node) === 'on',
   ).length
   return (
-    <section className={cardSurface}>
+    <section className={fieldCard}>
       <header className="flex items-center gap-2 pr-2">
         <button
           type="button"
@@ -171,9 +174,9 @@ export function CheckList({
   openCount?: number
   children?: React.ReactNode
 } & Ticks) {
-  if (nodes.length === 0) return null
+  if (nodes.length === 0 && !children) return null
   const ticks = { stateOf, onToggle }
-  if (nodes.every((n) => n.children?.length))
+  if (nodes.length > 0 && nodes.every((n) => n.children?.length))
     return (
       <div className="flex flex-col gap-2">
         {nodes.map((group, i) => (
@@ -187,8 +190,8 @@ export function CheckList({
       </div>
     )
   return (
-    <div className={cardSurface}>
-      <CheckRows nodes={nodes} ticks={ticks} />
+    <div className={fieldCard}>
+      {nodes.length > 0 && <CheckRows nodes={nodes} ticks={ticks} />}
       {children}
     </div>
   )

@@ -1,6 +1,7 @@
 // French is the source language (ADR-008). en.ts is typed against this shape.
 import { categoriesFr } from './fr-categories'
 import { merchantsFr } from './fr-merchants'
+import { peopleFr } from './fr-people'
 import { transactionsFr } from './fr-transactions'
 
 export const fr = {
@@ -27,6 +28,7 @@ export const fr = {
     editName: 'Modifier “{{name}}”',
     reset: 'Réinitialiser',
     remove: 'Retirer',
+    removeName: 'Retirer “{{name}}”',
     archive: 'Archiver',
     archiveName: 'Archiver “{{name}}”',
     reactivate: 'Réactiver',
@@ -147,6 +149,7 @@ export const fr = {
     categories: 'Catégories',
     currencies: 'Devises',
     merchants: 'Magasins',
+    people: 'Proches',
   },
   money: {
     converted: 'Environ {{amount}}, converti en {{currency}}',
@@ -201,6 +204,7 @@ export const fr = {
   categories: categoriesFr,
   transactions: transactionsFr,
   merchants: merchantsFr,
+  people: peopleFr,
   currencies: {
     title: 'Devises',
     defaultBadge: 'Par défaut',

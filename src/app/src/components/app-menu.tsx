@@ -13,6 +13,7 @@ import { signOut } from '#/server/session'
 const SCREENS = [
   { to: '/settings/categories', label: 'settings.categories', icon: 'tags' },
   { to: '/settings/merchants', label: 'settings.merchants', icon: 'store' },
+  { to: '/settings/people', label: 'settings.people', icon: 'users' },
   { to: '/settings/currencies', label: 'settings.currencies', icon: 'coins' },
 ] as const satisfies ReadonlyArray<{
   to: string

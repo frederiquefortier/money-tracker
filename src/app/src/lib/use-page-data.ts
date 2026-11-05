@@ -13,3 +13,7 @@ export function useCategoriesPage() {
 export function useMerchantsPage() {
   return useLoaderData({ from: '/_authed/settings/merchants' })
 }
+
+export function usePeoplePage() {
+  return useLoaderData({ from: '/_authed/settings/people' })
+}

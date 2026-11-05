@@ -114,11 +114,12 @@ English; this file is in English like every other meta-doc.
 
 | ID | Requirement | Source | Phase |
 |---|---|---|---|
-| PPL-01 | People have a name and a custom icon; they can be grouped. | v1, ai | 2 |
+| PPL-01 | People have a name and, for now, its first letter as their icon; they can be grouped, and a group shows its members' avatars. | v1, ai, author | 2 |
 | PPL-02 | A person or a group can be archived and hidden. | ai | 2 |
 | PPL-03 | A transaction can be linked to people or groups, each in a role: invited (I paid for them) or owes (they will pay me back). Their part is set by amount, share or percentage. | v1, ai | 2 |
 | PPL-04 | Without naming anyone: tick "I treated someone" with an amount and a head count, or "I expect a reimbursement" with an amount. | v1 | 2 |
 | PPL-05 | Reminders for money owed in both directions. | misc | 2 |
+| PPL-06 | A person can have aliases, other spellings of their name, so the import finds them by name or alias, ignoring case and accents. A name or an alias points to one person only. | author | 2 |
 
 ## 9. Events (`EVT`)
 

@@ -322,6 +322,119 @@ export type Database = {
           },
         ]
       }
+      people: {
+        Row: {
+          archived_on: string | null
+          created_at: string
+          id: string
+          name: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          archived_on?: string | null
+          created_at?: string
+          id?: string
+          name: string
+          updated_at?: string
+          user_id?: string
+        }
+        Update: {
+          archived_on?: string | null
+          created_at?: string
+          id?: string
+          name?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      person_aliases: {
+        Row: {
+          alias: string
+          person_id: string
+          user_id: string
+        }
+        Insert: {
+          alias: string
+          person_id: string
+          user_id?: string
+        }
+        Update: {
+          alias?: string
+          person_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "person_aliases_user_id_person_id_fkey"
+            columns: ["user_id", "person_id"]
+            isOneToOne: false
+            referencedRelation: "people"
+            referencedColumns: ["user_id", "id"]
+          },
+        ]
+      }
+      person_group_members: {
+        Row: {
+          group_id: string
+          person_id: string
+          user_id: string
+        }
+        Insert: {
+          group_id: string
+          person_id: string
+          user_id?: string
+        }
+        Update: {
+          group_id?: string
+          person_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "person_group_members_user_id_group_id_fkey"
+            columns: ["user_id", "group_id"]
+            isOneToOne: false
+            referencedRelation: "person_groups"
+            referencedColumns: ["user_id", "id"]
+          },
+          {
+            foreignKeyName: "person_group_members_user_id_person_id_fkey"
+            columns: ["user_id", "person_id"]
+            isOneToOne: false
+            referencedRelation: "people"
+            referencedColumns: ["user_id", "id"]
+          },
+        ]
+      }
+      person_groups: {
+        Row: {
+          archived_on: string | null
+          created_at: string
+          id: string
+          name: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          archived_on?: string | null
+          created_at?: string
+          id?: string
+          name: string
+          updated_at?: string
+          user_id?: string
+        }
+        Update: {
+          archived_on?: string | null
+          created_at?: string
+          id?: string
+          name?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
@@ -687,6 +800,19 @@ export type Database = {
           occurred_on: string
           real_balance: number
         }
+        Returns: string
+      }
+      save_person: {
+        Args: {
+          aliases?: string[]
+          group_ids: string[]
+          name: string
+          person_id: string
+        }
+        Returns: string
+      }
+      save_person_group: {
+        Args: { group_id: string; name: string; person_ids: string[] }
         Returns: string
       }
       save_transaction: {

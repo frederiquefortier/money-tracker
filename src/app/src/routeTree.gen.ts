@@ -26,6 +26,7 @@ import { Route as AuthedAccountsNewRouteImport } from './routes/_authed/accounts
 import { Route as AuthedSettingsCategoriesRouteImport } from './routes/_authed/settings/categories'
 import { Route as AuthedSettingsCurrenciesRouteImport } from './routes/_authed/settings/currencies'
 import { Route as AuthedSettingsMerchantsRouteImport } from './routes/_authed/settings/merchants'
+import { Route as AuthedSettingsPeopleRouteImport } from './routes/_authed/settings/people'
 import { Route as AuthedTransactionsTransactionIdRouteImport } from './routes/_authed/transactions/$transactionId'
 import { Route as AuthedTransactionsNewRouteImport } from './routes/_authed/transactions/new'
 import { Route as AuthedAccountsInstitutionsInstitutionIdRouteImport } from './routes/_authed/accounts/institutions/$institutionId'
@@ -35,8 +36,12 @@ import { Route as AuthedSettingsCategoriesNewRouteImport } from './routes/_authe
 import { Route as AuthedSettingsCurrenciesAddRouteImport } from './routes/_authed/settings/currencies/add'
 import { Route as AuthedSettingsMerchantsMerchantIdRouteImport } from './routes/_authed/settings/merchants/$merchantId'
 import { Route as AuthedSettingsMerchantsNewRouteImport } from './routes/_authed/settings/merchants/new'
+import { Route as AuthedSettingsPeoplePersonIdRouteImport } from './routes/_authed/settings/people/$personId'
+import { Route as AuthedSettingsPeopleNewRouteImport } from './routes/_authed/settings/people/new'
 import { Route as AuthedTransactionsAdjustmentsAdjustmentIdRouteImport } from './routes/_authed/transactions/adjustments/$adjustmentId'
 import { Route as AuthedTransactionsTransfersTransferIdRouteImport } from './routes/_authed/transactions/transfers/$transferId'
+import { Route as AuthedSettingsPeopleGroupsGroupIdRouteImport } from './routes/_authed/settings/people/groups/$groupId'
+import { Route as AuthedSettingsPeopleGroupsNewRouteImport } from './routes/_authed/settings/people/groups/new'
 
 const AuthedRoute = AuthedRouteImport.update({
   id: '/_authed',
@@ -124,6 +129,11 @@ const AuthedSettingsMerchantsRoute = AuthedSettingsMerchantsRouteImport.update({
   path: '/settings/merchants',
   getParentRoute: () => AuthedRoute,
 } as any)
+const AuthedSettingsPeopleRoute = AuthedSettingsPeopleRouteImport.update({
+  id: '/settings/people',
+  path: '/settings/people',
+  getParentRoute: () => AuthedRoute,
+} as any)
 const AuthedTransactionsTransactionIdRoute =
   AuthedTransactionsTransactionIdRouteImport.update({
     id: '/$transactionId',
@@ -177,6 +187,17 @@ const AuthedSettingsMerchantsNewRoute =
     path: '/new',
     getParentRoute: () => AuthedSettingsMerchantsRoute,
   } as any)
+const AuthedSettingsPeoplePersonIdRoute =
+  AuthedSettingsPeoplePersonIdRouteImport.update({
+    id: '/$personId',
+    path: '/$personId',
+    getParentRoute: () => AuthedSettingsPeopleRoute,
+  } as any)
+const AuthedSettingsPeopleNewRoute = AuthedSettingsPeopleNewRouteImport.update({
+  id: '/new',
+  path: '/new',
+  getParentRoute: () => AuthedSettingsPeopleRoute,
+} as any)
 const AuthedTransactionsAdjustmentsAdjustmentIdRoute =
   AuthedTransactionsAdjustmentsAdjustmentIdRouteImport.update({
     id: '/adjustments/$adjustmentId',
@@ -188,6 +209,18 @@ const AuthedTransactionsTransfersTransferIdRoute =
     id: '/transfers/$transferId',
     path: '/transfers/$transferId',
     getParentRoute: () => AuthedTransactionsRoute,
+  } as any)
+const AuthedSettingsPeopleGroupsGroupIdRoute =
+  AuthedSettingsPeopleGroupsGroupIdRouteImport.update({
+    id: '/groups/$groupId',
+    path: '/groups/$groupId',
+    getParentRoute: () => AuthedSettingsPeopleRoute,
+  } as any)
+const AuthedSettingsPeopleGroupsNewRoute =
+  AuthedSettingsPeopleGroupsNewRouteImport.update({
+    id: '/groups/new',
+    path: '/groups/new',
+    getParentRoute: () => AuthedSettingsPeopleRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
@@ -207,6 +240,7 @@ export interface FileRoutesByFullPath {
   '/settings/categories': typeof AuthedSettingsCategoriesRouteWithChildren
   '/settings/currencies': typeof AuthedSettingsCurrenciesRouteWithChildren
   '/settings/merchants': typeof AuthedSettingsMerchantsRouteWithChildren
+  '/settings/people': typeof AuthedSettingsPeopleRouteWithChildren
   '/transactions/$transactionId': typeof AuthedTransactionsTransactionIdRoute
   '/transactions/new': typeof AuthedTransactionsNewRoute
   '/accounts/institutions/$institutionId': typeof AuthedAccountsInstitutionsInstitutionIdRoute
@@ -216,8 +250,12 @@ export interface FileRoutesByFullPath {
   '/settings/currencies/add': typeof AuthedSettingsCurrenciesAddRoute
   '/settings/merchants/$merchantId': typeof AuthedSettingsMerchantsMerchantIdRoute
   '/settings/merchants/new': typeof AuthedSettingsMerchantsNewRoute
+  '/settings/people/$personId': typeof AuthedSettingsPeoplePersonIdRoute
+  '/settings/people/new': typeof AuthedSettingsPeopleNewRoute
   '/transactions/adjustments/$adjustmentId': typeof AuthedTransactionsAdjustmentsAdjustmentIdRoute
   '/transactions/transfers/$transferId': typeof AuthedTransactionsTransfersTransferIdRoute
+  '/settings/people/groups/$groupId': typeof AuthedSettingsPeopleGroupsGroupIdRoute
+  '/settings/people/groups/new': typeof AuthedSettingsPeopleGroupsNewRoute
 }
 export interface FileRoutesByTo {
   '/forgot-password': typeof ForgotPasswordRoute
@@ -236,6 +274,7 @@ export interface FileRoutesByTo {
   '/settings/categories': typeof AuthedSettingsCategoriesRouteWithChildren
   '/settings/currencies': typeof AuthedSettingsCurrenciesRouteWithChildren
   '/settings/merchants': typeof AuthedSettingsMerchantsRouteWithChildren
+  '/settings/people': typeof AuthedSettingsPeopleRouteWithChildren
   '/transactions/$transactionId': typeof AuthedTransactionsTransactionIdRoute
   '/transactions/new': typeof AuthedTransactionsNewRoute
   '/accounts/institutions/$institutionId': typeof AuthedAccountsInstitutionsInstitutionIdRoute
@@ -245,8 +284,12 @@ export interface FileRoutesByTo {
   '/settings/currencies/add': typeof AuthedSettingsCurrenciesAddRoute
   '/settings/merchants/$merchantId': typeof AuthedSettingsMerchantsMerchantIdRoute
   '/settings/merchants/new': typeof AuthedSettingsMerchantsNewRoute
+  '/settings/people/$personId': typeof AuthedSettingsPeoplePersonIdRoute
+  '/settings/people/new': typeof AuthedSettingsPeopleNewRoute
   '/transactions/adjustments/$adjustmentId': typeof AuthedTransactionsAdjustmentsAdjustmentIdRoute
   '/transactions/transfers/$transferId': typeof AuthedTransactionsTransfersTransferIdRoute
+  '/settings/people/groups/$groupId': typeof AuthedSettingsPeopleGroupsGroupIdRoute
+  '/settings/people/groups/new': typeof AuthedSettingsPeopleGroupsNewRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -267,6 +310,7 @@ export interface FileRoutesById {
   '/_authed/settings/categories': typeof AuthedSettingsCategoriesRouteWithChildren
   '/_authed/settings/currencies': typeof AuthedSettingsCurrenciesRouteWithChildren
   '/_authed/settings/merchants': typeof AuthedSettingsMerchantsRouteWithChildren
+  '/_authed/settings/people': typeof AuthedSettingsPeopleRouteWithChildren
   '/_authed/transactions/$transactionId': typeof AuthedTransactionsTransactionIdRoute
   '/_authed/transactions/new': typeof AuthedTransactionsNewRoute
   '/_authed/accounts/institutions/$institutionId': typeof AuthedAccountsInstitutionsInstitutionIdRoute
@@ -276,8 +320,12 @@ export interface FileRoutesById {
   '/_authed/settings/currencies/add': typeof AuthedSettingsCurrenciesAddRoute
   '/_authed/settings/merchants/$merchantId': typeof AuthedSettingsMerchantsMerchantIdRoute
   '/_authed/settings/merchants/new': typeof AuthedSettingsMerchantsNewRoute
+  '/_authed/settings/people/$personId': typeof AuthedSettingsPeoplePersonIdRoute
+  '/_authed/settings/people/new': typeof AuthedSettingsPeopleNewRoute
   '/_authed/transactions/adjustments/$adjustmentId': typeof AuthedTransactionsAdjustmentsAdjustmentIdRoute
   '/_authed/transactions/transfers/$transferId': typeof AuthedTransactionsTransfersTransferIdRoute
+  '/_authed/settings/people/groups/$groupId': typeof AuthedSettingsPeopleGroupsGroupIdRoute
+  '/_authed/settings/people/groups/new': typeof AuthedSettingsPeopleGroupsNewRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -298,6 +346,7 @@ export interface FileRouteTypes {
     | '/settings/categories'
     | '/settings/currencies'
     | '/settings/merchants'
+    | '/settings/people'
     | '/transactions/$transactionId'
     | '/transactions/new'
     | '/accounts/institutions/$institutionId'
@@ -307,8 +356,12 @@ export interface FileRouteTypes {
     | '/settings/currencies/add'
     | '/settings/merchants/$merchantId'
     | '/settings/merchants/new'
+    | '/settings/people/$personId'
+    | '/settings/people/new'
     | '/transactions/adjustments/$adjustmentId'
     | '/transactions/transfers/$transferId'
+    | '/settings/people/groups/$groupId'
+    | '/settings/people/groups/new'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/forgot-password'
@@ -327,6 +380,7 @@ export interface FileRouteTypes {
     | '/settings/categories'
     | '/settings/currencies'
     | '/settings/merchants'
+    | '/settings/people'
     | '/transactions/$transactionId'
     | '/transactions/new'
     | '/accounts/institutions/$institutionId'
@@ -336,8 +390,12 @@ export interface FileRouteTypes {
     | '/settings/currencies/add'
     | '/settings/merchants/$merchantId'
     | '/settings/merchants/new'
+    | '/settings/people/$personId'
+    | '/settings/people/new'
     | '/transactions/adjustments/$adjustmentId'
     | '/transactions/transfers/$transferId'
+    | '/settings/people/groups/$groupId'
+    | '/settings/people/groups/new'
   id:
     | '__root__'
     | '/_authed'
@@ -357,6 +415,7 @@ export interface FileRouteTypes {
     | '/_authed/settings/categories'
     | '/_authed/settings/currencies'
     | '/_authed/settings/merchants'
+    | '/_authed/settings/people'
     | '/_authed/transactions/$transactionId'
     | '/_authed/transactions/new'
     | '/_authed/accounts/institutions/$institutionId'
@@ -366,8 +425,12 @@ export interface FileRouteTypes {
     | '/_authed/settings/currencies/add'
     | '/_authed/settings/merchants/$merchantId'
     | '/_authed/settings/merchants/new'
+    | '/_authed/settings/people/$personId'
+    | '/_authed/settings/people/new'
     | '/_authed/transactions/adjustments/$adjustmentId'
     | '/_authed/transactions/transfers/$transferId'
+    | '/_authed/settings/people/groups/$groupId'
+    | '/_authed/settings/people/groups/new'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -500,6 +563,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthedSettingsMerchantsRouteImport
       parentRoute: typeof AuthedRoute
     }
+    '/_authed/settings/people': {
+      id: '/_authed/settings/people'
+      path: '/settings/people'
+      fullPath: '/settings/people'
+      preLoaderRoute: typeof AuthedSettingsPeopleRouteImport
+      parentRoute: typeof AuthedRoute
+    }
     '/_authed/transactions/$transactionId': {
       id: '/_authed/transactions/$transactionId'
       path: '/$transactionId'
@@ -563,6 +633,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthedSettingsMerchantsNewRouteImport
       parentRoute: typeof AuthedSettingsMerchantsRoute
     }
+    '/_authed/settings/people/$personId': {
+      id: '/_authed/settings/people/$personId'
+      path: '/$personId'
+      fullPath: '/settings/people/$personId'
+      preLoaderRoute: typeof AuthedSettingsPeoplePersonIdRouteImport
+      parentRoute: typeof AuthedSettingsPeopleRoute
+    }
+    '/_authed/settings/people/new': {
+      id: '/_authed/settings/people/new'
+      path: '/new'
+      fullPath: '/settings/people/new'
+      preLoaderRoute: typeof AuthedSettingsPeopleNewRouteImport
+      parentRoute: typeof AuthedSettingsPeopleRoute
+    }
     '/_authed/transactions/adjustments/$adjustmentId': {
       id: '/_authed/transactions/adjustments/$adjustmentId'
       path: '/adjustments/$adjustmentId'
@@ -576,6 +660,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/transactions/transfers/$transferId'
       preLoaderRoute: typeof AuthedTransactionsTransfersTransferIdRouteImport
       parentRoute: typeof AuthedTransactionsRoute
+    }
+    '/_authed/settings/people/groups/$groupId': {
+      id: '/_authed/settings/people/groups/$groupId'
+      path: '/groups/$groupId'
+      fullPath: '/settings/people/groups/$groupId'
+      preLoaderRoute: typeof AuthedSettingsPeopleGroupsGroupIdRouteImport
+      parentRoute: typeof AuthedSettingsPeopleRoute
+    }
+    '/_authed/settings/people/groups/new': {
+      id: '/_authed/settings/people/groups/new'
+      path: '/groups/new'
+      fullPath: '/settings/people/groups/new'
+      preLoaderRoute: typeof AuthedSettingsPeopleGroupsNewRouteImport
+      parentRoute: typeof AuthedSettingsPeopleRoute
     }
   }
 }
@@ -668,6 +766,24 @@ const AuthedSettingsMerchantsRouteWithChildren =
     AuthedSettingsMerchantsRouteChildren,
   )
 
+interface AuthedSettingsPeopleRouteChildren {
+  AuthedSettingsPeoplePersonIdRoute: typeof AuthedSettingsPeoplePersonIdRoute
+  AuthedSettingsPeopleNewRoute: typeof AuthedSettingsPeopleNewRoute
+  AuthedSettingsPeopleGroupsGroupIdRoute: typeof AuthedSettingsPeopleGroupsGroupIdRoute
+  AuthedSettingsPeopleGroupsNewRoute: typeof AuthedSettingsPeopleGroupsNewRoute
+}
+
+const AuthedSettingsPeopleRouteChildren: AuthedSettingsPeopleRouteChildren = {
+  AuthedSettingsPeoplePersonIdRoute: AuthedSettingsPeoplePersonIdRoute,
+  AuthedSettingsPeopleNewRoute: AuthedSettingsPeopleNewRoute,
+  AuthedSettingsPeopleGroupsGroupIdRoute:
+    AuthedSettingsPeopleGroupsGroupIdRoute,
+  AuthedSettingsPeopleGroupsNewRoute: AuthedSettingsPeopleGroupsNewRoute,
+}
+
+const AuthedSettingsPeopleRouteWithChildren =
+  AuthedSettingsPeopleRoute._addFileChildren(AuthedSettingsPeopleRouteChildren)
+
 interface AuthedRouteChildren {
   AuthedAccountsRoute: typeof AuthedAccountsRouteWithChildren
   AuthedBudgetRoute: typeof AuthedBudgetRoute
@@ -677,6 +793,7 @@ interface AuthedRouteChildren {
   AuthedSettingsCategoriesRoute: typeof AuthedSettingsCategoriesRouteWithChildren
   AuthedSettingsCurrenciesRoute: typeof AuthedSettingsCurrenciesRouteWithChildren
   AuthedSettingsMerchantsRoute: typeof AuthedSettingsMerchantsRouteWithChildren
+  AuthedSettingsPeopleRoute: typeof AuthedSettingsPeopleRouteWithChildren
 }
 
 const AuthedRouteChildren: AuthedRouteChildren = {
@@ -688,6 +805,7 @@ const AuthedRouteChildren: AuthedRouteChildren = {
   AuthedSettingsCategoriesRoute: AuthedSettingsCategoriesRouteWithChildren,
   AuthedSettingsCurrenciesRoute: AuthedSettingsCurrenciesRouteWithChildren,
   AuthedSettingsMerchantsRoute: AuthedSettingsMerchantsRouteWithChildren,
+  AuthedSettingsPeopleRoute: AuthedSettingsPeopleRouteWithChildren,
 }
 
 const AuthedRouteWithChildren =

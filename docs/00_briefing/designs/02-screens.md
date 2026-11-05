@@ -21,6 +21,7 @@ onto them.
 | 16 | [Transfer and adjustment](16-transfer-adjustment.md) | Transfer form (fee, two currencies), balance adjustment | TRX-03, 04, 11 | Built |
 | 17 | [First run](17-first-run.md) | Language, currencies, first accounts and categories | SET-01 | Reviewed |
 | 18 | [Import and export](18-import-export.md) | File check, summary, commit, undo, export | IMP-01, 04, 05, 06, SEC-04 | Reviewed |
+| 19 | [People](19-people.md) | Proches and groups, their forms, aliases, in the Réglages menu | PPL-01, 02, 06 | Built |
 
 ## Shared patterns
 
@@ -47,7 +48,7 @@ component to use, so a screen is assembled, not redrawn.
   how many while in use; on phones a single Filtres button opening on the first filter.
   Each opens one sheet on its tab (`FilterSheet`): tabs with
   counts, a search for the open tab, lists of checkboxes (`CheckList`), several ticked
-  at once, each applying as it is ticked, and a footer with Effacer and "Voir 128
+  at once, each applying as it is ticked, their cards with a form field's 4px corners and input border (`fieldCard`), and a footer with Effacer and "Voir 128
   résultats". A whole row is the tap target, the box at its end. Only groups fold, each
   a card like an institution's on Comptes, its name folding it and "Tout" ticking all of
   it. Order, left to right:
@@ -92,7 +93,10 @@ component to use, so a screen is assembled, not redrawn.
   `LinkedFields`). Dates are native (`FormField` with `type="date"`, ADR-024). `LinkedFields` wraps only the sub-field, never the field it belongs to. Required fields carry an asterisk, no legend, no "(facultatif)".
 - **Choosing from the user's own items:** `Combobox`, typed into the field: it filters,
   offers "Créer « … »" when that makes sense (`useInlineCreate`: a failure is a toast,
-  the new item is chosen), and a × clears it. Nothing chosen is an
+  the new item is chosen), and a × clears it. Several choices in a form (a person's groups, spec 19)
+  are the filters' `CheckList` under a field label, as in a filter sheet; creating one
+  there is the card's last row, a "+ Nouveau …" button that becomes a name field
+  (`CreateRow`). Nothing chosen is an
   empty field, never "Aucun(e)". The chosen option is tinted (the accent background,
   semibold), as in a native select, with no check and no slot for one; options under a
   group heading (an institution, a category type) sit one step in; hover and the
