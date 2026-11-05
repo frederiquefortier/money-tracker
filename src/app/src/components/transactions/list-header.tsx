@@ -43,6 +43,8 @@ function onlyPicked(tab: FilterTab, names: ListFilters | null) {
   }
   if (tab === 'merchants' && names?.merchants.length === 1)
     return { name: names.merchants[0].name }
+  if (tab === 'people' && names?.people.length === 1)
+    return { name: names.people[0].name }
   return null
 }
 
@@ -110,37 +112,103 @@ function AllFiltersButton({
 }
 
 /**
- * TRX-09: "3 en attente" in the spreadsheet's blue while something is pending, at any
- * date; pressed, the list keeps only those.
+ * A status's bubble in its rows' colour, at any date, while some exist; pressed, the list
+ * keeps only those. TRX-09: "3 en attente" in the spreadsheet's blue; spec 20: "2 me
+ * doivent" in amber.
  */
-function PendingButton({
+function StatusButton({
+  status,
   count,
   on,
   onToggle,
 }: {
+  status: 'pending' | 'owed'
   count: number | null
   on: boolean
   onToggle: (on: boolean) => void
 }) {
   const { t } = useTranslation()
   if (!on && !count) return null
+  const pending = status === 'pending'
   return (
     <button
       type="button"
       aria-pressed={on}
       onClick={() => onToggle(!on)}
-      className={cn(chip, 'bg-pending', on && inUse)}
+      className={cn(chip, pending ? 'bg-pending' : 'bg-owed', on && inUse)}
     >
-      <Icon name="clock" className="size-4" />
-      {t('transactions.list.pendingCount', { count: count ?? 0 })}
+      <Icon name={pending ? 'clock' : 'users'} className="size-4" />
+      {t(
+        pending
+          ? 'transactions.list.pendingCount'
+          : 'transactions.list.owedCount',
+        { count: count ?? 0 },
+      )}
     </button>
   )
 }
 
+type BubblesProps = {
+  choice: PeriodChoice
+  filters: FilterValues
+  names: ListFilters | null
+  pending: { count: number | null; on: boolean }
+  owed: { count: number | null; on: boolean }
+  loading: boolean
+  onPeriod: (choice: PeriodChoice) => void
+  onPending: (on: boolean) => void
+  onOwed: (on: boolean) => void
+  onOpen: (tab: FilterTab) => void
+}
+
 /**
- * The title, the search, then one row: what is pending, the period with its arrows and a button per
- * filter (spec 14), or on phones a single Filtres button. The row scrolls sideways when
- * it runs out of room, fading at the edge.
+ * Pending, owed, the period and the filters, as bubbles: on phones one row scrolling
+ * sideways and fading at the edge; from md up, wrapping onto more lines.
+ */
+function Bubbles(props: BubblesProps) {
+  const { choice, filters, names, pending, owed, loading } = props
+  return (
+    <div className="-mx-4 -my-1 overflow-x-auto px-4 py-1 [scrollbar-width:none] max-md:[mask-image:linear-gradient(to_right,black_calc(100%-1rem),transparent)] md:mx-0 md:overflow-visible md:px-0">
+      <div className="flex w-max items-center gap-2 md:w-auto md:flex-wrap">
+        <StatusButton
+          status="pending"
+          count={pending.count}
+          on={pending.on}
+          onToggle={props.onPending}
+        />
+        <StatusButton
+          status="owed"
+          count={owed.count}
+          on={owed.on}
+          onToggle={props.onOwed}
+        />
+        <PeriodPicker
+          choice={choice}
+          disabled={loading}
+          onChange={props.onPeriod}
+        />
+        <AllFiltersButton
+          values={filters}
+          onOpen={() => props.onOpen('accounts')}
+        />
+        {FILTER_TABS.map((tab) => (
+          <span key={tab} className="hidden md:contents">
+            <FilterButton
+              tab={tab}
+              values={filters}
+              names={names}
+              onOpen={() => props.onOpen(tab)}
+            />
+          </span>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+/**
+ * The title, the search, then the bubbles: what is pending or owed, the period with its
+ * arrows and a button per filter (spec 14), or on phones a single Filtres button.
  */
 export function ListHeader({
   choice,
@@ -148,11 +216,13 @@ export function ListHeader({
   names,
   total,
   pending,
+  owed,
   search,
   loading,
   onPeriod,
   onFilters,
   onPending,
+  onOwed,
   onSearch,
 }: {
   choice: PeriodChoice
@@ -161,11 +231,13 @@ export function ListHeader({
   /** How many rows the list matches, for the sheet's button. */
   total: number | null
   pending: { count: number | null; on: boolean }
+  owed: { count: number | null; on: boolean }
   search: string
   loading: boolean
   onPeriod: (choice: PeriodChoice) => void
   onFilters: (values: FilterValues) => void
   onPending: (on: boolean) => void
+  onOwed: (on: boolean) => void
   onSearch: (text: string) => void
 }) {
   const { t } = useTranslation()
@@ -177,35 +249,11 @@ export function ListHeader({
     <>
       <PageTitle>{t('nav.transactions')}</PageTitle>
       <SearchField value={search} onChange={onSearch} />
-      <div className="-mx-4 -my-1 overflow-x-auto px-4 py-1 [scrollbar-width:none] max-md:[mask-image:linear-gradient(to_right,black_calc(100%-1rem),transparent)] md:mx-0 md:px-0">
-        <div className="flex w-max items-center gap-2">
-          <PendingButton
-            count={pending.count}
-            on={pending.on}
-            onToggle={onPending}
-          />
-          <PeriodPicker
-            choice={choice}
-            disabled={loading}
-            onChange={onPeriod}
-          />
-          <AllFiltersButton
-            values={filters}
-            onOpen={() => setSheet({ open: true, tab: 'accounts' })}
-          />
-          <div className="hidden gap-2 md:flex">
-            {FILTER_TABS.map((tab) => (
-              <FilterButton
-                key={tab}
-                tab={tab}
-                values={filters}
-                names={names}
-                onOpen={() => setSheet({ open: true, tab })}
-              />
-            ))}
-          </div>
-        </div>
-      </div>
+      <Bubbles
+        {...{ choice, filters, names, pending, owed, loading }}
+        {...{ onPeriod, onPending, onOwed }}
+        onOpen={(tab) => setSheet({ open: true, tab })}
+      />
       <FilterSheet
         open={sheet.open}
         tab={sheet.tab}

@@ -3,6 +3,7 @@ import type { peopleFr } from './fr-people'
 export const peopleEn: typeof peopleFr = {
   title: 'People',
   tabsLabel: 'People or groups',
+  sort: { nameAsc: 'Name A–Z', nameDesc: 'Name Z–A' },
   tabs: {
     people: 'People',
     groups: 'Groups',
@@ -28,4 +29,8 @@ export const peopleEn: typeof peopleFr = {
   archivedGroups: 'Archived groups ({{count}})',
   archivedOn: 'Archived on {{date}}',
   archivedOnField: 'Archive date',
+  deleteKeeps_one:
+    'The transaction keeps its amount; their line becomes “Unnamed”.',
+  deleteKeeps_other:
+    'The {{count}} transactions keep their amounts; their lines become “Unnamed”.',
 }

@@ -80,9 +80,10 @@ From `md` up: the same list, centred, at most 48rem wide.
 
 ### The row under the search
 
-- One row, all bubbles the same height (`chip`): the period, then the filters. When the
-  row runs out of room it scrolls sideways and fades at the right edge, so the list
-  never moves down.
+- One row, all bubbles the same height (`chip`): the period, then the filters. On
+  phones, when the row runs out of room it scrolls sideways and fades at the right edge,
+  so the list never moves down; from `md` up the bubbles wrap onto more lines (decided
+  2026-11-05).
 - On phones, one Filtres button with the filter icon, "Filtres · 3" and filled while
   any are in use, opens the sheet on Comptes.
 - From `md` up, a button per filter instead, Comptes, Catégories, Magasins, each with a
@@ -157,7 +158,8 @@ From `md` up: the same list, centred, at most 48rem wide.
   still matches its rows. While anything is pending, a blue "3 en attente" bubble starts
   the row of controls; pressed, the list keeps only what is pending, at any date, and
   choosing a period lets go of it. The count follows the filters and the search, not the
-  period.
+  period. **Owed** works the same way (spec 20): an amber "2 me doivent" bubble after
+  it while some expense has a Me doit line, keeping only those when pressed.
 - **Transfer** (TRX-04): a transfer icon, the title "Transfert: Chèque (Desjardins) →
   Épargne", the amount neutral (no sign). One row per transfer, even though it is two
   legs. "En attente" shows while either side is pending (spec 16). Between two
@@ -225,6 +227,7 @@ From `md` up: the same list, centred, at most 48rem wide.
 | Filters | Filtres, Filtres · {count}, Comptes, Catégories, Magasins, {name} · {count}; Rechercher un compte, une catégorie, un magasin; Tout, Aucun, Tout cocher dans “{name}”, Tout décocher dans “{name}”; Effacer, Voir {count} résultat(s), Voir les résultats, Aucun résultat |
 | Converted detail | {original} converti au taux du {date} ({rate}) |
 | Pending | En attente, {count} en attente |
+| Owed | {count} me doit / me doivent; Quelqu'un me doit sa part (screen readers) |
 | Fee lines | Frais de conversion, Frais de transaction |
 | Transfer fee | Frais du transfert: {from} → {to} |
 | Transfer | Transfert: {from} → {to} |

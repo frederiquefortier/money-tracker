@@ -62,6 +62,16 @@ export type AccountName = { name: string; institution: string | null }
 
 export type ListedCategory = { name: string; icon: string; color: string }
 
+export type ListedPerson = {
+  name: string | null
+  count: number
+  role: 'invited' | 'owes' | 'from'
+}
+
+/** Someone on it owes me their part (spec 20; settled with spec 21). */
+export const isOwed = (row: { people: ReadonlyArray<ListedPerson> }) =>
+  row.people.some((p) => p.role === 'owes')
+
 export type ListedTransaction = {
   id: string
   transferId: string | null
@@ -75,6 +85,11 @@ export type ListedTransaction = {
   transfer: { from: AccountName; to: AccountName } | null
   /** Every category of the transaction, the largest share first (TRX-06). */
   categories: Array<ListedCategory>
+  /**
+   * Everyone on it but Moi, in the order of their lines (spec 20): a line without a name
+   * has no name and a count; `owes` lines colour the row.
+   */
+  people: Array<ListedPerson>
   /** As booked, in the account's currency; a transfer is unsigned in the full list. */
   amount: string
   currency: string
@@ -109,8 +124,10 @@ export type ListQuery = {
   accountIds?: Array<string>
   categoryIds?: Array<string>
   merchantIds?: Array<string>
+  personIds?: Array<string>
   search?: string
   pendingOnly?: boolean
+  owedOnly?: boolean
 }
 
 /** The filters in use with their names, for their chips; gone ones are left out. */
@@ -118,6 +135,7 @@ export type ListFilters = {
   accounts: Array<AccountName & { id: string }>
   categories: Array<ListedCategory & { id: string }>
   merchants: Array<{ id: string; name: string }>
+  people: Array<{ id: string; name: string }>
 }
 
 export type PageRow = { row: ListedTransaction; dayNet: string | null }

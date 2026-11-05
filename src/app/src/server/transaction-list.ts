@@ -19,13 +19,23 @@ const listInput = z.object({
   accountIds: z.array(z.uuid()).max(100).optional(),
   categoryIds: z.array(z.uuid()).max(100).optional(),
   merchantIds: z.array(z.uuid()).max(100).optional(),
+  personIds: z.array(z.uuid()).max(100).optional(),
   search: z.string().trim().max(200).optional(),
   pendingOnly: z.boolean().optional(),
+  owedOnly: z.boolean().optional(),
   before: z.iso.date().optional(),
 })
 
 const categoriesSchema = z.array(
   z.object({ name: z.string(), icon: z.string(), color: z.string() }),
+)
+
+const peopleSchema = z.array(
+  z.object({
+    name: z.string().nullable(),
+    count: z.number().int(),
+    role: z.enum(['invited', 'owes', 'from']),
+  }),
 )
 
 type ListRow =
@@ -53,6 +63,7 @@ function toPageRow(r: ListRow): Array<PageRow> {
               }
             : null,
         categories: categories.success ? categories.data : [],
+        people: peopleSchema.safeParse(r.people).data ?? [],
         amount: r.amount,
         currency: r.currency,
         displayAmount: r.display_amount,
@@ -75,6 +86,20 @@ function toPageRow(r: ListRow): Array<PageRow> {
   ]
 }
 
+/**
+ * Every row carries the counts; only the first page's are the whole list's (`first` is
+ * undefined on later pages). Pending and owed count at any date, for their bubbles.
+ */
+function counts(first: ListRow | undefined | null) {
+  if (first === undefined)
+    return { total: null, pendingCount: null, owedCount: null }
+  return {
+    total: first?.total ?? 0,
+    pendingCount: first?.pending_count ?? 0,
+    owedCount: first?.owed_count ?? 0,
+  }
+}
+
 const none = { data: [], error: null }
 
 /** The filters in use with their names, for their chips (RLS hides another user's). */
@@ -82,8 +107,13 @@ async function filterNames(
   data: z.infer<typeof listInput>,
 ): Promise<ListFilters> {
   const supabase = getSupabase()
-  const { accountIds = [], categoryIds = [], merchantIds = [] } = data
-  const [accounts, categories, merchants] = loaded(
+  const {
+    accountIds = [],
+    categoryIds = [],
+    merchantIds = [],
+    personIds = [],
+  } = data
+  const [accounts, categories, merchants, people] = loaded(
     'Filters',
     ...(await Promise.all([
       accountIds.length
@@ -101,6 +131,9 @@ async function filterNames(
       merchantIds.length
         ? supabase.from('merchants').select('id, name').in('id', merchantIds)
         : none,
+      personIds.length
+        ? supabase.from('people').select('id, name').in('id', personIds)
+        : none,
     ])),
   )
   return {
@@ -111,6 +144,7 @@ async function filterNames(
     })),
     categories,
     merchants,
+    people,
   }
 }
 
@@ -129,6 +163,7 @@ export const listTransactions = createServerFn({ method: 'GET' })
         filters: ListFilters | null
         total: number | null
         pendingCount: number | null
+        owedCount: number | null
       }
     > => {
       const [result, filters] = await Promise.all([
@@ -138,8 +173,10 @@ export const listTransactions = createServerFn({ method: 'GET' })
           account_ids: data.accountIds,
           category_ids: data.categoryIds,
           merchant_ids: data.merchantIds,
+          person_ids: data.personIds,
           search: data.search || undefined,
           pending_only: data.pendingOnly,
+          owed_only: data.owedOnly,
           before: data.before,
         }),
         data.before ? null : filterNames(data),
@@ -148,10 +185,7 @@ export const listTransactions = createServerFn({ method: 'GET' })
       return {
         ...groupByDay(rows.flatMap(toPageRow), rows.at(0)?.more ?? false),
         filters,
-        // Every row carries it; only the first page's counts the whole list.
-        total: data.before ? null : (rows.at(0)?.total ?? 0),
-        // Pending rows at any date, for the "En attente" bubble.
-        pendingCount: data.before ? null : (rows.at(0)?.pending_count ?? 0),
+        ...counts(data.before ? undefined : (rows.at(0) ?? null)),
       }
     },
   )

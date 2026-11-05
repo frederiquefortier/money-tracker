@@ -2,13 +2,13 @@ import type { Category } from '#/lib/categories'
 import type { FieldErrors } from '#/lib/form'
 import type { Merchant } from '#/lib/merchants'
 import type { Locale } from '#/i18n/locales'
+import { absDecimal, amountForInput, fromMinor, minorDigits } from '#/lib/money'
 import {
-  absDecimal,
-  amountForInput,
-  fromMinor,
-  minorDigits,
-  toMinor,
-} from '#/lib/money'
+  linesFromTransaction,
+  peopleErrors,
+  peopleInput,
+} from '#/lib/transaction-people'
+import type { PersonLine } from '#/lib/transaction-people'
 import {
   bookedMinor,
   splitPreview,
@@ -45,6 +45,9 @@ export type Draft = {
   lines: Array<Line>
   note: string
   pending: boolean
+  /** Empty when no one is on the transaction (spec 20). */
+  people: Array<PersonLine>
+  peopleMode: SplitMode
 }
 
 export function emptyDraft(
@@ -66,6 +69,8 @@ export function emptyDraft(
     lines: [],
     note: '',
     pending: false,
+    people: [],
+    peopleMode: 'share',
   }
 }
 
@@ -93,32 +98,6 @@ export function withMerchant(
     merchantId: merchant.id,
     ...(found ? { categoryId: merchant.defaultCategoryId } : {}),
   }
-}
-
-// 100 % in units of 0.0001, the precision a percentage is stored with.
-const HUNDRED = 1000000n
-
-/**
- * TRX-06: percentages never total more than 100 (spec 15). A typed value above what the
- * other lines leave is cut to it; anything not yet a number is kept as typed.
- */
-export function capPercent(
-  lines: ReadonlyArray<Line>,
-  { key, value: typed }: Pick<Line, 'key' | 'value'>,
-  locale: Locale,
-): string {
-  const weight = typedWeight(typed)
-  const value = weight === null ? null : toMinor(weight, 4)
-  if (value === null) return typed
-  const others = lines
-    .filter((l) => l.key !== key)
-    .reduce((sum, l) => {
-      const w = typedWeight(l.value)
-      return sum + (w === null ? 0n : (toMinor(w, 4) ?? 0n))
-    }, 0n)
-  const left = HUNDRED - others
-  if (value <= left) return typed
-  return amountForInput(fromMinor(left > 0n ? left : 0n, 4), null, locale)
 }
 
 export function draftFromTransaction(
@@ -160,6 +139,10 @@ export function draftFromTransaction(
         })),
     note: transaction.note ?? '',
     pending: transaction.pending,
+    peopleMode: transaction.peopleMode,
+    people: linesFromTransaction(transaction, (value, inAccount) =>
+      forInput(value, inAccount ? accountCurrency : null),
+    ),
   }
 }
 
@@ -202,7 +185,11 @@ function fieldErrors(
   const foreign = accountCurrency !== null && draft.currency !== accountCurrency
   if (foreign && total === null && !errors.amount)
     errors.paid = draft.paid.trim() || !draft.paidByHand ? 'amount' : 'required'
-  return { ...errors, ...categoryErrors(draft, accountCurrency, total) }
+  return {
+    ...errors,
+    ...categoryErrors(draft, accountCurrency, total),
+    ...peopleErrors(draft, accountCurrency, total),
+  }
 }
 
 function splitValues(draft: Draft, accountCurrency: string, total: bigint) {
@@ -258,6 +245,8 @@ export function validateDraft(
       note: draft.note.trim(),
       splitMode: draft.splitMode ?? 'amount',
       splits: splitValues(draft, accountCurrency, total),
+      peopleMode: draft.peopleMode,
+      people: peopleInput(draft, accountCurrency),
     },
   }
 }

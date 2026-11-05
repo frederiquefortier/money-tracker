@@ -10,6 +10,7 @@ import {
   TRANSACTION_KINDS,
   transactionInputSchema,
 } from '#/lib/transactions'
+import { PERSON_ROLES } from '#/lib/transaction-people'
 import { isOneOf } from '#/lib/utils'
 import type {
   FormAccount,
@@ -26,6 +27,7 @@ const failure = failureFor<TransactionError>('transactions', {
 
 const isKind = isOneOf(TRANSACTION_KINDS)
 const isMode = isOneOf(SPLIT_MODES)
+const isRole = isOneOf(PERSON_ROLES)
 
 /** Every account, so an old transaction still shows its closed or hidden one. */
 export const getFormAccounts = createServerFn({ method: 'GET' }).handler(
@@ -67,6 +69,23 @@ export const getFrequentCategories = createServerFn({ method: 'GET' }).handler(
   },
 )
 
+/** The people most often on transactions over the last 90 days, most first (spec 20). */
+export const getFrequentPeople = createServerFn({ method: 'GET' }).handler(
+  async (): Promise<Array<string>> => {
+    const [data] = loaded(
+      'Frequent people',
+      await getSupabase()
+        .from('person_usage')
+        .select('person_id, recent_count, last_on')
+        .gt('recent_count', 0)
+        .order('recent_count', { ascending: false })
+        .order('last_on', { ascending: false })
+        .limit(8),
+    )
+    return data.flatMap((row) => (row.person_id ? [row.person_id] : []))
+  },
+)
+
 /** An expense or income with its splits; null for anything else, such as a transfer. */
 export const getTransaction = createServerFn({ method: 'GET' })
   .validator(idInput)
@@ -74,7 +93,7 @@ export const getTransaction = createServerFn({ method: 'GET' })
     const { data: row, error } = await getSupabase()
       .from('transactions')
       .select(
-        'id, account_id, kind, occurred_on, amount::text, original_amount::text, original_currency, status, merchant_id, note, transfer_id, transaction_splits(category_id, input_mode, input_value::text, amount::text)',
+        'id, account_id, kind, occurred_on, amount::text, original_amount::text, original_currency, status, merchant_id, note, transfer_id, transaction_splits(category_id, input_mode, input_value::text, amount::text), transaction_people(position, role, person_id, head_count, input_mode, input_value::text)',
       )
       .eq('id', data.id)
       .maybeSingle()
@@ -83,6 +102,10 @@ export const getTransaction = createServerFn({ method: 'GET' })
     if (!row || !isKind(row.kind) || row.transfer_id) return null
     const splits = row.transaction_splits
     const mode = splits[0]?.input_mode ?? 'amount'
+    const people = [...row.transaction_people].sort(
+      (a, b) => a.position - b.position,
+    )
+    const peopleMode = people[0]?.input_mode ?? 'share'
     return {
       id: row.id,
       accountId: row.account_id,
@@ -101,10 +124,23 @@ export const getTransaction = createServerFn({ method: 'GET' })
           compareDecimal(absDecimal(b.amount), absDecimal(a.amount)),
         )
         .map((s) => ({ categoryId: s.category_id, value: s.input_value })),
+      peopleMode: isMode(peopleMode) ? peopleMode : 'share',
+      people: people.flatMap((p) =>
+        isRole(p.role)
+          ? [
+              {
+                role: p.role,
+                personId: p.person_id,
+                headCount: p.head_count,
+                value: p.input_value,
+              },
+            ]
+          : [],
+      ),
     }
   })
 
-/** One SQL function writes the transaction and its splits together (ADR-012). */
+/** One SQL function writes the transaction, its splits and people together (ADR-012). */
 export const saveTransaction = createServerFn({ method: 'POST' })
   .validator(transactionInputSchema)
   .handler(async ({ data }): Promise<TransactionResult<{ id: string }>> => {
@@ -123,6 +159,13 @@ export const saveTransaction = createServerFn({ method: 'POST' })
         category_id: s.categoryId,
         input_mode: data.splitMode,
         input_value: s.value,
+      })),
+      people: data.people.map((p) => ({
+        role: p.role,
+        person_id: p.personId,
+        head_count: p.headCount,
+        input_mode: data.peopleMode,
+        input_value: p.value,
       })),
     })
     if (error) return failure('save', error)

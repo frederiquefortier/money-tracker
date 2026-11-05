@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import { CategoryBadge } from '#/components/categories/category-badge'
 import { Icon } from '#/components/icon'
+import { AvatarStack } from '#/components/people/avatars'
 import type { IconName } from '#/components/icon'
 import { rowHover, stackRing } from '#/components/list-card'
 import { MissingRate, Money } from '#/components/money'
@@ -10,6 +11,7 @@ import { useRowText } from '#/components/transactions/row-text'
 import { FORMAT_LOCALE } from '#/i18n/locales'
 import { formatDate, formatMoney } from '#/lib/format'
 import { absDecimal } from '#/lib/money'
+import { isOwed } from '#/lib/transaction-list'
 import type { ListedCategory, ListedTransaction } from '#/lib/transaction-list'
 import { useLocale } from '#/lib/use-locale'
 import { cn, focusRing } from '#/lib/utils'
@@ -162,14 +164,32 @@ function RowContent({
         </span>
         <span className="flex min-w-0 flex-1 flex-col">
           <span className="truncate font-semibold">{title}</span>
-          {details && (
-            <span className="truncate text-sm text-muted-foreground">
-              {details}
+          {(details || row.people.length > 0) && (
+            <span className="flex min-w-0 items-center gap-2 text-sm text-muted-foreground">
+              <span className="truncate">{details}</span>
+              {/* Spec 20: who it was with, stacked like a group's avatars. */}
+              {row.people.length > 0 && (
+                <>
+                  <AvatarStack items={row.people} size="md" />
+                  <span className="sr-only">
+                    {row.people
+                      .map(
+                        (p) =>
+                          p.name ??
+                          t('transactions.people.count', { count: p.count }),
+                      )
+                      .join(', ')}
+                  </span>
+                </>
+              )}
             </span>
           )}
           {/* The blue row and the bubble show it; screen readers still hear it. */}
           {row.pending && (
             <span className="sr-only">{t('transactions.pending')}</span>
+          )}
+          {isOwed(row) && (
+            <span className="sr-only">{t('transactions.list.owed')}</span>
           )}
         </span>
         <RowAmount
@@ -208,7 +228,10 @@ export function TransactionRow({
       className={cn(
         'flex items-center pr-2',
         rowHover,
-        row.pending && 'bg-pending [--row-bg:var(--pending)]',
+        // Pending first: the bank has not settled it, whoever owes what.
+        row.pending
+          ? 'bg-pending [--row-bg:var(--pending)]'
+          : isOwed(row) && 'bg-owed [--row-bg:var(--owed)]',
       )}
     >
       <RowLink row={row} className={cn(rowLayout, focusRing)}>

@@ -7,6 +7,7 @@ import {
   merchantNodes,
   useAccountTree,
   useCategoryTree,
+  usePeopleTree,
 } from '#/components/transactions/filter-nodes'
 import type {
   FilterTab,
@@ -15,15 +16,18 @@ import type {
 import { Button } from '#/components/ui/button'
 import type { Category } from '#/lib/categories'
 import type { Merchant } from '#/lib/merchants'
+import type { Person, PersonGroup } from '#/lib/people'
 import type { FormAccount } from '#/lib/transactions'
 import { useFormatLocale } from '#/lib/use-locale'
 
-// The filter sheet's three lists, one per tab (spec 14).
+// The filter sheet's lists, one per tab (spec 14, spec 20).
 
 export type Options = {
   accounts: Array<FormAccount>
   categories: Array<Category>
   merchants: Array<Merchant>
+  people: Array<Person>
+  groups: Array<PersonGroup>
 }
 
 function NoMatch() {
@@ -81,7 +85,10 @@ function MerchantList({
   )
 }
 
-/** The open tab's list: accounts by institution, the categories tree by type, merchants. */
+/**
+ * The open tab's list: accounts by institution, the categories tree by type, merchants,
+ * people by group.
+ */
 export function FilterList({
   tab,
   query,
@@ -97,6 +104,7 @@ export function FilterList({
 }) {
   const accounts = useAccountTree(options.accounts, query)
   const categories = useCategoryTree(options.categories, query)
+  const people = usePeopleTree(options.people, options.groups, query)
   if (tab === 'accounts') {
     const ticks = groupTicks(values.accountIds)
     if (!accounts.length) return <NoMatch />
@@ -121,6 +129,20 @@ export function FilterList({
         stateOf={ticks.stateOf}
         onToggle={(node) =>
           onChange({ ...values, categoryIds: ticks.toggle(node) })
+        }
+      />
+    )
+  }
+  if (tab === 'people') {
+    const ticks = groupTicks(values.personIds)
+    if (!people.length) return <NoMatch />
+    return (
+      <CheckList
+        nodes={people}
+        openCount={people.length}
+        stateOf={ticks.stateOf}
+        onToggle={(node) =>
+          onChange({ ...values, personIds: ticks.toggle(node) })
         }
       />
     )

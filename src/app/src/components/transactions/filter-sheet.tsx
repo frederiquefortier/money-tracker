@@ -11,26 +11,35 @@ import {
   SheetBody,
   SheetContent,
   SheetFooter,
+  SheetHead,
 } from '#/components/ui/sheet'
 import { formatCount } from '#/lib/format'
 import { useLocale } from '#/lib/use-locale'
 import { getCategories } from '#/server/categories'
 import { getMerchants } from '#/server/merchants'
+import { getPeople } from '#/server/people'
 import { getFormAccounts } from '#/server/transactions'
 
 export type FilterValues = {
   accountIds: Array<string>
   categoryIds: Array<string>
   merchantIds: Array<string>
+  personIds: Array<string>
 }
 
-export const FILTER_TABS = ['accounts', 'categories', 'merchants'] as const
+export const FILTER_TABS = [
+  'accounts',
+  'categories',
+  'merchants',
+  'people',
+] as const
 export type FilterTab = (typeof FILTER_TABS)[number]
 
 export const FILTER_KEYS = {
   accounts: 'accountIds',
   categories: 'categoryIds',
   merchants: 'merchantIds',
+  people: 'personIds',
 } as const satisfies Record<FilterTab, keyof FilterValues>
 
 function useOptions(open: boolean) {
@@ -39,9 +48,14 @@ function useOptions(open: boolean) {
   const [options, setOptions] = useState<Options | null>(null)
   useEffect(() => {
     if (!open || options) return
-    Promise.all([getFormAccounts(), getCategories(), getMerchants()])
-      .then(([accounts, categories, merchants]) =>
-        setOptions({ accounts, categories, merchants }),
+    Promise.all([
+      getFormAccounts(),
+      getCategories(),
+      getMerchants(),
+      getPeople(),
+    ])
+      .then(([accounts, categories, merchants, people]) =>
+        setOptions({ accounts, categories, merchants, ...people }),
       )
       .catch(() => toast({ text: t('common.genericError') }))
   }, [open, options, toast, t])
@@ -99,7 +113,7 @@ function FilterPanel({
   const key = FILTER_KEYS[tab]
   return (
     <>
-      <div className="flex flex-col gap-3 border-b px-5 py-4">
+      <SheetHead>
         <TabList
           label={t('transactions.list.filters')}
           tabs={FILTER_TABS}
@@ -117,7 +131,7 @@ function FilterPanel({
           onChange={setQuery}
           label={t(`transactions.list.search.${tab}`)}
         />
-      </div>
+      </SheetHead>
       <SheetBody
         id={`${id}-panel`}
         role="tabpanel"
@@ -155,7 +169,7 @@ function FilterPanel({
 /**
  * The filters' sheet (spec 14, TRX-14), opened on one tab by its button in the row under
  * the search: checkboxes for accounts, categories (a category keeps its sub-categories)
- * or merchants, several at once. Each tick applies at once. The choices load the first
+ * merchants or people, several at once. Each tick applies at once. The choices load the first
  * time it opens.
  */
 export function FilterSheet({

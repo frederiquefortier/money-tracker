@@ -23,6 +23,9 @@ viewing are in `references/visual/` (gitignored: third-party images, never commi
 - **Pending is blue** (`--pending`, a light blue background, dark blue in dark mode), the
   spreadsheet's colour for it, with no visible label; the "En attente" bubble names it
   and screen readers hear it (spec 14).
+- **Owed is amber** (`--owed`, a light amber background, dark amber in dark mode): a row
+  where someone owes me their part (spec 20), named by its bubble and heard by screen
+  readers the same way. Pending's blue wins on a row that is both.
 - **Primary is a dusk plum** (`oklch(0.48 0.17 320)`, dark mode `oklch(0.76 0.12 320)`),
   with its tints (secondary, accent) at the same hue (2026-11-03). Text, muted text,
   borders, field borders, the focus outline and the backgrounds are plum tints too (hue

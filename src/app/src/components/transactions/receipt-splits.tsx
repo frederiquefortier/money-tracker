@@ -11,9 +11,8 @@ import { SplitRemaining } from '#/components/transactions/receipt-remaining'
 import { categoryPath } from '#/lib/categories'
 import type { Category } from '#/lib/categories'
 import { fromMinor, minorDigits } from '#/lib/money'
-import { capPercent } from '#/lib/transaction-draft'
+import { capPercent, splitPreview } from '#/lib/transaction-preview'
 import type { Draft, Line } from '#/lib/transaction-draft'
-import { splitPreview } from '#/lib/transaction-preview'
 import { SPLIT_MODES } from '#/lib/transactions'
 import type { SplitMode } from '#/lib/transactions'
 import { useLocale } from '#/lib/use-locale'
@@ -29,29 +28,28 @@ function withoutLine(lines: ReadonlyArray<Line>, key: number): Partial<Draft> {
 }
 
 /** What the line holds as typed, and in Parts and % what that comes to. */
-function LineValue({
-  line,
-  n,
+export function LineValue({
+  value,
+  label,
   mode,
   computed,
   accountCurrency,
   onChange,
 }: {
-  line: Line
-  n: number
+  value: string
+  label: string
   mode: SplitMode
   computed: bigint | null | undefined
   accountCurrency: string
   onChange: (value: string) => void
 }) {
-  const { t } = useTranslation()
   return (
     <span className="flex flex-col items-end">
       <input
-        aria-label={t('transactions.lineValue', { n })}
+        aria-label={label}
         inputMode="decimal"
         autoComplete="off"
-        value={line.value}
+        value={value}
         onChange={(event) => onChange(event.target.value)}
         className={cn(typed, 'w-20')}
       />
@@ -120,8 +118,8 @@ function SplitLine({
         onOpen={() => onPick(line.key)}
       />
       <LineValue
-        line={line}
-        n={n}
+        value={line.value}
+        label={t('transactions.lineValue', { n })}
         mode={draft.splitMode ?? 'amount'}
         computed={computed}
         accountCurrency={accountCurrency}
@@ -136,8 +134,18 @@ function SplitLine({
   )
 }
 
-/** "Par" and the three modes, in one line of the slip. */
-function ModeLine({ draft, onChange }: { draft: Draft; onChange: Update }) {
+/** "Par" and the three modes, in one line of the slip: the splits' or the people's. */
+export function ModeLine({
+  value,
+  label,
+  idPrefix,
+  onSelect,
+}: {
+  value: SplitMode
+  label: string
+  idPrefix: string
+  onSelect: (mode: SplitMode) => void
+}) {
   const { t } = useTranslation()
   const panelId = useId()
   return (
@@ -145,18 +153,13 @@ function ModeLine({ draft, onChange }: { draft: Draft; onChange: Update }) {
       <span className="tracking-wide uppercase">{t('transactions.by')}</span>
       <div className="flex-1" id={panelId}>
         <TabList
-          label={t('transactions.splitBy')}
+          label={label}
           tabs={SPLIT_MODES}
-          value={draft.splitMode ?? 'amount'}
+          value={value}
           labelOf={(m) => t(`transactions.modes.${m}`)}
           panelId={panelId}
-          idPrefix="split"
-          onSelect={(splitMode) =>
-            onChange({
-              splitMode,
-              lines: draft.lines.map((l) => ({ ...l, value: '' })),
-            })
-          }
+          idPrefix={idPrefix}
+          onSelect={onSelect}
         />
       </div>
     </div>
@@ -190,7 +193,17 @@ export function SplitLines({
   const nextKey = Math.max(0, ...draft.lines.map((l) => l.key)) + 1
   return (
     <>
-      <ModeLine draft={draft} onChange={onChange} />
+      <ModeLine
+        value={draft.splitMode ?? 'amount'}
+        label={t('transactions.splitBy')}
+        idPrefix="split"
+        onSelect={(splitMode) =>
+          onChange({
+            splitMode,
+            lines: draft.lines.map((l) => ({ ...l, value: '' })),
+          })
+        }
+      />
       <ul className="flex flex-col gap-2">
         {draft.lines.map((line, i) => (
           <SplitLine
@@ -221,7 +234,8 @@ export function SplitLines({
       {(remaining !== null || draft.splitMode === 'percent') &&
         draft.splitMode !== 'share' && (
           <SplitRemaining
-            draft={draft}
+            mode={draft.splitMode ?? 'amount'}
+            values={draft.lines.map((l) => l.value)}
             remaining={remaining}
             accountCurrency={accountCurrency}
           />

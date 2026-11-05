@@ -1,4 +1,5 @@
 import { MerchantPicker } from '#/components/merchants/merchant-picker'
+import { PersonPicker } from '#/components/people/person-picker'
 import {
   AccountPicker,
   DateField,
@@ -6,6 +7,7 @@ import {
 } from '#/components/transactions/detail-fields'
 import type { Merchant } from '#/lib/merchants'
 import { withMerchant } from '#/lib/transaction-draft'
+import { sourceOf, withSource } from '#/lib/transaction-people'
 import type { Draft } from '#/lib/transaction-draft'
 import type { FormAccount, TransactionFormData } from '#/lib/transactions'
 
@@ -45,7 +47,7 @@ type DetailsProps = {
 
 /**
  * Spec 15, under the receipt: the store, full width, which can fill the category
- * (MER-01); the account, the date, the note.
+ * (MER-01), or on an income who it came from (spec 20); the account, the date, the note.
  */
 export function Details({ draft, data, error, onChange }: DetailsProps) {
   const currentCurrency = data.accounts.find(
@@ -54,13 +56,21 @@ export function Details({ draft, data, error, onChange }: DetailsProps) {
 
   return (
     <>
-      <MerchantPicker
-        merchants={data.merchants}
-        value={draft.merchantId}
-        onChange={(merchant) =>
-          onChange(merchantChanges(draft, merchant, data.categories))
-        }
-      />
+      {draft.kind === 'income' ? (
+        <PersonPicker
+          people={data.people}
+          value={sourceOf(draft)}
+          onChange={(personId) => onChange(withSource(personId))}
+        />
+      ) : (
+        <MerchantPicker
+          merchants={data.merchants}
+          value={draft.merchantId}
+          onChange={(merchant) =>
+            onChange(merchantChanges(draft, merchant, data.categories))
+          }
+        />
+      )}
       <AccountPicker
         accounts={data.accounts}
         value={draft.accountId}

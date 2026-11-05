@@ -10,8 +10,12 @@ import {
   DateField,
   NoteField,
 } from '#/components/transactions/detail-fields'
-import { AmountInput, rule } from '#/components/transactions/receipt-amount'
-import { ReceiptLine, small } from '#/components/transactions/receipt-line'
+import { AmountInput } from '#/components/transactions/receipt-amount'
+import {
+  rule,
+  ReceiptLine,
+  small,
+} from '#/components/transactions/receipt-line'
 import { useSheetForm } from '#/components/use-sheet-form'
 import { adjustmentFormSchema, adjustmentGap } from '#/lib/adjustments'
 import type { FormAccount } from '#/lib/transactions'

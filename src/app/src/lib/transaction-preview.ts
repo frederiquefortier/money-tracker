@@ -1,4 +1,6 @@
+import type { Locale } from '#/i18n/locales'
 import {
+  amountForInput,
   convertMinor,
   fromMinor,
   isHundred,
@@ -9,7 +11,7 @@ import {
   splitMinor,
   toMinor,
 } from '#/lib/money'
-import type { Draft } from '#/lib/transaction-draft'
+import type { Draft, Line } from '#/lib/transaction-draft'
 
 // The transaction form's live figures in minor units (ADR-004): what was paid and its fee
 // in another currency, and each split line's share.
@@ -112,4 +114,30 @@ export function percentLeft(values: ReadonlyArray<string>): bigint {
     return sum + (weight === null ? 0n : (toMinor(weight, 4) ?? 0n))
   }, 0n)
   return 1000000n - typed
+}
+
+// 100 % in units of 0.0001, the precision a percentage is stored with.
+const HUNDRED = 1000000n
+
+/**
+ * TRX-06: percentages never total more than 100 (spec 15). A typed value above what the
+ * other lines leave is cut to it; anything not yet a number is kept as typed.
+ */
+export function capPercent(
+  lines: ReadonlyArray<Line>,
+  { key, value: typed }: Pick<Line, 'key' | 'value'>,
+  locale: Locale,
+): string {
+  const weight = typedWeight(typed)
+  const value = weight === null ? null : toMinor(weight, 4)
+  if (value === null) return typed
+  const others = lines
+    .filter((l) => l.key !== key)
+    .reduce((sum, l) => {
+      const w = typedWeight(l.value)
+      return sum + (w === null ? 0n : (toMinor(w, 4) ?? 0n))
+    }, 0n)
+  const left = HUNDRED - others
+  if (value <= left) return typed
+  return amountForInput(fromMinor(left > 0n ? left : 0n, 4), null, locale)
 }

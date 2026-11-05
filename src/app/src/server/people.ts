@@ -33,13 +33,14 @@ export const getPeople = createServerFn({ method: 'GET' }).handler(
     groups: Array<PersonGroup>
   }> => {
     const supabase = getSupabase()
-    const [people, groups, members, aliases] = loaded(
+    const [people, groups, members, aliases, usage] = loaded(
       'People',
       ...(await Promise.all([
         supabase.from('people').select('id, name, archived_on'),
         supabase.from('person_groups').select('id, name, archived_on'),
         supabase.from('person_group_members').select('group_id, person_id'),
         supabase.from('person_aliases').select('person_id, alias'),
+        supabase.from('person_usage').select('person_id, transaction_count'),
       ])),
     )
     return {
@@ -53,6 +54,8 @@ export const getPeople = createServerFn({ method: 'GET' }).handler(
         aliases: aliases
           .filter((a) => a.person_id === p.id)
           .map((a) => a.alias),
+        transactionCount:
+          usage.find((u) => u.person_id === p.id)?.transaction_count ?? 0,
       })),
       groups: groups.map((g) => ({
         id: g.id,

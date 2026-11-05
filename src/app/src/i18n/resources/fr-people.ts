@@ -2,6 +2,7 @@
 export const peopleFr = {
   title: 'Proches',
   tabsLabel: 'Proches ou groupes',
+  sort: { nameAsc: 'Nom A–Z', nameDesc: 'Nom Z–A' },
   tabs: {
     people: 'Personnes',
     groups: 'Groupes',
@@ -27,4 +28,8 @@ export const peopleFr = {
   archivedGroups: 'Groupes archivés ({{count}})',
   archivedOn: 'Archivé le {{date}}',
   archivedOnField: 'Date d’archivage',
+  deleteKeeps_one:
+    'La transaction garde son montant; sa ligne passe à “Sans nom”.',
+  deleteKeeps_other:
+    'Les {{count}} transactions gardent leurs montants; ses lignes passent à “Sans nom”.',
 }

@@ -37,8 +37,10 @@ const KEPT = [
   'account',
   'category',
   'merchant',
+  'person',
   'q',
   'pending',
+  'owed',
 ] as const
 
 const ids = z.array(z.uuid()).max(100).optional().catch(undefined)
@@ -53,8 +55,10 @@ export const Route = createFileRoute('/_authed/transactions')({
     account: ids,
     category: ids,
     merchant: ids,
+    person: ids,
     q: z.string().max(200).optional().catch(undefined),
     pending: z.boolean().optional().catch(undefined),
+    owed: z.boolean().optional().catch(undefined),
   }),
   // The forms open over the list and close back to the same period, filters and search.
   search: { middlewares: [retainSearchParams([...KEPT])] },
@@ -67,6 +71,7 @@ export const Route = createFileRoute('/_authed/transactions')({
     const end = search.end ?? recent.end
     const period = search.period ?? 'all'
     const pendingOnly = search.pending === true
+    const owedOnly = search.owed === true
     return {
       period,
       month,
@@ -76,10 +81,12 @@ export const Route = createFileRoute('/_authed/transactions')({
       accountIds: search.account ?? [],
       categoryIds: search.category ?? [],
       merchantIds: search.merchant ?? [],
+      personIds: search.person ?? [],
       search: search.q?.trim() || undefined,
       pendingOnly,
-      // What is pending shows at any date, as its bubble counts.
-      ...(pendingOnly
+      owedOnly,
+      // What is pending or owed shows at any date, as its bubble counts.
+      ...(pendingOnly || owedOnly
         ? { from: null, to: null }
         : periodRange(period, { month, year, start, end })),
     }
@@ -100,8 +107,12 @@ function useEmptyText() {
   const deps = Route.useLoaderDeps()
   const { period } = deps
   const filtered =
-    deps.accountIds.length + deps.categoryIds.length + deps.merchantIds.length
-  if (deps.search || filtered || deps.pendingOnly) return t('common.noMatch')
+    deps.accountIds.length +
+    deps.categoryIds.length +
+    deps.merchantIds.length +
+    deps.personIds.length
+  if (deps.search || filtered || deps.pendingOnly || deps.owedOnly)
+    return t('common.noMatch')
   if (period === 'month')
     return t('transactions.list.empty.month', {
       period: formatMonth(deps.month, locale),
@@ -142,11 +153,16 @@ function useListNavigation() {
           start: c.period === 'custom' ? c.start : undefined,
           end: c.period === 'custom' ? c.end : undefined,
           pending: undefined,
+          owed: undefined,
         }),
       }),
     pending: (on: boolean) =>
       void navigate({
         search: (prev) => ({ ...prev, pending: on || undefined }),
+      }),
+    owed: (on: boolean) =>
+      void navigate({
+        search: (prev) => ({ ...prev, owed: on || undefined }),
       }),
     filters: (f: FilterValues) =>
       void navigate({
@@ -155,6 +171,7 @@ function useListNavigation() {
           account: f.accountIds.length ? f.accountIds : undefined,
           category: f.categoryIds.length ? f.categoryIds : undefined,
           merchant: f.merchantIds.length ? f.merchantIds : undefined,
+          person: f.personIds.length ? f.personIds : undefined,
         }),
       }),
     search: (text: string) =>
@@ -185,11 +202,13 @@ function Transactions() {
         names={data.filters}
         total={data.total}
         pending={{ count: data.pendingCount, on: deps.pendingOnly }}
+        owed={{ count: data.owedCount, on: deps.owedOnly }}
         search={text}
         loading={switching}
         onPeriod={go.period}
         onFilters={go.filters}
         onPending={go.pending}
+        onOwed={go.owed}
         onSearch={setText}
       />
       <div className="mt-2 flex flex-col gap-4">

@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest'
 import {
-  capPercent,
   withMerchant,
   withPicked,
   draftFromTransaction,
@@ -8,6 +7,7 @@ import {
   validateDraft,
 } from '#/lib/transaction-draft'
 import {
+  capPercent,
   foreignPreview,
   percentLeft,
   splitPreview,
@@ -173,6 +173,8 @@ describe('draftFromTransaction', () => {
           { categoryId: GROCERIES, value: '1.0000' },
           { categoryId: HOUSE, value: '2.5000' },
         ],
+        peopleMode: 'share',
+        people: [],
       },
       'CAD',
       'fr',

@@ -63,6 +63,23 @@ function SheetContent({
   )
 }
 
+/**
+ * What stays put above a sheet's scrolling body: its search, and tabs when it has them.
+ * Every sheet with a search uses it, so the search is always in reach (decided
+ * 2026-11-05).
+ */
+function SheetHead({ className, ...props }: React.ComponentProps<'div'>) {
+  return (
+    <div
+      className={cn(
+        'flex shrink-0 flex-col gap-3 border-b px-5 py-4',
+        className,
+      )}
+      {...props}
+    />
+  )
+}
+
 // Children never shrink: once the body scrolls, a flex column would squeeze the fields.
 function SheetBody({ className, ...props }: React.ComponentProps<'div'>) {
   return (
@@ -90,4 +107,4 @@ function SheetFooter({ className, ...props }: React.ComponentProps<'div'>) {
 
 const SheetClose = SheetPrimitive.Close
 
-export { Sheet, SheetBody, SheetClose, SheetContent, SheetFooter }
+export { Sheet, SheetBody, SheetClose, SheetContent, SheetFooter, SheetHead }

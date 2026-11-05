@@ -4,6 +4,29 @@ Document new concepts, techniques, and knowledge gained. Reference this file to 
 
 <!-- Newest first: a new entry goes directly below this line. Template at the bottom. -->
 
+### 2026-11-05 - Text fields match :focus-visible on a click
+
+**What Was New:**
+- With the outline fixed, it showed on every click into a field, the receipt's amount
+  included, though buttons kept it for the keyboard.
+
+**Key Points:**
+- Browsers decide `:focus-visible` per element: a button clicked does not match, a text
+  input does (it expects typing, so the browser shows where the caret is).
+- To show outlines on keyboard navigation only, `useKeyboardFocus` sets
+  `<html data-keyboard>` on a Tab and removes it on the next pointer press, and a base
+  rule turns the outline off without it. Listening in the capture phase catches the
+  keys before a field or a dialog stops them.
+
+**Sources:**
+- MDN, `:focus-visible` (the heuristics each browser applies).
+
+**Where to Learn More:**
+- WCAG 2.4.7 Focus Visible: the keyboard must always see focus; mouse users need not.
+
+**Applied In:**
+- `src/app/src/lib/use-keyboard-focus.ts`, `styles.css` (base layer).
+
 ### 2026-11-05 - Tailwind 4 outlines take their style from a variable
 
 **What Was New:**

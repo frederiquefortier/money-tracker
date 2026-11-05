@@ -487,6 +487,63 @@ export type Database = {
           },
         ]
       }
+      transaction_people: {
+        Row: {
+          amount: number
+          created_at: string
+          head_count: number
+          id: string
+          input_mode: string
+          input_value: number
+          person_id: string | null
+          position: number
+          role: string
+          transaction_id: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          head_count?: number
+          id?: string
+          input_mode: string
+          input_value: number
+          person_id?: string | null
+          position: number
+          role: string
+          transaction_id: string
+          user_id?: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          head_count?: number
+          id?: string
+          input_mode?: string
+          input_value?: number
+          person_id?: string | null
+          position?: number
+          role?: string
+          transaction_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "transaction_people_user_id_person_id_fkey"
+            columns: ["user_id", "person_id"]
+            isOneToOne: false
+            referencedRelation: "people"
+            referencedColumns: ["user_id", "id"]
+          },
+          {
+            foreignKeyName: "transaction_people_user_id_transaction_id_fkey"
+            columns: ["user_id", "transaction_id"]
+            isOneToOne: false
+            referencedRelation: "transactions"
+            referencedColumns: ["user_id", "id"]
+          },
+        ]
+      }
       transaction_splits: {
         Row: {
           amount: number
@@ -694,6 +751,15 @@ export type Database = {
         }
         Relationships: []
       }
+      person_usage: {
+        Row: {
+          last_on: string | null
+          person_id: string | null
+          recent_count: number | null
+          transaction_count: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       account_balance_on: {
@@ -725,6 +791,10 @@ export type Database = {
         Args: { amount: number; currency: string }
         Returns: undefined
       }
+      check_transaction_people: {
+        Args: { transaction: string }
+        Returns: undefined
+      }
       check_transaction_splits: {
         Args: { transaction: string }
         Returns: undefined
@@ -748,7 +818,9 @@ export type Database = {
           from_date?: string
           max_rows?: number
           merchant_ids?: string[]
+          owed_only?: boolean
           pending_only?: boolean
+          person_ids?: string[]
           search?: string
           to_date?: string
         }
@@ -771,8 +843,10 @@ export type Database = {
           more: boolean
           note: string
           occurred_on: string
+          owed_count: number
           pending: boolean
           pending_count: number
+          people: Json
           rate: string
           received_amount: string
           received_currency: string
@@ -825,6 +899,7 @@ export type Database = {
           occurred_on: string
           original_amount?: number
           original_currency?: string
+          people?: Json
           splits: Json
           status?: string
           transaction_id: string

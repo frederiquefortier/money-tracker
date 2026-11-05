@@ -2,6 +2,9 @@ import { z } from 'zod'
 import type { Category } from '#/lib/categories'
 import { currencyCodeSchema } from '#/lib/currencies'
 import type { Merchant } from '#/lib/merchants'
+import type { Person, PersonGroup } from '#/lib/people'
+import { PERSON_ROLES } from '#/lib/transaction-people'
+import type { PersonRole } from '#/lib/transaction-people'
 
 // Shared by the transaction form (spec 15) and its server functions.
 
@@ -29,6 +32,10 @@ export type TransactionFormData = {
   categories: Array<Category>
   merchants: Array<Merchant>
   frequent: FrequentCategories
+  people: Array<Person>
+  groups: Array<PersonGroup>
+  /** The people most often on transactions lately, most first (spec 20). */
+  frequentPeople: Array<string>
 }
 
 /** A saved expense or income as the form loads it; amounts signed, as stored. */
@@ -45,6 +52,14 @@ export type Transaction = {
   note: string | null
   splitMode: SplitMode
   splits: Array<{ categoryId: string; value: string }>
+  peopleMode: SplitMode
+  /** In the order shown, Moi first on an expense (spec 20). */
+  people: Array<{
+    role: PersonRole
+    personId: string | null
+    headCount: number
+    value: string
+  }>
 }
 
 export const positiveDecimal = z
@@ -69,6 +84,18 @@ export const transactionInputSchema = z
       .array(z.object({ categoryId: z.uuid(), value: positiveDecimal }))
       .min(1)
       .max(50),
+    peopleMode: z.enum(SPLIT_MODES),
+    people: z
+      .array(
+        z.object({
+          role: z.enum(PERSON_ROLES),
+          personId: z.uuid().nullable(),
+          headCount: z.number().int().min(1).max(999),
+          // Moi can be zero (spec 20).
+          value: z.string().regex(/^\d{1,15}(\.\d{1,4})?$/),
+        }),
+      )
+      .max(100),
   })
   .refine((t) => (t.originalAmount === null) === (t.originalCurrency === null))
 export type TransactionInput = z.input<typeof transactionInputSchema>

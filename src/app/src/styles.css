@@ -32,6 +32,8 @@
   --income: oklch(0.5 0.13 150);
   /* A pending row's background, the spreadsheet's blue (TRX-09, spec 14). */
   --pending: oklch(0.94 0.04 240);
+  /* A row where someone owes me their part (spec 20): amber, apart from pending's blue. */
+  --owed: oklch(0.95 0.05 85);
   --border: oklch(0.88 0.04 320);
   /* Every field and outline control: between the cards' border and the old field edge. */
   --input: oklch(0.765 0.06 320);
@@ -70,6 +72,7 @@
   --destructive-foreground: oklch(0.7 0.17 27);
   --income: oklch(0.78 0.13 150);
   --pending: oklch(0.3 0.05 240);
+  --owed: oklch(0.32 0.05 85);
   --border: oklch(0.34 0.04 320);
   --input: oklch(0.58 0.07 320);
   --ring: oklch(0.96 0.012 320);
@@ -103,6 +106,7 @@
   --color-destructive-foreground: var(--destructive-foreground);
   --color-income: var(--income);
   --color-pending: var(--pending);
+  --color-owed: var(--owed);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
@@ -122,6 +126,11 @@
 @layer base {
   * {
     @apply border-border outline-ring/50;
+  }
+
+  /* Focus outlines on keyboard navigation only (lib/use-keyboard-focus.ts). */
+  :root:not([data-keyboard]) :focus-visible {
+    outline-style: none !important;
   }
 
   /* Tailwind 4 resets buttons to the default cursor; every control here is clickable. */

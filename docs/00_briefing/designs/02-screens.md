@@ -22,6 +22,7 @@ onto them.
 | 17 | [First run](17-first-run.md) | Language, currencies, first accounts and categories | SET-01 | Reviewed |
 | 18 | [Import and export](18-import-export.md) | File check, summary, commit, undo, export | IMP-01, 04, 05, 06, SEC-04 | Reviewed |
 | 19 | [People](19-people.md) | Proches and groups, their forms, aliases, in the Réglages menu | PPL-01, 02, 06 | Built |
+| 20 | [People on a transaction](20-people-on-transactions.md) | The people list, the people's lines and round add on the receipt, an income's Proche field, avatars and a Proches filter on the list | PPL-03, 04 | Built |
 
 ## Shared patterns
 
@@ -37,7 +38,8 @@ component to use, so a screen is assembled, not redrawn.
   right, above the tab bar on phones, with "Ajouter un compte" as its accessible name,
   and the first stop when tabbing into a page's content, after the header and menu
   (`AddButtonTarget` at the start of `main`). Every focusable element shows the shared
-  outline (`focusRing`); inside a container that clips (a card, a row scrolling
+  outline (`focusRing`), after keyboard navigation only (`useKeyboardFocus`: from a Tab
+  until the next pointer press, since text fields match `:focus-visible` on a click); inside a container that clips (a card, a row scrolling
   sideways) it is drawn within the element (`insetFocus`), so it is never cut. Stacked
   icons (a split's categories, a group's members) are separated by a ring of the row's
   own colour, white, purple on hover, blue when pending (`stackRing`). A
@@ -58,7 +60,8 @@ component to use, so a screen is assembled, not redrawn.
   résultats". A whole row is the tap target, the box at its end. Only groups fold, each
   a card like an institution's on Comptes, its name folding it and "Tout" ticking all of
   it. Order, left to right:
-  expand all, filter, sort.
+  expand all, filter, sort. Sort and expand all are on pages only, never in a sheet or a
+  list over a form (decided 2026-11-05).
 - **Lists:** cards (`ListCard`), one line per item where it fits. Tapping an item opens
   its form. A card header (an institution) is a row too: tapping the line opens its form,
   its chevron alone toggles the card, as for a tree's parent; a header with no form ("Sans
@@ -103,7 +106,10 @@ component to use, so a screen is assembled, not redrawn.
   are the filters' `CheckList` under a field label, as in a filter sheet; creating one
   there is the card's last row, a "+ Nouveau …" button that becomes a name field
   (`CreateRow`). Escape leaves the field only: `useSheetEscape` keeps a stack, the
-  innermost layer first. When creating needs a whole form (a category from the
+  innermost layer first. People are grouped the same way everywhere they are
+  ticked (the filter, a transaction's people list): `usePeopleTree`. A list over the
+  form (the categories, the people) takes the field's radius and border too.
+  When creating needs a whole form (a category from the
   transaction form), the same "+ …" row (`CreateButton`) opens it in a `FormSheet` over
   the sheet: a `RouteSheet` without a URL, saving and asking before discarding the same
   way. Nothing chosen is an
@@ -120,7 +126,7 @@ component to use, so a screen is assembled, not redrawn.
   connectors (`TreeGuides`), each with its icon and its name; the field shows the full
   path once chosen. A search keeps each match's parents.
 - **Search:** only on lists that grow long (Magasins, Catégories, the icon picker,
-  Transactions), a `SearchField` with a magnifier inside it above the list (and above the tabs, when a list has them), filtering as you type, ignoring case and accents. The
+  Transactions), a `SearchField` with a magnifier inside it above the list (and above the tabs, when a list has them; in a sheet, under its tabs and staying put above the scrolling list, `SheetHead`, in every sheet that searches), filtering as you type, ignoring case and accents. The
   words are the same everywhere: "Rechercher" and "Aucun résultat.", never naming the
   thing searched.
 - **Round pickers:** a round button that opens a picker (a category's icon) shows a

@@ -4,14 +4,12 @@ import { CategoryBadge } from '#/components/categories/category-badge'
 import { CategoryTree } from '#/components/categories/category-tree'
 import { KindTabs } from '#/components/categories/kind-tabs'
 import { useExpandedBranches } from '#/components/categories/use-expanded-branches'
-import { ExpandAllButton } from '#/components/expand-all-button'
 import { IconButton } from '#/components/icon-button'
 import { NewCategoryRow } from '#/components/transactions/new-category-row'
 import { EmptyState, rowHover } from '#/components/list-card'
 import { SearchField } from '#/components/search-field'
-import { SortMenu } from '#/components/sort-menu'
 import { useSheetEscape } from '#/components/route-sheet'
-import { SheetBody } from '#/components/ui/sheet'
+import { SheetBody, SheetHead } from '#/components/ui/sheet'
 import { CATEGORY_SORTS, categoryPath } from '#/lib/categories'
 import type { Category, CategorySort, Kind } from '#/lib/categories'
 import { categoryChildren, frequentCategories } from '#/lib/category-list'
@@ -75,7 +73,14 @@ function Frequent({
   )
 }
 
-function Header({ onBack }: { onBack: () => void }) {
+/** A list over the whole sheet (categories, people): a back arrow and its title. */
+export function ScreenHeader({
+  title,
+  onBack,
+}: {
+  title: string
+  onBack: () => void
+}) {
   const { t } = useTranslation()
   return (
     <header className="flex items-center gap-2 border-b px-3 pt-[calc(1rem+env(safe-area-inset-top))] pb-4 md:pt-4">
@@ -85,35 +90,9 @@ function Header({ onBack }: { onBack: () => void }) {
         onClick={onBack}
       />
       <h2 className="font-mono text-lg font-bold tracking-wide uppercase">
-        {t('transactions.category')}
+        {title}
       </h2>
     </header>
-  )
-}
-
-/** "Tout déplier" and the sort, on the right, as on the list pages. */
-function Toolbar({
-  allExpanded,
-  onToggleAll,
-  sort,
-  onSort,
-}: {
-  allExpanded: boolean
-  onToggleAll: () => void
-  sort: CategorySort
-  onSort: (sort: CategorySort) => void
-}) {
-  const { t } = useTranslation()
-  return (
-    <div className="flex justify-end gap-2">
-      <ExpandAllButton allExpanded={allExpanded} onToggle={onToggleAll} />
-      <SortMenu
-        sort={sort}
-        options={CATEGORY_SORTS}
-        labelOf={(s) => t(`categories.sort.${s}`)}
-        onChange={onSort}
-      />
-    </div>
   )
 }
 
@@ -145,9 +124,9 @@ export function CategoryScreen({
   useSheetEscape(onBack)
   const panelId = useId()
   const [kind, setKind] = useState<Kind>(transactionKind)
-  const pick = (category: Category) => onPick(category.id)
   const [query, setQuery] = useState('')
-  const [sort, setSort] = useStoredState<CategorySort>(
+  // The order chosen on Catégories, without its menu here (decided 2026-11-05).
+  const [sort] = useStoredState<CategorySort>(
     'categories.sort',
     'name',
     parseSort,
@@ -168,32 +147,29 @@ export function CategoryScreen({
 
   return (
     <div className="absolute inset-0 z-10 flex flex-col bg-card">
-      <Header onBack={onBack} />
-      <SheetBody className="flex flex-col gap-3">
-        <Toolbar
-          allExpanded={branches.allExpanded}
-          onToggleAll={branches.toggleAll}
-          sort={sort}
-          onSort={setSort}
-        />
-        {/* Focus moves into the list from the button now under it. */}
-        <SearchField value={query} onChange={setQuery} autoFocus />
+      <ScreenHeader title={t('transactions.category')} onBack={onBack} />
+      <SheetHead>
+        {/* Tabs first, then the search, as in the filter sheet. */}
         <KindTabs kind={kind} panelId={panelId} onChange={setKind} />
+        <SearchField value={query} onChange={setQuery} autoFocus />
+      </SheetHead>
+      <SheetBody className="flex flex-col gap-3">
         <div id={panelId} className="flex flex-col gap-3">
           {!query.trim() && (
             <Frequent
               categories={frequentCategories(categories, often, date)}
               byId={byId}
-              onPick={pick}
+              onPick={(c) => onPick(c.id)}
             />
           )}
           {roots.length === 0 && <EmptyState>{t('common.noMatch')}</EmptyState>}
           <CategoryTree
+            className="rounded-field border-input"
             roots={roots}
             childrenOf={childrenOf}
             expanded={open ?? branches.expanded}
             onToggle={branches.toggle}
-            onPick={pick}
+            onPick={(c) => onPick(c.id)}
           >
             <NewCategoryRow
               kind={kind}

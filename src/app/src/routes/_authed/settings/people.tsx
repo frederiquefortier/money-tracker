@@ -7,9 +7,16 @@ import { ListPage } from '#/components/list-page'
 import { ArchivedOn, ArchivedPeople } from '#/components/people/archived-people'
 import { PeopleRow } from '#/components/people/people-row'
 import { SearchField } from '#/components/search-field'
+import { SortMenu } from '#/components/sort-menu'
 import { TabList } from '#/components/tab-list'
-import { PEOPLE_TABS, byName, namesOf, withMemberNames } from '#/lib/people'
-import type { PeopleTab, Person, PersonGroup } from '#/lib/people'
+import {
+  PEOPLE_SORTS,
+  PEOPLE_TABS,
+  byName,
+  namesOf,
+  withMemberNames,
+} from '#/lib/people'
+import type { PeopleSort, PeopleTab, Person, PersonGroup } from '#/lib/people'
 import { useFormatLocale } from '#/lib/use-locale'
 import { useStoredState } from '#/lib/use-stored-state'
 import { foldForSearch, oneOf } from '#/lib/utils'
@@ -21,6 +28,7 @@ export const Route = createFileRoute('/_authed/settings/people')({
 })
 
 const parseTab = oneOf(PEOPLE_TABS)
+const parseSort = oneOf(PEOPLE_SORTS)
 const PANEL_ID = 'people-panel'
 
 function AddMenu() {
@@ -88,6 +96,7 @@ function GroupRows({
 function TabPanel<T extends { name: string; archivedOn: string | null }>({
   all,
   query,
+  sort,
   empty,
   archivedLabel,
   storageKey,
@@ -95,6 +104,7 @@ function TabPanel<T extends { name: string; archivedOn: string | null }>({
 }: {
   all: ReadonlyArray<T>
   query: string
+  sort: PeopleSort
   empty: string
   archivedLabel: (count: number) => string
   storageKey: string
@@ -104,10 +114,11 @@ function TabPanel<T extends { name: string; archivedOn: string | null }>({
   const locale = useFormatLocale()
   if (all.length === 0) return <EmptyState>{empty}</EmptyState>
   const q = foldForSearch(query)
-  const shown = byName(
+  const sorted = byName(
     all.filter((item) => foldForSearch(item.name).includes(q)),
     locale,
   )
+  const shown = sort === 'nameDesc' ? sorted.reverse() : sorted
   const active = shown.filter((item) => !item.archivedOn)
   const archived = shown.filter((item) => item.archivedOn)
   if (shown.length === 0) return <EmptyState>{t('common.noMatch')}</EmptyState>
@@ -135,9 +146,24 @@ function People() {
     parseTab,
   )
   const [query, setQuery] = useState('')
+  const [sort, setSort] = useStoredState<PeopleSort>(
+    'people.sort',
+    'nameAsc',
+    parseSort,
+  )
 
   return (
-    <ListPage title={t('people.title')}>
+    <ListPage
+      title={t('people.title')}
+      actions={
+        <SortMenu
+          sort={sort}
+          options={PEOPLE_SORTS}
+          labelOf={(option) => t(`people.sort.${option}`)}
+          onChange={setSort}
+        />
+      }
+    >
       <SearchField value={query} onChange={setQuery} />
       <TabList
         label={t('people.tabsLabel')}
@@ -158,6 +184,7 @@ function People() {
           <TabPanel
             all={people}
             query={query}
+            sort={sort}
             empty={t('people.empty')}
             archivedLabel={(count) => t('people.archivedPeople', { count })}
             storageKey="people.archivedExpanded"
@@ -167,6 +194,7 @@ function People() {
           <TabPanel
             all={groups}
             query={query}
+            sort={sort}
             empty={t('people.emptyGroups')}
             archivedLabel={(count) => t('people.archivedGroups', { count })}
             storageKey="people.archivedGroupsExpanded"

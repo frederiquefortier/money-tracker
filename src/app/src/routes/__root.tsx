@@ -5,6 +5,7 @@ import { TanStackDevtools } from '@tanstack/react-devtools'
 import { I18nextProvider } from 'react-i18next'
 import { RouteProgress } from '#/components/route-progress'
 import { createI18n } from '#/i18n'
+import { useKeyboardFocus } from '#/lib/use-keyboard-focus'
 import { getSession } from '#/server/session'
 
 import appCss from '../styles.css?url'
@@ -29,6 +30,7 @@ export const Route = createRootRoute({
 function RootDocument({ children }: { children: React.ReactNode }) {
   const { session } = Route.useRouteContext()
   const i18n = useMemo(() => createI18n(session.locale), [session.locale])
+  useKeyboardFocus()
 
   return (
     <html lang={session.locale}>

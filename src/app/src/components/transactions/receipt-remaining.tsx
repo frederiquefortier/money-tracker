@@ -4,7 +4,7 @@ import { small } from '#/components/transactions/receipt-line'
 import { FORMAT_LOCALE } from '#/i18n/locales'
 import { formatMoney } from '#/lib/format'
 import { fromMinor, minorDigits } from '#/lib/money'
-import type { Draft } from '#/lib/transaction-draft'
+import type { SplitMode } from '#/lib/transactions'
 import { percentLeft } from '#/lib/transaction-preview'
 import { useLocale } from '#/lib/use-locale'
 import { cn } from '#/lib/utils'
@@ -44,13 +44,18 @@ function RemainingLine({
   )
 }
 
-/** What is left: in percent in % mode, in the account's currency otherwise. */
+/**
+ * What is left of the splits or the people's parts: in percent in % mode (from the typed
+ * `values`), in the account's currency otherwise.
+ */
 export function SplitRemaining({
-  draft,
+  mode,
+  values,
   remaining,
   accountCurrency,
 }: {
-  draft: Draft
+  mode: SplitMode
+  values: ReadonlyArray<string>
   remaining: bigint | null
   accountCurrency: string
 }) {
@@ -59,14 +64,10 @@ export function SplitRemaining({
     style: 'percent',
     maximumFractionDigits: 2,
   })
-  const inPercent = draft.splitMode === 'percent'
+  const inPercent = mode === 'percent'
   return (
     <RemainingLine
-      remaining={
-        inPercent
-          ? percentLeft(draft.lines.map((l) => l.value))
-          : (remaining ?? 0n)
-      }
+      remaining={inPercent ? percentLeft(values) : (remaining ?? 0n)}
       format={(gap) =>
         inPercent
           ? percent.format(fromMinor(gap, 6) as Intl.StringNumericLiteral)

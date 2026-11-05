@@ -41,7 +41,8 @@ The interface says "Proche"; the code and these docs keep "person" and "people".
   their members (a person would show twice).
 - A search field above the tabs (`SearchField`), searching the open tab, ignoring case
   and accents. Nothing found: "Aucun résultat.".
-- Alphabetical, no sort menu.
+- **Trier** (`SortMenu`, beside the title): Nom A–Z (the default) or Nom Z–A, for both
+  tabs, kept per browser (decided 2026-11-05).
 - **Person row:** the person's avatar as tall as the two lines beside it (for now the
   first letter of the name, on the secondary colour), the name, and under it their groups in alphabetical order, joined by commas (no
   second line when they have none). The transaction count joins the row with spec 20.
@@ -122,6 +123,7 @@ The same sheet (`/settings/people/groups/new`, `/settings/people/groups/{id}`).
 | Menu row | Proches (the `users` icon) |
 | Screen title | Proches |
 | Tabs | Personnes, Groupes |
+| Sort | Nom A–Z, Nom Z–A; Trier: … (accessible name) |
 | Empty | Aucune personne pour le moment., Aucun groupe pour l'instant. |
 | Add | Ajouter un proche, Ajouter un groupe (the + fans out both) |
 | Form titles | Nouveau proche, Modifier le proche, Nouveau groupe, Modifier le groupe |

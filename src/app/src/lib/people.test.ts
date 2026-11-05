@@ -43,6 +43,7 @@ describe('takenNames', () => {
     archivedOn: null,
     groupIds: [],
     aliases,
+    transactionCount: 0,
   })
   const people = [person('p1', 'Élise', ['Lili']), person('p2', 'Marco', [])]
 

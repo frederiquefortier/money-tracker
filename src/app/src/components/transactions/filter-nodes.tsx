@@ -5,6 +5,8 @@ import { accountLabel } from '#/lib/accounts'
 import { KINDS, categoryPath } from '#/lib/categories'
 import type { Category } from '#/lib/categories'
 import type { Merchant } from '#/lib/merchants'
+import { byName } from '#/lib/people'
+import type { Person, PersonGroup } from '#/lib/people'
 import type { FormAccount } from '#/lib/transactions'
 import { treeOrder } from '#/lib/tree'
 import { useFormatLocale } from '#/lib/use-locale'
@@ -63,6 +65,47 @@ export function useAccountTree(
       label: name,
       children,
     }))
+}
+
+/**
+ * People under their groups, as accounts under their institution (spec 20): a person in
+ * several groups is in each, those in none under "Sans groupe". Searching lists the
+ * matches flat, by name or alias. Archived people stay, for past transactions.
+ */
+export function usePeopleTree(
+  people: ReadonlyArray<Person>,
+  groups: ReadonlyArray<PersonGroup>,
+  query: string,
+): Array<CheckNode> {
+  const { t } = useTranslation()
+  const locale = useFormatLocale()
+  const q = foldForSearch(query)
+  const sorted = byName(people, locale)
+  const leaf = (p: Person) => ({ id: p.id, label: p.name })
+  if (q || groups.length === 0)
+    return sorted
+      .filter((p) =>
+        [p.name, ...p.aliases].some((n) => foldForSearch(n).includes(q)),
+      )
+      .map(leaf)
+  const cards = byName(groups, locale)
+    .map((g) => ({
+      id: `${GROUP}${g.id}`,
+      label: g.name,
+      children: sorted.filter((p) => g.memberIds.includes(p.id)).map(leaf),
+    }))
+    .filter((card) => card.children.length > 0)
+  const alone = sorted.filter((p) => p.groupIds.length === 0).map(leaf)
+  return alone.length
+    ? [
+        ...cards,
+        {
+          id: `${GROUP}none`,
+          label: t('transactions.list.noGroup'),
+          children: alone,
+        },
+      ]
+    : cards
 }
 
 /** Ticks that a group (an institution) spreads to its children; other nodes stand alone. */

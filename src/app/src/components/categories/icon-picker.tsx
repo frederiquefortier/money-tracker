@@ -3,7 +3,12 @@ import { useTranslation } from 'react-i18next'
 import { CategoryBadge } from '#/components/categories/category-badge'
 import { EmptyState } from '#/components/list-card'
 import { SearchField } from '#/components/search-field'
-import { Sheet, SheetBody, SheetContent } from '#/components/ui/sheet'
+import {
+  Sheet,
+  SheetBody,
+  SheetContent,
+  SheetHead,
+} from '#/components/ui/sheet'
 import { searchIcons } from '#/lib/categories'
 import { cn, focusRing } from '#/lib/utils'
 
@@ -42,9 +47,9 @@ export function IconPicker({
         title={t('categories.icon.choose')}
         closeLabel={t('common.close')}
       >
-        <div className="border-b px-5 py-3">
+        <SheetHead>
           <SearchField value={query} onChange={setQuery} />
-        </div>
+        </SheetHead>
         <SheetBody>
           {icons.length === 0 && <EmptyState>{t('common.noMatch')}</EmptyState>}
           <ul className="grid grid-cols-[repeat(auto-fill,minmax(4rem,1fr))] gap-2">

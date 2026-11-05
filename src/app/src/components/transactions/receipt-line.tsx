@@ -2,6 +2,9 @@ import { cn, focusRing } from '#/lib/utils'
 
 // The receipt slip's parts (spec 15), shared by the amount and its split lines.
 
+/** The dashed rule between the slip's sections. */
+export const rule = <hr className="my-1 border-dashed border-border" />
+
 /** The slip's small text (Taux, notes under a line): a step under its lines. */
 export const small = 'text-[0.8125rem]'
 

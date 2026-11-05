@@ -176,7 +176,7 @@ export function CheckList({
 } & Ticks) {
   if (nodes.length === 0 && !children) return null
   const ticks = { stateOf, onToggle }
-  if (nodes.length > 0 && nodes.every((n) => n.children?.length))
+  if (nodes.length > 0 && nodes.every((n) => n.children !== undefined))
     return (
       <div className="flex flex-col gap-2">
         {nodes.map((group, i) => (

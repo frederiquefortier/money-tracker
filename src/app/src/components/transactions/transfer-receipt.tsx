@@ -5,8 +5,12 @@ import { FixedCurrency } from '#/components/currency-chip'
 import { FieldMessage } from '#/components/form-field'
 import { Icon } from '#/components/icon'
 import { MissingRate, Money } from '#/components/money'
-import { AmountInput, rule } from '#/components/transactions/receipt-amount'
-import { ReceiptLine, typed } from '#/components/transactions/receipt-line'
+import { AmountInput } from '#/components/transactions/receipt-amount'
+import {
+  rule,
+  ReceiptLine,
+  typed,
+} from '#/components/transactions/receipt-line'
 import { Checkbox } from '#/components/ui/checkbox'
 import { FORMAT_LOCALE } from '#/i18n/locales'
 import { amountForInput } from '#/lib/money'

@@ -10,6 +10,8 @@ export type Person = {
   groupIds: Array<string>
   /** Other spellings, for the import (PPL-06). */
   aliases: Array<string>
+  /** How many transactions name them (spec 20). */
+  transactionCount: number
 }
 
 export type PersonGroup = {
@@ -21,6 +23,9 @@ export type PersonGroup = {
 
 export const PEOPLE_TABS = ['people', 'groups'] as const
 export type PeopleTab = (typeof PEOPLE_TABS)[number]
+
+export const PEOPLE_SORTS = ['nameAsc', 'nameDesc'] as const
+export type PeopleSort = (typeof PEOPLE_SORTS)[number]
 
 export const nameFormSchema = z.object({
   name: z

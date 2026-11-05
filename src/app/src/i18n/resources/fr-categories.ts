@@ -25,7 +25,7 @@ export const categoriesFr = {
   followedFrom: 'Comme {{parent}} ({{value}})',
   clearCategory: 'Retirer la catégorie',
   archivedTag: 'Archivée',
-  frequent: 'Fréquemment utilisées',
+  frequent: 'Fréquents',
   color: 'Couleur',
   customColor: 'Couleur personnalisée',
   swatch: 'Couleur {{n}}',

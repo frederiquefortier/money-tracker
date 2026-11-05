@@ -26,7 +26,7 @@ export const categoriesEn: typeof categoriesFr = {
   followedFrom: 'Same as {{parent}} ({{value}})',
   clearCategory: 'Remove the category',
   archivedTag: 'Archived',
-  frequent: 'Frequently used',
+  frequent: 'Frequent',
   color: 'Colour',
   customColor: 'Custom colour',
   swatch: 'Colour {{n}}',

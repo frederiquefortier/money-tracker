@@ -76,6 +76,7 @@ const row = (id: string, occurredOn: string): ListedTransaction => ({
   account: { name: 'Chèque', institution: null },
   transfer: null,
   categories: [],
+  people: [],
   amount: '-1.0000',
   currency: 'CAD',
   displayAmount: '-1.00',

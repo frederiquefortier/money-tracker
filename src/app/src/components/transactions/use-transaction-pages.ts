@@ -27,8 +27,10 @@ export function useTransactionPages(first: TransactionPage, query: ListQuery) {
     accountIds,
     categoryIds,
     merchantIds,
+    personIds,
     search,
     pendingOnly,
+    owedOnly,
   } = query
 
   useEffect(() => {
@@ -45,8 +47,10 @@ export function useTransactionPages(first: TransactionPage, query: ListQuery) {
           accountIds,
           categoryIds,
           merchantIds,
+          personIds,
           search,
           pendingOnly,
+          owedOnly,
           before: cursor,
         },
       })
@@ -69,8 +73,10 @@ export function useTransactionPages(first: TransactionPage, query: ListQuery) {
     accountIds,
     categoryIds,
     merchantIds,
+    personIds,
     search,
     pendingOnly,
+    owedOnly,
     toast,
     t,
   ])

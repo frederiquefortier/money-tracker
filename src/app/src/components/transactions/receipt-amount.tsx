@@ -6,26 +6,27 @@ import { MissingRate, Money } from '#/components/money'
 import { CategoryButton } from '#/components/transactions/category-field'
 import {
   ReceiptLine,
-  small,
+  rule,
   typed,
 } from '#/components/transactions/receipt-line'
+import { PeopleLines } from '#/components/transactions/people-lines'
 import { SplitLines } from '#/components/transactions/receipt-splits'
+import { SplitToggle } from '#/components/transactions/split-toggle'
 import { Checkbox } from '#/components/ui/checkbox'
 import { FORMAT_LOCALE } from '#/i18n/locales'
 import type { Category } from '#/lib/categories'
 import type { Currency } from '#/lib/currencies'
+import type { Person } from '#/lib/people'
 import { absDecimal, amountForInput } from '#/lib/money'
 import type { Draft } from '#/lib/transaction-draft'
 import { bookedMinor, foreignPreview } from '#/lib/transaction-preview'
 import { useLocale } from '#/lib/use-locale'
-import { cn, focusRing } from '#/lib/utils'
+import { cn } from '#/lib/utils'
 
 type Update = (changes: Partial<Draft>) => void
 
 /** Which category the list is choosing: the transaction's, or a split line's (by key). */
 export type PickTarget = 'main' | number
-
-export const rule = <hr className="my-1 border-dashed border-border" />
 
 /**
  * CUR-08: what left the account, prefilled at the day's rate and editable, with the rate
@@ -133,41 +134,6 @@ export function AmountInput({
   )
 }
 
-/** Répartir itemizes the slip; in the same place, "Ne pas répartir" goes back. */
-function SplitToggle({ draft, onChange }: { draft: Draft; onChange: Update }) {
-  const { t } = useTranslation()
-  const split = draft.splitMode !== null
-  return (
-    <button
-      type="button"
-      onClick={() =>
-        onChange(
-          split
-            ? {
-                splitMode: null,
-                lines: [],
-                categoryId: draft.lines[0]?.categoryId ?? null,
-              }
-            : {
-                splitMode: 'amount',
-                lines: [
-                  { key: 0, categoryId: draft.categoryId, value: '' },
-                  { key: 1, categoryId: null, value: '' },
-                ],
-              },
-        )
-      }
-      className={cn(
-        'self-start rounded-sm font-semibold tracking-wide text-primary uppercase underline decoration-transparent transition-colors hover:decoration-current',
-        small,
-        focusRing,
-      )}
-    >
-      {t(split ? 'transactions.unsplit' : 'transactions.split')}
-    </button>
-  )
-}
-
 type ReceiptProps = {
   draft: Draft
   categories: ReadonlyArray<Category>
@@ -179,16 +145,63 @@ type ReceiptProps = {
     category?: string
     paid?: string
     splits?: string
+    people?: string
   }
+  people: ReadonlyArray<Person>
   autoFocus: boolean
   onChange: Update
   onPick: (target: PickTarget) => void
+  onOpenPeople: () => void
+}
+
+/** The category's round icon (unless split), the amount, and the currency chip. */
+function AmountRow({
+  single,
+  draft,
+  categories,
+  errors,
+  autoFocus,
+  currencies,
+  onChange,
+  onPick,
+}: ReceiptProps & { single: boolean }) {
+  const { t } = useTranslation()
+  return (
+    <div className="flex items-center gap-3">
+      {single && (
+        <CategoryButton
+          category={categories.find((c) => c.id === draft.categoryId)}
+          categories={categories}
+          kind={draft.kind}
+          invalid={Boolean(errors.category)}
+          className="size-12 [&_svg]:size-6"
+          onOpen={() => onPick('main')}
+        />
+      )}
+      <AmountInput
+        value={draft.amount}
+        invalid={Boolean(errors.amount)}
+        autoFocus={autoFocus}
+        onChange={(amount) => onChange({ amount })}
+      />
+      {draft.currency && (
+        <CurrencyChip
+          value={draft.currency}
+          label={t('transactions.currency', { code: draft.currency })}
+          currencies={currencies}
+          onChange={(currency) =>
+            onChange({ currency, paid: '', paidByHand: false })
+          }
+        />
+      )}
+    </div>
+  )
 }
 
 /**
  * Spec 15: the transaction as a receipt slip. The category's round icon, the amount and
  * the currency; Répartir, which itemizes the slip; Débité and Frais in another currency
- * than the account's; then En attente (TRX-09) after a rule.
+ * than the account's; the people's parts (spec 20); then En attente (TRX-09) after a rule.
  */
 export function ReceiptAmount(props: ReceiptProps) {
   const { draft, categories, accountCurrency, errors, onChange, onPick } = props
@@ -198,34 +211,7 @@ export function ReceiptAmount(props: ReceiptProps) {
   const single = draft.splitMode === null || accountCurrency === null
   return (
     <div className="receipt flex flex-col gap-3 bg-background px-4 pt-4 font-mono">
-      <div className="flex items-center gap-3">
-        {single && (
-          <CategoryButton
-            category={categories.find((c) => c.id === draft.categoryId)}
-            categories={categories}
-            kind={draft.kind}
-            invalid={Boolean(errors.category)}
-            className="size-12 [&_svg]:size-6"
-            onOpen={() => onPick('main')}
-          />
-        )}
-        <AmountInput
-          value={draft.amount}
-          invalid={Boolean(errors.amount)}
-          autoFocus={props.autoFocus}
-          onChange={(amount) => onChange({ amount })}
-        />
-        {draft.currency && (
-          <CurrencyChip
-            value={draft.currency}
-            label={t('transactions.currency', { code: draft.currency })}
-            currencies={props.currencies}
-            onChange={(currency) =>
-              onChange({ currency, paid: '', paidByHand: false })
-            }
-          />
-        )}
-      </div>
+      <AmountRow {...props} single={single} />
       {(errors.category ?? errors.amount) && (
         <FieldMessage>{errors.category ?? errors.amount}</FieldMessage>
       )}
@@ -257,6 +243,17 @@ export function ReceiptAmount(props: ReceiptProps) {
             onPick={onPick}
           />
         </>
+      )}
+      {accountCurrency !== null && draft.kind === 'expense' && (
+        <PeopleLines
+          draft={draft}
+          people={props.people}
+          total={bookedMinor(draft, accountCurrency, props.rate ?? null)}
+          accountCurrency={accountCurrency}
+          error={errors.people}
+          onChange={onChange}
+          onOpen={props.onOpenPeople}
+        />
       )}
       {rule}
       <ReceiptLine label={t('transactions.pending')} htmlFor={pendingId}>

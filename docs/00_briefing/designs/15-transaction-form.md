@@ -165,7 +165,7 @@ it was underneath; "←" or Escape goes back without choosing.
 │                  [⇕] [⇅ Nom▾]│
 │ [Rechercher                 ]│
 │ [Dépenses][Revenus][Placem.] │
-│ Fréquemment utilisées        │
+│ Fréquents        │
 │  (◉)    (◉)    (◉)    (◉)    │
 │ Épicer. Café  Essence Resto  │
 │ ┌──────────────────────────┐ │
@@ -176,15 +176,16 @@ it was underneath; "←" or Escape goes back without choosing.
 └──────────────────────────────┘
 ```
 
-- What applies to every type comes first: "Tout déplier" and the sort on the right, as
-  on the list pages; then **Rechercher**, full width, which takes focus. Then the type
-  tabs (`KindTabs`, as on Catégories), the transaction's type selected.
-- **Fréquemment utilisées** (CAT-06): the five categories of the selected type used most over the
-  last 90 days, by count, under "Fréquemment utilisées", as a row of round icons with
+- On top, staying put while the list scrolls (`SheetHead`): the type tabs (`KindTabs`,
+  the transaction's type selected), then **Rechercher**, full width, which takes focus,
+  as in the filter sheet. No sort and no "Tout déplier": they belong to the Catégories
+  page (decided 2026-11-05); the list follows the order chosen there.
+- **Fréquents** (CAT-06): the five categories of the selected type used most over the
+  last 90 days, by count, under "Fréquents", as a row of round icons with
   their names under them. Hidden while searching and until there are transactions.
 - Then the type's tree, the shared `CategoryTree` as on Catégories: elbow connectors,
   parents opened and closed by their chevron, open branches remembered per browser and
-  shared with that page, the same sort. A search shows every match with its parents.
+  shared with that page, in its order. A search shows every match with its parents.
 - **+ Nouvelle catégorie** closes the tree's card (`CreateButton`, decided 2026-11-05):
   it opens the whole Catégories form (spec 12) in a sheet over the transaction, starting
   at the top of the open tab. Saving closes it, refreshes the data and picks the new
@@ -246,9 +247,9 @@ it was underneath; "←" or Escape goes back without choosing.
 | Titles | Nouvelle transaction, Modifier la transaction |
 | Kinds | Dépense, Revenu, Transfert |
 | Receipt | Montant (accessible name), Répartir, Ne pas répartir, Débité, Taux, Frais de conversion, 1 {from} = {rate} {to}, Taux manquant, En attente |
-| Category | Catégorie, Choisir une catégorie, Remboursement, Retour au formulaire, Fréquemment utilisées, Dépenses, Revenus, Placements, Rechercher, Aucun résultat. |
+| Category | Catégorie, Choisir une catégorie, Remboursement, Retour au formulaire, Fréquents, Dépenses, Revenus, Placements, Rechercher, Aucun résultat. |
 | Fields | Magasin, Compte, Date, Note |
-| Picker | Fréquemment utilisées, Archivée, Retirer la catégorie, Créer « {text} » |
+| Picker | Fréquents, Archivée, Retirer la catégorie, Créer « {text} » |
 | Splits | Répartir, Ne pas répartir, Par, Montant, Parts, %, Ajouter une catégorie, Retirer la ligne, Tout est réparti, Reste {amount} à répartir, Dépasse le montant de {amount} |
 | Split errors | Répartissez tout le montant., Les pourcentages doivent totaliser 100., Chaque catégorie une seule fois. |
 | Imported | Importée le {date} |
