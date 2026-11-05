@@ -6,6 +6,7 @@ import { KindTabs } from '#/components/categories/kind-tabs'
 import { useExpandedBranches } from '#/components/categories/use-expanded-branches'
 import { ExpandAllButton } from '#/components/expand-all-button'
 import { IconButton } from '#/components/icon-button'
+import { NewCategoryRow } from '#/components/transactions/new-category-row'
 import { EmptyState, rowHover } from '#/components/list-card'
 import { SearchField } from '#/components/search-field'
 import { SortMenu } from '#/components/sort-menu'
@@ -120,7 +121,9 @@ function Toolbar({
  * Spec 15: the category list over the whole sheet, its header included: a back arrow and
  * the title, no ✕. The toolbar and the search, kept across types, then the type tabs
  * and the Catégories tree, branches
- * collapsible as there. An expense category on a revenue is a refund.
+ * collapsible as there, ending on "+ Nouvelle catégorie", which opens the category form
+ * over the transaction; the saved category is picked. An expense category on a revenue
+ * is a refund.
  */
 export function CategoryScreen({
   categories,
@@ -134,7 +137,7 @@ export function CategoryScreen({
   kind: Kind
   frequent: FrequentCategories
   date: string
-  onPick: (category: Category) => void
+  onPick: (categoryId: string) => void
   onBack: () => void
 }) {
   const { t } = useTranslation()
@@ -142,6 +145,7 @@ export function CategoryScreen({
   useSheetEscape(onBack)
   const panelId = useId()
   const [kind, setKind] = useState<Kind>(transactionKind)
+  const pick = (category: Category) => onPick(category.id)
   const [query, setQuery] = useState('')
   const [sort, setSort] = useStoredState<CategorySort>(
     'categories.sort',
@@ -180,20 +184,23 @@ export function CategoryScreen({
             <Frequent
               categories={frequentCategories(categories, often, date)}
               byId={byId}
-              onPick={onPick}
+              onPick={pick}
             />
           )}
-          {roots.length === 0 ? (
-            <EmptyState>{t('common.noMatch')}</EmptyState>
-          ) : (
-            <CategoryTree
-              roots={roots}
-              childrenOf={childrenOf}
-              expanded={open ?? branches.expanded}
-              onToggle={branches.toggle}
+          {roots.length === 0 && <EmptyState>{t('common.noMatch')}</EmptyState>}
+          <CategoryTree
+            roots={roots}
+            childrenOf={childrenOf}
+            expanded={open ?? branches.expanded}
+            onToggle={branches.toggle}
+            onPick={pick}
+          >
+            <NewCategoryRow
+              kind={kind}
+              categories={categories}
               onPick={onPick}
             />
-          )}
+          </CategoryTree>
         </div>
       </SheetBody>
     </div>

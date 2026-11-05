@@ -185,6 +185,11 @@ it was underneath; "←" or Escape goes back without choosing.
 - Then the type's tree, the shared `CategoryTree` as on Catégories: elbow connectors,
   parents opened and closed by their chevron, open branches remembered per browser and
   shared with that page, the same sort. A search shows every match with its parents.
+- **+ Nouvelle catégorie** closes the tree's card (`CreateButton`, decided 2026-11-05):
+  it opens the whole Catégories form (spec 12) in a sheet over the transaction, starting
+  at the top of the open tab. Saving closes it, refreshes the data and picks the new
+  category on the transaction; closing without saving goes back to the list. It shows
+  under "Aucun résultat." too.
 - A category of another type is allowed: an expense category chosen for a revenue is a
   refund, which lowers that category's spending (database.md).
 - Parents are choosable too. **Archived categories never appear** (CAT-04), as of the

@@ -7,15 +7,18 @@ import { Sheet, SheetContent } from '#/components/ui/sheet'
 
 const CloseSheet = createContext<() => void>(() => {})
 const MarkChanged = createContext<() => void>(() => {})
-const EscapeTo = createContext<(handler: (() => void) | null) => void>(() => {})
+// Layers over the sheet, innermost last: Escape runs the last one's handler.
+const EscapeTo = createContext<(handler: () => void) => () => void>(
+  () => () => {},
+)
 
-/** Closes the enclosing RouteSheet with its animation, then leaves the route. */
+/** Closes the enclosing sheet with its animation (a RouteSheet then leaves its route). */
 export function useCloseSheet() {
   return useContext(CloseSheet)
 }
 
 /**
- * Tells the enclosing RouteSheet that something changed, for the choices typing does not
+ * Tells the enclosing sheet that something changed, for the choices typing does not
  * report (a picker, a tab). Outside a sheet it does nothing.
  */
 export function useMarkChanged() {
@@ -24,50 +27,50 @@ export function useMarkChanged() {
 
 /**
  * While mounted, Escape runs `handler` instead of closing the sheet: a layer over the
- * sheet (the category list) goes back one level.
+ * sheet (the category list) goes back one level, a field being typed (a create row)
+ * stops. The innermost wins; the one under it is back once it unmounts.
  */
 export function useSheetEscape(handler: () => void) {
-  const setEscape = useContext(EscapeTo)
+  const push = useContext(EscapeTo)
   const latest = useRef(handler)
   latest.current = handler
-  useEffect(() => {
-    setEscape(() => latest.current())
-    return () => setEscape(null)
-  }, [setEscape])
+  useEffect(() => push(() => latest.current()), [push])
 }
 
 /**
- * A sheet that is a route (spec 11): it has a URL, so back and reload work. Closing plays
- * the animation first, then navigates to `to` and refreshes its data. `actions` show in
- * the header on phones (shared patterns). Once something was typed or chosen, closing
- * other than by saving asks first (spec 15).
+ * A form's sheet: closing plays the animation, then runs `onClosed`. Once something was
+ * typed or chosen, closing other than by saving asks first (spec 15). `actions` show in
+ * the header on phones (shared patterns). A sheet over a sheet (the category form over a
+ * transaction) is one too, with its own changes and Escape layers.
  */
-export function RouteSheet({
+export function FormSheet({
   title,
-  to,
   actions,
+  onClosed,
   children,
 }: {
   title: string
-  to: LinkProps['to']
   actions?: React.ReactNode
+  onClosed: () => void
   children: React.ReactNode
 }) {
   const { t } = useTranslation()
-  const router = useRouter()
   const [open, setOpen] = useState(true)
   const [changed, setChanged] = useState(false)
   const [asking, setAsking] = useState(false)
   const markChanged = () => setChanged(true)
-  const escape = useRef<(() => void) | null>(null)
-  const [setEscape] = useState(() => (handler: (() => void) | null) => {
-    escape.current = handler
+  const escapes = useRef<Array<() => void>>([])
+  const [pushEscape] = useState(() => (handler: () => void) => {
+    escapes.current.push(handler)
+    return () => {
+      escapes.current = escapes.current.filter((h) => h !== handler)
+    }
   })
 
   return (
     <CloseSheet value={() => setOpen(false)}>
       <MarkChanged value={markChanged}>
-        <EscapeTo value={setEscape}>
+        <EscapeTo value={pushEscape}>
           <Sheet
             open={open}
             onOpenChange={(next) => {
@@ -80,17 +83,14 @@ export function RouteSheet({
               closeLabel={t('common.close')}
               actions={actions}
               onEscapeKeyDown={(event) => {
-                if (!escape.current) return
+                const handler = escapes.current.at(-1)
+                if (!handler) return
                 event.preventDefault()
-                escape.current()
+                handler()
               }}
               onCloseAutoFocus={(event) => {
                 event.preventDefault()
-                // Refresh first, while the sheet's route leaves the scroll alone: every
-                // load after the navigation would scroll the list back to the top.
-                void router
-                  .invalidate()
-                  .then(() => router.navigate({ to, resetScroll: false }))
+                onClosed()
               }}
             >
               <div className="contents" onInputCapture={markChanged}>
@@ -112,5 +112,30 @@ export function RouteSheet({
         </EscapeTo>
       </MarkChanged>
     </CloseSheet>
+  )
+}
+
+/**
+ * A sheet that is a route (spec 11): it has a URL, so back and reload work. Once closed
+ * it navigates to `to` and refreshes its data.
+ */
+export function RouteSheet({
+  to,
+  ...sheet
+}: Omit<React.ComponentProps<typeof FormSheet>, 'onClosed'> & {
+  to: LinkProps['to']
+}) {
+  const router = useRouter()
+  return (
+    <FormSheet
+      {...sheet}
+      // Refresh first, while the sheet's route leaves the scroll alone: every load after
+      // the navigation would scroll the list back to the top.
+      onClosed={() =>
+        void router
+          .invalidate()
+          .then(() => router.navigate({ to, resetScroll: false }))
+      }
+    />
   )
 }

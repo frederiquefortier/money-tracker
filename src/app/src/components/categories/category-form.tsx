@@ -113,12 +113,15 @@ export function CategoryForm({
   initial,
   categories,
   savedText,
+  onSaved,
   children,
 }: {
   categoryId?: string
   initial: CategoryValues
   categories: ReadonlyArray<Category>
   savedText: string
+  /** The saved category's id, before the sheet closes (picked by the transaction form). */
+  onSaved?: (id: string) => void
   /** Read-only content after the fields: the history. */
   children?: React.ReactNode
 }) {
@@ -128,7 +131,11 @@ export function CategoryForm({
   const form = useSheetForm({
     schema: categoryFormSchema,
     initial: { name: initial.name },
-    save: (data) => saveCategory({ data: draft.input(data.name) }),
+    save: async (data) => {
+      const result = await saveCategory({ data: draft.input(data.name) })
+      if (result.ok) onSaved?.(result.id)
+      return result
+    },
     savedText,
   })
   const name = form.field('name')

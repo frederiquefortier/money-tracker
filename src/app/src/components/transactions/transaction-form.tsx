@@ -110,8 +110,8 @@ export function TransactionForm({
           kind={draft.kind}
           frequent={data.frequent}
           date={draft.occurredOn}
-          onPick={(category) => {
-            update(withPicked(draft, picking, category.id))
+          onPick={(categoryId) => {
+            update(withPicked(draft, picking, categoryId))
             setPicking(null)
           }}
           onBack={() => setPicking(null)}

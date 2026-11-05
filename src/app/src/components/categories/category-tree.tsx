@@ -124,14 +124,23 @@ function CategoryList({
  * draws its own (CAT-05). With `onPick` each row chooses its category instead of opening
  * it (spec 15).
  */
+/** `children` close the card, under the tree (a create row). */
 export function CategoryTree({
   roots,
   className,
+  children,
   ...tree
-}: TreeProps & { roots: ReadonlyArray<Category>; className?: string }) {
+}: TreeProps & {
+  roots: ReadonlyArray<Category>
+  className?: string
+  children?: React.ReactNode
+}) {
   return (
     <div className={cn(cardSurface, className)}>
-      <CategoryList categories={roots} depth={0} {...tree} />
+      {roots.length > 0 && (
+        <CategoryList categories={roots} depth={0} {...tree} />
+      )}
+      {children}
     </div>
   )
 }

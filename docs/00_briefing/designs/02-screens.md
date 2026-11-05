@@ -96,7 +96,11 @@ component to use, so a screen is assembled, not redrawn.
   the new item is chosen), and a × clears it. Several choices in a form (a person's groups, spec 19)
   are the filters' `CheckList` under a field label, as in a filter sheet; creating one
   there is the card's last row, a "+ Nouveau …" button that becomes a name field
-  (`CreateRow`). Nothing chosen is an
+  (`CreateRow`). Escape leaves the field only: `useSheetEscape` keeps a stack, the
+  innermost layer first. When creating needs a whole form (a category from the
+  transaction form), the same "+ …" row (`CreateButton`) opens it in a `FormSheet` over
+  the sheet: a `RouteSheet` without a URL, saving and asking before discarding the same
+  way. Nothing chosen is an
   empty field, never "Aucun(e)". The chosen option is tinted (the accent background,
   semibold), as in a native select, with no check and no slot for one; options under a
   group heading (an institution, a category type) sit one step in; hover and the
