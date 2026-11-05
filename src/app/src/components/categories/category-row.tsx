@@ -13,6 +13,7 @@ export type RowContext = {
   parent: Category | undefined
   hasChildren: boolean
   branch: number
+  archivedParents: ReadonlyArray<Category>
   onAddChild?: () => void
 }
 
@@ -124,6 +125,7 @@ export function CategoryRow({
           parent={context.parent}
           hasChildren={context.hasChildren}
           branch={context.branch}
+          archivedParents={context.archivedParents}
           onAddChild={context.onAddChild}
         />
       )}

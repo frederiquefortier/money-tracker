@@ -1,8 +1,7 @@
 import { useTranslation } from 'react-i18next'
-import { CategoryRow } from '#/components/categories/category-row'
+import { CategoryTree } from '#/components/categories/category-tree'
 import type { RowContext } from '#/components/categories/category-row'
 import { CollapseToggle } from '#/components/collapse-toggle'
-import { ListCard } from '#/components/list-card'
 import type { Category } from '#/lib/categories'
 import { formatDate } from '#/lib/format'
 import { useLocale } from '#/lib/use-locale'
@@ -10,14 +9,29 @@ import { useStoredState } from '#/lib/use-stored-state'
 
 const parseBoolean = (v: unknown) => (typeof v === 'boolean' ? v : undefined)
 
-/** CAT-05: archived categories, flat and muted, with their full path and date. */
+const archivedOn = (category: Category) => category.history[0]?.effectiveOn
+
+/**
+ * CAT-05: archived categories as a muted tree. A branch whose parent is still active
+ * starts at the top with its full path. The date shows where it differs from the parent's.
+ */
 export function ArchivedCategories({
-  archived,
+  childrenOf,
+  count,
+  byId,
+  pathOf,
   contextOf,
+  expanded: openBranches,
+  onToggle,
   open = false,
 }: {
-  archived: ReadonlyArray<{ category: Category; path: string }>
+  childrenOf: ReadonlyMap<string | null, ReadonlyArray<Category>>
+  count: number
+  byId: ReadonlyMap<string, Category>
+  pathOf: (category: Category) => string
   contextOf: (category: Category) => RowContext
+  expanded: ReadonlySet<string>
+  onToggle: (id: string) => void
   open?: boolean
 }) {
   const { t } = useTranslation()
@@ -28,7 +42,9 @@ export function ArchivedCategories({
     parseBoolean,
   )
   const expanded = open || stored
-  if (archived.length === 0) return null
+  const roots = childrenOf.get(null) ?? []
+  if (count === 0) return null
+  const isRoot = (category: Category) => roots.includes(category)
 
   return (
     <section className="flex flex-col gap-2">
@@ -37,33 +53,38 @@ export function ArchivedCategories({
         onToggle={() => setExpanded(!expanded)}
         className="self-start text-sm font-semibold text-muted-foreground"
       >
-        {t('categories.archived', { count: archived.length })}
+        {t('categories.archived', { count })}
       </CollapseToggle>
-      {expanded && (
-        <ListCard className="text-muted-foreground">
-          {archived.map(({ category, path }) => (
-            <li key={category.id}>
-              <CategoryRow
-                category={category}
-                label={path}
-                context={contextOf(category)}
-                aside={
-                  category.history[0] && (
-                    <span className="text-sm whitespace-nowrap">
-                      {t('categories.archivedOn', {
-                        date: formatDate(
-                          category.history[0].effectiveOn,
-                          locale,
-                          'medium',
-                        ),
-                      })}
-                    </span>
-                  )
-                }
-              />
-            </li>
-          ))}
-        </ListCard>
+      {expanded && roots.length > 0 && (
+        <CategoryTree
+          className="text-muted-foreground"
+          roots={roots}
+          childrenOf={childrenOf}
+          contextOf={contextOf}
+          expanded={openBranches}
+          onToggle={onToggle}
+          labelOf={(category) =>
+            isRoot(category) ? pathOf(category) : category.name
+          }
+          asideOf={(category) => {
+            const date = archivedOn(category)
+            const parent = category.parentId
+              ? byId.get(category.parentId)
+              : undefined
+            if (
+              !date ||
+              (!isRoot(category) && parent && archivedOn(parent) === date)
+            )
+              return null
+            return (
+              <span className="text-sm whitespace-nowrap">
+                {t('categories.archivedOn', {
+                  date: formatDate(date, locale, 'medium'),
+                })}
+              </span>
+            )
+          }}
+        />
       )}
     </section>
   )

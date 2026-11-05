@@ -16,13 +16,13 @@ import type { Locale } from '#/i18n/locales'
 import {
   CATEGORY_SORTS,
   KINDS,
-  categoryContext,
   categoryPath,
   childrenByParent,
   isArchived,
   sortSiblings,
 } from '#/lib/categories'
 import type { Category, CategorySort, Kind } from '#/lib/categories'
+import { archivedTree, categoryContext } from '#/lib/category-tree'
 import { useLocale } from '#/lib/use-locale'
 import { useStoredState } from '#/lib/use-stored-state'
 import { foldForSearch, indexById, oneOf } from '#/lib/utils'
@@ -36,14 +36,14 @@ export const Route = createFileRoute('/_authed/settings/categories')({
 const parseKind = oneOf(KINDS)
 const parseSort = oneOf(CATEGORY_SORTS)
 
-/** The active categories whose name matches, with their parents so each keeps its path. */
+/** The categories whose name matches, with their parents so each keeps its path. */
 function matchesWithParents(
-  active: ReadonlyArray<Category>,
+  list: ReadonlyArray<Category>,
   query: string,
   byId: ReadonlyMap<string, Category>,
 ) {
   const keep = new Set<string>()
-  for (const category of active) {
+  for (const category of list) {
     if (!foldForSearch(category.name).includes(query)) continue
     for (
       let c: Category | undefined = category;
@@ -56,9 +56,9 @@ function matchesWithParents(
 }
 
 /**
- * One kind's active tree in the chosen order, its archived categories by path, each row's
- * context, and every parent of any kind (expanding all opens every tab). A query keeps
- * the matches: in the tree with their parents, in the archive by name.
+ * One kind's active tree in the chosen order, its archived tree, each row's context, and
+ * every parent of any kind (expanding all opens every tab). A query keeps the matches
+ * with their parents, in both trees.
  */
 function shape(
   categories: ReadonlyArray<Category>,
@@ -73,15 +73,21 @@ function shape(
   const byId = indexById(categories)
   const ofKind = categories.filter((c) => c.kind === kind)
   const activeOfKind = ofKind.filter((c) => !isArchived(c))
+  const archivedOfKind = ofKind.filter(isArchived)
   const found = query ? matchesWithParents(activeOfKind, query, byId) : null
-  const archived = ofKind
-    .filter(isArchived)
-    .filter((c) => !query || foldForSearch(c.name).includes(query))
-    .map((category) => ({ category, path: categoryPath(category, byId) }))
-    .sort((a, b) => a.path.localeCompare(b.path, collator))
+  const foundArchived = query
+    ? matchesWithParents(archivedOfKind, query, byId)
+    : null
+  const archived = foundArchived
+    ? archivedOfKind.filter((c) => foundArchived.has(c.id))
+    : archivedOfKind
   const contextOf = categoryContext(categories, collator)
   const active = childrenByParent(
     categories.filter((c) => !isArchived(c)),
+    collator,
+  )
+  const archivedParents = childrenByParent(
+    categories.filter(isArchived),
     collator,
   )
   return {
@@ -94,10 +100,18 @@ function shape(
       sort,
       collator,
     ),
-    parents: [...active.keys()].filter((id) => id !== null),
-    archived,
+    parents: [...active.keys(), ...archivedParents.keys()].filter(
+      (id) => id !== null,
+    ),
+    archived: {
+      childrenOf: archivedTree(archived, byId, collator),
+      count: archived.length,
+      byId,
+      pathOf: (category: Category) => categoryPath(category, byId),
+    },
     contextOf,
     found,
+    foundArchived,
   }
 }
 
@@ -134,10 +148,15 @@ function Categories() {
   const panelId = useId()
   const { kind, setKind, sort, setSort } = useView()
   const [query, setQuery] = useState('')
-  const { ofKind, childrenOf, parents, archived, contextOf, found } = shape(
-    categories,
-    { kind, sort, locale, query: foldForSearch(query) },
-  )
+  const {
+    ofKind,
+    childrenOf,
+    parents,
+    archived,
+    contextOf,
+    found,
+    foundArchived,
+  } = shape(categories, { kind, sort, locale, query: foldForSearch(query) })
   const roots = childrenOf.get(null) ?? []
   const branches = useExpandedBranches(parents)
 
@@ -174,7 +193,7 @@ function Categories() {
         {ofKind.length === 0 && (
           <EmptyState>{t('categories.empty')}</EmptyState>
         )}
-        {found && roots.length === 0 && archived.length === 0 && (
+        {found && roots.length === 0 && archived.count === 0 && (
           <EmptyState>{t('common.noMatch')}</EmptyState>
         )}
         {roots.length > 0 && (
@@ -189,8 +208,10 @@ function Categories() {
           />
         )}
         <ArchivedCategories
-          archived={archived}
+          {...archived}
           contextOf={contextOf}
+          expanded={foundArchived ?? branches.expanded}
+          onToggle={branches.toggle}
           open={found !== null}
         />
       </div>

@@ -18,7 +18,7 @@ function EditAccount() {
   const locale = useLocale()
   const { accountId } = Route.useParams()
   const account = accounts.find((a) => a.id === accountId)
-  if (!account) return <Navigate to="/settings/accounts" />
+  if (!account) return <Navigate to="/settings/accounts" resetScroll={false} />
 
   return (
     <RouteSheet

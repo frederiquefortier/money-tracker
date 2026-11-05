@@ -25,14 +25,32 @@ function EditTransaction() {
   const locale = useLocale()
   const { data, transaction } = Route.useLoaderData()
   const account = data.accounts.find((a) => a.id === transaction?.accountId)
-  if (!transaction || !account) return <Navigate to="/transactions" />
+  if (!transaction || !account)
+    return <Navigate to="/transactions" resetScroll={false} />
 
   return (
     <RouteSheet
       to="/transactions"
       title={t('transactions.editTitle')}
       actions={
-        <TransactionActions transactionId={transaction.id} placement="sheet" />
+        <TransactionActions
+          placement="sheet"
+          summary={{
+            id: transaction.id,
+            occurredOn: transaction.occurredOn,
+            amount: transaction.amount,
+            currency: account.currency,
+            merchant:
+              data.merchants.find((m) => m.id === transaction.merchantId)
+                ?.name ?? null,
+            categories: transaction.splits.flatMap(
+              (split) =>
+                data.categories.find((c) => c.id === split.categoryId)?.name ??
+                [],
+            ),
+            account: account,
+          }}
+        />
       }
     >
       <TransactionForm

@@ -1,6 +1,7 @@
 import { CategoryRow, indentOf } from '#/components/categories/category-row'
 import type { RowContext } from '#/components/categories/category-row'
 import { cardSurface } from '#/components/list-card'
+import { isArchived } from '#/lib/categories'
 import type { Category } from '#/lib/categories'
 import { cn } from '#/lib/utils'
 
@@ -12,6 +13,9 @@ type TreeProps = {
   onToggle: (id: string) => void
   onExpand?: (id: string) => void
   onPick?: (category: Category) => void
+  /** The row's text when it is not the name (a path in the archive). */
+  labelOf?: (category: Category) => string
+  asideOf?: (category: Category) => React.ReactNode
 }
 
 const line = 'pointer-events-none absolute z-10 border-primary/30'
@@ -77,13 +81,16 @@ function CategoryList({
             )}
             <CategoryRow
               category={category}
-              label={category.name}
+              label={tree.labelOf?.(category) ?? category.name}
+              aside={tree.asideOf?.(category)}
               depth={depth}
               context={
                 tree.contextOf && {
                   ...tree.contextOf(category),
-                  // The new child shows once saved.
-                  onAddChild: () => tree.onExpand?.(category.id),
+                  // The new child shows once saved. Archived rows take no child.
+                  onAddChild: isArchived(category)
+                    ? undefined
+                    : () => tree.onExpand?.(category.id),
                 }
               }
               onPick={tree.onPick}
@@ -113,15 +120,17 @@ function CategoryList({
 }
 
 /**
- * CAT-01: active categories of one kind, each level alphabetical, parents expandable. With
- * `onPick` each row chooses its category instead of opening it (spec 15).
+ * CAT-01: categories of one kind, each level alphabetical, parents expandable; the archive
+ * draws its own (CAT-05). With `onPick` each row chooses its category instead of opening
+ * it (spec 15).
  */
 export function CategoryTree({
   roots,
+  className,
   ...tree
-}: TreeProps & { roots: ReadonlyArray<Category> }) {
+}: TreeProps & { roots: ReadonlyArray<Category>; className?: string }) {
   return (
-    <div className={cardSurface}>
+    <div className={cn(cardSurface, className)}>
       <CategoryList categories={roots} depth={0} {...tree} />
     </div>
   )

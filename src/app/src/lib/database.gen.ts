@@ -160,6 +160,7 @@ export type Database = {
           id: number
           status: string
           user_id: string
+          via_category_id: string | null
         }
         Insert: {
           category_id: string
@@ -168,6 +169,7 @@ export type Database = {
           id?: never
           status: string
           user_id?: string
+          via_category_id?: string | null
         }
         Update: {
           category_id?: string
@@ -176,11 +178,19 @@ export type Database = {
           id?: never
           status?: string
           user_id?: string
+          via_category_id?: string | null
         }
         Relationships: [
           {
             foreignKeyName: "category_status_events_user_id_category_id_fkey"
             columns: ["user_id", "category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["user_id", "id"]
+          },
+          {
+            foreignKeyName: "category_status_events_user_id_via_category_id_fkey"
+            columns: ["user_id", "via_category_id"]
             isOneToOne: false
             referencedRelation: "categories"
             referencedColumns: ["user_id", "id"]
@@ -647,6 +657,10 @@ export type Database = {
       merge_merchants: {
         Args: { source: string; target: string }
         Returns: undefined
+      }
+      reactivate_category: {
+        Args: { active_from: string; category: string }
+        Returns: number
       }
       recolor_categories: { Args: { colors: Json }; Returns: undefined }
       save_adjustment: {

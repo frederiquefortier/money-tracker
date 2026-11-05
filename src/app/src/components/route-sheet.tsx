@@ -86,8 +86,11 @@ export function RouteSheet({
               }}
               onCloseAutoFocus={(event) => {
                 event.preventDefault()
-                // Back on the list, refresh it: the sheet may have changed what it shows.
-                void router.navigate({ to }).then(() => router.invalidate())
+                // Refresh first, while the sheet's route leaves the scroll alone: every
+                // load after the navigation would scroll the list back to the top.
+                void router
+                  .invalidate()
+                  .then(() => router.navigate({ to, resetScroll: false }))
               }}
             >
               <div className="contents" onInputCapture={markChanged}>

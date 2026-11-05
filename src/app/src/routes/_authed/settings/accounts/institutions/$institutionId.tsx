@@ -17,7 +17,8 @@ function EditInstitution() {
   const { accounts, institutions } = useAccountsPage()
   const { institutionId } = Route.useParams()
   const institution = institutions.find((i) => i.id === institutionId)
-  if (!institution) return <Navigate to="/settings/accounts" />
+  if (!institution)
+    return <Navigate to="/settings/accounts" resetScroll={false} />
 
   return (
     <RouteSheet

@@ -72,6 +72,16 @@ export function formatMonth(
   }).format(utcDate(month))
 }
 
+/** “Maison” et “Entretien”: names in quotes, as every message names them. */
+export function formatQuotedList(
+  names: ReadonlyArray<string>,
+  locale: Locale,
+): string {
+  return new Intl.ListFormat(FORMAT_LOCALE[locale], {
+    type: 'conjunction',
+  }).format(names.map((name) => `“${name}”`))
+}
+
 export function formatCount(count: number, locale: Locale): string {
   return new Intl.NumberFormat(FORMAT_LOCALE[locale]).format(count)
 }

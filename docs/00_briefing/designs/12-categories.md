@@ -84,11 +84,15 @@ CAT-08 (emergency fund exclusion) is phase 2.
 ### Archived (CAT-05)
 
 - Archived categories leave the tree and sit in a collapsed section under it,
-  "Catégories archivées (3)", like "Comptes archivés": flat and muted, one line each with
-  the icon, the full path ("Transport > Taxi"), then "Archivée le 3 mars 2024" on the
-  right, before the actions.
-- Actions: reactivate (the undo icon, with a date) and trash. A sub-category cannot be
-  reactivated while its parent is archived ("Réactivez d'abord “{parent}”." in a toast).
+  "Catégories archivées (3)", like "Comptes archivés": muted, drawn as the same tree
+  (chevrons and connectors). An archived branch keeps its shape under its archived
+  parent. A category whose parent is still active starts a branch at the top, with its
+  full path ("Transport > Taxi"). "Archivée le 3 mars 2024" sits on the right, before the
+  actions, on the top rows and on any row archived on another date than its parent.
+- Actions: reactivate (the undo icon, with a date) and trash. Reactivating a
+  sub-category under an archived parent brings that parent back too, from the same date,
+  up to the first active one; the confirmation names them ("“Maison” sera aussi
+  réactivée."). Their other sub-categories stay archived.
 - Tapping the row opens its form.
 
 ## Category form
@@ -155,8 +159,11 @@ appearance first, need or want as radios.
     branch.
   - The tree shows nothing for it; the dashboard reads it (DSH-09).
 - **Historique** (CAT-03), when the category has one: the archive and reactivation
-  events, newest first, as text: "Archivée le 3 mars 2024", "Réactivée le 1 janvier
-  2025". Archive, reactivate and delete are row actions, never among the sheet's fields.
+  events, newest first, as a two-column table: the short date on the left, the action on
+  the right ("27/05/2027 | Archivée"). An event that came through another category
+  names it: "Archivée avec “Animaux”" on a sub-category archived with its parent,
+  "Réactivée avec “Chat”" on a parent brought back by its sub-category. Lines between the
+  rows and between the columns, none around the table. Archive, reactivate and delete are row actions, never among the sheet's fields.
 
 ### Colours
 
@@ -272,9 +279,10 @@ clothes plum, beauty pink), and slate for everything else. Income and investment
 | Clear parent | Retirer le parent |
 | Archive | À partir du, Réactivée le (the verbs are the shared ones) |
 | Past period | Cette période chevauche une autre période archivée. |
-| Archive branch | {count} sous-catégories seront archivées aussi. |
-| Parent archived | Réactivez d'abord “{parent}”. |
+| Archive branch | {count} sous-catégories seront aussi archivées. |
+| Parent archived | Réactivez d'abord “{parent}”. (a past period only) |
+| Reactivate parents | {names} sera aussi réactivée. / {names} seront aussi réactivées. |
 | Has children | Cette catégorie a des sous-catégories. |
-| History | Historique, Archivée le {date}, Réactivée le {date} |
+| History | Historique, Archivée, Réactivée, Archivée avec “{name}”, Réactivée avec “{name}” |
 | Search | Rechercher, Aucun résultat. (shared, also in the icon picker) |
 | Icon picker | Choisir une icône, Suggérée |

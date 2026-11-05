@@ -39,6 +39,14 @@ export const transactionsEn: typeof transactionsFr = {
   created: 'Transaction added.',
   updated: 'Transaction saved.',
   deleteTitle: 'Delete the transaction',
+  deleteTitleOn: 'Delete the {{amount}} transaction of {{date}}',
+  deleteTitleAt:
+    'Delete the {{amount}} transaction at “{{merchant}}” on {{date}}',
+  deleteAccount: 'It was recorded in the {{account}} account.',
+  deleteCategories_one:
+    'It was recorded in the {{account}} account and assigned to the {{categories}} category.',
+  deleteCategories_other:
+    'It was recorded in the {{account}} account and split between the {{categories}} categories.',
   list: {
     periodLabel: 'Period: {{period}}',
     periodsLabel: 'Periods',

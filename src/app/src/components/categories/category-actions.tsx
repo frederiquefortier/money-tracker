@@ -8,7 +8,7 @@ import { useToast } from '#/components/toaster'
 import { useServerAction } from '#/components/use-server-action'
 import { isArchived } from '#/lib/categories'
 import type { Category } from '#/lib/categories'
-import { formatDate, todayIso } from '#/lib/format'
+import { formatDate, formatQuotedList, todayIso } from '#/lib/format'
 import { useLocale } from '#/lib/use-locale'
 import {
   addCategoryPause,
@@ -28,20 +28,54 @@ function submitStatus(
   return archiveCategory({ data: { id, from } })
 }
 
+/** What else the change takes along: the archived parents, or the active branch. */
+function StatusNotes({
+  parents,
+  branch,
+}: {
+  parents: ReadonlyArray<Category>
+  branch: number
+}) {
+  const { t } = useTranslation()
+  const locale = useLocale()
+  if (parents.length > 0)
+    return (
+      <p className="text-sm">
+        {t('categories.reactivateParents', {
+          count: parents.length,
+          names: formatQuotedList(
+            parents.map((p) => p.name),
+            locale,
+          ),
+        })}
+      </p>
+    )
+  if (branch > 0)
+    return (
+      <p className="text-sm">
+        {t('categories.archiveBranch', { count: branch })}
+      </p>
+    )
+  return null
+}
+
 /**
- * Archive or reactivate from a date (CAT-03); archiving takes the branch along. A
- * reactivation date makes it a past period.
+ * Archive or reactivate from a date (CAT-03); archiving takes the branch along,
+ * reactivating brings back the archived parents. A reactivation date on archive makes it
+ * a past period.
  */
 function StatusDialog({
   category,
   parent,
   branch,
+  archivedParents,
   mode,
   onClose,
 }: {
   category: Category
   parent: Category | undefined
   branch: number
+  archivedParents: ReadonlyArray<Category>
   mode: StatusMode
   onClose: () => void
 }) {
@@ -52,7 +86,11 @@ function StatusDialog({
   const [from, setFrom] = useState(today)
   const [until, setUntil] = useState('')
   const { id, name } = category
-  const last = category.history[0]?.effectiveOn
+  const parents = mode === 'reactivate' ? archivedParents : []
+  // The parents cannot come back before they were archived either.
+  const last = [category, ...parents]
+    .map((c) => c.history[0]?.effectiveOn ?? '')
+    .reduce((a, b) => (a > b ? a : b), '')
   const datesOk = from !== '' && (!until || until > from)
 
   function failureText(error: string) {
@@ -99,11 +137,7 @@ function StatusDialog({
           onChange={(event) => setUntil(event.target.value)}
         />
       )}
-      {mode !== 'reactivate' && branch > 0 && (
-        <p className="text-sm">
-          {t('categories.archiveBranch', { count: branch })}
-        </p>
-      )}
+      <StatusNotes parents={parents} branch={mode === 'archive' ? branch : 0} />
     </ConfirmDialog>
   )
 }
@@ -143,6 +177,7 @@ export function CategoryActions({
   parent,
   hasChildren,
   branch,
+  archivedParents,
   onAddChild,
   placement,
   className,
@@ -152,6 +187,7 @@ export function CategoryActions({
   hasChildren: boolean
   /** Active sub-categories that archiving takes along. */
   branch: number
+  archivedParents: ReadonlyArray<Category>
   onAddChild?: () => void
   placement?: ActionPlacement
   className?: string
@@ -202,7 +238,9 @@ export function CategoryActions({
       )}
       {dialog && dialog !== 'delete' && (
         <StatusDialog
-          {...{ category, parent, branch, mode: dialog, onClose: close }}
+          {...{ category, parent, branch, archivedParents }}
+          mode={dialog}
+          onClose={close}
         />
       )}
     </IconActions>

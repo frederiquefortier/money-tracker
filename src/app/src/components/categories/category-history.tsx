@@ -3,26 +3,47 @@ import type { Category } from '#/lib/categories'
 import { formatDate } from '#/lib/format'
 import { useLocale } from '#/lib/use-locale'
 
-/** CAT-03: the archive and reactivation dates, newest first. Read-only. */
-export function CategoryHistory({ category }: { category: Category }) {
+/**
+ * CAT-03: the archive and reactivation dates, newest first, naming the category an event
+ * came through. Read-only.
+ */
+export function CategoryHistory({
+  category,
+  byId,
+}: {
+  category: Category
+  byId: ReadonlyMap<string, Category>
+}) {
   const { t } = useTranslation()
   const locale = useLocale()
   if (category.history.length === 0) return null
   return (
-    <section className="flex flex-col gap-1 border-t pt-5">
+    <section className="flex flex-col gap-2 border-t pt-5">
       <h3 className="text-sm font-semibold">{t('categories.history')}</h3>
-      <ul className="text-sm text-muted-foreground">
-        {category.history.map((event) => (
-          <li key={`${event.status}-${event.effectiveOn}`}>
-            {t(
-              event.status === 'archived'
-                ? 'categories.historyArchived'
-                : 'categories.historyActive',
-              { date: formatDate(event.effectiveOn, locale) },
-            )}
-          </li>
-        ))}
-      </ul>
+      <table className="text-sm text-muted-foreground">
+        <tbody>
+          {category.history.map((event) => {
+            const via = event.viaId ? byId.get(event.viaId) : undefined
+            const action =
+              event.status === 'archived' ? 'historyArchived' : 'historyActive'
+            return (
+              <tr
+                key={`${event.status}-${event.effectiveOn}`}
+                className="border-b last:border-b-0"
+              >
+                <td className="w-px border-r py-1.5 pr-3 whitespace-nowrap tabular-nums">
+                  {formatDate(event.effectiveOn, locale, 'short')}
+                </td>
+                <td className="py-1.5 pl-3">
+                  {via
+                    ? t(`categories.${action}With`, { name: via.name })
+                    : t(`categories.${action}`)}
+                </td>
+              </tr>
+            )
+          })}
+        </tbody>
+      </table>
     </section>
   )
 }

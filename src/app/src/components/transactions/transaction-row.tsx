@@ -237,7 +237,17 @@ export function TransactionRow({
         </button>
       )}
       {editable ? (
-        <TransactionActions transactionId={row.id} />
+        <TransactionActions
+          summary={{
+            id: row.id,
+            occurredOn: row.occurredOn,
+            amount: row.amount,
+            currency: row.currency,
+            merchant: row.merchant,
+            categories: row.categories.map((c) => c.name),
+            account: row.account,
+          }}
+        />
       ) : (
         <IconActions slots={1} />
       )}

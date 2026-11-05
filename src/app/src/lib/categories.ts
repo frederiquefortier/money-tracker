@@ -3,7 +3,7 @@ import categoryIcons from '#/icons/category-icons.json'
 import { hexToOklch, siblingVariation } from '#/lib/color'
 import { NECESSITIES } from '#/lib/necessity'
 import type { Necessity } from '#/lib/necessity'
-import { foldForSearch, indexById } from '#/lib/utils'
+import { foldForSearch } from '#/lib/utils'
 
 // Shared by the category screens, the picker and the server functions (spec 12).
 
@@ -15,6 +15,8 @@ export const DEFAULT_ICON = 'tag'
 export type CategoryEvent = {
   status: 'archived' | 'active'
   effectiveOn: string
+  /** The category it came through: the parent that archived its branch, the sub-category that brought it back. */
+  viaId: string | null
 }
 
 /** `[from, to)`, null bounds open (the view `category_active_periods`). */
@@ -189,26 +191,6 @@ export function descendantIds(
     }
   }
   return found
-}
-
-/**
- * What a category's actions need from the rest of the tree: its parent, whether it has
- * children (delete waits), and how many active sub-categories archiving takes along.
- */
-export function categoryContext(
-  categories: ReadonlyArray<Category>,
-  locale: string,
-) {
-  const byId = indexById(categories)
-  const children = childrenByParent(categories, locale)
-  return (category: Category) => ({
-    parent: category.parentId ? byId.get(category.parentId) : undefined,
-    hasChildren: children.has(category.id),
-    branch: [...descendantIds(category.id, children)].filter((id) => {
-      const c = byId.get(id)
-      return c !== undefined && !isArchived(c)
-    }).length,
-  })
 }
 
 type Colored = Pick<

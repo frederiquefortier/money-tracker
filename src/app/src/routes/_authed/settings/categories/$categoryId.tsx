@@ -4,8 +4,10 @@ import { CategoryActions } from '#/components/categories/category-actions'
 import { CategoryForm } from '#/components/categories/category-form'
 import { CategoryHistory } from '#/components/categories/category-history'
 import { RouteSheet } from '#/components/route-sheet'
-import { categoryContext, isArchived } from '#/lib/categories'
+import { isArchived } from '#/lib/categories'
+import { categoryContext } from '#/lib/category-tree'
 import { useCategoriesPage } from '#/lib/use-page-data'
+import { indexById } from '#/lib/utils'
 import { useFormatLocale } from '#/lib/use-locale'
 
 export const Route = createFileRoute(
@@ -21,7 +23,8 @@ function EditCategory() {
   const locale = useFormatLocale()
   const { categoryId } = Route.useParams()
   const category = categories.find((c) => c.id === categoryId)
-  if (!category) return <Navigate to="/settings/categories" />
+  if (!category)
+    return <Navigate to="/settings/categories" resetScroll={false} />
 
   return (
     <RouteSheet
@@ -43,7 +46,7 @@ function EditCategory() {
         categories={categories}
         savedText={t('categories.updated')}
       >
-        <CategoryHistory category={category} />
+        <CategoryHistory category={category} byId={indexById(categories)} />
       </CategoryForm>
     </RouteSheet>
   )

@@ -17,7 +17,8 @@ function EditMerchant() {
   const { merchants, categories } = useMerchantsPage()
   const { merchantId } = Route.useParams()
   const merchant = merchants.find((m) => m.id === merchantId)
-  if (!merchant) return <Navigate to="/settings/merchants" />
+  if (!merchant)
+    return <Navigate to="/settings/merchants" resetScroll={false} />
 
   return (
     <RouteSheet

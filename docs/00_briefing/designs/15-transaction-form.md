@@ -195,7 +195,12 @@ it was underneath; "←" or Escape goes back without choosing.
   (`/transactions/{id}`). Its body only edits.
 - **Delete** follows the shared row actions: a trash on the row from `md` up, in the
   sheet's header on phones, where rows keep their width for the amount (decided
-  2026-11-04, process.md).
+  2026-11-04, process.md). The confirmation names the transaction in its title,
+  "Supprimer la transaction de 45,00 $ du 3 novembre 2026 chez “Épicerie du coin”"
+  (without "chez …" when there is no merchant; the amount as booked, in the account's
+  currency), then says where it went: "Elle a été notée dans le compte “Chèques”
+  (Desjardins) et assignée à la catégorie “Épicerie”. Cette action est irréversible."
+  With several categories: "répartie entre les catégories “Épicerie” et “Maison”".
 - A transaction from an import shows "Importée le {date}" in the sheet's header; editing
   it is allowed.
 
@@ -241,7 +246,7 @@ it was underneath; "←" or Escape goes back without choosing.
 | Splits | Répartir, Ne pas répartir, Par, Montant, Parts, %, Ajouter une catégorie, Retirer la ligne, Tout est réparti, Reste {amount} à répartir, Dépasse le montant de {amount} |
 | Split errors | Répartissez tout le montant., Les pourcentages doivent totaliser 100., Chaque catégorie une seule fois. |
 | Imported | Importée le {date} |
-| Delete | Supprimer la transaction, Cette action est irréversible. |
+| Delete | Supprimer la transaction (the trash), Supprimer la transaction de {amount} du {date} chez “{merchant}”, Elle a été notée dans le compte “{account}” ({institution}) et assignée à la catégorie {categories}. / répartie entre les catégories {categories}., Cette action est irréversible. |
 | No account | Aucun compte pour l'instant. |
 | Discard | Abandonner les modifications?, Abandonner |
 | Actions | Annuler, Enregistrer |

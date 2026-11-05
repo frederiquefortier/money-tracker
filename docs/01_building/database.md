@@ -82,7 +82,7 @@ per ADR-008. User-owned rows (categories, merchants, notes) store one string, as
 | Table | Columns | Req |
 |---|---|---|
 | `categories` | `parent_id` (nullable, self, composite FK with `user_id`), `name`, `kind` (`expense`/`income`/`investment`), `icon` (a coolicons name, ADR-020, default `tag`), `icon_is_auto`, `color` (hex `#rrggbb`, free choice; a sub-category starts from a variation of its parent's), `color_is_auto` (designs/12-categories.md), `necessity` (`need`/`want`, nullable: null follows the nearest marked parent) | CAT-01, 02, 07, 10. A check allows `necessity` on `expense` categories only. `is_favourite` was dropped on 2026-11-04 (CAT-06 now works out frequent categories from transactions). Names unique among siblings of the same kind, ignoring case; top-level categories count as siblings. Deleting one with children fails on the foreign key. `exclude_from_emergency_fund` comes with CAT-08 (phase 2). |
-| `category_status_events` | `category_id`, `status` (`archived`/`active`), `effective_on` | CAT-03. Append-only: insert and select grants only. A category with no events is active; a trigger makes events alternate starting with an archive, refuses a date before the previous event, and refuses reactivating a sub-category whose parent is archived. Deleted with its category. |
+| `category_status_events` | `category_id`, `status` (`archived`/`active`), `effective_on`, `via_category_id` | CAT-03. Append-only: insert and select grants only. A category with no events is active; a trigger makes events alternate starting with an archive, refuses a date before the previous event, and refuses reactivating a sub-category whose parent is archived. `via_category_id` names the category an event came through (the parent that archived the branch, the sub-category that brought its parents back), null for an event of its own; its foreign key includes `user_id` and is set to null when that category is deleted. Deleted with its category. |
 | view `category_active_periods` | `category_id`, `active_from`, `active_to` | Periods `[active_from, active_to)`, null bounds open; one open period when there is no history. Pickers (CAT-04) and charts (DSH-03) both read this, so they never disagree. |
 | view `category_necessity` (comes with DSH-09) | `category_id`, `necessity` (`need`/`want`/null) | DSH-09. Expense categories only. A recursive walk up `parent_id` to the nearest category with a mark; null when none has one. `security_invoker`, so RLS on `categories` applies. The category form works the same rule out from the tree it already loads (`inheritedNecessity`). |
 
@@ -95,7 +95,10 @@ category in it (a before-update trigger on `kind`), so the check holds. Category
 Functions: `category_status(id)` gives the status after all events.
 `archive_category(id, from)` archives a category and every active category in its branch
 from the same date, and returns how many sub-categories went with it (ADR-012).
-Reactivating is a single insert into `category_status_events`.
+`reactivate_category(id, from)` reactivates a category and, from the same date, every
+archived parent above it up to the first active one, top-down so the insert trigger finds
+each parent active; it returns how many parents came back. The three functions fill
+`via_category_id` on the events they add for other categories.
 `add_category_pause(id, archive_from, active_from)` adds a past archived period to a
 category and its branch, and returns how many sub-categories got it. It refuses a period
 that is not strictly inside one active period, ends in the future, or reactivates under

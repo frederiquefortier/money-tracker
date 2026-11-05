@@ -53,7 +53,7 @@ export const getCategories = createServerFn({ method: 'GET' }).handler(
           ),
         supabase
           .from('category_status_events')
-          .select('category_id, status, effective_on')
+          .select('category_id, status, effective_on, via_category_id')
           .order('effective_on', { ascending: false })
           .order('id', { ascending: false }),
         supabase
@@ -68,6 +68,7 @@ export const getCategories = createServerFn({ method: 'GET' }).handler(
       list.push({
         status: e.status === 'archived' ? 'archived' : 'active',
         effectiveOn: e.effective_on,
+        viaId: e.via_category_id,
       })
       history.set(e.category_id, list)
     }
@@ -161,17 +162,15 @@ export const addCategoryPause = createServerFn({ method: 'POST' })
     return error ? failure('pause', error) : { ok: true, branch }
   })
 
+/** Its archived parents come back with it; returns how many did. */
 export const reactivateCategory = createServerFn({ method: 'POST' })
   .validator(datedInput)
-  .handler(async ({ data }): Promise<CategoryResult> => {
-    const { error } = await getSupabase()
-      .from('category_status_events')
-      .insert({
-        category_id: data.id,
-        status: 'active',
-        effective_on: data.from,
-      })
-    return error ? failure('reactivate', error) : { ok: true }
+  .handler(async ({ data }): Promise<CategoryResult<{ parents: number }>> => {
+    const { data: parents, error } = await getSupabase().rpc(
+      'reactivate_category',
+      { category: data.id, active_from: data.from },
+    )
+    return error ? failure('reactivate', error) : { ok: true, parents }
   })
 
 /** Children block it on the foreign key; transactions will too, with their migration. */

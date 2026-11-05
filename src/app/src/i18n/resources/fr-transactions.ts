@@ -38,6 +38,14 @@ export const transactionsFr = {
   created: 'Transaction ajoutée.',
   updated: 'Transaction enregistrée.',
   deleteTitle: 'Supprimer la transaction',
+  deleteTitleOn: 'Supprimer la transaction de {{amount}} du {{date}}',
+  deleteTitleAt:
+    'Supprimer la transaction de {{amount}} du {{date}} chez “{{merchant}}”',
+  deleteAccount: 'Elle a été notée dans le compte {{account}}.',
+  deleteCategories_one:
+    'Elle a été notée dans le compte {{account}} et assignée à la catégorie {{categories}}.',
+  deleteCategories_other:
+    'Elle a été notée dans le compte {{account}} et répartie entre les catégories {{categories}}.',
   list: {
     periodLabel: 'Période: {{period}}',
     periodsLabel: 'Périodes',

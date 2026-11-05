@@ -82,9 +82,9 @@ English; this file is in English like every other meta-doc.
 |---|---|---|---|
 | CAT-01 | Categories nest with no depth limit. | v1, ai | 1 |
 | CAT-02 | A category has a kind: expense (default), income, or investment. | v1, ai | 1 |
-| CAT-03 | Archive a category from a chosen date; reactivate from a chosen date. A past archived period (two dates) can be added afterwards, from the archive action. The full history is viewable as a timeline. Archiving a parent archives its branch; a sub-category cannot be reactivated under an archived parent. | v1, ai, add, C10 | 1 |
+| CAT-03 | Archive a category from a chosen date; reactivate from a chosen date. A past archived period (two dates) can be added afterwards, from the archive action. The full history is viewable as a timeline. Archiving a parent archives its branch; reactivating a sub-category reactivates its archived parents from the same date. | v1, ai, add, C10 | 1 |
 | CAT-04 | Archived categories are absent from every picker. Editing an old transaction still shows its archived category with a badge and lets you change it. | add, C8 | 1 |
-| CAT-05 | The category page shows active categories first and archived ones in a collapsed section with a count and "archivée depuis [date]". | add, C9 | 1 |
+| CAT-05 | The category page shows active categories first and archived ones in a collapsed section with a count and "archivée depuis [date]", drawn as a tree. | add, C9 | 1 |
 | CAT-06 | The picker starts with a "Fréquemment utilisées" group (first called "Fréquentes"): the most used categories of the transaction's type, worked out from recent transactions and shown as "Parent > Enfant". They also keep their place in the tree below, which lists categories as the category page draws them. Hand-picked favourites were dropped on 2026-11-04. | v1, ai, add, C7, author | 1 (with the transaction form) |
 | CAT-07 | A category has a coolicons icon, chosen in a searchable picker of a curated subset of the set (ADR-020). A default is suggested from the name; picking the suggested icon returns to it. Each category has its own colour, chosen freely; a sub-category starts from a variation of its parent's colour. | v1, ai, add, C11 | 1 |
 | CAT-08 | A category can be excluded from the emergency-fund calculation. | v1, ai | 2 |

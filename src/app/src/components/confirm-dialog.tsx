@@ -9,7 +9,8 @@ import {
 
 /**
  * Asks before an action. Destructive by default: "Supprimer {name}" in red, a red button,
- * Annuler. `children` holds what the action needs, such as a date.
+ * Annuler. `description` says what is affected, before "Cette action est irréversible.";
+ * `children` holds what the action needs, such as a date.
  */
 export function ConfirmDialog({
   open,
@@ -17,6 +18,7 @@ export function ConfirmDialog({
   confirmLabel,
   tone = 'destructive',
   irreversible = tone === 'destructive',
+  description,
   busy = false,
   canConfirm = true,
   onCancel,
@@ -29,6 +31,7 @@ export function ConfirmDialog({
   tone?: 'destructive' | 'default'
   /** Adds "Cette action est irréversible."; false for what can be undone. */
   irreversible?: boolean
+  description?: string
   busy?: boolean
   canConfirm?: boolean
   onCancel: () => void
@@ -41,13 +44,19 @@ export function ConfirmDialog({
     <Dialog open={open} onOpenChange={(next) => !next && onCancel()}>
       <DialogContent
         closeLabel={t('common.close')}
-        {...(irreversible ? {} : { 'aria-describedby': undefined })}
+        {...(irreversible || description
+          ? {}
+          : { 'aria-describedby': undefined })}
       >
         <DialogTitle className={destructive ? 'text-destructive' : undefined}>
           {title}
         </DialogTitle>
-        {irreversible && (
-          <DialogDescription>{t('common.irreversible')}</DialogDescription>
+        {(irreversible || description) && (
+          <DialogDescription>
+            {[description, irreversible && t('common.irreversible')]
+              .filter(Boolean)
+              .join(' ')}
+          </DialogDescription>
         )}
         {children}
         <div className="flex justify-end gap-2">
