@@ -106,9 +106,9 @@ English; this file is in English like every other meta-doc.
 
 | ID | Requirement | Source | Phase |
 |---|---|---|---|
-| TAG-01 | Create tags; a transaction can have several. | v1, ai | 2 |
-| TAG-02 | A tag can carry a date range and categories. In that range, it attaches itself to every transaction in at least one of those categories. Automatic tags are marked as such and can be removed by hand. | ai | 2 |
-| TAG-03 | Per tag: most and least expensive transactions. | misc ("Tag + expensive, less expensive") | 2 |
+| TAG-01 | Create tags; a transaction can have several. | v1, ai | later |
+| TAG-02 | Automatic linking by date range and categories moved to events (EVT-07) on 2026-11-05. | ai | later |
+| TAG-03 | Per tag: most and least expensive transactions. | misc ("Tag + expensive, less expensive") | later |
 
 ## 8. People and groups (`PPL`)
 
@@ -126,10 +126,11 @@ English; this file is in English like every other meta-doc.
 |---|---|---|---|
 | EVT-01 | User-defined event types. | ai | 2 |
 | EVT-02 | An event has a name, a date (or range), a type and optional people. | v1, ai | 2 |
-| EVT-03 | Transactions can be linked to an event. | v1, ai | 2 |
+| EVT-03 | Transactions can be linked to an event, by hand or automatically (EVT-07). The event shows as a tag on the transaction. | v1, ai, author | 2 |
 | EVT-04 | Calendar view of events with the total spent on each. | v1, ai | 2 |
 | EVT-05 | Compare events of the same type. | ai | 2 |
 | EVT-06 | Give an event a budget and follow it live. | ai | 2 |
+| EVT-07 | An event can carry categories. In its date range, it attaches itself to every transaction in at least one of those categories. Automatic links are marked as such and can be removed or changed by hand. | ai (was TAG-02), author | 2 |
 
 ## 10. Dashboard and reports (`DSH`)
 
@@ -245,6 +246,10 @@ Not in the notes, required by the brief. Details in [security.md](../01_building
 - **Category icons.** C11 asks for an emoji picker in Google's style. Replaced by coolicons,
   the set the logo comes from, so the interface has one visual language (ADR-020).
 - **"Canada"** became region packs (`LOC`), since 2026 data is Swiss.
+- **Tags and events.** Both could hold a trip: a tag with a date range and categories, or
+  an event. On 2026-11-05 the author kept events, the more defined idea, gave them the
+  automatic linking (EVT-07) and shows the event as a tag on the transaction. Tags moved
+  to later.
 - **v1 "account hidden for future transactions"** was dropped from `ai`, probably by
   accident. Kept as ACC-04; delete it if the drop was deliberate.
 - **v1 "anonymous" treat/reimbursement** (PPL-04) was also dropped from `ai`. Kept for the

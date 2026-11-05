@@ -9,7 +9,7 @@ import { useExpandedBranches } from '#/components/categories/use-expanded-branch
 import { ExpandAllButton } from '#/components/expand-all-button'
 import { FloatingAddLink } from '#/components/floating-add-button'
 import { SearchField } from '#/components/search-field'
-import { SettingsPage } from '#/components/settings-page'
+import { ListPage } from '#/components/list-page'
 import { SortMenu } from '#/components/sort-menu'
 import { FORMAT_LOCALE } from '#/i18n/locales'
 import type { Locale } from '#/i18n/locales'
@@ -161,7 +161,7 @@ function Categories() {
   const branches = useExpandedBranches(parents)
 
   return (
-    <SettingsPage
+    <ListPage
       title={t('categories.title')}
       actions={
         <>
@@ -218,6 +218,6 @@ function Categories() {
       <AddCategoryButton kind={kind} />
       {/* The category form opens here as a sheet, over the tree (spec 12). */}
       <Outlet />
-    </SettingsPage>
+    </ListPage>
   )
 }

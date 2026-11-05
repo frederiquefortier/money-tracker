@@ -17,11 +17,10 @@ IMP-01, 04, 05, 06, SEC-04 (the export half). The format itself is
 
 ## Importer et exporter
 
-Reached from Réglages, and from the empty transactions list (spec 14).
+Reached from the menu, and from the empty transactions list (spec 14).
 
 ```
 ┌──────────────────────────────┐
-│ ← Réglages                   │
 │ IMPORTER ET EXPORTER         │
 │ ┌──────────────────────────┐ │
 │ │ IMPORTER                 │ │

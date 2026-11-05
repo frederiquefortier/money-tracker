@@ -7,7 +7,7 @@ import { FloatingAddLink } from '#/components/floating-add-button'
 import { EmptyState, ListCard } from '#/components/list-card'
 import { MerchantRow } from '#/components/merchants/merchant-row'
 import { SearchField } from '#/components/search-field'
-import { SettingsPage } from '#/components/settings-page'
+import { ListPage } from '#/components/list-page'
 import { SortMenu } from '#/components/sort-menu'
 import { TreeGuides } from '#/components/tree-guides'
 import { categoryPath } from '#/lib/categories'
@@ -143,7 +143,7 @@ function Merchants() {
   }
 
   return (
-    <SettingsPage
+    <ListPage
       title={t('merchants.title')}
       actions={
         <>
@@ -184,6 +184,6 @@ function Merchants() {
       <AddMerchantButton />
       {/* The merchant form opens here as a sheet (spec 13). */}
       <Outlet />
-    </SettingsPage>
+    </ListPage>
   )
 }

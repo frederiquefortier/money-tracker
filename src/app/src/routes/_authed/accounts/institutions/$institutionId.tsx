@@ -6,7 +6,7 @@ import { RouteSheet } from '#/components/route-sheet'
 import { useAccountsPage } from '#/lib/use-page-data'
 
 export const Route = createFileRoute(
-  '/_authed/settings/accounts/institutions/$institutionId',
+  '/_authed/accounts/institutions/$institutionId',
 )({
   staticData: { sheet: true },
   component: EditInstitution,
@@ -17,12 +17,11 @@ function EditInstitution() {
   const { accounts, institutions } = useAccountsPage()
   const { institutionId } = Route.useParams()
   const institution = institutions.find((i) => i.id === institutionId)
-  if (!institution)
-    return <Navigate to="/settings/accounts" resetScroll={false} />
+  if (!institution) return <Navigate to="/accounts" resetScroll={false} />
 
   return (
     <RouteSheet
-      to="/settings/accounts"
+      to="/accounts"
       title={t('institutions.editTitle')}
       actions={
         <InstitutionActions

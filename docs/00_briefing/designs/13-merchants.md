@@ -8,7 +8,7 @@ come with the transactions migration. Shared rules:
 
 A merchant is where the money went: the grocery store, the landlord, the airline. It
 saves typing, because choosing one prefills the category, and it gives the dashboard a
-second way to read spending (DSH-07, phase 4). Reached from Réglages; most merchants are
+second way to read spending (DSH-07, phase 4). Reached from the menu; most merchants are
 created inline from the transaction form.
 
 ## Requirements
@@ -24,7 +24,6 @@ docs keep "merchant".
 
 ```
 ┌──────────────────────────────────┐
-│ ← Réglages                       │
 │ MAGASINS        [Filtre▾][Tri▾]  │
 │ [Rechercher                    ] │
 │ ┌──────────────────────────────┐ │

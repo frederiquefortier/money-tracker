@@ -12,7 +12,7 @@ onto them.
 
 | # | Spec | Screens | Requirements | Status |
 |---|---|---|---|---|
-| 10 | [Settings and currencies](10-settings-currencies.md) | Réglages hub, Devises, display currency switcher in the header | CUR-01..07, SET-06 | Built |
+| 10 | [Settings and currencies](10-settings-currencies.md) | Réglages menu, Devises, display currency switcher in the header | CUR-01..07, SET-06 | Built |
 | 11 | [Accounts](11-accounts.md) | Accounts by institution, account form, institution form | ACC-01..07 | Built |
 | 12 | [Categories](12-categories.md) | Category tree, category form, icon picker | CAT-01..03, 05, 07 | Built |
 | 13 | [Merchants](13-merchants.md) | Merchant list and form, merchant picker | MER-01, 05, TRX-05 | Built |
@@ -28,7 +28,7 @@ Decided on Devises and Comptes (process.md, "Who decided what"); every spec foll
 and a spec that disagrees is wrong until the author says otherwise. Each names the shared
 component to use, so a screen is assembled, not redrawn.
 
-- **Page:** `SettingsPage` (or the tab's own page): "← Réglages" top left, the title with
+- **Page:** `ListPage` (or the tab's own page), with no back link: the title with
   its buttons beside it, never a button under the list: expand all, the sort
   (`SortMenu`, an outline button with a chevron, like a select, showing the sort icon and
   the current order, "Trier: …" as its accessible name; kept per browser). Adding is

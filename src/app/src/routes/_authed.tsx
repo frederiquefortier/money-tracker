@@ -1,4 +1,5 @@
 import { Outlet, createFileRoute, redirect } from '@tanstack/react-router'
+import { AppMenu } from '#/components/app-menu'
 import { AppNav } from '#/components/app-nav'
 import { DisplayCurrencySwitcher } from '#/components/display-currency-switcher'
 import { LocaleSwitcher } from '#/components/locale-switcher'
@@ -25,7 +26,10 @@ function AuthedLayout() {
       <div className="min-h-dvh pb-[calc(4.5rem+env(safe-area-inset-bottom))] md:pb-0">
         <header className="sticky top-0 z-20 border-b bg-card/80 pt-[env(safe-area-inset-top)] backdrop-blur">
           <div className="flex items-center justify-between gap-4 px-4 py-3 md:px-6">
-            <Logo className="min-w-0" />
+            <div className="flex min-w-0 items-center gap-2">
+              <AppMenu />
+              <Logo className="min-w-0" />
+            </div>
             <div className="hidden md:block">
               <AppNav variant="top" />
             </div>

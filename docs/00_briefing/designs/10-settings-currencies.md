@@ -5,8 +5,8 @@
 
 ## Purpose
 
-Réglages is the home of everything set up once and rarely touched: accounts, categories,
-merchants, currencies, import. Devises manages the currencies the user works with and the
+Réglages is the menu of everything set up once and rarely touched: categories, merchants,
+currencies, proches (phase 2), import. Accounts left it for a tab of their own on 2026-11-05. Devises manages the currencies the user works with and the
 default used to prefill forms. The display currency switcher, in the header, picks the
 currency every amount is shown in.
 
@@ -16,15 +16,13 @@ CUR-01, 02, 03, 04, 05, 06, 07 (conversion rule, shown here as the switcher's ef
 SET-06 (currency names in both languages). CUR-09, the converted-amount marker, belongs to
 the transactions list (spec 14).
 
-## Réglages hub
+## Réglages menu
 
 ```
 ┌──────────────────────────────┐
-│ [logo] MONEY TRACKER CAD▾ FR EN│
+│ RÉGLAGES                   x │
 ├──────────────────────────────┤
-│ RÉGLAGES                     │
 │ ┌──────────────────────────┐ │
-│ │ ◫ Comptes              › │ │
 │ │ ◫ Catégories           › │ │
 │ │ ◫ Magasins            › │ │
 │ │ ◫ Devises              › │ │
@@ -35,23 +33,22 @@ the transactions list (spec 14).
 │ ┌──────────────────────────┐ │
 │ │ ◫ Se déconnecter         │ │
 │ └──────────────────────────┘ │
-├──────────────────────────────┤
-│  Transactions Dashboard ...  │
 └──────────────────────────────┘
 ```
 
+- A menu icon (`menu`) at the left of the header, before the logo, opens it in the shared
+  sheet from the left, beside its button: full screen on phones, a panel from `md` up,
+  sliding in from the left at every width. Choosing a row closes it.
 - One card per group, rows separated by a thin border, a coolicons icon on the left and an
   arrow on the right. A row is a link to its screen.
 - **Se déconnecter** is in red (the destructive colour), icon included, with no arrow.
 - Rows appear as their screens are built; a row never leads to a placeholder.
-- From `md` up: the same cards, centred, at most 40rem wide. The sub-screens open in the
-  same place (no two-pane layout in v1).
+- The screens it opens have no back link; the tabs and the menu are always there.
 
 ## Devises
 
 ```
 ┌──────────────────────────────────────────┐
-│← Réglages                                │
 │ DEVISES                                  │
 │ ┌──────────────────────────────────────┐ │
 │ │ CAD Dollar can… ($) [Par défaut] ⌂ x │ │
@@ -149,8 +146,8 @@ the transactions list (spec 14).
 
 | Key | Français |
 |---|---|
-| Hub title | Réglages |
-| Hub rows | Comptes, Catégories, Magasins, Devises, Importer et exporter, Se déconnecter |
+| Menu title, and the menu icon's name | Réglages |
+| Menu rows | Catégories, Magasins, Devises, Importer et exporter, Se déconnecter |
 | Screen title | Devises |
 | Default badge | Par défaut |
 | Add button | Devise (named Ajouter une devise, also the sheet title) |

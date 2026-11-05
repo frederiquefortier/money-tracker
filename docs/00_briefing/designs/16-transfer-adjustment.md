@@ -131,7 +131,7 @@ same route sheet as spec 15, its title following the tab. A saved transfer opens
   note follow the slip, as on the other forms. Until an account is chosen, the amounts
   show a dash.
 - Opened from Comptes (spec 11): "Ajuster un solde", a third choice under the round +,
-  opens `/settings/accounts/adjust`. A route sheet, like every form; saving goes back to
+  opens `/accounts/adjust`. A route sheet, like every form; saving goes back to
   Comptes with the new balance. The + keeps its three tabs, and the transactions list
   carries no account actions (decided 2026-11-05). Adjustments are rare: a few cents the
   owner cannot trace.

@@ -125,7 +125,7 @@ Deleting a merchant clears it on its transactions.
 
 | Table | Columns | Req |
 |---|---|---|
-| `transactions` | `account_id`, `kind` (`expense`/`income`/`transfer`/`adjustment`), `occurred_on` (a `date`, no time, decided 2026-11-04: `occurred_at_time` was dropped so no time zone can shift a date), `amount`, `currency`, `original_amount`, `original_currency` (both nullable), `status` (`pending`/`cleared`), `merchant_id` (cleared when the merchant is deleted), `note`, `transfer_id`; later with their tables: `event_id`, `recurring_rule_id`, `treated_count`, `treated_amount`, `expected_reimbursement`, `holding_id`, `source`, `import_ref`, `import_batch_id` | TRX-01..05, 09..11, CUR-08, PPL-04, NW-03. Checks: an expense is negative, an income positive, a transfer leg or adjustment non-zero; `original_*` only on expenses and incomes, in another currency than the account's (a composite FK to `user_currencies`), signed like `amount`; a `transfer` row has a `transfer_id`, and only transfers and their fee carry one. |
+| `transactions` | `account_id`, `kind` (`expense`/`income`/`transfer`/`adjustment`), `occurred_on` (a `date`, no time, decided 2026-11-04: `occurred_at_time` was dropped so no time zone can shift a date), `amount`, `currency`, `original_amount`, `original_currency` (both nullable), `status` (`pending`/`cleared`), `merchant_id` (cleared when the merchant is deleted), `note`, `transfer_id`; later with their tables: `event_id`, `event_source`, `recurring_rule_id`, `treated_count`, `treated_amount`, `expected_reimbursement`, `holding_id`, `source`, `import_ref`, `import_batch_id` | TRX-01..05, 09..11, CUR-08, PPL-04, NW-03. Checks: an expense is negative, an income positive, a transfer leg or adjustment non-zero; `original_*` only on expenses and incomes, in another currency than the account's (a composite FK to `user_currencies`), signed like `amount`; a `transfer` row has a `transfer_id`, and only transfers and their fee carry one. |
 | `transaction_splits` | `transaction_id`, `category_id`, `input_mode` (`amount`/`share`/`percent`), `input_value`, `amount` | TRX-06. Every `expense` and `income` transaction has at least one split; transfers and adjustments have none. One input mode per transaction, one split per category, each signed like the transaction. A deferred constraint trigger checks the splits sum to the transaction amount, so transaction and splits are written together by `save_transaction` (ADR-012). A category with splits cannot be deleted. |
 | `reimbursements` | `expense_id`, `income_id`, `amount` | TRX-07, DSH-05 |
 | `recurring_rules` | `account_id`, `category_id`, `merchant_id`, `kind`, `frequency` (`weekly`/`monthly`/`yearly`), `interval`, `day_of_month`, `starts_on`, `ends_on` | TRX-08. `ends_on` set = recurrence stopped. Plain columns rather than an iCal RRULE string, which would need a parsing library for schedules this simple. |
@@ -214,6 +214,9 @@ Notes:
 
 ### Tags
 
+Later (TAG-01, 03): tags moved out of the plan on 2026-11-05, and their automatic linking
+went to events (EVT-07). Kept as the draft for when they come back.
+
 | Table | Columns | Req |
 |---|---|---|
 | `tags` | `name`, `color`, `starts_on`, `ends_on` (both nullable) | TAG-01 |
@@ -231,6 +234,13 @@ Notes:
 | `event_types` | `name`, `icon` | EVT-01 |
 | `events` | `type_id`, `name`, `starts_on`, `ends_on` | EVT-02 |
 | `event_people` | `event_id`, `person_id` | EVT-02 |
+| `event_categories` | `event_id`, `category_id` | EVT-07 |
+
+A transaction has one event (`transactions.event_id`) and `event_source`
+(`manual`/`auto`). Automatic links are recomputed when an event's range or categories
+change, and for one transaction when its date or splits change; a manual link is never
+touched. To settle with the spec: two automatic events matching the same transaction, and
+how removing an automatic link by hand keeps it from coming back.
 
 ### Budget
 

@@ -126,9 +126,9 @@ export const fr = {
   nav: {
     label: 'Navigation principale',
     transactions: 'Transactions',
+    accounts: 'Comptes',
     dashboard: 'Dashboard',
     budget: 'Budget',
-    settings: 'Réglages',
   },
   comingSoon: {
     dashboard: 'Vos dépenses par catégorie et par mois s’afficheront ici.',
@@ -144,11 +144,9 @@ export const fr = {
   },
   settings: {
     title: 'Réglages',
-    accounts: 'Comptes',
     categories: 'Catégories',
     currencies: 'Devises',
     merchants: 'Magasins',
-    back: 'Réglages',
   },
   money: {
     converted: 'Environ {{amount}}, converti en {{currency}}',

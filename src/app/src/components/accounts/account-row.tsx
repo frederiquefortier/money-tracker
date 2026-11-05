@@ -28,7 +28,7 @@ export function AccountRow({
   return (
     <li className={cn('flex pr-2', align, rowHover)}>
       <Link
-        to="/settings/accounts/$accountId"
+        to="/accounts/$accountId"
         params={{ accountId: account.id }}
         className={cn('flex min-w-0 flex-1 gap-3 py-3 pl-4', align, focusRing)}
       >

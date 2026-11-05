@@ -90,7 +90,7 @@ For transactions spread over several categories.
 
 ## Later columns
 
-Features from later phases add optional columns (tags, people, events, reimbursement links,
+Features from later phases add optional columns (people, events, reimbursement links,
 `holding` for investment contributions)
 and optional files (net-worth holdings and snapshots, IMP-02). A file in the v1 format stays
 valid.

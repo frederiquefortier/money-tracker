@@ -8,7 +8,8 @@ after the author's corrections; the shared rules are in
 
 Where the money sits. The Comptes screen lists every account grouped by institution, with
 its balance, so the owner can check them against the bank. The forms create and edit
-accounts and institutions. Reached from Réglages.
+accounts and institutions. A tab of its own (Comptes), since it shows the balances
+(decided 2026-11-05).
 
 ## Requirements
 
@@ -18,7 +19,6 @@ ACC-01, 02, 03, 04, 05, 06, 07. ACC-08 (last reconciled, last transaction) is ph
 
 ```
 ┌──────────────────────────────────┐
-│ ← Réglages                       │
 │ COMPTES                [⇕][Trier▾]│
 │ ┌──────────────────────────────┐ │
 │ │ ▾ Desjardins    4 000,00 $ ↗ 🗑│ │
@@ -109,7 +109,7 @@ the row actions, so they never read as part of the icons.
 └──────────────────────────────┘
 ```
 
-A route sheet over Comptes (`/settings/accounts/new`, `/settings/accounts/{id}`). It only
+A route sheet over Comptes (`/accounts/new`, `/accounts/{id}`). It only
 edits.
 
 - **Nom** required, unique among the user's open accounts at the same institution (or among
@@ -130,8 +130,8 @@ edits.
 
 - **Nom** required, unique per user ignoring case. **Site web** optional, an `https://`
   URL.
-- The same sheet, with its own URL (`/settings/accounts/institutions/new`,
-  `/settings/accounts/institutions/{id}`). Opened from Institution under the round +, from
+- The same sheet, with its own URL (`/accounts/institutions/new`,
+  `/accounts/institutions/{id}`). Opened from Institution under the round +, from
   its card header, or created inline from the account form.
 - **Delete** is the trash on its card header, muted while any account (open or archived)
   uses it; a tap says "Des comptes utilisent encore cette institution." in a toast.

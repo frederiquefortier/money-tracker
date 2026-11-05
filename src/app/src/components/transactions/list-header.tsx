@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { CategoryBadge } from '#/components/categories/category-badge'
 import { Icon } from '#/components/icon'
 import { SearchField } from '#/components/search-field'
-import { PageTitle } from '#/components/settings-page'
+import { PageTitle } from '#/components/list-page'
 import {
   FILTER_KEYS,
   FILTER_TABS,

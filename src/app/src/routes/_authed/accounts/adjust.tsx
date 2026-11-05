@@ -6,7 +6,7 @@ import { todayIso } from '#/lib/format'
 import type { FormAccount } from '#/lib/transactions'
 import { useAccountsPage } from '#/lib/use-page-data'
 
-export const Route = createFileRoute('/_authed/settings/accounts/adjust')({
+export const Route = createFileRoute('/_authed/accounts/adjust')({
   staticData: { sheet: true },
   component: AdjustBalance,
 })
@@ -27,10 +27,7 @@ function AdjustBalance() {
   const open = choosable.filter((a) => !a.closedOn && !a.hiddenForNew)
 
   return (
-    <RouteSheet
-      to="/settings/accounts"
-      title={t('transactions.adjustment.newTitle')}
-    >
+    <RouteSheet to="/accounts" title={t('transactions.adjustment.newTitle')}>
       <AdjustmentForm
         accounts={choosable}
         initial={{

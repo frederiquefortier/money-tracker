@@ -4,8 +4,9 @@ import { Icon } from '#/components/icon'
 import { iconAction } from '#/components/icon-button'
 import { cn } from '#/lib/utils'
 
-// Based on shadcn's sheet: full screen on phones, a panel from the right from md up, its
-// animations in styles.css (.sheet-panel). Built on the Radix dialog, so focus is trapped
+// Based on shadcn's sheet: full screen on phones, a panel from the right from md up (from
+// the left with side="left", sliding in from there at every width), its animations in
+// styles.css (.sheet-panel). Built on the Radix dialog, so focus is trapped
 // and returns to the trigger on close. Content is a SheetBody that scrolls and a
 // SheetFooter that stays put; a form can wrap both. `actions` are the item's row actions,
 // shown in the header on phones only, where rows do not carry them.
@@ -16,6 +17,7 @@ function Sheet(props: React.ComponentProps<typeof SheetPrimitive.Root>) {
 function SheetContent({
   title,
   closeLabel,
+  side = 'right',
   actions,
   children,
   onCloseAutoFocus,
@@ -23,6 +25,7 @@ function SheetContent({
 }: {
   title: string
   closeLabel: string
+  side?: 'right' | 'left'
   actions?: React.ReactNode
   children: React.ReactNode
   /** Runs once the closing animation has finished. */
@@ -36,7 +39,12 @@ function SheetContent({
         aria-describedby={undefined}
         onCloseAutoFocus={onCloseAutoFocus}
         onEscapeKeyDown={onEscapeKeyDown}
-        className="sheet-panel fixed inset-0 z-50 flex flex-col bg-card text-card-foreground outline-none md:left-auto md:w-full md:max-w-md md:border-l"
+        className={cn(
+          'sheet-panel fixed inset-0 z-50 flex flex-col bg-card text-card-foreground outline-none md:w-full md:max-w-md',
+          side === 'left'
+            ? 'sheet-panel-left md:right-auto md:border-r'
+            : 'md:left-auto md:border-l',
+        )}
       >
         <header className="flex items-center gap-3 border-b px-5 pt-[calc(1rem+env(safe-area-inset-top))] pb-4 md:pt-4">
           <SheetPrimitive.Title className="flex-1 font-mono text-lg font-bold tracking-wide uppercase">

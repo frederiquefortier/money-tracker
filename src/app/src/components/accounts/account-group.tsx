@@ -127,7 +127,7 @@ function GroupHeader({
     >
       <GroupToggle name={name} expanded={!collapsed} onToggle={onToggle} />
       <Link
-        to="/settings/accounts/institutions/$institutionId"
+        to="/accounts/institutions/$institutionId"
         params={{ institutionId: institution.id }}
         className={cn(
           'min-w-0 truncate rounded-lg font-bold after:absolute after:inset-0',

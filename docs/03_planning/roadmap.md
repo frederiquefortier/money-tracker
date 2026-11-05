@@ -81,14 +81,16 @@ tags and events (2026-11-05).
 ## Phase 2: What a transaction carries
 Everything the owner's current use can set on a transaction exists before the import, so
 the eight years of history are prepared in one pass, not one per feature (decided
-2026-11-05). In this order (author, 2026-11-05): proches, tags, events.
+2026-11-05). In this order (author, 2026-11-05): proches, then events. Tags moved to
+later; events took their automatic linking (2026-11-05).
 
 - People and groups, roles on transactions, anonymous treat/reimbursement. PPL-01..05.
 - Reimbursement links. TRX-07.
-- Tags with automatic rules. TAG-01..03.
-- Events, calendar, comparison, event budgets. EVT-01..06.
+- Events, linked by hand or automatically by date range and categories, shown as a tag
+  on the transaction; calendar, comparison, event budgets. EVT-01..07.
 - Holdings, and transactions linked to the holding they pay into (the `holding` column
-  of the import). NW-01, and the my-money part of NW-03.
+  of the import), on the Comptes tab with the accounts. NW-01, and the my-money part of
+  NW-03.
 
 ## Phase 3: The import
 **CSV import and export in the fixed format** (IMP-01, 04, 05, 06, SEC-04 export, ADR-010).
@@ -141,6 +143,7 @@ Tracked in [improvements.md](improvements.md).
 - Projections: net-worth growth scenarios, the goal solver, "if this continues", and
   scenario budgets by place. NW-06..08, BUD-07.
 - Demo-data generator and public demo, only if another user joins. DEM-01, 02.
+- Tags, several per transaction. TAG-01, 03 (moved out of the plan, 2026-11-05).
 - Region packs, birth date and country, merchant countries, local-purchase share, and the
   goal-reached celebration. LOC-01, 02, SET-02, 03, MER-03, YR-06, BUD-05 (moved out of
   the plan, 2026-11-05).

@@ -29,8 +29,12 @@ copyrighted images, never committed).
 
 ## Decisions on top of the reference
 
-- **Four tabs for v1:** Transactions, Dashboard, Budget, Réglages (accounts, categories and
-  currencies live under Réglages). Patrimoine and Proches get tabs in v2.
+- **Four tabs for v1:** Transactions, Comptes, Dashboard, Budget (decided 2026-11-05).
+  Comptes is a tab because it shows the balances. The lists set up once (categories,
+  merchants, currencies, later proches and import) are in Réglages, a menu icon top left,
+  as in TravelSpend, which opens a sheet. Proches go in the menu, being mostly settings.
+  Accounts and net worth go together: holdings (phase 2) and the net worth chart (phase
+  5) join the Comptes tab, whose name is settled then ("Net worth" kept for English).
 - **Tab labels are one short word**, on one line at phone width. The French interface keeps
   "Dashboard": "Tableau de bord" wraps.
 - **Icon pairs:** outline icon for a tab, the `-fill` variant when it is active.

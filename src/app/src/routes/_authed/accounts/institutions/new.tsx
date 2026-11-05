@@ -3,9 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { InstitutionForm } from '#/components/accounts/institution-form'
 import { RouteSheet } from '#/components/route-sheet'
 
-export const Route = createFileRoute(
-  '/_authed/settings/accounts/institutions/new',
-)({
+export const Route = createFileRoute('/_authed/accounts/institutions/new')({
   staticData: { sheet: true },
   component: NewInstitution,
 })
@@ -13,7 +11,7 @@ export const Route = createFileRoute(
 function NewInstitution() {
   const { t } = useTranslation()
   return (
-    <RouteSheet to="/settings/accounts" title={t('institutions.newTitle')}>
+    <RouteSheet to="/accounts" title={t('institutions.newTitle')}>
       <InstitutionForm institution={null} />
     </RouteSheet>
   )

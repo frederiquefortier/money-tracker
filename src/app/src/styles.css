@@ -235,6 +235,16 @@
     transform: translateX(100%);
   }
 }
+@keyframes sheet-in-left {
+  from {
+    transform: translateX(-100%);
+  }
+}
+@keyframes sheet-out-left {
+  to {
+    transform: translateX(-100%);
+  }
+}
 
 @layer components {
   .sheet-overlay[data-state='open'] {
@@ -256,6 +266,13 @@
     .sheet-panel[data-state='closed'] {
       animation-name: sheet-out-right;
     }
+  }
+  /* A sheet opened from the left of the header slides in from there at every width. */
+  .sheet-panel-left[data-state='open'] {
+    animation-name: sheet-in-left;
+  }
+  .sheet-panel-left[data-state='closed'] {
+    animation-name: sheet-out-left;
   }
   @media (prefers-reduced-motion: reduce) {
     .sheet-panel[data-state='open'] {

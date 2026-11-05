@@ -124,9 +124,9 @@ export const en: Messages = {
   nav: {
     label: 'Main navigation',
     transactions: 'Transactions',
+    accounts: 'Accounts',
     dashboard: 'Dashboard',
     budget: 'Budget',
-    settings: 'Settings',
   },
   comingSoon: {
     dashboard: 'Your spending by category and by month will show here.',
@@ -142,11 +142,9 @@ export const en: Messages = {
   },
   settings: {
     title: 'Settings',
-    accounts: 'Accounts',
     categories: 'Categories',
     currencies: 'Currencies',
     merchants: 'Merchants',
-    back: 'Settings',
   },
   money: {
     converted: 'About {{amount}}, converted to {{currency}}',

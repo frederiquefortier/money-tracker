@@ -15,20 +15,21 @@ import { Route as MfaRouteImport } from './routes/mfa'
 import { Route as SetPasswordRouteImport } from './routes/set-password'
 import { Route as SignInRouteImport } from './routes/sign-in'
 import { Route as AuthedIndexRouteImport } from './routes/_authed/index'
+import { Route as AuthedAccountsRouteImport } from './routes/_authed/accounts'
 import { Route as AuthedBudgetRouteImport } from './routes/_authed/budget'
 import { Route as AuthedDashboardRouteImport } from './routes/_authed/dashboard'
 import { Route as AuthedTransactionsRouteImport } from './routes/_authed/transactions'
 import { Route as AuthConfirmRouteImport } from './routes/auth/confirm'
-import { Route as AuthedSettingsIndexRouteImport } from './routes/_authed/settings/index'
-import { Route as AuthedSettingsAccountsRouteImport } from './routes/_authed/settings/accounts'
+import { Route as AuthedAccountsAccountIdRouteImport } from './routes/_authed/accounts/$accountId'
+import { Route as AuthedAccountsAdjustRouteImport } from './routes/_authed/accounts/adjust'
+import { Route as AuthedAccountsNewRouteImport } from './routes/_authed/accounts/new'
 import { Route as AuthedSettingsCategoriesRouteImport } from './routes/_authed/settings/categories'
 import { Route as AuthedSettingsCurrenciesRouteImport } from './routes/_authed/settings/currencies'
 import { Route as AuthedSettingsMerchantsRouteImport } from './routes/_authed/settings/merchants'
 import { Route as AuthedTransactionsTransactionIdRouteImport } from './routes/_authed/transactions/$transactionId'
 import { Route as AuthedTransactionsNewRouteImport } from './routes/_authed/transactions/new'
-import { Route as AuthedSettingsAccountsAccountIdRouteImport } from './routes/_authed/settings/accounts/$accountId'
-import { Route as AuthedSettingsAccountsAdjustRouteImport } from './routes/_authed/settings/accounts/adjust'
-import { Route as AuthedSettingsAccountsNewRouteImport } from './routes/_authed/settings/accounts/new'
+import { Route as AuthedAccountsInstitutionsInstitutionIdRouteImport } from './routes/_authed/accounts/institutions/$institutionId'
+import { Route as AuthedAccountsInstitutionsNewRouteImport } from './routes/_authed/accounts/institutions/new'
 import { Route as AuthedSettingsCategoriesCategoryIdRouteImport } from './routes/_authed/settings/categories/$categoryId'
 import { Route as AuthedSettingsCategoriesNewRouteImport } from './routes/_authed/settings/categories/new'
 import { Route as AuthedSettingsCurrenciesAddRouteImport } from './routes/_authed/settings/currencies/add'
@@ -36,8 +37,6 @@ import { Route as AuthedSettingsMerchantsMerchantIdRouteImport } from './routes/
 import { Route as AuthedSettingsMerchantsNewRouteImport } from './routes/_authed/settings/merchants/new'
 import { Route as AuthedTransactionsAdjustmentsAdjustmentIdRouteImport } from './routes/_authed/transactions/adjustments/$adjustmentId'
 import { Route as AuthedTransactionsTransfersTransferIdRouteImport } from './routes/_authed/transactions/transfers/$transferId'
-import { Route as AuthedSettingsAccountsInstitutionsInstitutionIdRouteImport } from './routes/_authed/settings/accounts/institutions/$institutionId'
-import { Route as AuthedSettingsAccountsInstitutionsNewRouteImport } from './routes/_authed/settings/accounts/institutions/new'
 
 const AuthedRoute = AuthedRouteImport.update({
   id: '/_authed',
@@ -68,6 +67,11 @@ const AuthedIndexRoute = AuthedIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthedRoute,
 } as any)
+const AuthedAccountsRoute = AuthedAccountsRouteImport.update({
+  id: '/accounts',
+  path: '/accounts',
+  getParentRoute: () => AuthedRoute,
+} as any)
 const AuthedBudgetRoute = AuthedBudgetRouteImport.update({
   id: '/budget',
   path: '/budget',
@@ -88,15 +92,20 @@ const AuthConfirmRoute = AuthConfirmRouteImport.update({
   path: '/auth/confirm',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthedSettingsIndexRoute = AuthedSettingsIndexRouteImport.update({
-  id: '/settings/',
-  path: '/settings/',
-  getParentRoute: () => AuthedRoute,
+const AuthedAccountsAccountIdRoute = AuthedAccountsAccountIdRouteImport.update({
+  id: '/$accountId',
+  path: '/$accountId',
+  getParentRoute: () => AuthedAccountsRoute,
 } as any)
-const AuthedSettingsAccountsRoute = AuthedSettingsAccountsRouteImport.update({
-  id: '/settings/accounts',
-  path: '/settings/accounts',
-  getParentRoute: () => AuthedRoute,
+const AuthedAccountsAdjustRoute = AuthedAccountsAdjustRouteImport.update({
+  id: '/adjust',
+  path: '/adjust',
+  getParentRoute: () => AuthedAccountsRoute,
+} as any)
+const AuthedAccountsNewRoute = AuthedAccountsNewRouteImport.update({
+  id: '/new',
+  path: '/new',
+  getParentRoute: () => AuthedAccountsRoute,
 } as any)
 const AuthedSettingsCategoriesRoute =
   AuthedSettingsCategoriesRouteImport.update({
@@ -126,23 +135,17 @@ const AuthedTransactionsNewRoute = AuthedTransactionsNewRouteImport.update({
   path: '/new',
   getParentRoute: () => AuthedTransactionsRoute,
 } as any)
-const AuthedSettingsAccountsAccountIdRoute =
-  AuthedSettingsAccountsAccountIdRouteImport.update({
-    id: '/$accountId',
-    path: '/$accountId',
-    getParentRoute: () => AuthedSettingsAccountsRoute,
+const AuthedAccountsInstitutionsInstitutionIdRoute =
+  AuthedAccountsInstitutionsInstitutionIdRouteImport.update({
+    id: '/institutions/$institutionId',
+    path: '/institutions/$institutionId',
+    getParentRoute: () => AuthedAccountsRoute,
   } as any)
-const AuthedSettingsAccountsAdjustRoute =
-  AuthedSettingsAccountsAdjustRouteImport.update({
-    id: '/adjust',
-    path: '/adjust',
-    getParentRoute: () => AuthedSettingsAccountsRoute,
-  } as any)
-const AuthedSettingsAccountsNewRoute =
-  AuthedSettingsAccountsNewRouteImport.update({
-    id: '/new',
-    path: '/new',
-    getParentRoute: () => AuthedSettingsAccountsRoute,
+const AuthedAccountsInstitutionsNewRoute =
+  AuthedAccountsInstitutionsNewRouteImport.update({
+    id: '/institutions/new',
+    path: '/institutions/new',
+    getParentRoute: () => AuthedAccountsRoute,
   } as any)
 const AuthedSettingsCategoriesCategoryIdRoute =
   AuthedSettingsCategoriesCategoryIdRouteImport.update({
@@ -186,18 +189,6 @@ const AuthedTransactionsTransfersTransferIdRoute =
     path: '/transfers/$transferId',
     getParentRoute: () => AuthedTransactionsRoute,
   } as any)
-const AuthedSettingsAccountsInstitutionsInstitutionIdRoute =
-  AuthedSettingsAccountsInstitutionsInstitutionIdRouteImport.update({
-    id: '/institutions/$institutionId',
-    path: '/institutions/$institutionId',
-    getParentRoute: () => AuthedSettingsAccountsRoute,
-  } as any)
-const AuthedSettingsAccountsInstitutionsNewRoute =
-  AuthedSettingsAccountsInstitutionsNewRouteImport.update({
-    id: '/institutions/new',
-    path: '/institutions/new',
-    getParentRoute: () => AuthedSettingsAccountsRoute,
-  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof AuthedIndexRoute
@@ -205,20 +196,21 @@ export interface FileRoutesByFullPath {
   '/mfa': typeof MfaRoute
   '/set-password': typeof SetPasswordRoute
   '/sign-in': typeof SignInRoute
+  '/accounts': typeof AuthedAccountsRouteWithChildren
   '/budget': typeof AuthedBudgetRoute
   '/dashboard': typeof AuthedDashboardRoute
   '/transactions': typeof AuthedTransactionsRouteWithChildren
   '/auth/confirm': typeof AuthConfirmRoute
-  '/settings/accounts': typeof AuthedSettingsAccountsRouteWithChildren
+  '/accounts/$accountId': typeof AuthedAccountsAccountIdRoute
+  '/accounts/adjust': typeof AuthedAccountsAdjustRoute
+  '/accounts/new': typeof AuthedAccountsNewRoute
   '/settings/categories': typeof AuthedSettingsCategoriesRouteWithChildren
   '/settings/currencies': typeof AuthedSettingsCurrenciesRouteWithChildren
   '/settings/merchants': typeof AuthedSettingsMerchantsRouteWithChildren
   '/transactions/$transactionId': typeof AuthedTransactionsTransactionIdRoute
   '/transactions/new': typeof AuthedTransactionsNewRoute
-  '/settings/': typeof AuthedSettingsIndexRoute
-  '/settings/accounts/$accountId': typeof AuthedSettingsAccountsAccountIdRoute
-  '/settings/accounts/adjust': typeof AuthedSettingsAccountsAdjustRoute
-  '/settings/accounts/new': typeof AuthedSettingsAccountsNewRoute
+  '/accounts/institutions/$institutionId': typeof AuthedAccountsInstitutionsInstitutionIdRoute
+  '/accounts/institutions/new': typeof AuthedAccountsInstitutionsNewRoute
   '/settings/categories/$categoryId': typeof AuthedSettingsCategoriesCategoryIdRoute
   '/settings/categories/new': typeof AuthedSettingsCategoriesNewRoute
   '/settings/currencies/add': typeof AuthedSettingsCurrenciesAddRoute
@@ -226,29 +218,28 @@ export interface FileRoutesByFullPath {
   '/settings/merchants/new': typeof AuthedSettingsMerchantsNewRoute
   '/transactions/adjustments/$adjustmentId': typeof AuthedTransactionsAdjustmentsAdjustmentIdRoute
   '/transactions/transfers/$transferId': typeof AuthedTransactionsTransfersTransferIdRoute
-  '/settings/accounts/institutions/$institutionId': typeof AuthedSettingsAccountsInstitutionsInstitutionIdRoute
-  '/settings/accounts/institutions/new': typeof AuthedSettingsAccountsInstitutionsNewRoute
 }
 export interface FileRoutesByTo {
   '/forgot-password': typeof ForgotPasswordRoute
   '/mfa': typeof MfaRoute
   '/set-password': typeof SetPasswordRoute
   '/sign-in': typeof SignInRoute
+  '/accounts': typeof AuthedAccountsRouteWithChildren
   '/budget': typeof AuthedBudgetRoute
   '/dashboard': typeof AuthedDashboardRoute
   '/transactions': typeof AuthedTransactionsRouteWithChildren
   '/auth/confirm': typeof AuthConfirmRoute
   '/': typeof AuthedIndexRoute
-  '/settings/accounts': typeof AuthedSettingsAccountsRouteWithChildren
+  '/accounts/$accountId': typeof AuthedAccountsAccountIdRoute
+  '/accounts/adjust': typeof AuthedAccountsAdjustRoute
+  '/accounts/new': typeof AuthedAccountsNewRoute
   '/settings/categories': typeof AuthedSettingsCategoriesRouteWithChildren
   '/settings/currencies': typeof AuthedSettingsCurrenciesRouteWithChildren
   '/settings/merchants': typeof AuthedSettingsMerchantsRouteWithChildren
   '/transactions/$transactionId': typeof AuthedTransactionsTransactionIdRoute
   '/transactions/new': typeof AuthedTransactionsNewRoute
-  '/settings': typeof AuthedSettingsIndexRoute
-  '/settings/accounts/$accountId': typeof AuthedSettingsAccountsAccountIdRoute
-  '/settings/accounts/adjust': typeof AuthedSettingsAccountsAdjustRoute
-  '/settings/accounts/new': typeof AuthedSettingsAccountsNewRoute
+  '/accounts/institutions/$institutionId': typeof AuthedAccountsInstitutionsInstitutionIdRoute
+  '/accounts/institutions/new': typeof AuthedAccountsInstitutionsNewRoute
   '/settings/categories/$categoryId': typeof AuthedSettingsCategoriesCategoryIdRoute
   '/settings/categories/new': typeof AuthedSettingsCategoriesNewRoute
   '/settings/currencies/add': typeof AuthedSettingsCurrenciesAddRoute
@@ -256,8 +247,6 @@ export interface FileRoutesByTo {
   '/settings/merchants/new': typeof AuthedSettingsMerchantsNewRoute
   '/transactions/adjustments/$adjustmentId': typeof AuthedTransactionsAdjustmentsAdjustmentIdRoute
   '/transactions/transfers/$transferId': typeof AuthedTransactionsTransfersTransferIdRoute
-  '/settings/accounts/institutions/$institutionId': typeof AuthedSettingsAccountsInstitutionsInstitutionIdRoute
-  '/settings/accounts/institutions/new': typeof AuthedSettingsAccountsInstitutionsNewRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -266,21 +255,22 @@ export interface FileRoutesById {
   '/mfa': typeof MfaRoute
   '/set-password': typeof SetPasswordRoute
   '/sign-in': typeof SignInRoute
+  '/_authed/accounts': typeof AuthedAccountsRouteWithChildren
   '/_authed/budget': typeof AuthedBudgetRoute
   '/_authed/dashboard': typeof AuthedDashboardRoute
   '/_authed/transactions': typeof AuthedTransactionsRouteWithChildren
   '/auth/confirm': typeof AuthConfirmRoute
   '/_authed/': typeof AuthedIndexRoute
-  '/_authed/settings/accounts': typeof AuthedSettingsAccountsRouteWithChildren
+  '/_authed/accounts/$accountId': typeof AuthedAccountsAccountIdRoute
+  '/_authed/accounts/adjust': typeof AuthedAccountsAdjustRoute
+  '/_authed/accounts/new': typeof AuthedAccountsNewRoute
   '/_authed/settings/categories': typeof AuthedSettingsCategoriesRouteWithChildren
   '/_authed/settings/currencies': typeof AuthedSettingsCurrenciesRouteWithChildren
   '/_authed/settings/merchants': typeof AuthedSettingsMerchantsRouteWithChildren
   '/_authed/transactions/$transactionId': typeof AuthedTransactionsTransactionIdRoute
   '/_authed/transactions/new': typeof AuthedTransactionsNewRoute
-  '/_authed/settings/': typeof AuthedSettingsIndexRoute
-  '/_authed/settings/accounts/$accountId': typeof AuthedSettingsAccountsAccountIdRoute
-  '/_authed/settings/accounts/adjust': typeof AuthedSettingsAccountsAdjustRoute
-  '/_authed/settings/accounts/new': typeof AuthedSettingsAccountsNewRoute
+  '/_authed/accounts/institutions/$institutionId': typeof AuthedAccountsInstitutionsInstitutionIdRoute
+  '/_authed/accounts/institutions/new': typeof AuthedAccountsInstitutionsNewRoute
   '/_authed/settings/categories/$categoryId': typeof AuthedSettingsCategoriesCategoryIdRoute
   '/_authed/settings/categories/new': typeof AuthedSettingsCategoriesNewRoute
   '/_authed/settings/currencies/add': typeof AuthedSettingsCurrenciesAddRoute
@@ -288,8 +278,6 @@ export interface FileRoutesById {
   '/_authed/settings/merchants/new': typeof AuthedSettingsMerchantsNewRoute
   '/_authed/transactions/adjustments/$adjustmentId': typeof AuthedTransactionsAdjustmentsAdjustmentIdRoute
   '/_authed/transactions/transfers/$transferId': typeof AuthedTransactionsTransfersTransferIdRoute
-  '/_authed/settings/accounts/institutions/$institutionId': typeof AuthedSettingsAccountsInstitutionsInstitutionIdRoute
-  '/_authed/settings/accounts/institutions/new': typeof AuthedSettingsAccountsInstitutionsNewRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -299,20 +287,21 @@ export interface FileRouteTypes {
     | '/mfa'
     | '/set-password'
     | '/sign-in'
+    | '/accounts'
     | '/budget'
     | '/dashboard'
     | '/transactions'
     | '/auth/confirm'
-    | '/settings/accounts'
+    | '/accounts/$accountId'
+    | '/accounts/adjust'
+    | '/accounts/new'
     | '/settings/categories'
     | '/settings/currencies'
     | '/settings/merchants'
     | '/transactions/$transactionId'
     | '/transactions/new'
-    | '/settings/'
-    | '/settings/accounts/$accountId'
-    | '/settings/accounts/adjust'
-    | '/settings/accounts/new'
+    | '/accounts/institutions/$institutionId'
+    | '/accounts/institutions/new'
     | '/settings/categories/$categoryId'
     | '/settings/categories/new'
     | '/settings/currencies/add'
@@ -320,29 +309,28 @@ export interface FileRouteTypes {
     | '/settings/merchants/new'
     | '/transactions/adjustments/$adjustmentId'
     | '/transactions/transfers/$transferId'
-    | '/settings/accounts/institutions/$institutionId'
-    | '/settings/accounts/institutions/new'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/forgot-password'
     | '/mfa'
     | '/set-password'
     | '/sign-in'
+    | '/accounts'
     | '/budget'
     | '/dashboard'
     | '/transactions'
     | '/auth/confirm'
     | '/'
-    | '/settings/accounts'
+    | '/accounts/$accountId'
+    | '/accounts/adjust'
+    | '/accounts/new'
     | '/settings/categories'
     | '/settings/currencies'
     | '/settings/merchants'
     | '/transactions/$transactionId'
     | '/transactions/new'
-    | '/settings'
-    | '/settings/accounts/$accountId'
-    | '/settings/accounts/adjust'
-    | '/settings/accounts/new'
+    | '/accounts/institutions/$institutionId'
+    | '/accounts/institutions/new'
     | '/settings/categories/$categoryId'
     | '/settings/categories/new'
     | '/settings/currencies/add'
@@ -350,8 +338,6 @@ export interface FileRouteTypes {
     | '/settings/merchants/new'
     | '/transactions/adjustments/$adjustmentId'
     | '/transactions/transfers/$transferId'
-    | '/settings/accounts/institutions/$institutionId'
-    | '/settings/accounts/institutions/new'
   id:
     | '__root__'
     | '/_authed'
@@ -359,21 +345,22 @@ export interface FileRouteTypes {
     | '/mfa'
     | '/set-password'
     | '/sign-in'
+    | '/_authed/accounts'
     | '/_authed/budget'
     | '/_authed/dashboard'
     | '/_authed/transactions'
     | '/auth/confirm'
     | '/_authed/'
-    | '/_authed/settings/accounts'
+    | '/_authed/accounts/$accountId'
+    | '/_authed/accounts/adjust'
+    | '/_authed/accounts/new'
     | '/_authed/settings/categories'
     | '/_authed/settings/currencies'
     | '/_authed/settings/merchants'
     | '/_authed/transactions/$transactionId'
     | '/_authed/transactions/new'
-    | '/_authed/settings/'
-    | '/_authed/settings/accounts/$accountId'
-    | '/_authed/settings/accounts/adjust'
-    | '/_authed/settings/accounts/new'
+    | '/_authed/accounts/institutions/$institutionId'
+    | '/_authed/accounts/institutions/new'
     | '/_authed/settings/categories/$categoryId'
     | '/_authed/settings/categories/new'
     | '/_authed/settings/currencies/add'
@@ -381,8 +368,6 @@ export interface FileRouteTypes {
     | '/_authed/settings/merchants/new'
     | '/_authed/transactions/adjustments/$adjustmentId'
     | '/_authed/transactions/transfers/$transferId'
-    | '/_authed/settings/accounts/institutions/$institutionId'
-    | '/_authed/settings/accounts/institutions/new'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -438,6 +423,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthedIndexRouteImport
       parentRoute: typeof AuthedRoute
     }
+    '/_authed/accounts': {
+      id: '/_authed/accounts'
+      path: '/accounts'
+      fullPath: '/accounts'
+      preLoaderRoute: typeof AuthedAccountsRouteImport
+      parentRoute: typeof AuthedRoute
+    }
     '/_authed/budget': {
       id: '/_authed/budget'
       path: '/budget'
@@ -466,19 +458,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthConfirmRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authed/settings/': {
-      id: '/_authed/settings/'
-      path: '/settings'
-      fullPath: '/settings/'
-      preLoaderRoute: typeof AuthedSettingsIndexRouteImport
-      parentRoute: typeof AuthedRoute
+    '/_authed/accounts/$accountId': {
+      id: '/_authed/accounts/$accountId'
+      path: '/$accountId'
+      fullPath: '/accounts/$accountId'
+      preLoaderRoute: typeof AuthedAccountsAccountIdRouteImport
+      parentRoute: typeof AuthedAccountsRoute
     }
-    '/_authed/settings/accounts': {
-      id: '/_authed/settings/accounts'
-      path: '/settings/accounts'
-      fullPath: '/settings/accounts'
-      preLoaderRoute: typeof AuthedSettingsAccountsRouteImport
-      parentRoute: typeof AuthedRoute
+    '/_authed/accounts/adjust': {
+      id: '/_authed/accounts/adjust'
+      path: '/adjust'
+      fullPath: '/accounts/adjust'
+      preLoaderRoute: typeof AuthedAccountsAdjustRouteImport
+      parentRoute: typeof AuthedAccountsRoute
+    }
+    '/_authed/accounts/new': {
+      id: '/_authed/accounts/new'
+      path: '/new'
+      fullPath: '/accounts/new'
+      preLoaderRoute: typeof AuthedAccountsNewRouteImport
+      parentRoute: typeof AuthedAccountsRoute
     }
     '/_authed/settings/categories': {
       id: '/_authed/settings/categories'
@@ -515,26 +514,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthedTransactionsNewRouteImport
       parentRoute: typeof AuthedTransactionsRoute
     }
-    '/_authed/settings/accounts/$accountId': {
-      id: '/_authed/settings/accounts/$accountId'
-      path: '/$accountId'
-      fullPath: '/settings/accounts/$accountId'
-      preLoaderRoute: typeof AuthedSettingsAccountsAccountIdRouteImport
-      parentRoute: typeof AuthedSettingsAccountsRoute
+    '/_authed/accounts/institutions/$institutionId': {
+      id: '/_authed/accounts/institutions/$institutionId'
+      path: '/institutions/$institutionId'
+      fullPath: '/accounts/institutions/$institutionId'
+      preLoaderRoute: typeof AuthedAccountsInstitutionsInstitutionIdRouteImport
+      parentRoute: typeof AuthedAccountsRoute
     }
-    '/_authed/settings/accounts/adjust': {
-      id: '/_authed/settings/accounts/adjust'
-      path: '/adjust'
-      fullPath: '/settings/accounts/adjust'
-      preLoaderRoute: typeof AuthedSettingsAccountsAdjustRouteImport
-      parentRoute: typeof AuthedSettingsAccountsRoute
-    }
-    '/_authed/settings/accounts/new': {
-      id: '/_authed/settings/accounts/new'
-      path: '/new'
-      fullPath: '/settings/accounts/new'
-      preLoaderRoute: typeof AuthedSettingsAccountsNewRouteImport
-      parentRoute: typeof AuthedSettingsAccountsRoute
+    '/_authed/accounts/institutions/new': {
+      id: '/_authed/accounts/institutions/new'
+      path: '/institutions/new'
+      fullPath: '/accounts/institutions/new'
+      preLoaderRoute: typeof AuthedAccountsInstitutionsNewRouteImport
+      parentRoute: typeof AuthedAccountsRoute
     }
     '/_authed/settings/categories/$categoryId': {
       id: '/_authed/settings/categories/$categoryId'
@@ -585,22 +577,29 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthedTransactionsTransfersTransferIdRouteImport
       parentRoute: typeof AuthedTransactionsRoute
     }
-    '/_authed/settings/accounts/institutions/$institutionId': {
-      id: '/_authed/settings/accounts/institutions/$institutionId'
-      path: '/institutions/$institutionId'
-      fullPath: '/settings/accounts/institutions/$institutionId'
-      preLoaderRoute: typeof AuthedSettingsAccountsInstitutionsInstitutionIdRouteImport
-      parentRoute: typeof AuthedSettingsAccountsRoute
-    }
-    '/_authed/settings/accounts/institutions/new': {
-      id: '/_authed/settings/accounts/institutions/new'
-      path: '/institutions/new'
-      fullPath: '/settings/accounts/institutions/new'
-      preLoaderRoute: typeof AuthedSettingsAccountsInstitutionsNewRouteImport
-      parentRoute: typeof AuthedSettingsAccountsRoute
-    }
   }
 }
+
+interface AuthedAccountsRouteChildren {
+  AuthedAccountsAccountIdRoute: typeof AuthedAccountsAccountIdRoute
+  AuthedAccountsAdjustRoute: typeof AuthedAccountsAdjustRoute
+  AuthedAccountsNewRoute: typeof AuthedAccountsNewRoute
+  AuthedAccountsInstitutionsInstitutionIdRoute: typeof AuthedAccountsInstitutionsInstitutionIdRoute
+  AuthedAccountsInstitutionsNewRoute: typeof AuthedAccountsInstitutionsNewRoute
+}
+
+const AuthedAccountsRouteChildren: AuthedAccountsRouteChildren = {
+  AuthedAccountsAccountIdRoute: AuthedAccountsAccountIdRoute,
+  AuthedAccountsAdjustRoute: AuthedAccountsAdjustRoute,
+  AuthedAccountsNewRoute: AuthedAccountsNewRoute,
+  AuthedAccountsInstitutionsInstitutionIdRoute:
+    AuthedAccountsInstitutionsInstitutionIdRoute,
+  AuthedAccountsInstitutionsNewRoute: AuthedAccountsInstitutionsNewRoute,
+}
+
+const AuthedAccountsRouteWithChildren = AuthedAccountsRoute._addFileChildren(
+  AuthedAccountsRouteChildren,
+)
 
 interface AuthedTransactionsRouteChildren {
   AuthedTransactionsTransactionIdRoute: typeof AuthedTransactionsTransactionIdRoute
@@ -620,30 +619,6 @@ const AuthedTransactionsRouteChildren: AuthedTransactionsRouteChildren = {
 
 const AuthedTransactionsRouteWithChildren =
   AuthedTransactionsRoute._addFileChildren(AuthedTransactionsRouteChildren)
-
-interface AuthedSettingsAccountsRouteChildren {
-  AuthedSettingsAccountsAccountIdRoute: typeof AuthedSettingsAccountsAccountIdRoute
-  AuthedSettingsAccountsAdjustRoute: typeof AuthedSettingsAccountsAdjustRoute
-  AuthedSettingsAccountsNewRoute: typeof AuthedSettingsAccountsNewRoute
-  AuthedSettingsAccountsInstitutionsInstitutionIdRoute: typeof AuthedSettingsAccountsInstitutionsInstitutionIdRoute
-  AuthedSettingsAccountsInstitutionsNewRoute: typeof AuthedSettingsAccountsInstitutionsNewRoute
-}
-
-const AuthedSettingsAccountsRouteChildren: AuthedSettingsAccountsRouteChildren =
-  {
-    AuthedSettingsAccountsAccountIdRoute: AuthedSettingsAccountsAccountIdRoute,
-    AuthedSettingsAccountsAdjustRoute: AuthedSettingsAccountsAdjustRoute,
-    AuthedSettingsAccountsNewRoute: AuthedSettingsAccountsNewRoute,
-    AuthedSettingsAccountsInstitutionsInstitutionIdRoute:
-      AuthedSettingsAccountsInstitutionsInstitutionIdRoute,
-    AuthedSettingsAccountsInstitutionsNewRoute:
-      AuthedSettingsAccountsInstitutionsNewRoute,
-  }
-
-const AuthedSettingsAccountsRouteWithChildren =
-  AuthedSettingsAccountsRoute._addFileChildren(
-    AuthedSettingsAccountsRouteChildren,
-  )
 
 interface AuthedSettingsCategoriesRouteChildren {
   AuthedSettingsCategoriesCategoryIdRoute: typeof AuthedSettingsCategoriesCategoryIdRoute
@@ -694,27 +669,25 @@ const AuthedSettingsMerchantsRouteWithChildren =
   )
 
 interface AuthedRouteChildren {
+  AuthedAccountsRoute: typeof AuthedAccountsRouteWithChildren
   AuthedBudgetRoute: typeof AuthedBudgetRoute
   AuthedDashboardRoute: typeof AuthedDashboardRoute
   AuthedTransactionsRoute: typeof AuthedTransactionsRouteWithChildren
   AuthedIndexRoute: typeof AuthedIndexRoute
-  AuthedSettingsAccountsRoute: typeof AuthedSettingsAccountsRouteWithChildren
   AuthedSettingsCategoriesRoute: typeof AuthedSettingsCategoriesRouteWithChildren
   AuthedSettingsCurrenciesRoute: typeof AuthedSettingsCurrenciesRouteWithChildren
   AuthedSettingsMerchantsRoute: typeof AuthedSettingsMerchantsRouteWithChildren
-  AuthedSettingsIndexRoute: typeof AuthedSettingsIndexRoute
 }
 
 const AuthedRouteChildren: AuthedRouteChildren = {
+  AuthedAccountsRoute: AuthedAccountsRouteWithChildren,
   AuthedBudgetRoute: AuthedBudgetRoute,
   AuthedDashboardRoute: AuthedDashboardRoute,
   AuthedTransactionsRoute: AuthedTransactionsRouteWithChildren,
   AuthedIndexRoute: AuthedIndexRoute,
-  AuthedSettingsAccountsRoute: AuthedSettingsAccountsRouteWithChildren,
   AuthedSettingsCategoriesRoute: AuthedSettingsCategoriesRouteWithChildren,
   AuthedSettingsCurrenciesRoute: AuthedSettingsCurrenciesRouteWithChildren,
   AuthedSettingsMerchantsRoute: AuthedSettingsMerchantsRouteWithChildren,
-  AuthedSettingsIndexRoute: AuthedSettingsIndexRoute,
 }
 
 const AuthedRouteWithChildren =

@@ -4,7 +4,7 @@ import {
   AddCurrencyButton,
   CurrencyManager,
 } from '#/components/currencies/currency-manager'
-import { SettingsPage } from '#/components/settings-page'
+import { ListPage } from '#/components/list-page'
 import { getCurrencySettings } from '#/server/currencies'
 
 export const Route = createFileRoute('/_authed/settings/currencies')({
@@ -17,11 +17,11 @@ function Currencies() {
   const { ratesFrom, openAccounts } = Route.useLoaderData()
 
   return (
-    <SettingsPage title={t('currencies.title')}>
+    <ListPage title={t('currencies.title')}>
       <CurrencyManager ratesFrom={ratesFrom} openAccounts={openAccounts} />
       <AddCurrencyButton />
       {/* Adding a currency opens here as a sheet (spec 10). */}
       <Outlet />
-    </SettingsPage>
+    </ListPage>
   )
 }

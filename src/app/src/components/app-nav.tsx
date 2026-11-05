@@ -12,6 +12,12 @@ const TABS = [
     activeIcon: 'receipt-fill',
   },
   {
+    to: '/accounts',
+    label: 'nav.accounts',
+    icon: 'wallet',
+    activeIcon: 'wallet-fill',
+  },
+  {
     to: '/dashboard',
     label: 'nav.dashboard',
     icon: 'chart-pie',
@@ -22,12 +28,6 @@ const TABS = [
     label: 'nav.budget',
     icon: 'target',
     activeIcon: 'target-fill',
-  },
-  {
-    to: '/settings',
-    label: 'nav.settings',
-    icon: 'settings',
-    activeIcon: 'settings-fill',
   },
 ] as const satisfies ReadonlyArray<{
   to: string

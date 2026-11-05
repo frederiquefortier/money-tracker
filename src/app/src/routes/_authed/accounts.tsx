@@ -6,7 +6,7 @@ import { ClosedAccounts } from '#/components/accounts/closed-accounts'
 import { EmptyState } from '#/components/list-card'
 import { ExpandAllButton } from '#/components/expand-all-button'
 import { FloatingAddButton } from '#/components/floating-add-button'
-import { SettingsPage } from '#/components/settings-page'
+import { ListPage } from '#/components/list-page'
 import { SortMenu } from '#/components/sort-menu'
 import { FORMAT_LOCALE } from '#/i18n/locales'
 import type { Locale } from '#/i18n/locales'
@@ -19,7 +19,7 @@ import { oneOf } from '#/lib/utils'
 import { getAccounts } from '#/server/accounts'
 import type { AccountsPage } from '#/server/accounts'
 
-export const Route = createFileRoute('/_authed/settings/accounts')({
+export const Route = createFileRoute('/_authed/accounts')({
   loader: () => getAccounts(),
   component: Accounts,
 })
@@ -64,17 +64,17 @@ function AddMenu() {
       label={t('common.add')}
       options={[
         {
-          to: '/settings/accounts/new',
+          to: '/accounts/new',
           label: t('accounts.addAccount'),
-          icon: 'coins',
+          icon: 'wallet',
         },
         {
-          to: '/settings/accounts/institutions/new',
+          to: '/accounts/institutions/new',
           label: t('accounts.addInstitution'),
           icon: 'bank',
         },
         {
-          to: '/settings/accounts/adjust',
+          to: '/accounts/adjust',
           label: t('transactions.adjustment.newTitle'),
           icon: 'scale',
         },
@@ -101,7 +101,7 @@ function Accounts() {
   const allExpanded = keys.every((key) => !collapsed.ids.has(key))
 
   return (
-    <SettingsPage
+    <ListPage
       title={t('accounts.title')}
       actions={
         <>
@@ -142,6 +142,6 @@ function Accounts() {
       <AddMenu />
       {/* The account form opens here as a sheet, over the list (spec 11). */}
       <Outlet />
-    </SettingsPage>
+    </ListPage>
   )
 }

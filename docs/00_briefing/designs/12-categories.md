@@ -8,7 +8,7 @@
 The category tree is how spending gets read: the dashboard, budgets and the yearly review
 all group by it. This spec covers the Catégories screen (the tree and its archive), the
 category form with its icon and colour. The category picker the transaction form uses is
-spec 15. Reached from Réglages.
+spec 15. Reached from the menu.
 
 ## Requirements
 
@@ -19,7 +19,6 @@ CAT-08 (emergency fund exclusion) is phase 4.
 
 ```
 ┌──────────────────────────────────┐
-│ ← Réglages                       │
 │ CATÉGORIES            [⇕][Tri▾]  │
 │ [Rechercher                    ] │
 │ [Dépenses][Revenus][Placements]  │

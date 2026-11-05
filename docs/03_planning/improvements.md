@@ -4,6 +4,35 @@ Track future enhancements and feature ideas. Review this file during planning se
 
 <!-- Newest first: a new idea goes directly below this line. Template at the bottom. -->
 
+### 2026-11-05 - Tags
+
+**Description:**
+- Free labels on a transaction, several per transaction (TAG-01), with the most and
+  least expensive transactions per tag (TAG-03).
+
+**Motivation:**
+- Taken out of the plan by the author on 2026-11-05: events are the more defined idea and
+  hold what tags were meant for (a trip, an occasion), so tags wait until a need shows
+  that events do not cover, such as labels that cut across time.
+
+**Potential Approach:**
+- The draft tables stay in database.md. The automatic linking by date range and
+  categories went to events (EVT-07); tags would get it back only if needed.
+
+**Priority:**
+- [ ] High - Critical improvement
+- [ ] Medium - Nice to have
+- [x] Low - Future consideration
+
+**Dependencies:**
+- Events (phase 2), so the two do not overlap.
+
+**Status:**
+- [x] Proposed
+- [ ] In Progress
+- [ ] Completed
+- [ ] Deferred
+
 ### 2026-11-05 - Region packs, local purchases and the goal celebration
 
 **Description:**
