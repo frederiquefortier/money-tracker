@@ -1,23 +1,20 @@
-import { useId, useState } from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { CategoryBadge } from '#/components/categories/category-badge'
 import { IconPicker } from '#/components/categories/icon-picker'
 import { EditHint } from '#/components/edit-hint'
 import type { CategoryDraft } from '#/components/categories/use-category-draft'
-import { Button } from '#/components/ui/button'
-import { FieldLabel } from '#/components/ui/field'
+import { Icon } from '#/components/icon'
 import { SWATCHES } from '#/lib/categories'
 import { iconColor } from '#/lib/color'
 import { cn, focusRing } from '#/lib/utils'
 
 /** The icon in its colour circle; tapping it opens the picker (CAT-07). */
-export function IconField({ draft }: { draft: CategoryDraft }) {
+function IconButton({ draft }: { draft: CategoryDraft }) {
   const { t } = useTranslation()
-  const labelId = useId()
   const [picking, setPicking] = useState(false)
   return (
-    <div role="group" aria-labelledby={labelId} className="flex flex-col gap-2">
-      <FieldLabel id={labelId}>{t('categories.icon.label')}</FieldLabel>
+    <>
       <button
         type="button"
         aria-label={t('categories.icon.choose')}
@@ -40,7 +37,7 @@ export function IconField({ draft }: { draft: CategoryDraft }) {
           onClose={() => setPicking(false)}
         />
       )}
-    </div>
+    </>
   )
 }
 
@@ -126,10 +123,11 @@ function CustomColor({
 }
 
 /**
- * Nineteen quick picks, then any colour (spec 12). `used` holds the quick picks other
- * top-level categories of the same type already have.
+ * Nineteen quick picks, any colour, and a reset when a sub-category's colour was picked
+ * by hand (spec 12). `used` holds the quick picks other top-level categories of the same
+ * type already have.
  */
-export function ColorField({
+function ColorGrid({
   draft,
   used,
 }: {
@@ -137,40 +135,54 @@ export function ColorField({
   used: ReadonlySet<string>
 }) {
   const { t } = useTranslation()
-  const labelId = useId()
   const isSwatch = SWATCHES.some((swatch) => swatch.hex === draft.color)
   return (
-    <div className="flex flex-col gap-2">
-      <div className="flex items-center justify-between">
-        <FieldLabel id={labelId}>{t('categories.color')}</FieldLabel>
-        {draft.canResetColor && (
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={draft.resetColor}
-          >
-            {t('common.reset')}
-          </Button>
-        )}
-      </div>
-      <div
-        role="group"
-        aria-labelledby={labelId}
-        className="grid grid-cols-10 gap-1.5"
-      >
-        {SWATCHES.map((swatch, i) => (
-          <Swatch
-            key={swatch.key}
-            hex={swatch.hex}
-            n={i + 1}
-            picked={swatch.hex === draft.color}
-            used={used.has(swatch.hex)}
-            onPick={() => draft.pickColor(swatch.hex)}
-          />
-        ))}
-        <CustomColor draft={draft} isSwatch={isSwatch} />
-      </div>
+    <div
+      role="group"
+      aria-label={t('categories.color')}
+      className="grid flex-1 grid-cols-11 gap-1.5"
+    >
+      {SWATCHES.map((swatch, i) => (
+        <Swatch
+          key={swatch.key}
+          hex={swatch.hex}
+          n={i + 1}
+          picked={swatch.hex === draft.color}
+          used={used.has(swatch.hex)}
+          onPick={() => draft.pickColor(swatch.hex)}
+        />
+      ))}
+      <CustomColor draft={draft} isSwatch={isSwatch} />
+      {draft.canResetColor && (
+        <button
+          type="button"
+          aria-label={t('common.reset')}
+          title={t('common.reset')}
+          onClick={draft.resetColor}
+          className={cn(
+            'grid aspect-square place-items-center rounded-full text-muted-foreground hover:bg-secondary hover:text-foreground',
+            focusRing,
+          )}
+        >
+          <Icon name="undo" />
+        </button>
+      )}
+    </div>
+  )
+}
+
+/** The icon first, the colours filling the space beside it. */
+export function AppearanceFields({
+  draft,
+  used,
+}: {
+  draft: CategoryDraft
+  used: ReadonlySet<string>
+}) {
+  return (
+    <div className="flex items-center gap-4">
+      <IconButton draft={draft} />
+      <ColorGrid draft={draft} used={used} />
     </div>
   )
 }

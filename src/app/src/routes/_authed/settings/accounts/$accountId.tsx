@@ -9,6 +9,7 @@ import { useAccountsPage } from '#/lib/use-accounts-page'
 import { useLocale } from '#/lib/use-locale'
 
 export const Route = createFileRoute('/_authed/settings/accounts/$accountId')({
+  staticData: { sheet: true },
   component: EditAccount,
 })
 

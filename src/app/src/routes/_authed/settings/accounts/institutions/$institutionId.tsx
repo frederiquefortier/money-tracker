@@ -8,6 +8,7 @@ import { useAccountsPage } from '#/lib/use-accounts-page'
 export const Route = createFileRoute(
   '/_authed/settings/accounts/institutions/$institutionId',
 )({
+  staticData: { sheet: true },
   component: EditInstitution,
 })
 

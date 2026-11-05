@@ -87,6 +87,7 @@ English; this file is in English like every other meta-doc.
 | CAT-07 | A category has a coolicons icon, chosen in a searchable picker of a curated subset of the set (ADR-020). A default is suggested from the name; picking the suggested icon returns to it. Each category has its own colour, chosen freely; a sub-category starts from a variation of its parent's colour. | v1, ai, add, C11 | 1 |
 | CAT-08 | A category can be excluded from the emergency-fund calculation. | v1, ai | 2 |
 | CAT-09 | The category tree sorts by name or by colour (rainbow order), kept per browser. One button opens or closes every branch, in every tab. A search filters the open tab by name, keeping each match's parents. | author | 1 |
+| CAT-10 | An expense category can be marked a need or a want. A sub-category with no mark follows its nearest marked parent and can set its own (Santé a need, Massothérapie a want). A category with no mark anywhere up its branch is unclassified. Income categories have no mark; investment categories count as savings. | author | 1 |
 
 ## 6. Merchants (`MER`)
 
@@ -140,6 +141,7 @@ English; this file is in English like every other meta-doc.
 | DSH-06 | Header tiles: total available, spent this month, invested this month, pending count. | sheet | 2 |
 | DSH-07 | Category ranking by spend over the range. | sheet | 2 |
 | DSH-08 | Year view and month view. | misc | 2 |
+| DSH-09 | Needs, wants and savings over the range: expenses by their need or want mark (CAT-10), unclassified ones apart, and investments as savings, in amounts and as shares of income. | author | 2 |
 
 ## 11. Budget (`BUD`)
 

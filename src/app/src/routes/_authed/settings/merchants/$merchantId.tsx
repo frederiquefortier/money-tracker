@@ -8,6 +8,7 @@ import { useMerchantsPage } from '#/lib/use-merchants-page'
 
 export const Route = createFileRoute('/_authed/settings/merchants/$merchantId')(
   {
+    staticData: { sheet: true },
     component: EditMerchant,
   },
 )

@@ -1,10 +1,9 @@
-import { useActionState } from 'react'
+import { useActionState, useId } from 'react'
 import { useTranslation } from 'react-i18next'
-import {
-  ColorField,
-  IconField,
-} from '#/components/categories/appearance-fields'
+import { AppearanceFields } from '#/components/categories/appearance-fields'
 import { CategoryBadge } from '#/components/categories/category-badge'
+import { KindTabs } from '#/components/categories/kind-tabs'
+import { NecessityRadios } from '#/components/categories/necessity-radios'
 import { useCategoryDraft } from '#/components/categories/use-category-draft'
 import type {
   CategoryDraft,
@@ -12,13 +11,10 @@ import type {
 } from '#/components/categories/use-category-draft'
 import { Combobox } from '#/components/combobox'
 import { FormField } from '#/components/form-field'
-import { LinkedFields } from '#/components/linked-fields'
 import { useCloseSheet } from '#/components/route-sheet'
-import { SelectField } from '#/components/select-field'
 import { SheetForm } from '#/components/sheet-form'
 import { FORMAT_LOCALE } from '#/i18n/locales'
 import {
-  KINDS,
   categoryFormSchema,
   categoryPath,
   childrenByParent,
@@ -35,6 +31,7 @@ import {
   validate,
 } from '#/lib/form'
 import type { FormState } from '#/lib/form'
+import { necessitySource } from '#/lib/necessity'
 import { useLocale } from '#/lib/use-locale'
 import { treeOrder } from '#/lib/tree'
 import { saveCategory } from '#/server/categories'
@@ -88,8 +85,8 @@ function parentOptions(
   }))
 }
 
-/** Type, then the parent within it: only a top-level category chooses its type (CAT-02). */
-function PlacementFields({
+/** The parent within the kind; a category cannot go under itself or its branch. */
+function ParentField({
   draft,
   categories,
   categoryId,
@@ -101,36 +98,40 @@ function PlacementFields({
   const { t } = useTranslation()
   const locale = useLocale()
   return (
-    <>
-      <SelectField
-        name="kind"
-        label={t('categories.type')}
-        value={draft.kind}
-        disabled={draft.parent !== undefined}
-        onChange={(event) =>
-          draft.setKind(
-            KINDS.find((k) => k === event.target.value) ?? 'expense',
-          )
-        }
-        options={KINDS.map((k) => ({
-          value: k,
-          label: t(`categories.kind.${k}`),
-        }))}
-      />
-      <LinkedFields>
-        <Combobox
-          label={t('categories.parent')}
-          options={parentOptions(
-            categories,
-            { id: categoryId, kind: draft.kind },
-            FORMAT_LOCALE[locale],
-          )}
-          value={draft.parent?.id ?? null}
-          onChange={draft.setParent}
-          clearLabel={t('categories.clearParent')}
-        />
-      </LinkedFields>
-    </>
+    <Combobox
+      label={t('categories.parent')}
+      options={parentOptions(
+        categories,
+        { id: categoryId, kind: draft.kind },
+        FORMAT_LOCALE[locale],
+      )}
+      value={draft.parent?.id ?? null}
+      onChange={draft.setParent}
+      clearLabel={t('categories.clearParent')}
+    />
+  )
+}
+
+/** CAT-10, expense only: a sub-category with no mark follows its nearest marked parent. */
+function NecessityField({
+  draft,
+  categories,
+}: {
+  draft: CategoryDraft
+  categories: ReadonlyArray<Category>
+}) {
+  if (draft.kind !== 'expense') return null
+  const source = necessitySource(
+    draft.parent?.id ?? null,
+    new Map(categories.map((c) => [c.id, c])),
+  )
+  return (
+    <NecessityRadios
+      value={draft.necessity}
+      parentName={draft.parent?.name}
+      source={source}
+      onChange={draft.setNecessity}
+    />
   )
 }
 
@@ -150,6 +151,7 @@ export function CategoryForm({
   children?: React.ReactNode
 }) {
   const { t } = useTranslation()
+  const panelId = useId()
   const closeSheet = useCloseSheet()
   const draft = useCategoryDraft(categoryId, initial, categories)
   const [state, submit, pending] = useCategorySubmit(
@@ -170,33 +172,42 @@ export function CategoryForm({
       pending={pending}
       error={state.failed && t('common.saveFailed')}
     >
-      <FormField
-        name="name"
-        label={t('categories.name')}
-        required
-        autoComplete="off"
-        defaultValue={state.values.name}
-        error={fields.error('name')}
-        onBlur={fields.onBlur}
-        onChange={(event) => {
-          draft.setName(event.target.value)
-          fields.onChange(event)
-        }}
+      <KindTabs
+        kind={draft.kind}
+        panelId={panelId}
+        onChange={draft.setKind}
+        singular
+        disabled={draft.parent !== undefined}
       />
-      <PlacementFields
-        draft={draft}
-        categories={categories}
-        categoryId={categoryId}
-      />
-      <IconField draft={draft} />
-      <ColorField
-        draft={draft}
-        used={
-          draft.parent
-            ? new Set<string>()
-            : usedTopColors(categories, draft.kind, categoryId)
-        }
-      />
+      <div id={panelId} className="contents">
+        <AppearanceFields
+          draft={draft}
+          used={
+            draft.parent
+              ? new Set<string>()
+              : usedTopColors(categories, draft.kind, categoryId)
+          }
+        />
+        <FormField
+          name="name"
+          label={t('categories.name')}
+          required
+          autoComplete="off"
+          defaultValue={state.values.name}
+          error={fields.error('name')}
+          onBlur={fields.onBlur}
+          onChange={(event) => {
+            draft.setName(event.target.value)
+            fields.onChange(event)
+          }}
+        />
+        <ParentField
+          draft={draft}
+          categories={categories}
+          categoryId={categoryId}
+        />
+        <NecessityField draft={draft} categories={categories} />
+      </div>
       {children}
     </SheetForm>
   )

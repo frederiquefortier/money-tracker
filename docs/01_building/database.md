@@ -81,13 +81,15 @@ per ADR-008. User-owned rows (categories, merchants, notes) store one string, as
 
 | Table | Columns | Req |
 |---|---|---|
-| `categories` | `parent_id` (nullable, self, composite FK with `user_id`), `name`, `kind` (`expense`/`income`/`investment`), `icon` (a coolicons name, ADR-020, default `tag`), `icon_is_auto`, `color` (hex `#rrggbb`, free choice; a sub-category starts from a variation of its parent's), `color_is_auto` (designs/12-categories.md) | CAT-01, 02, 07. `is_favourite` was dropped on 2026-11-04 (CAT-06 now works out frequent categories from transactions). Names unique among siblings of the same kind, ignoring case; top-level categories count as siblings. Deleting one with children fails on the foreign key. `exclude_from_emergency_fund` comes with CAT-08 (phase 2). |
+| `categories` | `parent_id` (nullable, self, composite FK with `user_id`), `name`, `kind` (`expense`/`income`/`investment`), `icon` (a coolicons name, ADR-020, default `tag`), `icon_is_auto`, `color` (hex `#rrggbb`, free choice; a sub-category starts from a variation of its parent's), `color_is_auto` (designs/12-categories.md), `necessity` (`need`/`want`, nullable: null follows the nearest marked parent) | CAT-01, 02, 07, 10. A check allows `necessity` on `expense` categories only. `is_favourite` was dropped on 2026-11-04 (CAT-06 now works out frequent categories from transactions). Names unique among siblings of the same kind, ignoring case; top-level categories count as siblings. Deleting one with children fails on the foreign key. `exclude_from_emergency_fund` comes with CAT-08 (phase 2). |
 | `category_status_events` | `category_id`, `status` (`archived`/`active`), `effective_on` | CAT-03. Append-only: insert and select grants only. A category with no events is active; a trigger makes events alternate starting with an archive, refuses a date before the previous event, and refuses reactivating a sub-category whose parent is archived. Deleted with its category. |
 | view `category_active_periods` | `category_id`, `active_from`, `active_to` | Periods `[active_from, active_to)`, null bounds open; one open period when there is no history. Pickers (CAT-04) and charts (DSH-03) both read this, so they never disagree. |
+| view `category_necessity` (comes with DSH-09) | `category_id`, `necessity` (`need`/`want`/null) | DSH-09. Expense categories only. A recursive walk up `parent_id` to the nearest category with a mark; null when none has one. `security_invoker`, so RLS on `categories` applies. The category form works the same rule out from the tree it already loads (`inheritedNecessity`). |
 
 A trigger on `parent_id` and `kind` rejects cycles (no depth limit, but no loops) and
 requires a sub-category to have its parent's `kind`; changing a top-level category's kind
-carries its branch along. Category kind does not constrain transaction kind: a refund is an
+carries its branch along. Moving a branch out of `expense` clears `necessity` on every
+category in it (a before-update trigger on `kind`), so the check holds. Category kind does not constrain transaction kind: a refund is an
 `income` transaction on an `expense` category, and it reduces that category's spending.
 
 Functions: `category_status(id)` gives the status after all events.

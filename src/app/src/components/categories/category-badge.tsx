@@ -12,6 +12,23 @@ const SIZES = {
   lg: 'size-16 [&_svg]:size-8',
 } as const
 
+/** One icon from the category set, outside a badge. */
+export function CategoryIcon({
+  icon,
+  className,
+}: {
+  icon: string
+  className?: string
+}) {
+  return (
+    <Iconify
+      icon={`coolicons:${icon}`}
+      aria-hidden="true"
+      className={cn('size-4 shrink-0', className)}
+    />
+  )
+}
+
 /** A category's icon in a filled circle of its colour; the icon stays readable (spec 12). */
 export function CategoryBadge({
   icon,

@@ -17,6 +17,7 @@ export const Route = createFileRoute('/_authed/transactions/$transactionId')({
     ])
     return { data, transaction }
   },
+  staticData: { sheet: true },
   component: EditTransaction,
 })
 

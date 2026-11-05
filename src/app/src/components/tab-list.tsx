@@ -3,7 +3,7 @@ import { cn, focusRing } from '#/lib/utils'
 /**
  * A row of tabs over one panel (`panelId`); arrows move between them. Each tab's id is
  * `{idPrefix}-{tab}`, for the panel's aria-labelledby. A `muted` tab looks unavailable but
- * still answers, so the caller can say why.
+ * still answers, so the caller can say why. `disabled` turns the whole row off.
  */
 export function TabList<TTab extends string>({
   label,
@@ -13,6 +13,7 @@ export function TabList<TTab extends string>({
   panelId,
   idPrefix,
   muted,
+  disabled = false,
   onSelect,
 }: {
   label: string
@@ -22,6 +23,7 @@ export function TabList<TTab extends string>({
   panelId: string
   idPrefix: string
   muted?: (tab: TTab) => boolean
+  disabled?: boolean
   onSelect: (tab: TTab) => void
 }) {
   const idOf = (tab: TTab) => `${idPrefix}-${tab}`
@@ -43,8 +45,12 @@ export function TabList<TTab extends string>({
     <div
       role="tablist"
       aria-label={label}
+      aria-disabled={disabled || undefined}
       onKeyDown={onKeyDown}
-      className="grid auto-cols-fr grid-flow-col gap-1 rounded-xl bg-secondary p-1"
+      className={cn(
+        'grid auto-cols-fr grid-flow-col gap-1 rounded-xl bg-secondary p-1',
+        disabled && 'opacity-50',
+      )}
     >
       {tabs.map((tab) => (
         <button
@@ -56,6 +62,7 @@ export function TabList<TTab extends string>({
           aria-controls={panelId}
           aria-disabled={muted?.(tab) || undefined}
           tabIndex={tab === value ? 0 : -1}
+          disabled={disabled}
           onClick={() => onSelect(tab)}
           className={cn(
             'rounded-lg px-2 py-1.5 text-sm font-semibold',
@@ -64,6 +71,7 @@ export function TabList<TTab extends string>({
               : 'text-muted-foreground hover:text-foreground',
             muted?.(tab) &&
               'cursor-default opacity-50 hover:text-muted-foreground',
+            disabled && 'cursor-not-allowed hover:text-muted-foreground',
             focusRing,
           )}
         >

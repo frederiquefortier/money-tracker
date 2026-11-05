@@ -6,6 +6,7 @@ import { useToast } from '#/components/toaster'
 import { useMerchantsPage } from '#/lib/use-merchants-page'
 
 export const Route = createFileRoute('/_authed/settings/merchants/new')({
+  staticData: { sheet: true },
   component: NewMerchant,
 })
 

@@ -12,7 +12,7 @@ spec 15. Reached from Réglages.
 
 ## Requirements
 
-CAT-01, 02, 03, 05, 07, 09. CAT-04 and CAT-06 (Fréquentes, in the picker) are spec 15.
+CAT-01, 02, 03, 05, 07, 09, 10. CAT-04 and CAT-06 (Fréquentes, in the picker) are spec 15.
 CAT-08 (emergency fund exclusion) is phase 2.
 
 ## Catégories
@@ -96,15 +96,18 @@ CAT-08 (emergency fund exclusion) is phase 2.
 ```
 ┌──────────────────────────────┐
 │ NOUVELLE CATÉGORIE         ✕ │
-│ Nom *        [Restaurants  ] │
-│ Type         [Dépense     ▾] │
-│ │ Parent     [Alimentation ✕]│
-│ Icône                        │
-│ ( ◉ )✎                       │
-│ Couleur                      │
-│ ● ● ● ● ● ● ● ● ● ●          │
-│ ● ● ● ● ● ● ● ● ● ●          │
-│ ● ● ● ● ● ● ● ● ● ◎          │
+│ [Dépense][Revenu][Placement] │
+│                              │
+│ ╭─────╮ ●●●●●●●●●●●          │
+│ │ ⌂ ✎ │ ●●●●●●●●◎↺           │
+│ ╰─────╯                      │
+│ Nom *    [Restaurants      ] │
+│ Parent   [Alimentation    ✕] │
+│ Priorité                     │
+│ (•) Comme Alimentation       │
+│     (Besoin)                 │
+│ ( ) Besoin                   │
+│ ( ) Envie                    │
 │ ──────────────────────────── │
 │ Historique (read-only)       │
 │        Annuler  Enregistrer  │
@@ -112,22 +115,45 @@ CAT-08 (emergency fund exclusion) is phase 2.
 ```
 
 The form is a route sheet over the tree, like the account form: its body only edits, with
-one "Enregistrer" at the bottom.
+one "Enregistrer" at the bottom. Reordered on 2026-11-05: the type as tabs, the
+appearance first, need or want as radios.
 
+- **Type** (CAT-02) as the shared tabs at the top (`KindTabs` with singular labels:
+  Dépense, Revenu, Placement), as on the transaction form. It decides the parents and
+  whether need or want shows. A sub-category takes its parent's type: the whole bar is
+  disabled (`TabList` `disabled`), the current tab still shown.
+- **Appearance**, with no visible labels: the icon in its 64px colour circle on the
+  left, the colours filling the space beside it.
+  - Tapping the circle opens the icon picker; a pencil appears on it on hover and focus,
+    and always on touch screens.
+  - The colours in eleven columns, two rows, centred on the circle: nineteen quick picks
+    and the custom circle (below). About 19px each on a phone, 6px apart, so each still
+    has a 24px target area without overlap (WCAG 2.5.8). A new sub-category starts with a variation of its
+    parent's colour; picking one by hand keeps it, and a 21st circle, an undo icon
+    ("Réinitialiser"), the last spot of the second row, returns to the variation.
 - **Nom** required, unique among siblings (two "Autres" under different parents is fine).
-- **Type** (CAT-02), then **Parent** as its sub-field, indented under it with a line down
-  its left side (`LinkedFields`), since the parent is chosen within the type:
-  - Type: expense (default), income, investment. Only top-level categories choose; a
-    sub-category takes its parent's type and the field is read-only.
-  - Parent: the shared combobox, typed and filtered, listing active categories of the
-    type as the tree above (connectors, icon, name), the full path in the field once chosen. Empty means top level; a × empties it, as for the
-    account's institution. A category cannot be moved under itself or its own children.
-- **Icône**, a labelled field like the others: the icon in its colour circle on the left.
-  Tapping the circle opens the icon picker; a pencil appears on it on hover and focus, and
-  always on touch screens. The colour has its own field.
-- **Couleur**: every category has its own, chosen freely (below). A new sub-category
-  starts with a variation of its parent's colour; picking one by hand keeps it.
-  "Réinitialiser" returns to the variation.
+  The suggested icon above follows it as it is typed.
+- **Parent**: the shared combobox, typed and filtered, listing active categories of the
+  type as the tree above (connectors, icon, name), the full path in the field once
+  chosen. Empty means top level; a × empties it, as for the account's institution. A
+  category cannot be moved under itself or its own children.
+- **Priorité** (CAT-10, built 2026-11-05), on the Dépense tab only: three radios under
+  the label, one per line (`RadioGroupField`, native radios drawn like the checkbox; the
+  chosen one a plum dot inside a white ring, the card's colour in dark mode).
+  - The first stores nothing and is chosen by default. On a top-level category it reads
+    "Non classée". On a sub-category it reads "Comme {parent} ({value})": the direct
+    parent's name and the value it follows from the nearest marked parent, or "non
+    classée" under an unmarked branch. Following keeps up with later changes to the
+    parent.
+  - Then Besoin and Envie, the category's own mark.
+  - Tried first the same day: a select, a pill with house and heart icons, unlabelled
+    chips, then two field-styled buttons (with the inherited one dashed, then with the
+    parent's icon, then with "Comme {parent}" under the word). Two buttons cannot show
+    three states, so following the parent became a choice of its own.
+  - Absent on income and investment categories: income has no mark, investments count as
+    savings. Switching a top-level category to another type clears the marks of its
+    branch.
+  - The tree shows nothing for it; the dashboard reads it (DSH-09).
 - **Historique** (CAT-03), when the category has one: the archive and reactivation
   events, newest first, as text: "Archivée le 3 mars 2024", "Réactivée le 1 janvier
   2025". Archive, reactivate and delete are row actions, never among the sheet's fields.
@@ -220,6 +246,9 @@ clothes plum, beauty pink), and slate for everything else. Income and investment
 - `categories.color` stores a hex colour (`#rrggbb`, checked by a constraint);
   `color_is_auto` tells whether it still follows the parent. `icon_is_auto` tells the form whether the name
   still drives the icon.
+- `categories.necessity` is `need`, `want` or null. The form works out what a null
+  follows from the loaded tree (`inheritedNecessity`); the dashboard will read the
+  `category_necessity` view (DSH-09).
 - The cycle and same-type rules are enforced by a trigger (database.md), not only by the
   form.
 
@@ -234,7 +263,8 @@ clothes plum, beauty pink), and slate for everything else. Income and investment
 | Empty | Aucune catégorie pour l'instant. |
 | Add | Catégorie (named Ajouter une catégorie, also the sheet title) |
 | Form titles | Nouvelle catégorie, Modifier la catégorie |
-| Fields | Nom, Type, Parent, Icône, Couleur |
+| Fields | Nom, Parent, Priorité; Couleur as the colour group's name for screen readers |
+| Need or want | Non classée, Comme {parent} ({value}), non classée, Besoin, Envie |
 | Colour | Couleur personnalisée (the custom circle's accessible name), Couleur {n}, déjà utilisée |
 | Expand | Tout déplier, Tout replier |
 | Sort | Nom, Couleur; Trier: {sort} (accessible name) |

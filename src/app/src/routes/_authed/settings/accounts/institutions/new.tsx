@@ -6,6 +6,7 @@ import { RouteSheet } from '#/components/route-sheet'
 export const Route = createFileRoute(
   '/_authed/settings/accounts/institutions/new',
 )({
+  staticData: { sheet: true },
   component: NewInstitution,
 })
 

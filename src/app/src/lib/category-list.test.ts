@@ -19,6 +19,7 @@ const category = (
   iconIsAuto: true,
   color: '#aa3322',
   colorIsAuto: false,
+  necessity: null,
   history: [],
   periods: [{ from: null, to }],
 })

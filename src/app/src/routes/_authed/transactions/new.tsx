@@ -11,6 +11,7 @@ import { useStoredState } from '#/lib/use-stored-state'
 
 export const Route = createFileRoute('/_authed/transactions/new')({
   loader: () => loadTransactionForm(),
+  staticData: { sheet: true },
   component: NewTransaction,
 })
 

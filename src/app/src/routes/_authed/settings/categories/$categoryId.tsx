@@ -13,6 +13,7 @@ import { useLocale } from '#/lib/use-locale'
 export const Route = createFileRoute(
   '/_authed/settings/categories/$categoryId',
 )({
+  staticData: { sheet: true },
   component: EditCategory,
 })
 

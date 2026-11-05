@@ -12,6 +12,7 @@ export const Route = createFileRoute('/_authed/settings/categories/new')({
     kind: KINDS.find((k) => k === search.kind),
     parent: typeof search.parent === 'string' ? search.parent : undefined,
   }),
+  staticData: { sheet: true },
   component: NewCategory,
 })
 
@@ -37,6 +38,7 @@ function NewCategory() {
           color:
             parent?.color ?? nextTopColor(categories, search.kind ?? 'expense'),
           colorIsAuto: parent !== undefined,
+          necessity: null,
         }}
         categories={categories}
         onSaved={() => toast({ text: t('categories.created') })}

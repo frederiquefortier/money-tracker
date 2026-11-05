@@ -37,6 +37,7 @@ function useCreate(
       iconIsAuto: true,
       color: nextTopColor(categories, kind),
       colorIsAuto: false,
+      necessity: null,
     }
     const result = await saveCategory({ data: values }).catch(() => null)
     if (!result?.ok) {

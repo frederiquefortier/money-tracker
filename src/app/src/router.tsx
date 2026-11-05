@@ -1,4 +1,5 @@
 import { createRouter as createTanStackRouter } from '@tanstack/react-router'
+import type { ParsedLocation } from '@tanstack/react-router'
 import { getGlobalStartContext } from '@tanstack/react-start'
 import { routeTree } from './routeTree.gen'
 
@@ -8,9 +9,16 @@ function getNonce() {
 }
 
 export function getRouter() {
+  // A sheet opens over the list, so opening, closing or switching sheets keeps the list
+  // where it was; any other navigation restores or resets the scroll as usual.
+  const opensSheet = (location: ParsedLocation): boolean =>
+    router
+      .matchRoutes(location)
+      .some((match) => match.staticData.sheet === true)
+
   const router = createTanStackRouter({
     routeTree,
-    scrollRestoration: true,
+    scrollRestoration: ({ location }) => !opensSheet(location),
     // Data preloaded on hover is reused by the click (default preload stale time, 30 s).
     defaultPreload: 'intent',
     ssr: { nonce: getNonce() },
@@ -22,5 +30,9 @@ export function getRouter() {
 declare module '@tanstack/react-router' {
   interface Register {
     router: ReturnType<typeof getRouter>
+  }
+  interface StaticDataRouteOption {
+    /** The route draws a RouteSheet over its parent's list. */
+    sheet?: boolean
   }
 }

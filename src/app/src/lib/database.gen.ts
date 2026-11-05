@@ -109,6 +109,7 @@ export type Database = {
           id: string
           kind: string
           name: string
+          necessity: string | null
           parent_id: string | null
           updated_at: string
           user_id: string
@@ -122,6 +123,7 @@ export type Database = {
           id?: string
           kind?: string
           name: string
+          necessity?: string | null
           parent_id?: string | null
           updated_at?: string
           user_id?: string
@@ -135,6 +137,7 @@ export type Database = {
           id?: string
           kind?: string
           name?: string
+          necessity?: string | null
           parent_id?: string | null
           updated_at?: string
           user_id?: string

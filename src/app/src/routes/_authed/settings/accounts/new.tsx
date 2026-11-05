@@ -9,6 +9,7 @@ import { useAccountsPage } from '#/lib/use-accounts-page'
 import { useMyCurrencies } from '#/lib/use-my-currencies'
 
 export const Route = createFileRoute('/_authed/settings/accounts/new')({
+  staticData: { sheet: true },
   component: NewAccount,
 })
 

@@ -7,6 +7,8 @@ import {
   resolveColors,
 } from '#/lib/categories'
 import type { Category, CategoryEvent, Kind } from '#/lib/categories'
+import { NECESSITIES } from '#/lib/necessity'
+import type { Necessity } from '#/lib/necessity'
 import { failed } from '#/lib/result'
 import type { Result } from '#/lib/result'
 import { getSupabase } from '#/lib/supabase.server'
@@ -44,6 +46,8 @@ function failure(
 
 const isKind = (kind: string): kind is Kind =>
   (KINDS as ReadonlyArray<string>).includes(kind)
+const isNecessity = (value: string | null): value is Necessity =>
+  (NECESSITIES as ReadonlyArray<string | null>).includes(value)
 
 export const getCategories = createServerFn({ method: 'GET' }).handler(
   async (): Promise<Array<Category>> => {
@@ -52,7 +56,7 @@ export const getCategories = createServerFn({ method: 'GET' }).handler(
       supabase
         .from('categories')
         .select(
-          'id, parent_id, name, kind, icon, icon_is_auto, color, color_is_auto',
+          'id, parent_id, name, kind, icon, icon_is_auto, color, color_is_auto, necessity',
         ),
       supabase
         .from('category_status_events')
@@ -86,6 +90,7 @@ export const getCategories = createServerFn({ method: 'GET' }).handler(
       iconIsAuto: c.icon_is_auto,
       color: c.color,
       colorIsAuto: c.color_is_auto,
+      necessity: isNecessity(c.necessity) ? c.necessity : null,
       history: history.get(c.id) ?? [],
       periods: periods.data
         .filter((p) => p.category_id === c.id)
@@ -128,6 +133,8 @@ export const saveCategory = createServerFn({ method: 'POST' })
       icon_is_auto: data.iconIsAuto,
       color: data.color,
       color_is_auto: data.colorIsAuto,
+      // Only expense takes a mark (CAT-10); the database refuses it on other kinds.
+      necessity: data.kind === 'expense' ? data.necessity : null,
     }
     const supabase = getSupabase()
     const query = data.id

@@ -1,6 +1,8 @@
 import { z } from 'zod'
 import categoryIcons from '#/icons/category-icons.json'
 import { hexToOklch, siblingVariation } from '#/lib/color'
+import { NECESSITIES } from '#/lib/necessity'
+import type { Necessity } from '#/lib/necessity'
 import { foldForSearch } from '#/lib/utils'
 
 // Shared by the category screens, the picker and the server functions (spec 12).
@@ -27,6 +29,8 @@ export type Category = {
   iconIsAuto: boolean
   color: string
   colorIsAuto: boolean
+  /** Null follows the nearest marked parent. */
+  necessity: Necessity | null
   /** Newest first. */
   history: Array<CategoryEvent>
   periods: Array<Period>
@@ -297,5 +301,6 @@ export const categoryInputSchema = categoryFormSchema.extend({
   iconIsAuto: z.boolean(),
   color: z.string().regex(HEX_COLOR),
   colorIsAuto: z.boolean(),
+  necessity: z.enum(NECESSITIES).nullable(),
 })
 export type CategoryInput = z.input<typeof categoryInputSchema>

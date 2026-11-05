@@ -44,7 +44,8 @@ The transactions migration is pushed to dev: transactions, splits, transfers wit
 adjustments and real balances, with 39 pgTAP tests; a merge now moves transactions. The
 transaction form (spec 15) is built: amount, foreign currency with its fee, splits,
 merchant and category pickers with "Fréquentes". Currency favourites are dropped (CUR-03)
-and every screen adds through one round + bottom right. The list (spec 14) and transfers
+and every screen adds through one round + bottom right. Expense categories take a need
+or want mark (CAT-10). The list (spec 14) and transfers
 (spec 16) come next.
 
 - Currencies, HexaRate validation, the Frankfurter rates job with a backfill to 2018,
@@ -57,6 +58,8 @@ and every screen adds through one round + bottom right. The list (spec 14) and t
   follows [01-visual-direction.md](../00_briefing/designs/01-visual-direction.md).
 - Institutions and accounts. ACC-01..07.
 - Categories with archive history, coolicons icons, sort, search and expand all. CAT-01..05, 07, 09; CAT-06 (Fréquentes) comes with the transaction form.
+- Need or want on expense categories, inherited down the branch (built 2026-11-05).
+  CAT-10. Before the import, so the new tree is marked as it is settled.
 - Merchants with default category, and merging. MER-01, 05.
 - Transactions: expense, income, adjustment, transfer with fee (including between
   currencies), splits, status, notes. TRX-01..06, 09..11. Multi-row writes as SQL functions
@@ -72,7 +75,8 @@ and every screen adds through one round + bottom right. The list (spec 14) and t
   3. Import, read the summary, undo and re-import until it is right.
 
 ## Phase 2: Seeing it
-- Dashboard: range picker, filters, per-category stats, tiles, ranking. DSH-01..04, 06..08.
+- Dashboard: range picker, filters, per-category stats, tiles, ranking, needs, wants and
+  savings. DSH-01..04, 06..09.
 - Budgets and the emergency fund. BUD-01..04, 06, CAT-08.
 - Tags with automatic rules. TAG-01..03.
 - Recurring transactions. TRX-08.

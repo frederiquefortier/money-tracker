@@ -1,10 +1,18 @@
 import { useState } from 'react'
 import { autoColor, suggestIcon } from '#/lib/categories'
 import type { Category, CategoryInput, Kind } from '#/lib/categories'
+import type { Necessity } from '#/lib/necessity'
 
 export type CategoryValues = Pick<
   Category,
-  'name' | 'kind' | 'parentId' | 'icon' | 'iconIsAuto' | 'color' | 'colorIsAuto'
+  | 'name'
+  | 'kind'
+  | 'parentId'
+  | 'icon'
+  | 'iconIsAuto'
+  | 'color'
+  | 'colorIsAuto'
+  | 'necessity'
 >
 
 /**
@@ -30,6 +38,7 @@ export function useCategoryDraft(
     parent && colorIsAuto
       ? autoColor(categories, { id, parentId: parent.id, name })
       : draft.color
+  const necessity = kind === 'expense' ? draft.necessity : null
   const update = (change: Partial<typeof draft>) =>
     setDraft((prev) => ({ ...prev, ...change }))
 
@@ -43,6 +52,7 @@ export function useCategoryDraft(
     color,
     colorIsAuto,
     canResetColor: parent !== undefined && draft.handPicked,
+    necessity,
     setName,
     setKind: (next: Kind) => update({ kind: next }),
     // Leaving the parent keeps the colour and kind it had.
@@ -51,6 +61,7 @@ export function useCategoryDraft(
     // Picking the suggestion lets the name drive the icon again.
     pickIcon: (next: string) =>
       update({ icon: next, iconIsAuto: next === suggestIcon(name) }),
+    setNecessity: (next: Necessity | null) => update({ necessity: next }),
     pickColor: (next: string) => update({ color: next, handPicked: true }),
     resetColor: () => update({ handPicked: false }),
     input: (typedName: string): CategoryInput => ({
@@ -62,6 +73,7 @@ export function useCategoryDraft(
       iconIsAuto: draft.iconIsAuto,
       color,
       colorIsAuto,
+      necessity,
     }),
   }
 }

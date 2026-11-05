@@ -71,7 +71,9 @@ component to use, so a screen is assembled, not redrawn.
   archive or delete buttons among the fields (on phones they are in the header, above).
   Closing with something typed or chosen asks "Abandonner les modifications?" first. Annuler and one "Enregistrer" in the footer; saving closes it
   with a toast. Errors from the server show in the sheet above the buttons; validation
-  stays under each field, and focus moves to the first one (SET-07).
+  stays under each field, and focus moves to the first one (SET-07). Opening, closing or
+  switching sheets keeps the list's scroll: sheet routes carry `staticData.sheet`, and
+  the router skips scroll restoration for them.
 - **Fields:** the shared ones (`FormField`, `SelectField`, `CheckboxField`,
   `LinkedFields`). Dates are native (`FormField` with `type="date"`, ADR-024). `LinkedFields` wraps only the sub-field, never the field it belongs to. Required fields carry an asterisk, no legend, no "(facultatif)".
 - **Choosing from the user's own items:** `Combobox`, typed into the field: it filters,

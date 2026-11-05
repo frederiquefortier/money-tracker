@@ -5,6 +5,7 @@ import { RouteSheet } from '#/components/route-sheet'
 import { useMyCurrencies } from '#/lib/use-my-currencies'
 
 export const Route = createFileRoute('/_authed/settings/currencies/add')({
+  staticData: { sheet: true },
   component: AddCurrency,
 })
 
