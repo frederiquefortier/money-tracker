@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { AddButton } from '#/components/add-button'
+import { FloatingAddButton } from '#/components/floating-add-button'
 import { ConfirmDialog } from '#/components/confirm-dialog'
 import { CurrencyRow } from '#/components/currencies/currency-row'
 import { useCurrencyActions } from '#/components/currencies/use-currency-actions'
@@ -10,10 +10,15 @@ import { useToast } from '#/components/toaster'
 export function AddCurrencyButton() {
   const { t } = useTranslation()
   return (
-    <AddButton
-      to="/settings/currencies/add"
-      text={t('currencies.addShort')}
+    <FloatingAddButton
       label={t('currencies.add')}
+      options={[
+        {
+          to: '/settings/currencies/add',
+          label: t('currencies.add'),
+          icon: 'plus',
+        },
+      ]}
     />
   )
 }
@@ -28,7 +33,7 @@ export function CurrencyManager({
 }) {
   const { t } = useTranslation()
   const toast = useToast()
-  const { shown, favourite, makeDefault, remove } = useCurrencyActions()
+  const { shown, makeDefault, remove } = useCurrencyActions()
   const [removing, setRemoving] = useState<string | null>(null)
 
   /** Why a currency cannot be removed, or null (CUR-04). */
@@ -56,7 +61,6 @@ export function CurrencyManager({
               isDefault={currency.code === shown.defaultCurrency}
               removeHint={removeHint}
               ratesFrom={ratesFrom[currency.code]}
-              onFavourite={(on) => favourite(currency.code, on)}
               onMakeDefault={() => makeDefault(currency.code)}
               onRemove={() =>
                 removeHint

@@ -17,8 +17,9 @@ function Currencies() {
   const { ratesFrom, openAccounts } = Route.useLoaderData()
 
   return (
-    <SettingsPage title={t('currencies.title')} actions={<AddCurrencyButton />}>
+    <SettingsPage title={t('currencies.title')}>
       <CurrencyManager ratesFrom={ratesFrom} openAccounts={openAccounts} />
+      <AddCurrencyButton />
       {/* Adding a currency opens here as a sheet (spec 10). */}
       <Outlet />
     </SettingsPage>

@@ -1,7 +1,8 @@
 import * as React from 'react'
 import { Dialog as SheetPrimitive } from 'radix-ui'
 import { Icon } from '#/components/icon'
-import { cn, focusRing } from '#/lib/utils'
+import { iconAction } from '#/components/icon-button'
+import { cn } from '#/lib/utils'
 
 // Based on shadcn's sheet: full screen on phones, a panel from the right from md up, its
 // animations in styles.css (.sheet-panel). Built on the Radix dialog, so focus is trapped
@@ -44,12 +45,7 @@ function SheetContent({
           {actions && (
             <div className="flex items-center md:hidden">{actions}</div>
           )}
-          <SheetPrimitive.Close
-            className={cn(
-              'rounded-lg p-1 text-muted-foreground hover:text-foreground',
-              focusRing,
-            )}
-          >
+          <SheetPrimitive.Close className={iconAction()}>
             <Icon name="close" label={closeLabel} className="size-5" />
           </SheetPrimitive.Close>
         </header>

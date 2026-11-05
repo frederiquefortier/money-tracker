@@ -31,23 +31,30 @@ component to use, so a screen is assembled, not redrawn.
 - **Page:** `SettingsPage` (or the tab's own page): "← Réglages" top left, the title with
   its buttons beside it, never a button under the list: expand all, the sort
   (`SortMenu`, an outline button with a chevron, like a select, showing the sort icon and
-  the current order, "Trier: …" as its accessible name; kept per browser), then
-  one `AddButton` per thing the screen adds: a plus and the noun, "+ Compte",
-  "+ Catégorie", with "Ajouter un compte" as its accessible name, never an add menu. A
+  the current order, "Trier: …" as its accessible name; kept per browser). Adding is
+  never beside the title: every screen, at every width, has one round + button bottom
+  right (`FloatingAddButton`), above the tab bar on phones, with "Ajouter un compte" as
+  its accessible name. A screen that adds one thing goes straight to its form; one that
+  adds several (Comptes: Compte, Institution) turns the + into a ✕ and fans the choices
+  out on a quarter circle as round icons only, the noun as tooltip and accessible name. Escape, a tap
+  outside or a choice closes it. A
   menu opens at least as wide as its button, aligned to it, and grows to fit its labels
   rather than cutting them. A list that filters has the filter before the sort, the
   same kind of button (`ChoiceMenu`): an icon for what it filters and the current choice,
   "Filtrer: …" as its accessible name. `SortMenu` is built on it. Order, left to right:
-  expand all, filter, sort, then the add buttons, so the sort always sits next to them.
+  expand all, filter, sort.
 - **Lists:** cards (`ListCard`), one line per item where it fits. Tapping an item opens
-  its form. A card header (an institution) toggles with `CollapseToggle` and edits with a
-  pencil. In a tree, every row opens its form; a parent's chevron alone toggles its
+  its form. A card header (an institution) is a row too: tapping the line opens its form,
+  its chevron alone toggles the card, as for a tree's parent; a header with no form ("Sans
+  institution") toggles from its name (`CollapseToggle`). Every chevron and icon action
+  has the same hover, a rounded square behind the icon (`iconAction`, `iconHover`), the
+  sheet's and dialogs' ✕ included. In a tree, every row opens its form; a parent's chevron alone toggles its
   branch, and children are joined to it by elbow connectors, as in a tree diagram. A list
   that collapses has an icon button beside the title to open or close everything, in
   every tab (`ExpandAllButton`, "Tout déplier", "Tout replier"). Collapsed state is remembered per
   browser (`useStoredState`).
 - **Row actions:** icons in a fixed slot at the end of the row (`IconActions`,
-  `IconButton`): add (a child, in a tree), star (currencies), archive or reactivate, trash, in that
+  `IconButton`): add (a child, in a tree), default (currencies), archive or reactivate, trash, in that
   order. On phones the rows carry none: the same icons sit in the item's sheet header,
   beside the ✕ (`RouteSheet` `actions`, `placement="sheet"`), so a row keeps its width for
   the name and the amount. A row whose item has no sheet (currencies) keeps them at every
@@ -66,24 +73,29 @@ component to use, so a screen is assembled, not redrawn.
   with a toast. Errors from the server show in the sheet above the buttons; validation
   stays under each field, and focus moves to the first one (SET-07).
 - **Fields:** the shared ones (`FormField`, `SelectField`, `CheckboxField`,
-  `LinkedFields`). `LinkedFields` wraps only the sub-field, never the field it belongs to. Required fields carry an asterisk, no legend, no "(facultatif)".
+  `LinkedFields`). Dates are native (`FormField` with `type="date"`, ADR-024). `LinkedFields` wraps only the sub-field, never the field it belongs to. Required fields carry an asterisk, no legend, no "(facultatif)".
 - **Choosing from the user's own items:** `Combobox`, typed into the field: it filters,
   offers "Créer « … »" when that makes sense, and a × clears it. Nothing chosen is an
-  empty field, never "Aucun(e)". The chosen option is checked on the left, in a slot
-  every option keeps, as in the dropdown menus. Options can sit in labelled groups and
+  empty field, never "Aucun(e)". The chosen option is tinted (the accent background,
+  semibold), as in a native select, with no check and no slot for one; options under a
+  group heading (an institution, a category type) sit one step in; hover and the
+  keyboard's position are grey. A popup takes its trigger's radius and border: a field's
+  list (`Combobox`) the field's 4px corners and input border; the menus of round buttons
+  and chips (sort, filter, currency chips) stay round. (`cn` knows `rounded-field`, so it
+  replaces the popover's default radius.) Options can sit in labelled groups and
   show a `Tag` in the field while chosen ("Archivée"). A category is always chosen with
   `CategoryPicker`, except the transaction form, whose category row opens a full-screen list (spec 15). Categories are listed as the Catégories page
   draws them, everywhere (the picker, Parent, the Magasins filter): a tree with elbow
   connectors (`TreeGuides`), each with its icon and its name; the field shows the full
   path once chosen. A search keeps each match's parents.
 - **Search:** only on lists that grow long (Magasins, Catégories, the icon picker), a
-  `SearchField` above the list, filtering as you type, ignoring case and accents. The
+  `SearchField` above the list (and above the tabs, when a list has them), filtering as you type, ignoring case and accents. The
   words are the same everywhere: "Rechercher" and "Aucun résultat.", never naming the
   thing searched.
 - **Round pickers:** a round button that opens a picker (a category's icon) shows a
   small badge in its corner, `EditHint`: a pencil when it holds a choice, on hover and
-  focus and always on touch screens; a plus on an empty dashed circle, always, its border
-  darkening to the primary colour on hover and focus.
+  focus and always on touch screens; a plus on an empty dashed circle, the same way (hover,
+  focus, touch), its border darkening to the primary colour on hover and focus.
 - **Tags:** a short status beside a name ("Par défaut", "Archivée") is a `Tag`.
 - **No helper text:** no hints under fields, legends or explanatory sentences. If a field
   needs explaining, fix its label or the layout. A reason for something unavailable goes

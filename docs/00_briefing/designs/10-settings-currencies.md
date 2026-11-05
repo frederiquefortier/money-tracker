@@ -52,16 +52,17 @@ the transactions list (spec 14).
 ```
 ┌──────────────────────────────────────────┐
 │← Réglages                                │
-│ DEVISES                       [+ DEVISE] │
+│ DEVISES                                  │
 │ ┌──────────────────────────────────────┐ │
-│ │ CAD Dollar c… ($) [Par défaut] ★ ⌂ x │ │
-│ │ CHF Franc suisse (CHF)         ☆ ⌂ x │ │
-│ │ EUR Euro (€)                   ☆ ⌂ x │ │
-│ │ GBP Livre sterling (£)         ☆ ⌂ x │ │
-│ │ USD Dollar américain ($)       ★ ⌂ x │ │
+│ │ CAD Dollar can… ($) [Par défaut] ⌂ x │ │
+│ │ CHF Franc suisse (CHF)           ⌂ x │ │
+│ │ EUR Euro (€)                     ⌂ x │ │
+│ │ GBP Livre sterling (£)           ⌂ x │ │
+│ │ USD Dollar américain ($)         ⌂ x │ │
 │ └──────────────────────────────────────┘ │
+│                                      (+) │
 └──────────────────────────────────────────┘
-★ ☆ favourite   ⌂ use as default (muted on the default)   x remove (muted on the default)
+⌂ use as default (muted on the default)   x remove (muted on the default)   (+) add
 ```
 
 ### The list (CUR-01, 03, 05)
@@ -72,16 +73,17 @@ the transactions list (spec 14).
 - **Par défaut** is a small tag after the name and symbol of the default currency
   (CUR-05). Exactly one currency is the default.
 - Every action is on the row, as icon buttons on the right, each with a label naming the
-  currency: **star** toggles favourite (CUR-03; favourites are not reordered here, they come
-  first in every picker), **house** makes it the default, **trash** removes it. On the
+  currency: **house** makes it the default, **trash** removes it. (A favourite star was
+  here until 2026-11-05: a user keeps a handful of currencies, so pinning some first in
+  the pickers saved nothing, CUR-03.) On the
   default currency the house and the trash are shown muted, like disabled.
-- The back link sits at the top left of the page; the title and "+ Devise" share
-  the line above the card. Buttons placed with a card share its radius; button text is set
+- The back link sits at the top left of the page, the title above the card, the round +
+  bottom right (shared patterns). Buttons placed with a card share its radius; button text is set
   in Inconsolata, uppercase.
 
 ### Adding (CUR-02)
 
-- "+ Devise" opens the same sheet as the account form
+- The round + opens the same sheet as the account form
   (`/settings/currencies/add`), with one field: a `Combobox` over the ISO 4217 list
   (`currencies`), minus the ones already added. Typing matches the code and the name in
   both languages; each option reads "CODE - Nom (symbole)".
@@ -117,8 +119,7 @@ the transactions list (spec 14).
 
 - A chip in the header, left of FR / EN, showing the code (`CAD ▾`) in Inconsolata. On
   every signed-in screen, phone and desktop.
-- Tap: a small menu of the user's currencies, favourites first, then alphabetical, the
-  current one checked.
+- Tap: a small menu of the user's currencies, alphabetical, the current one tinted.
 - Choosing one saves it on the profile and re-renders every amount on the page in it.
   Conversion uses the rate on each transaction's date (CUR-07); an amount already in the
   display currency is never converted.
@@ -139,7 +140,7 @@ the transactions list (spec 14).
   `profiles.default_currency`, `profiles.display_currency`; a count of transactions per
   currency for the confirmation; open accounts per currency for the block.
 - Writes, each a server function with the user's session (ADR-006):
-  `addCurrency(code)` (HexaRate check, then insert), `setFavourite(code, on)`,
+  `addCurrency(code)` (HexaRate check, then insert),
   `setDefaultCurrency(code)`, `removeCurrency(code)`, `setDisplayCurrency(code)`.
 - The default lives on `profiles.default_currency` only. The list is alphabetical, so
   there is no stored order.
@@ -173,7 +174,7 @@ What the build does differently or adds, for review:
   before the profile can be read.
 - **Not yet:** the transaction count in the confirmation, which needs the transactions
   table (spec 14).
-- **Favourite, default and remove** show at once and stay shown until the saved data comes
+- **Default and remove** show at once and stay shown until the saved data comes
   back, so a change never flashes back to the old state.
 - **Rows only appear as screens exist:** the hub shows Devises and Se déconnecter.
 - **Extra copy:**

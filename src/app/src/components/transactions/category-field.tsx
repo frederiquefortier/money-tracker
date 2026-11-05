@@ -81,7 +81,7 @@ export function CategoryButton({
       {label && (
         <span
           className={cn(
-            'min-w-0 flex-1 truncate group-hover:underline',
+            'min-w-0 flex-1 truncate underline decoration-transparent transition-colors group-hover:decoration-current',
             !category && 'text-muted-foreground',
           )}
         >

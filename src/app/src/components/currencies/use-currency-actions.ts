@@ -2,26 +2,13 @@ import { useState } from 'react'
 import { useServerAction } from '#/components/use-server-action'
 import { useMyCurrencies } from '#/lib/use-my-currencies'
 import type { MyCurrencies } from '#/lib/currencies'
-import {
-  removeCurrency,
-  setDefaultCurrency,
-  setFavourite,
-} from '#/server/currencies'
+import { removeCurrency, setDefaultCurrency } from '#/server/currencies'
 
 type Change =
-  | { type: 'favourite'; code: string; on: boolean }
-  | { type: 'default'; code: string }
-  | { type: 'remove'; code: string }
+  { type: 'default'; code: string } | { type: 'remove'; code: string }
 
 function applyChange(state: MyCurrencies, change: Change): MyCurrencies {
   switch (change.type) {
-    case 'favourite':
-      return {
-        ...state,
-        currencies: state.currencies.map((c) =>
-          c.code === change.code ? { ...c, isFavourite: change.on } : c,
-        ),
-      }
     case 'default':
       return { ...state, defaultCurrency: change.code }
     case 'remove':
@@ -70,10 +57,6 @@ export function useCurrencyActions() {
       (state, p) => applyChange(state, p.change),
       currencies,
     ),
-    favourite: (code: string, on: boolean) =>
-      save({ type: 'favourite', code, on }, () =>
-        setFavourite({ data: { code, on } }),
-      ),
     makeDefault: (code: string) =>
       save({ type: 'default', code }, () =>
         setDefaultCurrency({ data: { code } }),

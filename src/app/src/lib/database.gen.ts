@@ -493,7 +493,6 @@ export type Database = {
           code: string
           created_at: string
           id: string
-          is_favourite: boolean
           removed_at: string | null
           updated_at: string
           user_id: string
@@ -502,7 +501,6 @@ export type Database = {
           code: string
           created_at?: string
           id?: string
-          is_favourite?: boolean
           removed_at?: string | null
           updated_at?: string
           user_id?: string
@@ -511,7 +509,6 @@ export type Database = {
           code?: string
           created_at?: string
           id?: string
-          is_favourite?: boolean
           removed_at?: string | null
           updated_at?: string
           user_id?: string

@@ -1,7 +1,6 @@
 import { useId } from 'react'
 import { useTranslation } from 'react-i18next'
 import { FieldMessage } from '#/components/form-field'
-import { EditHint } from '#/components/edit-hint'
 import { IconButton } from '#/components/icon-button'
 import { Money } from '#/components/money'
 import { TabList } from '#/components/tab-list'
@@ -18,7 +17,7 @@ import { splitPreview } from '#/lib/transaction-preview'
 import { SPLIT_MODES } from '#/lib/transactions'
 import type { SplitMode } from '#/lib/transactions'
 import { useLocale } from '#/lib/use-locale'
-import { cn, focusRing } from '#/lib/utils'
+import { cn } from '#/lib/utils'
 
 type Update = (changes: Partial<Draft>) => void
 
@@ -202,27 +201,22 @@ export function SplitLines({
           />
         ))}
       </ul>
-      {/* A new line opens the category list for it, like every round icon. */}
-      <button
-        type="button"
-        aria-label={t('transactions.addLine')}
-        title={t('transactions.addLine')}
-        onClick={() => {
-          onChange({
-            lines: [
-              ...draft.lines,
-              { key: nextKey, categoryId: null, value: '' },
-            ],
-          })
-          onPick(nextKey)
-        }}
-        className={cn(
-          'relative size-9 self-start rounded-full border-2 border-dashed border-primary/40 transition-colors hover:border-primary focus-visible:border-primary',
-          focusRing,
-        )}
-      >
-        <EditHint size="xs" icon="plus" />
-      </button>
+      {/* Under the column of ✕; a new line opens the category list for it. */}
+      <div className="flex justify-end">
+        <IconButton
+          icon="plus"
+          label={t('transactions.addLine')}
+          onClick={() => {
+            onChange({
+              lines: [
+                ...draft.lines,
+                { key: nextKey, categoryId: null, value: '' },
+              ],
+            })
+            onPick(nextKey)
+          }}
+        />
+      </div>
       {/* Always there in % mode; in Montant once there is an amount to share. */}
       {(remaining !== null || draft.splitMode === 'percent') &&
         draft.splitMode !== 'share' && (

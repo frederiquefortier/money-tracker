@@ -147,6 +147,7 @@ export const fr = {
     title: 'Comptes',
     empty: 'Aucun compte pour l’instant.',
     noInstitution: 'Sans institution',
+    accountsOf: 'Comptes de “{{name}}”',
     sort: {
       name: 'Nom',
       type: 'Type',
@@ -155,10 +156,9 @@ export const fr = {
       balanceDesc: 'Solde +',
     },
     website: 'Site web de {{name}}',
+    noWebsite: 'Aucun site web pour {{name}}.',
     addAccount: 'Ajouter un compte',
-    addAccountShort: 'Compte',
     addInstitution: 'Ajouter une institution',
-    addInstitutionShort: 'Institution',
     emptyInstitution: 'Aucun compte ouvert.',
     hidden: 'Masqué des nouvelles transactions',
     pending: 'dont {{amount}} en attente',
@@ -194,7 +194,6 @@ export const fr = {
     title: 'Magasins',
     empty: 'Aucun magasin pour l’instant.',
     add: 'Ajouter un magasin',
-    addShort: 'Magasin',
     sort: {
       nameAsc: 'Nom A–Z',
       nameDesc: 'Nom Z–A',
@@ -222,7 +221,6 @@ export const fr = {
     title: 'Devises',
     defaultBadge: 'Par défaut',
     add: 'Ajouter une devise',
-    addShort: 'Devise',
     makeDefaultFor: 'Utiliser {{code}} par défaut',
     isDefault: '{{code}} est la devise par défaut',
     removeCode: 'Retirer {{code}}',
@@ -231,7 +229,6 @@ export const fr = {
     usedByAccount_one: 'Le compte {{name}} et 1 autre sont en {{code}}.',
     usedByAccount_other:
       'Le compte {{name}} et {{count}} autres sont en {{code}}.',
-    favourite: '{{code}} en favori',
     adding: 'Validation…',
     hexaRateDown:
       'La validation des taux est indisponible. Réessayez dans un moment.',

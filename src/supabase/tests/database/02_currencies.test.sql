@@ -1,7 +1,7 @@
 begin;
 create extension if not exists pgtap with schema extensions;
 
-select plan(25);
+select plan(26);
 
 insert into auth.users (id, email) values
   ('11111111-1111-1111-1111-111111111111', 'alice@example.test'),
@@ -80,13 +80,18 @@ select throws_ok(
   '42501', null, 'currencies are removed with removed_at, never deleted'
 );
 
-update public.user_currencies set is_favourite = true
+update public.user_currencies set removed_at = now()
 where user_id = '22222222-2222-2222-2222-222222222222';
 reset role;
 select is(
   (select count(*)::int from public.user_currencies
-   where user_id = '22222222-2222-2222-2222-222222222222' and is_favourite),
+   where user_id = '22222222-2222-2222-2222-222222222222' and removed_at is not null),
   0, 'a user cannot change another user''s currencies'
+);
+select is_empty(
+  $$ select 1 from information_schema.columns
+     where table_schema = 'public' and table_name = 'user_currencies' and column_name = 'is_favourite' $$,
+  'currencies have no favourite (CUR-03)'
 );
 set local role authenticated;
 

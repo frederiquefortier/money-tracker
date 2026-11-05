@@ -50,7 +50,7 @@ export function AccountRow({
             <span className="font-mono font-semibold">{account.currency}</span>
           </span>
         </span>
-        <span className="text-right">{aside}</span>
+        <span className="text-right md:pr-4">{aside}</span>
       </Link>
       <AccountActions
         account={account}

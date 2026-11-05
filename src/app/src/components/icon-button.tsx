@@ -5,7 +5,7 @@ import type { IconName } from '#/components/icon'
 import { cn, focusRing } from '#/lib/utils'
 
 // Every icon action in the app: one 32px target, one 20px icon, one hover.
-function iconAction(muted = false) {
+export function iconAction(muted = false) {
   return cn(
     'inline-grid size-8 shrink-0 place-items-center rounded-lg',
     muted
@@ -13,6 +13,17 @@ function iconAction(muted = false) {
       : 'text-primary hover:bg-secondary',
     focusRing,
   )
+}
+
+/**
+ * The icon actions' 32px hover behind a smaller icon whose box must not grow (a tree's
+ * chevron sets where its connectors meet). `group` variants light it from a wider
+ * button, as a section header whose name toggles too.
+ */
+export const iconHover = {
+  self: 'relative isolate before:absolute before:-inset-1.5 before:-z-10 before:rounded-lg hover:before:bg-secondary',
+  group:
+    'relative isolate before:absolute before:-inset-1.5 before:-z-10 before:rounded-lg group-hover:before:bg-secondary',
 }
 
 /** `muted` looks disabled but still answers a tap, so the reason can be shown. */

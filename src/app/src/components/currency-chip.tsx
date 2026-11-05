@@ -6,11 +6,10 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
 } from '#/components/ui/dropdown-menu'
-import { pickerOrder } from '#/lib/currencies'
-import type { UserCurrency } from '#/lib/currencies'
+import type { Currency } from '#/lib/currencies'
 import { cn, focusRing } from '#/lib/utils'
 
-/** A currency code as a chip opening the user's currencies, favourites first (CUR-03). */
+/** A currency code as a chip opening the user's currencies, by code (CUR-03). */
 export function CurrencyChip({
   value,
   label,
@@ -20,7 +19,7 @@ export function CurrencyChip({
   value: string
   /** The accessible name, with the current code. */
   label: string
-  currencies: ReadonlyArray<UserCurrency>
+  currencies: ReadonlyArray<Currency>
   onChange: (code: string) => void
 }) {
   return (
@@ -37,12 +36,13 @@ export function CurrencyChip({
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuRadioGroup value={value} onValueChange={onChange}>
-          {pickerOrder(currencies).map((currency) => (
-            <DropdownMenuRadioItem key={currency.code} value={currency.code}>
-              <span className="font-mono font-semibold">{currency.code}</span>
-              {currency.isFavourite && (
-                <Icon name="star-fill" className="size-3.5 text-primary" />
-              )}
+          {currencies.map((currency) => (
+            <DropdownMenuRadioItem
+              key={currency.code}
+              value={currency.code}
+              className="font-mono font-semibold"
+            >
+              {currency.code}
             </DropdownMenuRadioItem>
           ))}
         </DropdownMenuRadioGroup>

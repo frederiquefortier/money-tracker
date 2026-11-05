@@ -7,9 +7,9 @@ import { LinkedFields } from '#/components/linked-fields'
 import { FORMAT_LOCALE } from '#/i18n/locales'
 import type { Locale } from '#/i18n/locales'
 import { typeLabel } from '#/lib/accounts'
-import { currencyName, pickerOrder } from '#/lib/currencies'
+import { currencyName } from '#/lib/currencies'
 import { useLocale } from '#/lib/use-locale'
-import type { UserCurrency } from '#/lib/currencies'
+import type { Currency } from '#/lib/currencies'
 import type { AccountType, Institution } from '#/server/accounts'
 
 export type AccountValues = {
@@ -29,11 +29,11 @@ type FieldProps = {
 
 // A currency the user removed still shows on an account that uses it.
 function currencyOptions(
-  currencies: ReadonlyArray<UserCurrency>,
+  currencies: ReadonlyArray<Currency>,
   current: string,
   locale: Locale,
 ) {
-  const options = pickerOrder(currencies).map((c) => ({
+  const options = currencies.map((c) => ({
     value: c.code,
     label: `${c.code} - ${currencyName(c, locale)}`,
   }))
@@ -100,7 +100,7 @@ export function AccountFields({
   values: AccountValues
   fields: FieldProps
   types: ReadonlyArray<AccountType>
-  currencies: ReadonlyArray<UserCurrency>
+  currencies: ReadonlyArray<Currency>
   institutions: ReadonlyArray<Institution>
   institutionId: string | null
   onInstitutionChange: (id: string | null, created?: Institution) => void

@@ -145,6 +145,7 @@ export const en: Messages = {
     title: 'Accounts',
     empty: 'No accounts yet.',
     noInstitution: 'No institution',
+    accountsOf: 'Accounts of “{{name}}”',
     sort: {
       name: 'Name',
       type: 'Type',
@@ -153,10 +154,9 @@ export const en: Messages = {
       balanceDesc: 'Balance +',
     },
     website: '{{name}} website',
+    noWebsite: 'No website for {{name}}.',
     addAccount: 'Add an account',
-    addAccountShort: 'Account',
     addInstitution: 'Add an institution',
-    addInstitutionShort: 'Institution',
     emptyInstitution: 'No open accounts.',
     hidden: 'Hidden from new transactions',
     pending: 'including {{amount}} pending',
@@ -192,7 +192,6 @@ export const en: Messages = {
     title: 'Merchants',
     empty: 'No merchants yet.',
     add: 'Add a merchant',
-    addShort: 'Merchant',
     sort: {
       nameAsc: 'Name A–Z',
       nameDesc: 'Name Z–A',
@@ -221,7 +220,6 @@ export const en: Messages = {
     title: 'Currencies',
     defaultBadge: 'Default',
     add: 'Add a currency',
-    addShort: 'Currency',
     makeDefaultFor: 'Use {{code}} as default',
     isDefault: '{{code}} is the default currency',
     removeCode: 'Remove {{code}}',
@@ -230,7 +228,6 @@ export const en: Messages = {
     usedByAccount_one: 'The account {{name}} and 1 other are in {{code}}.',
     usedByAccount_other:
       'The account {{name}} and {{count}} others are in {{code}}.',
-    favourite: '{{code}} as favourite',
     adding: 'Checking…',
     hexaRateDown: 'Rate validation is unavailable. Try again in a moment.',
     unknown: 'The rate service does not know {{code}}.',

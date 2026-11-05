@@ -66,7 +66,7 @@ English; this file is in English like every other meta-doc.
 |---|---|---|---|
 | CUR-01 | Each user has a list of usable currencies. Defaults, sorted alphabetically: CAD, CHF, EUR, GBP, USD. | ai, C3 | 1 |
 | CUR-02 | Adding a currency validates it against HexaRate. If the provider is down, adding fails with a retry; existing currencies keep working. | ai, add, C3 | 1 |
-| CUR-03 | Currencies can be marked favourite; favourites come first in every currency picker. Pickers are searchable and show "CODE - Nom" and the symbol. | v1, ai, C3 | 1 |
+| CUR-03 | Currency pickers list the user's currencies by code; they are searchable and show "CODE - Nom" and the symbol. (Favourites were dropped on 2026-11-05: a user keeps a handful of currencies, so pinning saved nothing.) | v1, ai, C3 | 1 |
 | CUR-04 | Removing a currency in use asks for confirmation and names how many transactions use it. The default currency and a currency used by an open account cannot be removed. Adding a removed currency back skips the HexaRate check. | C3 | 1 |
 | CUR-05 | A default currency, used to prefill forms. | ai | 1 |
 | CUR-06 | A display currency switchable from any page (header dropdown, like a language switcher). Every amount re-renders in it. | ai, add, C4 | 1 |
@@ -231,7 +231,8 @@ Not in the notes, required by the brief. Details in [security.md](../01_building
   for it by marking which amounts were converted.
 - **"Favourite" vs. "default" currencies.** C3 marks the five starting currencies
   `is_default`; `ai` also has favourites. They are two different flags: default means "came
-  with the account", favourite means "pin to top".
+  with the account", favourite means "pin to top". Favourites were dropped on 2026-11-05
+  (CUR-03).
 - **Transfers.** C5 stores a transfer as two transactions pointing at each other. The schema
   uses a shared `transfer_id` on the legs instead; same behaviour, no circular foreign keys.
   See [database.md](../01_building/database.md).

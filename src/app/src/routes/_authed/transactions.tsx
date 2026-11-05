@@ -16,7 +16,16 @@ function Transactions() {
         title={t('nav.transactions')}
         text={t('comingSoon.transactions')}
       />
-      <FloatingAddButton to="/transactions/new" label={t('transactions.add')} />
+      <FloatingAddButton
+        label={t('transactions.add')}
+        options={[
+          {
+            to: '/transactions/new',
+            label: t('transactions.add'),
+            icon: 'plus',
+          },
+        ]}
+      />
       <Outlet />
     </>
   )

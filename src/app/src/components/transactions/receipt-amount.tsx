@@ -13,7 +13,7 @@ import { SplitLines } from '#/components/transactions/receipt-splits'
 import { Checkbox } from '#/components/ui/checkbox'
 import { FORMAT_LOCALE } from '#/i18n/locales'
 import type { Category } from '#/lib/categories'
-import type { UserCurrency } from '#/lib/currencies'
+import type { Currency } from '#/lib/currencies'
 import { forInput } from '#/lib/transaction-draft'
 import type { Draft } from '#/lib/transaction-draft'
 import { bookedMinor, foreignPreview } from '#/lib/transaction-preview'
@@ -154,7 +154,7 @@ function SplitToggle({ draft, onChange }: { draft: Draft; onChange: Update }) {
         )
       }
       className={cn(
-        'self-start rounded-sm font-semibold tracking-wide text-primary uppercase hover:underline',
+        'self-start rounded-sm font-semibold tracking-wide text-primary uppercase underline decoration-transparent transition-colors hover:decoration-current',
         small,
         focusRing,
       )}
@@ -168,7 +168,7 @@ type ReceiptProps = {
   draft: Draft
   categories: ReadonlyArray<Category>
   accountCurrency: string | null
-  currencies: ReadonlyArray<UserCurrency>
+  currencies: ReadonlyArray<Currency>
   rate: string | null | undefined
   errors: {
     amount?: string

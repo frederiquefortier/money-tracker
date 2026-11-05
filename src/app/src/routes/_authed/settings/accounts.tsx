@@ -1,10 +1,10 @@
 import { Outlet, createFileRoute } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
-import { AddButton } from '#/components/add-button'
 import { AccountGroup } from '#/components/accounts/account-group'
 import type { ListedAccount } from '#/components/accounts/account-row'
 import { ClosedAccounts } from '#/components/accounts/closed-accounts'
 import { ExpandAllButton } from '#/components/expand-all-button'
+import { FloatingAddButton } from '#/components/floating-add-button'
 import { SettingsPage } from '#/components/settings-page'
 import { SortMenu } from '#/components/sort-menu'
 import { FORMAT_LOCALE } from '#/i18n/locales'
@@ -58,21 +58,24 @@ function shape(page: AccountsPage, locale: Locale, sort: Sort) {
   return { listed, open, groups, used }
 }
 
-function AddButtons() {
+function AddMenu() {
   const { t } = useTranslation()
   return (
-    <>
-      <AddButton
-        to="/settings/accounts/institutions/new"
-        text={t('accounts.addInstitutionShort')}
-        label={t('accounts.addInstitution')}
-      />
-      <AddButton
-        to="/settings/accounts/new"
-        text={t('accounts.addAccountShort')}
-        label={t('accounts.addAccount')}
-      />
-    </>
+    <FloatingAddButton
+      label={t('common.add')}
+      options={[
+        {
+          to: '/settings/accounts/new',
+          label: t('accounts.addAccount'),
+          icon: 'coins',
+        },
+        {
+          to: '/settings/accounts/institutions/new',
+          label: t('accounts.addInstitution'),
+          icon: 'bank',
+        },
+      ]}
+    />
   )
 }
 
@@ -123,7 +126,6 @@ function Accounts() {
             labelOf={(option) => t(`accounts.sort.${option}`)}
             onChange={setSort}
           />
-          <AddButtons />
         </>
       }
     >
@@ -148,6 +150,7 @@ function Accounts() {
         accounts={listed.filter((a) => a.closedOn)}
         institutions={page.institutions}
       />
+      <AddMenu />
       {/* The account form opens here as a sheet, over the list (spec 11). */}
       <Outlet />
     </SettingsPage>

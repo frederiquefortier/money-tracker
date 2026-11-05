@@ -1,16 +1,16 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ConfirmDialog } from '#/components/confirm-dialog'
-import { IconButton, IconLink } from '#/components/icon-button'
+import { IconActions, IconAnchor, IconButton } from '#/components/icon-button'
 import { useToast } from '#/components/toaster'
 import { useServerAction } from '#/components/use-server-action'
 import { deleteInstitution } from '#/server/accounts'
 import type { Institution } from '#/server/accounts'
 
 /**
- * Edit and delete on the institution's card header, after the total; on phones delete is
- * in the institution's sheet (`placement="sheet"`, delete alone). Delete waits until no
- * account, open or closed, uses it (ACC-05).
+ * The website (opens in a new tab) and delete on the institution's card header, after the total, from `md` up; on phones it is
+ * in the institution's sheet (`placement="sheet"`). The header itself opens the form.
+ * Delete waits until no account, open or closed, uses it (ACC-05).
  */
 export function InstitutionActions({
   institution,
@@ -28,16 +28,23 @@ export function InstitutionActions({
   const { id, name } = institution
 
   return (
-    <div className="flex items-center">
-      {placement === 'row' && (
-        <IconLink
-          icon="pencil"
-          label={t('common.editName', { name })}
-          to="/settings/accounts/institutions/$institutionId"
-          params={{ institutionId: id }}
-        />
-      )}
-      <div className={placement === 'row' ? 'hidden md:flex' : 'flex'}>
+    <>
+      {/* Two slots, as on account rows, so the total lines up with their balances. */}
+      <IconActions slots={2} placement={placement}>
+        {institution.websiteUrl ? (
+          <IconAnchor
+            icon="external-link"
+            label={t('accounts.website', { name })}
+            href={institution.websiteUrl}
+          />
+        ) : (
+          <IconButton
+            icon="external-link"
+            label={t('accounts.noWebsite', { name })}
+            muted
+            onClick={() => toast({ text: t('accounts.noWebsite', { name }) })}
+          />
+        )}
         <IconButton
           icon="trash-full"
           label={
@@ -50,7 +57,7 @@ export function InstitutionActions({
               : setConfirming(true)
           }
         />
-      </div>
+      </IconActions>
       <ConfirmDialog
         open={confirming}
         title={t('common.deleteName', { name })}
@@ -63,6 +70,6 @@ export function InstitutionActions({
           })
         }
       />
-    </div>
+    </>
   )
 }

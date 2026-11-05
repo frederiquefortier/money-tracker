@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { DropdownMenu as DropdownMenuPrimitive } from 'radix-ui'
-import { Icon } from '#/components/icon'
 import { cn } from '#/lib/utils'
 
 // The parts of shadcn's dropdown menu the app uses.
@@ -49,7 +48,7 @@ function DropdownMenuItem({
     <DropdownMenuPrimitive.Item
       data-slot="dropdown-menu-item"
       className={cn(
-        'relative flex cursor-default items-center gap-2 rounded-lg px-2 py-1.5 text-sm outline-none select-none focus:bg-accent focus:text-accent-foreground data-disabled:pointer-events-none data-disabled:opacity-50',
+        'relative flex cursor-default items-center gap-2 rounded-lg px-2 py-1.5 text-sm outline-none select-none focus:bg-muted data-disabled:pointer-events-none data-disabled:opacity-50',
         className,
       )}
       {...props}
@@ -77,16 +76,11 @@ function DropdownMenuRadioItem({
     <DropdownMenuPrimitive.RadioItem
       data-slot="dropdown-menu-radio-item"
       className={cn(
-        'relative flex cursor-default items-center gap-2 rounded-lg py-1.5 pr-2 pl-8 text-sm outline-none select-none focus:bg-accent focus:text-accent-foreground data-disabled:pointer-events-none data-disabled:opacity-50',
+        'relative flex cursor-default items-center gap-2 rounded-lg px-2 py-1.5 text-sm outline-none select-none focus:bg-muted data-disabled:pointer-events-none data-disabled:opacity-50 data-[state=checked]:bg-accent data-[state=checked]:font-semibold data-[state=checked]:text-accent-foreground data-[state=checked]:focus:bg-muted',
         className,
       )}
       {...props}
     >
-      <span className="pointer-events-none absolute left-2 flex size-4 items-center justify-center">
-        <DropdownMenuPrimitive.ItemIndicator>
-          <Icon name="check" className="size-4" />
-        </DropdownMenuPrimitive.ItemIndicator>
-      </span>
       {children}
     </DropdownMenuPrimitive.RadioItem>
   )

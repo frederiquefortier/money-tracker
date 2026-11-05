@@ -1,11 +1,11 @@
 import { Outlet, createFileRoute } from '@tanstack/react-router'
 import { useId, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { AddButton } from '#/components/add-button'
 import { ArchivedCategories } from '#/components/categories/archived-categories'
 import { CategoryTree } from '#/components/categories/category-tree'
 import { KindTabs } from '#/components/categories/kind-tabs'
 import { ExpandAllButton } from '#/components/expand-all-button'
+import { FloatingAddButton } from '#/components/floating-add-button'
 import { SearchField } from '#/components/search-field'
 import { SettingsPage } from '#/components/settings-page'
 import { SortMenu } from '#/components/sort-menu'
@@ -104,11 +104,16 @@ function shape(
 function AddCategoryButton({ kind }: { kind: Kind }) {
   const { t } = useTranslation()
   return (
-    <AddButton
-      to="/settings/categories/new"
-      search={{ kind }}
-      text={t('categories.addShort')}
+    <FloatingAddButton
       label={t('categories.add')}
+      options={[
+        {
+          to: '/settings/categories/new',
+          search: { kind },
+          label: t('categories.add'),
+          icon: 'plus',
+        },
+      ]}
     />
   )
 }
@@ -184,10 +189,12 @@ function Categories() {
             labelOf={(option) => t(`categories.sort.${option}`)}
             onChange={setSort}
           />
-          <AddCategoryButton kind={kind} />
         </>
       }
     >
+      {categories.length > 0 && (
+        <SearchField value={query} onChange={setQuery} />
+      )}
       <KindTabs kind={kind} panelId={panelId} onChange={setKind} />
       <div
         id={panelId}
@@ -195,12 +202,10 @@ function Categories() {
         aria-labelledby={`tab-${kind}`}
         className="flex flex-col gap-4"
       >
-        {ofKind.length === 0 ? (
+        {ofKind.length === 0 && (
           <p className="py-6 text-center text-muted-foreground">
             {t('categories.empty')}
           </p>
-        ) : (
-          <SearchField value={query} onChange={setQuery} />
         )}
         {found && roots.length === 0 && archived.length === 0 && (
           <p className="py-6 text-center text-muted-foreground">
@@ -224,6 +229,7 @@ function Categories() {
           open={found !== null}
         />
       </div>
+      <AddCategoryButton kind={kind} />
       {/* The category form opens here as a sheet, over the tree (spec 12). */}
       <Outlet />
     </SettingsPage>

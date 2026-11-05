@@ -5,7 +5,10 @@ import { MerchantActions } from '#/components/merchants/merchant-actions'
 import type { Merchant } from '#/lib/merchants'
 import { cn, focusRing } from '#/lib/utils'
 
-/** The name, then its default category (MER-01) when it has one. */
+/**
+ * The default category's icon (MER-01) as tall as the two lines beside it: the name, then
+ * the category. With no category, an empty circle keeps the names aligned.
+ */
 export function MerchantRow({
   merchant,
   merchants,
@@ -20,19 +23,31 @@ export function MerchantRow({
       <Link
         to="/settings/merchants/$merchantId"
         params={{ merchantId: merchant.id }}
-        className={cn('flex min-w-0 flex-1 flex-col py-3 pl-4', focusRing)}
-      >
-        <span className="truncate font-semibold">{merchant.name}</span>
-        {category && (
-          <span className="flex min-w-0 items-center gap-1.5 pt-1 text-sm text-muted-foreground">
-            <CategoryBadge
-              icon={category.icon}
-              color={category.color}
-              size="sm"
-            />
-            <span className="truncate">{category.path}</span>
-          </span>
+        className={cn(
+          'flex min-w-0 flex-1 items-center gap-3 py-3 pl-4',
+          focusRing,
         )}
+      >
+        {category ? (
+          <CategoryBadge
+            icon={category.icon}
+            color={category.color}
+            className="size-11 [&_svg]:size-6"
+          />
+        ) : (
+          <span
+            aria-hidden="true"
+            className="size-11 shrink-0 rounded-full border border-dashed"
+          />
+        )}
+        <span className="flex min-w-0 flex-col">
+          <span className="truncate font-semibold">{merchant.name}</span>
+          {category && (
+            <span className="truncate text-sm text-muted-foreground">
+              {category.path}
+            </span>
+          )}
+        </span>
       </Link>
       <MerchantActions merchant={merchant} merchants={merchants} />
     </li>

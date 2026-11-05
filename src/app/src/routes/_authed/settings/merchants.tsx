@@ -1,9 +1,9 @@
 import { Outlet, createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { AddButton } from '#/components/add-button'
 import { CategoryBadge } from '#/components/categories/category-badge'
 import { ChoiceMenu } from '#/components/choice-menu'
+import { FloatingAddButton } from '#/components/floating-add-button'
 import { ListCard } from '#/components/list-card'
 import { MerchantRow } from '#/components/merchants/merchant-row'
 import { SearchField } from '#/components/search-field'
@@ -112,6 +112,22 @@ function MerchantList({
   )
 }
 
+function AddMerchantButton() {
+  const { t } = useTranslation()
+  return (
+    <FloatingAddButton
+      label={t('merchants.add')}
+      options={[
+        {
+          to: '/settings/merchants/new',
+          label: t('merchants.add'),
+          icon: 'plus',
+        },
+      ]}
+    />
+  )
+}
+
 function Merchants() {
   const { t } = useTranslation()
   const { merchants, categories } = Route.useLoaderData()
@@ -169,11 +185,6 @@ function Merchants() {
             labelOf={(option) => t(`merchants.sort.${option}`)}
             onChange={setSort}
           />
-          <AddButton
-            to="/settings/merchants/new"
-            text={t('merchants.addShort')}
-            label={t('merchants.add')}
-          />
         </>
       }
     >
@@ -187,6 +198,7 @@ function Merchants() {
           <MerchantList merchants={merchants} shown={shown} tree={tree} />
         </>
       )}
+      <AddMerchantButton />
       {/* The merchant form opens here as a sheet (spec 13). */}
       <Outlet />
     </SettingsPage>

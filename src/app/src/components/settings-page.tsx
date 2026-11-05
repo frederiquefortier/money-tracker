@@ -23,7 +23,7 @@ export function SettingsPage({
 }) {
   const { t } = useTranslation()
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 pb-20">
       {back && <BackLink to="/settings" label={t('settings.back')} />}
       <div className="mx-auto flex w-full max-w-[40rem] flex-col gap-4">
         <div className="flex flex-wrap items-center justify-between gap-3">

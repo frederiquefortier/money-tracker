@@ -38,7 +38,7 @@ export const getMyCurrencies = createServerFn({ method: 'GET' }).handler(
         .single(),
       supabase
         .from('user_currencies')
-        .select('code, is_favourite, currencies(name_fr, name_en, symbol)')
+        .select('code, currencies(name_fr, name_en, symbol)')
         .is('removed_at', null)
         .order('code'),
     ])
@@ -51,10 +51,7 @@ export const getMyCurrencies = createServerFn({ method: 'GET' }).handler(
       throw new Error(`Currencies could not be loaded (${error?.code})`)
     }
     return {
-      currencies: list.data.map((row) => ({
-        ...toCurrency(row.code, row.currencies),
-        isFavourite: row.is_favourite,
-      })),
+      currencies: list.data.map((row) => toCurrency(row.code, row.currencies)),
       defaultCurrency: profile.data.default_currency,
       displayCurrency: profile.data.display_currency,
     }
@@ -152,16 +149,6 @@ export const addCurrency = createServerFn({ method: 'POST' })
     return inserted.error
       ? failed('currencies', 'insert', inserted.error.code)
       : { ok: true }
-  })
-
-export const setFavourite = createServerFn({ method: 'POST' })
-  .validator(codeInput.extend({ on: z.boolean() }))
-  .handler(async ({ data }): Promise<CurrencyResult> => {
-    const { error } = await getSupabase()
-      .from('user_currencies')
-      .update({ is_favourite: data.on })
-      .eq('code', data.code)
-    return error ? failed('currencies', 'favourite', error.code) : { ok: true }
   })
 
 /**

@@ -25,17 +25,18 @@ docs keep "merchant".
 ```
 ┌──────────────────────────────────┐
 │ ← Réglages                       │
-│ MAGASINS [Filtre▾][Tri▾][+ MAGASIN]│
+│ MAGASINS        [Filtre▾][Tri▾]  │
 │ [Rechercher                    ] │
 │ ┌──────────────────────────────┐ │
-│ │ IGA                      ⇉ 🗑 │ │
-│ │ (◉) Épicerie                  │ │
-│ │ Hydro-Québec             ⇉ 🗑 │ │
-│ │ (◉) Logement > Électricité    │ │
-│ │ Librairie Pantoute       ⇉ 🗑 │ │
+│ │ (◉) IGA                  ⇉ 🗑 │ │
+│ │     Épicerie                  │ │
+│ │ (◉) Hydro-Québec         ⇉ 🗑 │ │
+│ │     Logement > Électricité    │ │
+│ │ ( ) Librairie Pantoute   ⇉ 🗑 │ │
 │ └──────────────────────────────┘ │
+│                              (+) │
 └──────────────────────────────────┘
-⇉ merge into another   🗑 delete
+⇉ merge into another   🗑 delete   (+) add
 ```
 
 - **Trier** (MER-06, `SortMenu`): Nom A–Z (the default), Nom Z–A, Catégorie (by the
@@ -47,8 +48,9 @@ docs keep "merchant".
   catégorie". Shown once there is something to filter; not remembered.
 - A search field above the card that filters as you type, ignoring
   case and accents (`SearchField`). Nothing found: "Aucun résultat.".
-- Each row: the name, then on the second line its default category (icon and full path),
-  left out when there is none; on the right the actions. The number of transactions
+- Each row: the default category's icon as tall as the two lines beside it (an empty
+  dashed circle when there is none, so names line up), then the name with the category's
+  full path under it; on the right the actions. The number of transactions
   joins them, before the actions, with the transactions migration.
 - Tapping a row opens the form.
 

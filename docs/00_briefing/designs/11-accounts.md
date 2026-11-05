@@ -19,10 +19,9 @@ ACC-01, 02, 03, 04, 05, 06, 07. ACC-08 (last reconciled, last transaction) is ph
 ```
 ┌──────────────────────────────────┐
 │ ← Réglages                       │
-│ COMPTES                          │
-│ [Trier▾][+ INSTITUTION][+ COMPTE] │
+│ COMPTES                [⇕][Trier▾]│
 │ ┌──────────────────────────────┐ │
-│ │ ▾ Desjardins ↗  4 000,00 $ ✎ 🗑│ │
+│ │ ▾ Desjardins    4 000,00 $ ↗ 🗑│ │
 │ │ ──────────────────────────── │ │
 │ │ Chèque          1 204,10 $ ▣ 🗑│ │
 │ │ Compte chèque CAD             │ │
@@ -30,19 +29,22 @@ ACC-01, 02, 03, 04, 05, 06, 07. ACC-08 (last reconciled, last transaction) is ph
 │ │ Compte épargne CAD            │ │
 │ └──────────────────────────────┘ │
 │ ┌──────────────────────────────┐ │
-│ │ ▸ Wise ↗       ≈ 900,00 $ ✎ 🗑│ │
+│ │ ▸ Wise         ≈ 900,00 $ ↗ 🗑│ │
 │ └──────────────────────────────┘ │
 │ ▸ Comptes archivés (2)           │
+│                              (+) │
 └──────────────────────────────────┘
-▣ archive   🗑 delete   ✎ edit the institution
+▣ archive   ↗ website (muted without one)   🗑 delete   (+) add
 ```
 
 ### Groups (ACC-06)
 
 - One card per institution, alphabetical, then a last card "Sans institution" for accounts
-  without one (cash, an envelope). The header holds a chevron to collapse it, the name, an
-  external-link icon when the institution has a website (opens in a new tab), the total of
-  its open accounts, then a pencil (opens the institution sheet) and a trash.
+  without one (cash, an envelope). The header holds a chevron to collapse it, the name, the
+  total of its open accounts, then its actions: the external-link icon (opens the website
+  in a new tab; muted when there is none, a tap says "Aucun site web pour {name}.") and a
+  trash. Tapping the header opens the institution sheet, as a
+  row opens its form; the chevron alone collapses it (a pencil did this until 2026-11-05).
 - **The total** is in the display currency (CUR-06). If any account in the group is in
   another currency, the total is converted and carries the converted marker (CUR-09).
 - Collapsed groups are remembered per browser. "Tout déplier" / "Tout replier"
@@ -64,8 +66,8 @@ ACC-01, 02, 03, 04, 05, 06, 07. ACC-08 (last reconciled, last transaction) is ph
   muted, says "dont 45,00 $ en attente". The text carries the meaning; colour alone would
   not.
 - **Actions** in the row's action slot from `md` up, in the account sheet's header on
-  phones: archive (asks the date, default today) and trash. The institution's trash
-  moves the same way; its pencil stays on the card header.
+  phones: archive (asks the date, default today) and trash. The institution's website
+  and trash move the same way.
 - Tapping a row opens the account form. Once the transactions list exists (spec 14), it
   opens that list filtered to the account, with a pencil in its header for the form.
 
@@ -86,7 +88,9 @@ ACC-01, 02, 03, 04, 05, 06, 07. ACC-08 (last reconciled, last transaction) is ph
 
 ### Adding
 
-"+ Institution" and "+ Compte" beside the title, two `AddButton`s.
+The round + bottom right (`FloatingAddButton`) fans out two choices, Compte and
+Institution, each opening its sheet. From `md` up the amounts keep 16px more room before
+the row actions, so they never read as part of the icons.
 
 ## Account form
 
@@ -114,7 +118,7 @@ edits.
 - **Institution** (ACC-05): the shared combobox over the user's institutions. Typing
   filters; "Créer « {texte} »" adds a new one (name only, the website can come later); a ×
   clears it. No institution is an empty field.
-- **Devise**: the user's currencies, favourites first, prefilled with the default currency
+- **Devise**: the user's currencies by code, prefilled with the default currency
   (CUR-05). Locked once the account has a transaction: the field is disabled.
 - **Date d'ouverture**, its own field, then **Solde à l'ouverture** (ACC-02) as its
   sub-field, indented under it with a line down its left side (`LinkedFields`). The
@@ -127,8 +131,8 @@ edits.
 - **Nom** required, unique per user ignoring case. **Site web** optional, an `https://`
   URL.
 - The same sheet, with its own URL (`/settings/accounts/institutions/new`,
-  `/settings/accounts/institutions/{id}`). Opened from "+ Institution", from
-  the pencil on its card, or created inline from the account form.
+  `/settings/accounts/institutions/{id}`). Opened from Institution under the round +, from
+  its card header, or created inline from the account form.
 - **Delete** is the trash on its card header, muted while any account (open or archived)
   uses it; a tap says "Des comptes utilisent encore cette institution." in a toast.
 

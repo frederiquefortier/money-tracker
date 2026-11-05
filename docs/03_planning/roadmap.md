@@ -37,14 +37,15 @@ migration for `profiles.locale` is written (ADR-019).
 ## Phase 1: The ledger
 Replace daily use of the spreadsheet.
 
-**Status (2026-11-04):** currencies, the rates job and the Réglages and Devises screens
+**Status (2026-11-05):** currencies, the rates job and the Réglages and Devises screens
 (spec 10), institutions and accounts (spec 11), and categories (spec 12) are built and
 tried in local dev. Merchants (spec 13) are built with the category picker of spec 15.
 The transactions migration is pushed to dev: transactions, splits, transfers with fee,
 adjustments and real balances, with 39 pgTAP tests; a merge now moves transactions. The
 transaction form (spec 15) is built: amount, foreign currency with its fee, splits,
-merchant and category pickers with "Fréquentes". The list (spec 14) and transfers (spec
-16) come next.
+merchant and category pickers with "Fréquentes". Currency favourites are dropped (CUR-03)
+and every screen adds through one round + bottom right. The list (spec 14) and transfers
+(spec 16) come next.
 
 - Currencies, HexaRate validation, the Frankfurter rates job with a backfill to 2018,
   converted-amount markers. CUR-01..09 (ADR-009).

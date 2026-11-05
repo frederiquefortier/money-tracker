@@ -7,7 +7,6 @@ export const categoriesEn: typeof categoriesFr = {
   kind: { expense: 'Expense', income: 'Income', investment: 'Investment' },
   empty: 'No categories yet.',
   add: 'Add a category',
-  addShort: 'Category',
   newTitle: 'New category',
   editTitle: 'Edit category',
   created: 'Category created.',

@@ -4,6 +4,31 @@ Document architectural choices with context, alternatives considered, and trade-
 
 <!-- Newest first: a new ADR goes directly below this line. Template at the bottom. -->
 
+### ADR-024: Dates stay native, after a calendar was tried (2026-11-05)
+
+**Context:**
+- The author found the native date popup "not cute" on desktop and asked whether shadcn
+  had one that fits. A shared `DateField` was built the same day: a typed input with
+  shadcn's Calendar (react-day-picker 10) in the field's popover, on phones too.
+- Trying it, the author found the month and the year could not be chosen directly. The
+  options were month and year views inside the popover (more custom code) or
+  react-day-picker's month and year dropdowns (native selects again).
+
+**Decision:**
+- Back to `<input type="date">` everywhere, as ADR-011 says. The calendar, the shared
+  field and react-day-picker were removed before being committed.
+
+**Alternatives Considered:**
+- shadcn's Calendar in a shared field -> No direct jump to a month or a year; fixing that
+  meant either custom month and year views or native dropdowns inside a custom picker.
+- shadcn's Date Picker as is (a button opening the calendar) -> No typing, and the same
+  month and year problem.
+
+**Consequences:**
+- No date dependency; the OS picker on phones, the browser's on desktop, unthemed.
+- A later proposal for a custom date picker should start from this ADR: it needs a
+  direct month and year choice to be worth it.
+
 ### ADR-023: Generated database types, amounts kept as text (2026-11-03)
 
 **Context:**

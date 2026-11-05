@@ -63,7 +63,7 @@ column.
 | Table | Columns | Req |
 |---|---|---|
 | `profiles` | `user_id` (PK), `locale` (`fr` or `en`, ADR-019), `default_currency`, `display_currency` (both CAD on sign-up, composite FKs to `user_currencies`), `transfer_fee_category_id` (the fee category used last, set by `save_transfer`; cleared when the category is deleted), `birth_date`, `home_country`, `show_budget_tooltips` | SET, CUR-05/06, BUD-06, TRX-04 |
-| `user_currencies` | `code`, `is_favourite`, `removed_at` | CUR-01..04. Unique (`user_id`, `code`). Five rows inserted by the sign-up trigger. Removing sets `removed_at`, so adding back skips the HexaRate check; there is no delete grant. Triggers refuse removing the default or a currency an open account books in, move the display currency to the default when it is removed, and keep both profile currencies pointing at active rows. Open accounts will block removal once `accounts` exists. |
+| `user_currencies` | `code`, `removed_at` (`is_favourite` dropped 2026-11-05, CUR-03) | CUR-01..04. Unique (`user_id`, `code`). Five rows inserted by the sign-up trigger. Removing sets `removed_at`, so adding back skips the HexaRate check; there is no delete grant. Triggers refuse removing the default or a currency an open account books in, move the display currency to the default when it is removed, and keep both profile currencies pointing at active rows. Open accounts will block removal once `accounts` exists. |
 
 Labels in reference tables come in pairs (`label_fr`, `label_en`; `name_fr`, `name_en`)
 per ADR-008. User-owned rows (categories, merchants, notes) store one string, as typed.

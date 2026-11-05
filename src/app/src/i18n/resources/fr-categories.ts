@@ -6,7 +6,6 @@ export const categoriesFr = {
   kind: { expense: 'Dépense', income: 'Revenu', investment: 'Placement' },
   empty: 'Aucune catégorie pour l’instant.',
   add: 'Ajouter une catégorie',
-  addShort: 'Catégorie',
   newTitle: 'Nouvelle catégorie',
   editTitle: 'Modifier la catégorie',
   created: 'Catégorie créée.',

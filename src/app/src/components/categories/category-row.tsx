@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { CategoryActions } from '#/components/categories/category-actions'
 import { CategoryBadge } from '#/components/categories/category-badge'
 import { Icon } from '#/components/icon'
+import { iconHover } from '#/components/icon-button'
 import { rowHover } from '#/components/list-card'
 import type { Category } from '#/lib/categories'
 import { cn, focusRing } from '#/lib/utils'
@@ -44,7 +45,11 @@ function BranchToggle({
       onClick={onToggle}
       aria-expanded={expanded}
       aria-label={t('categories.branchName', { name })}
-      className={cn('shrink-0 cursor-pointer rounded-lg', focusRing)}
+      className={cn(
+        'shrink-0 cursor-pointer rounded-lg',
+        iconHover.self,
+        focusRing,
+      )}
     >
       <Icon
         name="chevron-down"

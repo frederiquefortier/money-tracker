@@ -20,9 +20,9 @@ CAT-08 (emergency fund exclusion) is phase 2.
 ```
 ┌──────────────────────────────────┐
 │ ← Réglages                       │
-│ CATÉGORIES [⇕][Tri▾][+ CATÉGORIE]│
-│ [Dépenses][Revenus][Placements]  │
+│ CATÉGORIES            [⇕][Tri▾]  │
 │ [Rechercher                    ] │
+│ [Dépenses][Revenus][Placements]  │
 │ ┌──────────────────────────────┐ │
 │ │ ▾ (◉) Alimentation    + ▣ 🗑 │ │
 │ │ ├──── (◉) Épicerie    + ▣ 🗑 │ │
@@ -31,6 +31,7 @@ CAT-08 (emergency fund exclusion) is phase 2.
 │ │   (◉) Loisirs         + ▣ 🗑 │ │
 │ └──────────────────────────────┘ │
 │ ▸ Catégories archivées (3)       │
+│                              (+) │
 └──────────────────────────────────┘
 ```
 
@@ -38,8 +39,7 @@ CAT-08 (emergency fund exclusion) is phase 2.
 
 - Three tabs, one per kind (CAT-02): Dépenses, Revenus, Placements. Dépenses is open by
   default. The tab is remembered per browser.
-- The add button sits beside the title, as on Comptes and Devises; it opens the form with
-  the open tab's type.
+- The round + bottom right (shared patterns) opens the form with the open tab's type.
 - **Tout déplier / Tout replier** (CAT-09, `ExpandAllButton`), an icon button beside the
   title, opens every branch in every tab, or closes them all once all are open.
 - One row per category: its icon in a filled circle of its colour, then the name.
@@ -49,7 +49,8 @@ CAT-08 (emergency fund exclusion) is phase 2.
   level, the default) or Couleur (rainbow order from red at every level, greys last).
   Kept per browser. Sibling colours are always worked out in alphabetical order, so
   sorting never recolours a branch.
-- **Search** (`SearchField`) under the tabs, in the open tab, ignoring case and accents.
+- **Search** (`SearchField`) above the tabs (moved there 2026-11-05), searching the open
+  tab, ignoring case and accents.
   The tree keeps each matching category with its parents, opened so the match shows;
   the archived section keeps the matches by name and opens. "Tout déplier" hides while
   searching. Nothing found: "Aucun résultat.".

@@ -12,6 +12,20 @@ import { Popover, PopoverAnchor, PopoverContent } from '#/components/ui/popover'
 import { treeGuides } from '#/lib/tree'
 import { cn, focusRing } from '#/lib/utils'
 
+// The chosen option is tinted, as in a native select; hover and the keyboard's position
+// are grey so the two never look alike.
+function optionClass(row: Row, selected: boolean, active: boolean) {
+  return cn(
+    'flex cursor-pointer items-center gap-2 rounded-xs px-2 py-2',
+    selected && 'bg-accent font-semibold text-accent-foreground',
+    'hover:bg-muted',
+    active && 'bg-muted',
+    row.kind === 'create' && 'font-semibold text-primary',
+    // Options under a heading sit one step in, so the heading reads as their parent.
+    row.kind === 'option' && row.option.group !== undefined && 'pl-6',
+  )
+}
+
 function ComboboxList({
   id,
   rows,
@@ -40,6 +54,7 @@ function ComboboxList({
         const newGroup =
           group !== undefined &&
           (previous?.kind !== 'option' || previous.option.group !== group)
+        const selected = row.kind === 'option' && row.option.value === value
         return (
           <Fragment
             key={
@@ -52,25 +67,14 @@ function ComboboxList({
             <li
               id={`${id}-${i}`}
               role="option"
-              aria-selected={
-                row.kind === 'option' && row.option.value === value
-              }
+              aria-selected={selected}
               // Keep focus in the input while choosing with the mouse.
               onMouseDown={(event) => event.preventDefault()}
               onClick={() => onPick(row)}
-              className={cn(
-                'flex cursor-pointer items-center gap-2 rounded-lg px-2 py-2',
-                'hover:bg-accent hover:text-accent-foreground',
-                i === active && 'bg-accent text-accent-foreground',
-                row.kind === 'create' && 'font-semibold text-primary',
-              )}
+              className={optionClass(row, selected, i === active)}
             >
               {row.kind === 'option' ? (
-                <OptionContent
-                  option={row.option}
-                  selected={row.option.value === value}
-                  guide={guides[i]}
-                />
+                <OptionContent option={row.option} guide={guides[i]} />
               ) : (
                 <>
                   <Icon name="plus" className="size-4" />
@@ -214,7 +218,7 @@ export function Combobox({
           />
         </PopoverAnchor>
         <PopoverContent
-          className="w-(--radix-popper-anchor-width) p-1"
+          className="w-(--radix-popper-anchor-width) rounded-field border-input p-1"
           onOpenAutoFocus={(event) => event.preventDefault()}
           // The field is outside the list; typing or clicking in it must not close it.
           onInteractOutside={(event) => {

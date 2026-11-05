@@ -19,7 +19,7 @@ TRX-01, 02, 05, 06, 09, 10, CUR-08, CAT-04, 06 (the category picker, below), MER
 
 - A round button with a plus, bottom right, above the tab bar on phones, in the primary
   colour with a white icon. On `md` and up it sits bottom right of the content.
-- It shows on the Transactions tab only.
+- It is the same round + as on every other screen (shared patterns).
 - It opens a new expense in a route sheet over the list (`/transactions/new`), so the back
   button and a reload work. The Transactions tab lives at `/transactions`; `/` leads
   there.
@@ -77,14 +77,14 @@ Répartir, the remaining line) is 13px, one step under its 14px lines. Top to bo
   icon is the category's in its colour, or an empty dashed circle; tapping it opens the
   category list (below). Every round category control answers the same way: a small
   badge in its corner, a pencil on a category icon (shown on hover and focus, always on
-  touch screens, as on the category form's icon), a plus on an empty circle (always
-  shown, the circle's only sign), whose dashed border also turns the full primary colour
+  touch screens, as on the category form's icon), a plus on an empty circle (the same
+  way, since 2026-11-05), whose dashed border also turns the full primary colour
   on hover and focus; the shared `EditHint`, scaled to the circle. Its name, and "Remboursement" for an income on an expense
   or placement category, is its tooltip and accessible name. The amount has no visible
   label; it is large, focused when a new transaction opens, with the decimal keypad, and
   accepts the locale's separator (`84,12`, `84.12`). The chip is prefilled with the
   account's currency and follows it when the account changes; its menu lists the user's
-  currencies, favourites first (CUR-03). Errors for the category or the amount show
+  currencies by code (CUR-03). Errors for the category or the amount show
   under this line.
 - **Répartir**, once a category is chosen: it itemizes the slip (Splits, below). Split,
   the same place reads **Ne pas répartir** and goes back to one category, the first
@@ -120,8 +120,9 @@ rule, the slip lists the categories, the first one starting with the category ch
 - One mode for the whole transaction: Montant, Parts or %.
 - Each line: the category's round icon and its full path, one button with the gap
   between them (both open the same category list), its value typed on the slip, and a ✕
-  to remove it. An empty dashed circle with its plus, no label ("Ajouter une catégorie"
-  as its accessible name), adds a line and opens the category list for it.
+  to remove it. A + icon button under the column of ✕ ("Ajouter une catégorie" as its
+  tooltip and accessible name) adds a line and opens the category list for it, so an
+  empty dashed circle only ever means a line waiting for its category.
 - **The remaining line** closes the lines, small and right-aligned: "✓ Tout est
   réparti" once everything is shared; a warning icon and "Reste 12,00 $ à répartir"
   while something is left, or "Dépasse le montant de 3,00 $" when the lines go over. In

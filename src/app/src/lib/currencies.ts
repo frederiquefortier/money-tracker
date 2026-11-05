@@ -11,10 +11,8 @@ export type Currency = {
   symbol: string
 }
 
-export type UserCurrency = Currency & { isFavourite: boolean }
-
 export type MyCurrencies = {
-  currencies: Array<UserCurrency>
+  currencies: Array<Currency>
   defaultCurrency: string
   displayCurrency: string
 }
@@ -25,15 +23,4 @@ export const RATES_HISTORY_START = '2018-01-02'
 
 export function currencyName(currency: Currency, locale: Locale) {
   return inLocale(locale, currency.nameFr, currency.nameEn)
-}
-
-/** Favourites first, then alphabetical by code (CUR-03). */
-export function pickerOrder<T extends UserCurrency>(
-  currencies: ReadonlyArray<T>,
-): Array<T> {
-  return [...currencies].sort(
-    (a, b) =>
-      Number(b.isFavourite) - Number(a.isFavourite) ||
-      a.code.localeCompare(b.code),
-  )
 }

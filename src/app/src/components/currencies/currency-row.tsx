@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next'
 import { IconActions, IconButton } from '#/components/icon-button'
 import { Tag } from '#/components/tag'
 import { RATES_HISTORY_START, currencyName } from '#/lib/currencies'
-import type { Currency, UserCurrency } from '#/lib/currencies'
+import type { Currency } from '#/lib/currencies'
 import { formatDate } from '#/lib/format'
 import { useLocale } from '#/lib/use-locale'
 
@@ -53,15 +53,13 @@ export function CurrencyRow({
   isDefault,
   removeHint,
   ratesFrom,
-  onFavourite,
   onMakeDefault,
   onRemove,
 }: {
-  currency: UserCurrency
+  currency: Currency
   isDefault: boolean
   removeHint: string | null
   ratesFrom: string | null | undefined
-  onFavourite: (on: boolean) => void
   onMakeDefault: () => void
   onRemove: () => void
 }) {
@@ -71,13 +69,7 @@ export function CurrencyRow({
     <li className="py-2.5 pr-2 pl-4">
       <div className="flex items-center gap-3">
         <CurrencyLabel currency={currency} isDefault={isDefault} />
-        <IconActions slots={3} placement="always">
-          <IconButton
-            icon={currency.isFavourite ? 'star-fill' : 'star'}
-            label={t('currencies.favourite', { code })}
-            pressed={currency.isFavourite}
-            onClick={() => onFavourite(!currency.isFavourite)}
-          />
+        <IconActions slots={2} placement="always">
           <IconButton
             icon="house-check"
             label={

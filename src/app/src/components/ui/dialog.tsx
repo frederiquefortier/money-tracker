@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { Dialog as DialogPrimitive } from 'radix-ui'
 import { Icon } from '#/components/icon'
+import { iconAction } from '#/components/icon-button'
 import { cn } from '#/lib/utils'
 
 // shadcn's dialog, as a bottom sheet on phones and a centred card from sm up.
@@ -32,7 +33,9 @@ function DialogContent({
         {...props}
       >
         {children}
-        <DialogPrimitive.Close className="absolute top-4 right-4 rounded-full p-1 text-muted-foreground hover:text-foreground outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">
+        <DialogPrimitive.Close
+          className={cn(iconAction(), 'absolute top-3 right-3')}
+        >
           <Icon name="close" label={closeLabel} className="size-5" />
         </DialogPrimitive.Close>
       </DialogPrimitive.Content>
