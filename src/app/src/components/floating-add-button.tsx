@@ -33,32 +33,21 @@ function offset(i: number, count: number) {
   }
 }
 
-/**
- * The round add button of every screen. With one option it goes straight to its form;
- * with several, it turns into a ✕ and fans them out on a quarter circle.
- */
-export function FloatingAddButton({
+/** The round add button of a screen that adds one thing: straight to its form. */
+export function FloatingAddLink({
   label,
-  options,
-}: {
-  label: string
-  options: ReadonlyArray<AddOption>
-}) {
-  if (options.length === 1) {
-    const { to, search, label: optionLabel } = options[0]
-    return (
-      <Link
-        to={to}
-        search={search}
-        aria-label={optionLabel}
-        title={optionLabel}
-        className={cn(position, round)}
-      >
-        <Icon name="plus" className="size-6" />
-      </Link>
-    )
-  }
-  return <RadialAddMenu label={label} options={options} />
+  ...target
+}: Target & { label: string }) {
+  return (
+    <Link
+      {...target}
+      aria-label={label}
+      title={label}
+      className={cn(position, round)}
+    >
+      <Icon name="plus" className="size-6" />
+    </Link>
+  )
 }
 
 function useEscape(active: boolean, onEscape: () => void) {
@@ -114,7 +103,11 @@ function RadialOption({
   )
 }
 
-function RadialAddMenu({
+/**
+ * The round add button of a screen that adds several things: it turns into a ✕ and fans
+ * them out on a quarter circle.
+ */
+export function FloatingAddButton({
   label,
   options,
 }: {

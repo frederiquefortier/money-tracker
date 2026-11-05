@@ -1,50 +1,43 @@
 import { createServerFn } from '@tanstack/react-start'
-import { z } from 'zod'
-import { compareDecimal } from '#/lib/accounts'
-import { currencyCodeSchema } from '#/lib/currencies'
-import { failed } from '#/lib/result'
+import { loaded } from '#/lib/db.server'
+import { absDecimal, compareDecimal } from '#/lib/money'
+import { failureFor } from '#/lib/result'
 import type { Result } from '#/lib/result'
+import { idInput } from '#/lib/schemas'
 import { getSupabase } from '#/lib/supabase.server'
 import {
   SPLIT_MODES,
   TRANSACTION_KINDS,
   transactionInputSchema,
 } from '#/lib/transactions'
+import { isOneOf } from '#/lib/utils'
 import type {
   FormAccount,
-  SplitMode,
+  FrequentCategories,
   Transaction,
-  TransactionKind,
 } from '#/lib/transactions'
 
 export type TransactionError = 'notFound' | 'failed'
 type TransactionResult<T = object> = Result<TransactionError, T>
 
-/** Per kind, the ids of the categories used most lately, most used first (CAT-06). */
-export type FrequentCategories = Record<TransactionKind, Array<string>>
+const failure = failureFor<TransactionError>('transactions', {
+  P0002: 'notFound',
+})
 
-function failure(
-  context: string,
-  error: { code?: string },
-): { ok: false; error: TransactionError } {
-  if (error.code === 'P0002') return { ok: false, error: 'notFound' }
-  return failed('transactions', context, error.code)
-}
-
-const isKind = (kind: string): kind is TransactionKind =>
-  (TRANSACTION_KINDS as ReadonlyArray<string>).includes(kind)
-const isMode = (mode: string): mode is SplitMode =>
-  (SPLIT_MODES as ReadonlyArray<string>).includes(mode)
+const isKind = isOneOf(TRANSACTION_KINDS)
+const isMode = isOneOf(SPLIT_MODES)
 
 /** Every account, so an old transaction still shows its closed or hidden one. */
 export const getFormAccounts = createServerFn({ method: 'GET' }).handler(
   async (): Promise<Array<FormAccount>> => {
-    const { data, error } = await getSupabase()
-      .from('accounts')
-      .select(
-        'id, name, currency, closed_on, hidden_for_new, institutions(name)',
-      )
-    if (error) throw new Error(`Accounts could not be loaded (${error.code})`)
+    const [data] = loaded(
+      'Accounts',
+      await getSupabase()
+        .from('accounts')
+        .select(
+          'id, name, currency, closed_on, hidden_for_new, institutions(name)',
+        ),
+    )
     return data.map((a) => ({
       id: a.id,
       name: a.name,
@@ -58,12 +51,13 @@ export const getFormAccounts = createServerFn({ method: 'GET' }).handler(
 
 export const getFrequentCategories = createServerFn({ method: 'GET' }).handler(
   async (): Promise<FrequentCategories> => {
-    const { data, error } = await getSupabase()
-      .from('frequent_categories')
-      .select('kind, category_id, rank')
-      .order('rank')
-    if (error)
-      throw new Error(`Frequent categories could not be loaded (${error.code})`)
+    const [data] = loaded(
+      'Frequent categories',
+      await getSupabase()
+        .from('frequent_categories')
+        .select('kind, category_id, rank')
+        .order('rank'),
+    )
     const frequent: FrequentCategories = { expense: [], income: [] }
     for (const row of data) {
       if (row.kind && isKind(row.kind) && row.category_id)
@@ -75,7 +69,7 @@ export const getFrequentCategories = createServerFn({ method: 'GET' }).handler(
 
 /** An expense or income with its splits; null for anything else, such as a transfer. */
 export const getTransaction = createServerFn({ method: 'GET' })
-  .validator(z.object({ id: z.uuid() }))
+  .validator(idInput)
   .handler(async ({ data }): Promise<Transaction | null> => {
     const { data: row, error } = await getSupabase()
       .from('transactions')
@@ -104,28 +98,10 @@ export const getTransaction = createServerFn({ method: 'GET' })
       // Splits keep no order of their own; largest first reads best.
       splits: [...splits]
         .sort((a, b) =>
-          compareDecimal(b.amount.replace('-', ''), a.amount.replace('-', '')),
+          compareDecimal(absDecimal(b.amount), absDecimal(a.amount)),
         )
         .map((s) => ({ categoryId: s.category_id, value: s.input_value })),
     }
-  })
-
-/** Units of `to` for one `from` on `date`, as exact text; null when a rate is missing. */
-export const getRate = createServerFn({ method: 'GET' })
-  .validator(
-    z.object({
-      from: currencyCodeSchema,
-      to: currencyCodeSchema,
-      date: z.iso.date(),
-    }),
-  )
-  .handler(async ({ data }): Promise<string | null> => {
-    const { data: rate, error } = await getSupabase().rpc(
-      'exchange_rate_text',
-      { from_currency: data.from, to_currency: data.to, on_date: data.date },
-    )
-    if (error) throw new Error(`The rate could not be loaded (${error.code})`)
-    return rate
   })
 
 /** One SQL function writes the transaction and its splits together (ADR-012). */
@@ -155,7 +131,7 @@ export const saveTransaction = createServerFn({ method: 'POST' })
 
 /** An expense or income; a transfer's parts are deleted together (spec 16). */
 export const deleteTransaction = createServerFn({ method: 'POST' })
-  .validator(z.object({ id: z.uuid() }))
+  .validator(idInput)
   .handler(async ({ data }): Promise<TransactionResult> => {
     const { data: deleted, error } = await getSupabase()
       .from('transactions')

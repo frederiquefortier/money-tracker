@@ -1,7 +1,7 @@
 import { Outlet, createFileRoute } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
-import { ComingSoon } from '#/components/coming-soon'
-import { FloatingAddButton } from '#/components/floating-add-button'
+import { MessageCard } from '#/components/message-card'
+import { FloatingAddLink } from '#/components/floating-add-button'
 
 export const Route = createFileRoute('/_authed/transactions')({
   component: Transactions,
@@ -12,20 +12,11 @@ function Transactions() {
   const { t } = useTranslation()
   return (
     <>
-      <ComingSoon
+      <MessageCard
         title={t('nav.transactions')}
         text={t('comingSoon.transactions')}
       />
-      <FloatingAddButton
-        label={t('transactions.add')}
-        options={[
-          {
-            to: '/transactions/new',
-            label: t('transactions.add'),
-            icon: 'plus',
-          },
-        ]}
-      />
+      <FloatingAddLink to="/transactions/new" label={t('transactions.add')} />
       <Outlet />
     </>
   )

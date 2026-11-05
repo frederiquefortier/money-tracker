@@ -9,6 +9,7 @@ import { signInSchema, totpCodeSchema } from '#/lib/schemas'
 import { LOCALES, LOCALE_COOKIE, isLocale, resolveLocale } from '#/i18n/locales'
 import type { Locale } from '#/i18n/locales'
 import type { Result } from '#/lib/result'
+import { SIGNED_OUT, updateProfile } from '#/lib/db.server'
 import { getSupabase } from '#/lib/supabase.server'
 
 export type Session = {
@@ -58,16 +59,10 @@ export const setLocale = createServerFn({ method: 'POST' })
   .validator(z.object({ locale: z.enum(LOCALES) }))
   .handler(async ({ data }): Promise<Result<never>> => {
     writeLocaleCookie(data.locale)
-    const supabase = getSupabase()
-    const { data: auth } = await supabase.auth.getClaims()
-    // aal1 cannot write the profile (MFA policy); the cookie still applies.
-    if (auth?.claims) {
-      const { error } = await supabase
-        .from('profiles')
-        .update({ locale: data.locale })
-        .eq('user_id', auth.claims.sub)
-      if (error) console.error('[profile] locale not saved:', error.code)
-    }
+    // Signed out, or at aal1 (MFA policy), the profile stays; the cookie still applies.
+    const { error } = await updateProfile({ locale: data.locale })
+    if (error && error !== SIGNED_OUT)
+      console.error('[profile] locale not saved:', error.code)
     return { ok: true }
   })
 

@@ -5,8 +5,10 @@ import {
   accountInputSchema,
   institutionInputSchema,
 } from '#/lib/accounts'
-import { failed } from '#/lib/result'
+import { loaded, saveRow } from '#/lib/db.server'
+import { failureFor } from '#/lib/result'
 import type { Result } from '#/lib/result'
+import { idInput } from '#/lib/schemas'
 import { getSupabase } from '#/lib/supabase.server'
 
 export type AccountType = { code: string; labelFr: string; labelEn: string }
@@ -46,18 +48,13 @@ export type AccountError =
   'nameTaken' | 'inUse' | 'currencyRemoved' | 'notFound' | 'failed'
 type AccountResult<T = object> = Result<AccountError, T>
 
-const idInput = z.object({ id: z.uuid() })
-
-function failure(
-  context: string,
-  error: { code?: string; message?: string },
-): { ok: false; error: AccountError } {
-  if (error.code === '23505') return { ok: false, error: 'nameTaken' }
-  if (error.code === '23503') return { ok: false, error: 'inUse' }
-  if (error.message === 'currency_removed')
-    return { ok: false, error: 'currencyRemoved' }
-  return failed('accounts', context, error.code)
+const KNOWN: Partial<Record<string, AccountError>> = {
+  '23505': 'nameTaken',
+  '23503': 'inUse',
+  currency_removed: 'currencyRemoved',
 }
+
+const failure = failureFor('accounts', KNOWN)
 
 // Amounts as text: PostgREST sends numeric as a JSON number, a float (ADR-004).
 const ACCOUNT_COLUMNS =
@@ -76,12 +73,13 @@ type AccountRow = {
 }
 
 async function getTypes() {
-  const { data, error } = await getSupabase()
-    .from('account_types')
-    .select('code, label_fr, label_en')
-    .order('code')
-  if (error)
-    throw new Error(`Account types could not be loaded (${error.code})`)
+  const [data] = loaded(
+    'Account types',
+    await getSupabase()
+      .from('account_types')
+      .select('code, label_fr, label_en')
+      .order('code'),
+  )
   return data.map((t) => ({
     code: t.code,
     labelFr: t.label_fr,
@@ -90,11 +88,13 @@ async function getTypes() {
 }
 
 async function getInstitutions(): Promise<Array<Institution>> {
-  const { data, error } = await getSupabase()
-    .from('institutions')
-    .select('id, name, website_url')
-    .order('name')
-  if (error) throw new Error(`Institutions could not be loaded (${error.code})`)
+  const [data] = loaded(
+    'Institutions',
+    await getSupabase()
+      .from('institutions')
+      .select('id, name, website_url')
+      .order('name'),
+  )
   return data.map((i) => ({
     id: i.id,
     name: i.name,
@@ -105,8 +105,8 @@ async function getInstitutions(): Promise<Array<Institution>> {
 export const getAccounts = createServerFn({ method: 'GET' }).handler(
   async (): Promise<AccountsPage> => {
     const supabase = getSupabase()
-    const [accounts, balances, totals, institutions, types] = await Promise.all(
-      [
+    const [results, institutions, types] = await Promise.all([
+      Promise.all([
         supabase.from('accounts').select(ACCOUNT_COLUMNS),
         supabase
           .from('account_balances')
@@ -116,18 +116,15 @@ export const getAccounts = createServerFn({ method: 'GET' }).handler(
         supabase
           .from('institution_totals')
           .select('institution_id, total::text, converted'),
-        getInstitutions(),
-        getTypes(),
-      ],
-    )
-    if (accounts.error || balances.error || totals.error) {
-      const code = (accounts.error ?? balances.error ?? totals.error)?.code
-      throw new Error(`Accounts could not be loaded (${code})`)
-    }
+      ]),
+      getInstitutions(),
+      getTypes(),
+    ])
+    const [accounts, balances, totals] = loaded('Accounts', ...results)
 
-    const byAccount = new Map(balances.data.map((b) => [b.account_id, b]))
+    const byAccount = new Map(balances.map((b) => [b.account_id, b]))
     return {
-      accounts: accounts.data.map((a) => {
+      accounts: accounts.map((a) => {
         const b = byAccount.get(a.id)
         return {
           ...toAccount(a),
@@ -138,7 +135,7 @@ export const getAccounts = createServerFn({ method: 'GET' }).handler(
       }),
       institutions,
       totals: Object.fromEntries(
-        totals.data.map((t) => [
+        totals.map((t) => [
           t.institution_id ?? NO_INSTITUTION,
           { total: t.total, converted: t.converted ?? false },
         ]),
@@ -174,11 +171,7 @@ export const saveAccount = createServerFn({ method: 'POST' })
       opened_on: data.openedOn,
       hidden_for_new: data.hiddenForNew,
     }
-    const supabase = getSupabase()
-    const query = data.id
-      ? supabase.from('accounts').update(values).eq('id', data.id)
-      : supabase.from('accounts').insert(values)
-    const { data: saved, error } = await query.select('id').maybeSingle()
+    const { saved, error } = await saveRow('accounts', data.id, values)
     if (error) return failure('save', error)
     if (!saved) return { ok: false, error: 'notFound' }
     return { ok: true, id: saved.id }
@@ -218,12 +211,10 @@ export const deleteAccount = createServerFn({ method: 'POST' })
 export const saveInstitution = createServerFn({ method: 'POST' })
   .validator(institutionInputSchema)
   .handler(async ({ data }): Promise<AccountResult<{ id: string }>> => {
-    const values = { name: data.name, website_url: data.websiteUrl || null }
-    const supabase = getSupabase()
-    const query = data.id
-      ? supabase.from('institutions').update(values).eq('id', data.id)
-      : supabase.from('institutions').insert(values)
-    const { data: saved, error } = await query.select('id').maybeSingle()
+    const { saved, error } = await saveRow('institutions', data.id, {
+      name: data.name,
+      website_url: data.websiteUrl || null,
+    })
     if (error) return failure('institution', error)
     if (!saved) return { ok: false, error: 'notFound' }
     return { ok: true, id: saved.id }

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { getRate } from '#/server/transactions'
+import { getRate } from '#/server/currencies'
 
 /**
  * The rate from one currency to another on a date, as exact text (CUR-08). `undefined`

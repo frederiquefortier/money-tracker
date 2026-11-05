@@ -3,9 +3,11 @@ import { useId, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ArchivedCategories } from '#/components/categories/archived-categories'
 import { CategoryTree } from '#/components/categories/category-tree'
+import { EmptyState } from '#/components/list-card'
 import { KindTabs } from '#/components/categories/kind-tabs'
+import { useExpandedBranches } from '#/components/categories/use-expanded-branches'
 import { ExpandAllButton } from '#/components/expand-all-button'
-import { FloatingAddButton } from '#/components/floating-add-button'
+import { FloatingAddLink } from '#/components/floating-add-button'
 import { SearchField } from '#/components/search-field'
 import { SettingsPage } from '#/components/settings-page'
 import { SortMenu } from '#/components/sort-menu'
@@ -23,7 +25,7 @@ import {
 import type { Category, CategorySort, Kind } from '#/lib/categories'
 import { useLocale } from '#/lib/use-locale'
 import { useStoredState } from '#/lib/use-stored-state'
-import { foldForSearch } from '#/lib/utils'
+import { foldForSearch, indexById, oneOf } from '#/lib/utils'
 import { getCategories } from '#/server/categories'
 
 export const Route = createFileRoute('/_authed/settings/categories')({
@@ -31,10 +33,8 @@ export const Route = createFileRoute('/_authed/settings/categories')({
   component: Categories,
 })
 
-const parseKind = (v: unknown) => KINDS.find((k) => k === v)
-const parseSort = (v: unknown) => CATEGORY_SORTS.find((s) => s === v)
-const parseIds = (v: unknown) =>
-  Array.isArray(v) && v.every((x) => typeof x === 'string') ? v : undefined
+const parseKind = oneOf(KINDS)
+const parseSort = oneOf(CATEGORY_SORTS)
 
 /** The active categories whose name matches, with their parents so each keeps its path. */
 function matchesWithParents(
@@ -70,7 +70,7 @@ function shape(
   }: { kind: Kind; sort: CategorySort; locale: Locale; query: string },
 ) {
   const collator = FORMAT_LOCALE[locale]
-  const byId = new Map(categories.map((c) => [c.id, c]))
+  const byId = indexById(categories)
   const ofKind = categories.filter((c) => c.kind === kind)
   const activeOfKind = ofKind.filter((c) => !isArchived(c))
   const found = query ? matchesWithParents(activeOfKind, query, byId) : null
@@ -104,43 +104,12 @@ function shape(
 function AddCategoryButton({ kind }: { kind: Kind }) {
   const { t } = useTranslation()
   return (
-    <FloatingAddButton
+    <FloatingAddLink
+      to="/settings/categories/new"
+      search={{ kind }}
       label={t('categories.add')}
-      options={[
-        {
-          to: '/settings/categories/new',
-          search: { kind },
-          label: t('categories.add'),
-          icon: 'plus',
-        },
-      ]}
     />
   )
-}
-
-/** Open branches, remembered per browser, shared by every tab. */
-function useExpanded(parents: ReadonlyArray<string>) {
-  const [expanded, setExpanded] = useStoredState<Array<string>>(
-    'categories.expanded',
-    [],
-    parseIds,
-  )
-  const allExpanded =
-    parents.length > 0 && parents.every((id) => expanded.includes(id))
-  return {
-    expanded: new Set(expanded),
-    allExpanded,
-    toggle: (id: string) =>
-      setExpanded(
-        expanded.includes(id)
-          ? expanded.filter((x) => x !== id)
-          : [...expanded, id],
-      ),
-    toggleAll: () => setExpanded(allExpanded ? [] : [...parents]),
-    expand: (id: string) => {
-      if (!expanded.includes(id)) setExpanded([...expanded, id])
-    },
-  }
 }
 
 /** The tab and the sort, remembered per browser. */
@@ -170,7 +139,7 @@ function Categories() {
     { kind, sort, locale, query: foldForSearch(query) },
   )
   const roots = childrenOf.get(null) ?? []
-  const branches = useExpanded(parents)
+  const branches = useExpandedBranches(parents)
 
   return (
     <SettingsPage
@@ -203,14 +172,10 @@ function Categories() {
         className="flex flex-col gap-4"
       >
         {ofKind.length === 0 && (
-          <p className="py-6 text-center text-muted-foreground">
-            {t('categories.empty')}
-          </p>
+          <EmptyState>{t('categories.empty')}</EmptyState>
         )}
         {found && roots.length === 0 && archived.length === 0 && (
-          <p className="py-6 text-center text-muted-foreground">
-            {t('common.noMatch')}
-          </p>
+          <EmptyState>{t('common.noMatch')}</EmptyState>
         )}
         {roots.length > 0 && (
           <CategoryTree

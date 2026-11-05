@@ -2,6 +2,9 @@
 // The server recomputes everything; these only have to agree with it, so rounding is half
 // away from zero, like Postgres's round() on numeric.
 
+import { FORMAT_LOCALE } from '#/i18n/locales'
+import type { Locale } from '#/i18n/locales'
+
 const TEN = 10n
 
 /** Digits after the decimal point for a currency: 2 for CAD, 0 for JPY. */
@@ -101,4 +104,58 @@ export function percentOf(total: bigint, percent: string): bigint {
 export function ratio(part: bigint, whole: bigint): string | null {
   if (whole === 0n) return null
   return fromMinor(divideRounded(part * 1000n, whole), 3)
+}
+
+/** "1 250,50", "-500" or "1250.5" to a plain decimal string; null when not an amount. */
+export function parseAmount(input: string): string | null {
+  const cleaned = input.replace(/[\s\u00a0\u202f]/g, '').replace(',', '.')
+  if (!/^-?\d{1,15}(\.\d{1,4})?$/.test(cleaned)) return null
+  return cleaned
+}
+
+/** Compares decimal strings exactly, without going through a float (ADR-004). */
+export function compareDecimal(a: string, b: string): number {
+  const negA = a.startsWith('-')
+  const negB = b.startsWith('-')
+  if (negA !== negB) return negA ? -1 : 1
+  const [intA = '', fracA = ''] = a.replace('-', '').split('.')
+  const [intB = '', fracB = ''] = b.replace('-', '').split('.')
+  const width = Math.max(fracA.length, fracB.length)
+  const digitsA = intA.replace(/^0+(?=\d)/, '') + fracA.padEnd(width, '0')
+  const digitsB = intB.replace(/^0+(?=\d)/, '') + fracB.padEnd(width, '0')
+  const magnitude =
+    digitsA.length - digitsB.length || digitsA.localeCompare(digitsB)
+  const sign = Math.sign(magnitude)
+  return negA ? -sign : sign
+}
+
+/** The sign dropped: the transaction form types amounts unsigned, the kind carries it. */
+export function absDecimal(decimal: string): string {
+  return decimal.replace(/^-/, '')
+}
+
+function decimalSeparator(locale: Locale): string {
+  return (
+    new Intl.NumberFormat(FORMAT_LOCALE[locale])
+      .formatToParts(1.5)
+      .find((part) => part.type === 'decimal')?.value ?? '.'
+  )
+}
+
+/**
+ * A stored decimal ("-84.1200") as typed in this locale: "-84,12" with the currency's
+ * decimals at least, or "1,5" for a share or percentage (`currency` null).
+ */
+export function amountForInput(
+  amount: string,
+  currency: string | null,
+  locale: Locale,
+): string {
+  const digits = currency === null ? 0 : minorDigits(currency)
+  const minor = toMinor(amount, 4)
+  const [int = '0', frac = ''] = (
+    minor === null ? amount : fromMinor(minor, 4)
+  ).split('.')
+  const kept = frac.replace(/0+$/, '').padEnd(digits, '0')
+  return kept ? `${int}${decimalSeparator(locale)}${kept}` : int
 }

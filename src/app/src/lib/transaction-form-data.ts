@@ -1,4 +1,4 @@
-import type { TransactionFormData } from '#/components/transactions/transaction-form'
+import type { TransactionFormData } from '#/lib/transactions'
 import { getCategories } from '#/server/categories'
 import { getMerchants } from '#/server/merchants'
 import { getFormAccounts, getFrequentCategories } from '#/server/transactions'

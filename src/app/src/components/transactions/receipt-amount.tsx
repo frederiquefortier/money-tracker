@@ -14,7 +14,7 @@ import { Checkbox } from '#/components/ui/checkbox'
 import { FORMAT_LOCALE } from '#/i18n/locales'
 import type { Category } from '#/lib/categories'
 import type { Currency } from '#/lib/currencies'
-import { forInput } from '#/lib/transaction-draft'
+import { absDecimal, amountForInput } from '#/lib/money'
 import type { Draft } from '#/lib/transaction-draft'
 import { bookedMinor, foreignPreview } from '#/lib/transaction-preview'
 import { useLocale } from '#/lib/use-locale'
@@ -51,7 +51,8 @@ function ForeignLines({
   const preview = foreignPreview(draft, accountCurrency, rate ?? null)
   const paid = draft.paidByHand
     ? draft.paid
-    : preview.prefill && forInput(preview.prefill, accountCurrency, locale)
+    : preview.prefill &&
+      amountForInput(absDecimal(preview.prefill), accountCurrency, locale)
   const percent = new Intl.NumberFormat(format, {
     style: 'percent',
     maximumFractionDigits: 1,

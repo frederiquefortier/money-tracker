@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { AccountGroup } from '#/components/accounts/account-group'
 import type { ListedAccount } from '#/components/accounts/account-row'
 import { ClosedAccounts } from '#/components/accounts/closed-accounts'
+import { EmptyState } from '#/components/list-card'
 import { ExpandAllButton } from '#/components/expand-all-button'
 import { FloatingAddButton } from '#/components/floating-add-button'
 import { SettingsPage } from '#/components/settings-page'
@@ -13,7 +14,8 @@ import { NO_INSTITUTION, SORTS, sortAccounts, typeLabel } from '#/lib/accounts'
 import type { Sort } from '#/lib/accounts'
 import { useLocale } from '#/lib/use-locale'
 import { useMyCurrencies } from '#/lib/use-my-currencies'
-import { useStoredState } from '#/lib/use-stored-state'
+import { useStoredIds, useStoredState } from '#/lib/use-stored-state'
+import { oneOf } from '#/lib/utils'
 import { getAccounts } from '#/server/accounts'
 import type { AccountsPage } from '#/server/accounts'
 
@@ -22,10 +24,7 @@ export const Route = createFileRoute('/_authed/settings/accounts')({
   component: Accounts,
 })
 
-const parseSort = (v: unknown) =>
-  SORTS.find((s) => s === v) satisfies Sort | undefined
-const parseIds = (v: unknown) =>
-  Array.isArray(v) && v.every((x) => typeof x === 'string') ? v : undefined
+const parseSort = oneOf(SORTS)
 
 const groupKey = (institutionId: string | null) =>
   institutionId ?? NO_INSTITUTION
@@ -89,28 +88,12 @@ function Accounts() {
     'name',
     parseSort,
   )
-  const [collapsed, setCollapsed] = useStoredState<Array<string>>(
-    'accounts.collapsed',
-    [],
-    parseIds,
-  )
+  const collapsed = useStoredIds('accounts.collapsed')
 
   const { listed, open, groups, used } = shape(page, locale, sort)
 
   const keys = groups.map((group) => group.key)
-  const allExpanded = keys.every((key) => !collapsed.includes(key))
-
-  function toggleAll() {
-    setCollapsed(allExpanded ? keys : [])
-  }
-
-  function toggle(key: string) {
-    setCollapsed(
-      collapsed.includes(key)
-        ? collapsed.filter((k) => k !== key)
-        : [...collapsed, key],
-    )
-  }
+  const allExpanded = keys.every((key) => !collapsed.ids.has(key))
 
   return (
     <SettingsPage
@@ -118,7 +101,10 @@ function Accounts() {
       actions={
         <>
           {keys.length > 0 && (
-            <ExpandAllButton allExpanded={allExpanded} onToggle={toggleAll} />
+            <ExpandAllButton
+              allExpanded={allExpanded}
+              onToggle={() => collapsed.setAll(keys, allExpanded)}
+            />
           )}
           <SortMenu
             sort={sort}
@@ -130,9 +116,7 @@ function Accounts() {
       }
     >
       {page.accounts.length === 0 && (
-        <p className="py-6 text-center text-muted-foreground">
-          {t('accounts.empty')}
-        </p>
+        <EmptyState>{t('accounts.empty')}</EmptyState>
       )}
       {groups.map(({ key, institution }) => (
         <AccountGroup
@@ -142,8 +126,8 @@ function Accounts() {
           inUse={used.has(key)}
           total={page.totals[key]}
           displayCurrency={displayCurrency}
-          collapsed={collapsed.includes(key)}
-          onToggle={() => toggle(key)}
+          collapsed={collapsed.ids.has(key)}
+          onToggle={() => collapsed.toggle(key)}
         />
       ))}
       <ClosedAccounts

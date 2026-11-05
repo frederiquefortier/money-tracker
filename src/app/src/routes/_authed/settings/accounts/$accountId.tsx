@@ -3,9 +3,8 @@ import { useTranslation } from 'react-i18next'
 import { AccountActions } from '#/components/accounts/account-actions'
 import { AccountForm } from '#/components/accounts/account-form'
 import { RouteSheet } from '#/components/route-sheet'
-import { useToast } from '#/components/toaster'
-import { amountForInput } from '#/lib/accounts'
-import { useAccountsPage } from '#/lib/use-accounts-page'
+import { amountForInput } from '#/lib/money'
+import { useAccountsPage } from '#/lib/use-page-data'
 import { useLocale } from '#/lib/use-locale'
 
 export const Route = createFileRoute('/_authed/settings/accounts/$accountId')({
@@ -15,7 +14,6 @@ export const Route = createFileRoute('/_authed/settings/accounts/$accountId')({
 
 function EditAccount() {
   const { t } = useTranslation()
-  const toast = useToast()
   const { accounts, institutions, types } = useAccountsPage()
   const locale = useLocale()
   const { accountId } = Route.useParams()
@@ -35,14 +33,18 @@ function EditAccount() {
           name: account.name,
           type: account.type,
           currency: account.currency,
-          openingBalance: amountForInput(account.openingBalance, locale),
+          openingBalance: amountForInput(
+            account.openingBalance,
+            account.currency,
+            locale,
+          ),
           openedOn: account.openedOn,
           hiddenForNew: account.hiddenForNew,
         }}
         initialInstitutionId={account.institutionId}
         institutions={institutions}
         types={types}
-        onSaved={() => toast({ text: t('accounts.updated') })}
+        savedText={t('accounts.updated')}
       />
     </RouteSheet>
   )

@@ -1,4 +1,4 @@
-import { useActionState, useId } from 'react'
+import { useId } from 'react'
 import { useTranslation } from 'react-i18next'
 import { AppearanceFields } from '#/components/categories/appearance-fields'
 import { CategoryBadge } from '#/components/categories/category-badge'
@@ -11,8 +11,8 @@ import type {
 } from '#/components/categories/use-category-draft'
 import { Combobox } from '#/components/combobox'
 import { FormField } from '#/components/form-field'
-import { useCloseSheet } from '#/components/route-sheet'
 import { SheetForm } from '#/components/sheet-form'
+import { useSheetForm } from '#/components/use-sheet-form'
 import { FORMAT_LOCALE } from '#/i18n/locales'
 import {
   categoryFormSchema,
@@ -23,40 +23,11 @@ import {
   usedTopColors,
 } from '#/lib/categories'
 import type { Category } from '#/lib/categories'
-import {
-  formValues,
-  savedState,
-  useFieldValidation,
-  useFocusFirstError,
-  validate,
-} from '#/lib/form'
-import type { FormState } from '#/lib/form'
 import { necessitySource } from '#/lib/necessity'
 import { useLocale } from '#/lib/use-locale'
 import { treeOrder } from '#/lib/tree'
 import { saveCategory } from '#/server/categories'
-
-type State = FormState<{ name: string }>
-
-function useCategorySubmit(
-  draft: CategoryDraft,
-  initial: State['values'],
-  onSaved: () => void,
-) {
-  return useActionState(
-    async (_: State, form: FormData): Promise<State> => {
-      const values = formValues(form, ['name'])
-      const { data, errors } = validate(categoryFormSchema, values)
-      if (!data) return { values, errors, failed: false }
-      const result = await saveCategory({
-        data: draft.input(data.name),
-      })
-      if (result.ok) onSaved()
-      return savedState(values, result)
-    },
-    { values: initial, errors: {}, failed: false },
-  )
-}
+import { indexById } from '#/lib/utils'
 
 /** Active categories of the same kind, as a tree; never the category or its branch. */
 function parentOptions(
@@ -64,7 +35,7 @@ function parentOptions(
   self: { id: string | undefined; kind: Category['kind'] },
   locale: string,
 ) {
-  const byId = new Map(categories.map((c) => [c.id, c]))
+  const byId = indexById(categories)
   const branch = self.id
     ? descendantIds(self.id, childrenByParent(categories, locale))
     : new Set<string>()
@@ -123,7 +94,7 @@ function NecessityField({
   if (draft.kind !== 'expense') return null
   const source = necessitySource(
     draft.parent?.id ?? null,
-    new Map(categories.map((c) => [c.id, c])),
+    indexById(categories),
   )
   return (
     <NecessityRadios
@@ -140,38 +111,29 @@ export function CategoryForm({
   categoryId,
   initial,
   categories,
-  onSaved,
+  savedText,
   children,
 }: {
   categoryId?: string
   initial: CategoryValues
   categories: ReadonlyArray<Category>
-  onSaved: () => void
+  savedText: string
   /** Read-only content after the fields: the history. */
   children?: React.ReactNode
 }) {
   const { t } = useTranslation()
   const panelId = useId()
-  const closeSheet = useCloseSheet()
   const draft = useCategoryDraft(categoryId, initial, categories)
-  const [state, submit, pending] = useCategorySubmit(
-    draft,
-    { name: initial.name },
-    () => {
-      onSaved()
-      closeSheet()
-    },
-  )
-  const fields = useFieldValidation(categoryFormSchema, state.errors)
-  const formRef = useFocusFirstError(state.errors)
+  const form = useSheetForm({
+    schema: categoryFormSchema,
+    initial: { name: initial.name },
+    save: (data) => saveCategory({ data: draft.input(data.name) }),
+    savedText,
+  })
+  const name = form.field('name')
 
   return (
-    <SheetForm
-      action={submit}
-      formRef={formRef}
-      pending={pending}
-      error={state.failed && t('common.saveFailed')}
-    >
+    <SheetForm {...form.formProps}>
       <KindTabs
         kind={draft.kind}
         panelId={panelId}
@@ -189,16 +151,13 @@ export function CategoryForm({
           }
         />
         <FormField
-          name="name"
+          {...name}
           label={t('categories.name')}
           required
           autoComplete="off"
-          defaultValue={state.values.name}
-          error={fields.error('name')}
-          onBlur={fields.onBlur}
           onChange={(event) => {
             draft.setName(event.target.value)
-            fields.onChange(event)
+            name.onChange(event)
           }}
         />
         <ParentField

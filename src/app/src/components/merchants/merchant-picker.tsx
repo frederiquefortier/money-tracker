@@ -1,11 +1,8 @@
-import { useState } from 'react'
-import { useRouter } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { Combobox } from '#/components/combobox'
-import { useToast } from '#/components/toaster'
-import { FORMAT_LOCALE } from '#/i18n/locales'
+import { useInlineCreate } from '#/components/use-inline-create'
 import type { Merchant } from '#/lib/merchants'
-import { useLocale } from '#/lib/use-locale'
+import { useFormatLocale } from '#/lib/use-locale'
 import { saveMerchant } from '#/server/merchants'
 
 /**
@@ -22,14 +19,18 @@ export function MerchantPicker({
   onChange: (merchant: Merchant | null) => void
 }) {
   const { t } = useTranslation()
-  const toast = useToast()
-  const router = useRouter()
-  const locale = FORMAT_LOCALE[useLocale()]
-  const [created, setCreated] = useState<Array<Merchant>>([])
-  const merchants = [
-    ...loaded,
-    ...created.filter((c) => !loaded.some((l) => l.id === c.id)),
-  ]
+  const locale = useFormatLocale()
+  const { items: merchants, create } = useInlineCreate(loaded, {
+    save: async (name) => {
+      const result = await saveMerchant({
+        data: { name, defaultCategoryId: null },
+      })
+      return result.ok
+        ? { id: result.id, name, defaultCategoryId: null, transactionCount: 0 }
+        : null
+    },
+    onCreated: onChange,
+  })
   const options = [...merchants]
     .sort(
       (a, b) =>
@@ -37,25 +38,6 @@ export function MerchantPicker({
         a.name.localeCompare(b.name, locale),
     )
     .map((m) => ({ value: m.id, label: m.name }))
-
-  async function create(name: string) {
-    const result = await saveMerchant({
-      data: { name, defaultCategoryId: null },
-    }).catch(() => null)
-    if (!result?.ok) {
-      toast({ text: t('common.saveFailed') })
-      return
-    }
-    const merchant = {
-      id: result.id,
-      name,
-      defaultCategoryId: null,
-      transactionCount: 0,
-    }
-    setCreated((list) => [...list, merchant])
-    onChange(merchant)
-    await router.invalidate()
-  }
 
   return (
     <Combobox
@@ -65,7 +47,7 @@ export function MerchantPicker({
       onChange={(id) => onChange(merchants.find((m) => m.id === id) ?? null)}
       clearLabel={t('transactions.clearMerchant')}
       createLabel={(text) => t('common.createText', { text })}
-      onCreate={(name) => void create(name)}
+      onCreate={create}
       typedOrder={(a, b) => a.label.localeCompare(b.label, locale)}
     />
   )

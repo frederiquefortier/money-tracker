@@ -3,7 +3,7 @@ import categoryIcons from '#/icons/category-icons.json'
 import { hexToOklch, siblingVariation } from '#/lib/color'
 import { NECESSITIES } from '#/lib/necessity'
 import type { Necessity } from '#/lib/necessity'
-import { foldForSearch } from '#/lib/utils'
+import { foldForSearch, indexById } from '#/lib/utils'
 
 // Shared by the category screens, the picker and the server functions (spec 12).
 
@@ -199,7 +199,7 @@ export function categoryContext(
   categories: ReadonlyArray<Category>,
   locale: string,
 ) {
-  const byId = new Map(categories.map((c) => [c.id, c]))
+  const byId = indexById(categories)
   const children = childrenByParent(categories, locale)
   return (category: Category) => ({
     parent: category.parentId ? byId.get(category.parentId) : undefined,

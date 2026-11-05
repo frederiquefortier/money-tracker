@@ -1,6 +1,7 @@
 import { createRouter as createTanStackRouter } from '@tanstack/react-router'
 import type { ParsedLocation } from '@tanstack/react-router'
 import { getGlobalStartContext } from '@tanstack/react-start'
+import { RouteError, RouteNotFound } from './components/route-fallbacks'
 import { routeTree } from './routeTree.gen'
 
 // Set per request by the server entry (server.ts); undefined in the browser.
@@ -21,6 +22,9 @@ export function getRouter() {
     scrollRestoration: ({ location }) => !opensSheet(location),
     // Data preloaded on hover is reused by the click (default preload stale time, 30 s).
     defaultPreload: 'intent',
+    // Translated, instead of the router's built-in English screens (ADR-008).
+    defaultErrorComponent: RouteError,
+    defaultNotFoundComponent: RouteNotFound,
     ssr: { nonce: getNonce() },
   })
 

@@ -4,11 +4,9 @@ import { CategoryActions } from '#/components/categories/category-actions'
 import { CategoryForm } from '#/components/categories/category-form'
 import { CategoryHistory } from '#/components/categories/category-history'
 import { RouteSheet } from '#/components/route-sheet'
-import { useToast } from '#/components/toaster'
-import { FORMAT_LOCALE } from '#/i18n/locales'
 import { categoryContext, isArchived } from '#/lib/categories'
-import { useCategoriesPage } from '#/lib/use-categories-page'
-import { useLocale } from '#/lib/use-locale'
+import { useCategoriesPage } from '#/lib/use-page-data'
+import { useFormatLocale } from '#/lib/use-locale'
 
 export const Route = createFileRoute(
   '/_authed/settings/categories/$categoryId',
@@ -19,9 +17,8 @@ export const Route = createFileRoute(
 
 function EditCategory() {
   const { t } = useTranslation()
-  const toast = useToast()
   const categories = useCategoriesPage()
-  const locale = FORMAT_LOCALE[useLocale()]
+  const locale = useFormatLocale()
   const { categoryId } = Route.useParams()
   const category = categories.find((c) => c.id === categoryId)
   if (!category) return <Navigate to="/settings/categories" />
@@ -44,7 +41,7 @@ function EditCategory() {
         categoryId={category.id}
         initial={category}
         categories={categories}
-        onSaved={() => toast({ text: t('categories.updated') })}
+        savedText={t('categories.updated')}
       >
         <CategoryHistory category={category} />
       </CategoryForm>

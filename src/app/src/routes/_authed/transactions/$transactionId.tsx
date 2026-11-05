@@ -1,7 +1,6 @@
 import { Navigate, createFileRoute } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { RouteSheet } from '#/components/route-sheet'
-import { useToast } from '#/components/toaster'
 import { TransactionActions } from '#/components/transactions/transaction-actions'
 import { TransactionForm } from '#/components/transactions/transaction-form'
 import { draftFromTransaction } from '#/lib/transaction-draft'
@@ -23,7 +22,6 @@ export const Route = createFileRoute('/_authed/transactions/$transactionId')({
 
 function EditTransaction() {
   const { t } = useTranslation()
-  const toast = useToast()
   const locale = useLocale()
   const { data, transaction } = Route.useLoaderData()
   const account = data.accounts.find((a) => a.id === transaction?.accountId)
@@ -42,7 +40,7 @@ function EditTransaction() {
         id={transaction.id}
         initial={draftFromTransaction(transaction, account.currency, locale)}
         data={data}
-        onSaved={() => toast({ text: t('transactions.updated') })}
+        savedText={t('transactions.updated')}
       />
     </RouteSheet>
   )

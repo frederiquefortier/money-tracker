@@ -4,6 +4,39 @@ Document architectural choices with context, alternatives considered, and trade-
 
 <!-- Newest first: a new ADR goes directly below this line. Template at the bottom. -->
 
+### ADR-025: Each repeated form, picker and server pattern lives in one place (2026-11-05)
+
+**Context:**
+- A review found the same code written three to six times: the submit of every sheet
+  form, "Créer « … »" in three pickers, and in the server functions the error mapping,
+  the insert-or-update and the load errors. The copies had drifted: four forms crashed
+  on a network error where the transaction form did not, and one picker skipped the
+  toast on a lost connection.
+
+**Decision:**
+- `useSheetForm` (components) runs every RouteSheet form: validate, save, toast, close,
+  keep the values on failure, focus the first error. A form gives its schema, initial
+  values, `save` and `savedText`, and spreads `form.field(name)` on each `FormField`.
+- `useInlineCreate` (components) runs "Créer « … »" in a picker.
+- `lib/db.server.ts`: `loaded` (rows or a thrown load error), `saveRow`
+  (insert or update by id) and `updateProfile`. `failureFor(scope, known)` in
+  `lib/result.ts` maps SQLSTATEs and raised messages to the screen's error ids.
+- Money helpers (`parseAmount`, `compareDecimal`, `amountForInput`) live in
+  `lib/money.ts`; `amountForInput` takes the decimal separator from Intl.
+- `lib/` never imports from `components/`.
+
+**Alternatives Considered:**
+- A form library (React Hook Form, TanStack Form) -> React 19's `useActionState` and
+  zod already do the work (ADR-011); the repetition was wiring, not missing features.
+- A generic data layer over supabase-js -> More than three helpers would hide the
+  queries; `saveRow` narrows the builder with one cast, documented where it is.
+
+**Consequences:**
+- A new form or picker gets network errors, toasts and focus right without thinking
+  about them, and a fix to that behaviour is made once.
+- Forms take `savedText` instead of `onSaved`; the transaction form keeps an optional
+  `onSaved` for the last account used.
+
 ### ADR-024: Dates stay native, after a calendar was tried (2026-11-05)
 
 **Context:**

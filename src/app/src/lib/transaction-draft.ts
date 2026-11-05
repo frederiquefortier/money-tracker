@@ -1,7 +1,14 @@
 import type { Category } from '#/lib/categories'
 import type { FieldErrors } from '#/lib/form'
 import type { Merchant } from '#/lib/merchants'
-import { fromMinor, minorDigits, toMinor } from '#/lib/money'
+import type { Locale } from '#/i18n/locales'
+import {
+  absDecimal,
+  amountForInput,
+  fromMinor,
+  minorDigits,
+  toMinor,
+} from '#/lib/money'
 import {
   bookedMinor,
   splitPreview,
@@ -98,7 +105,7 @@ const HUNDRED = 1000000n
 export function capPercent(
   lines: ReadonlyArray<Line>,
   { key, value: typed }: Pick<Line, 'key' | 'value'>,
-  locale: string,
+  locale: Locale,
 ): string {
   const weight = typedWeight(typed)
   const value = weight === null ? null : toMinor(weight, 4)
@@ -111,40 +118,25 @@ export function capPercent(
     }, 0n)
   const left = HUNDRED - others
   if (value <= left) return typed
-  return forInput(fromMinor(left > 0n ? left : 0n, 4), null, locale)
-}
-
-/**
- * A stored decimal ("84.1200") as typed in this locale, unsigned: "84,12" with the
- * currency's decimals, or "1,5" for a share (`currency` null).
- */
-export function forInput(
-  amount: string,
-  currency: string | null,
-  locale: string,
-) {
-  const digits = currency === null ? 0 : minorDigits(currency)
-  const minor = toMinor(amount.replace('-', ''), 4)
-  const text = minor === null ? amount : fromMinor(minor, 4)
-  const [int = '0', frac = ''] = text.split('.')
-  const kept = frac.replace(/0+$/, '').padEnd(digits, '0')
-  return kept ? `${int}${locale === 'fr' ? ',' : '.'}${kept}` : int
+  return amountForInput(fromMinor(left > 0n ? left : 0n, 4), null, locale)
 }
 
 export function draftFromTransaction(
   transaction: Transaction,
   accountCurrency: string,
-  locale: string,
+  locale: Locale,
 ): Draft {
   const { originalAmount, originalCurrency } = transaction
-  const booked = forInput(transaction.amount, accountCurrency, locale)
+  const forInput = (amount: string, currency: string | null) =>
+    amountForInput(absDecimal(amount), currency, locale)
+  const booked = forInput(transaction.amount, accountCurrency)
   const single =
     transaction.splitMode === 'amount' && transaction.splits.length === 1
   return {
     kind: transaction.kind,
     amount:
       originalAmount && originalCurrency
-        ? forInput(originalAmount, originalCurrency, locale)
+        ? forInput(originalAmount, originalCurrency)
         : booked,
     currency: originalCurrency ?? accountCurrency,
     paid: originalCurrency ? booked : '',
@@ -163,8 +155,8 @@ export function draftFromTransaction(
           // Montant lines are in the account's currency; shares and percentages are plain.
           value:
             transaction.splitMode === 'amount'
-              ? forInput(s.value, accountCurrency, locale)
-              : forInput(s.value, null, locale),
+              ? forInput(s.value, accountCurrency)
+              : forInput(s.value, null),
         })),
     note: transaction.note ?? '',
     pending: transaction.pending,

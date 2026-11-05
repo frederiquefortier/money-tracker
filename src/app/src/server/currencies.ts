@@ -2,8 +2,9 @@ import { createServerFn } from '@tanstack/react-start'
 import { z } from 'zod'
 import { currencyCodeSchema } from '#/lib/currencies'
 import type { Currency, MyCurrencies } from '#/lib/currencies'
+import { loaded, updateProfile } from '#/lib/db.server'
 import { fetchHexaRate } from '#/lib/rates'
-import { failed } from '#/lib/result'
+import { failureFor } from '#/lib/result'
 import type { Result } from '#/lib/result'
 import { getSupabase } from '#/lib/supabase.server'
 
@@ -12,6 +13,13 @@ export type CurrencyError =
 type CurrencyResult = Result<CurrencyError>
 
 const codeInput = z.object({ code: currencyCodeSchema })
+
+const failure = failureFor<CurrencyError>('currencies', {
+  // On insert: not in the ISO list.
+  '23503': 'unknown',
+  default_currency_cannot_be_removed: 'isDefault',
+  currency_used_by_open_account: 'usedByAccount',
+})
 
 // Undefined table, column or relationship, in Postgres and PostgREST.
 const SCHEMA_NOT_YET = new Set(['42P01', '42703', 'PGRST200', 'PGRST205'])
@@ -75,14 +83,16 @@ export const getCurrencySettings = createServerFn({ method: 'GET' }).handler(
         .is('closed_on', null)
         .order('name'),
     ])
-    if (catalog.error || mine.error || open.error) {
-      const code = (catalog.error ?? mine.error ?? open.error)?.code
-      throw new Error(`Currencies could not be loaded (${code})`)
-    }
+    const [catalogRows, mineRows, openRows] = loaded(
+      'Currencies',
+      catalog,
+      mine,
+      open,
+    )
 
     // One primary-key lookup per currency; EUR is the base and always has rates.
     const firsts = await Promise.all(
-      mine.data
+      mineRows
         .map((row) => row.code)
         .filter((code) => code !== 'EUR')
         .map(async (code) => {
@@ -98,9 +108,9 @@ export const getCurrencySettings = createServerFn({ method: 'GET' }).handler(
         }),
     )
     return {
-      catalog: catalog.data.map((row) => toCurrency(row.code, row)),
+      catalog: catalogRows.map((row) => toCurrency(row.code, row)),
       ratesFrom: Object.fromEntries(firsts) as Record<string, string | null>,
-      openAccounts: open.data.reduce<Partial<Record<string, Array<string>>>>(
+      openAccounts: openRows.reduce<Partial<Record<string, Array<string>>>>(
         (byCode, account) => {
           ;(byCode[account.currency] ??= []).push(account.name)
           return byCode
@@ -110,6 +120,24 @@ export const getCurrencySettings = createServerFn({ method: 'GET' }).handler(
     }
   },
 )
+
+/** Units of `to` for one `from` on `date`, as exact text; null when a rate is missing. */
+export const getRate = createServerFn({ method: 'GET' })
+  .validator(
+    z.object({
+      from: currencyCodeSchema,
+      to: currencyCodeSchema,
+      date: z.iso.date(),
+    }),
+  )
+  .handler(async ({ data }): Promise<string | null> => {
+    const { data: rate, error } = await getSupabase().rpc(
+      'exchange_rate_text',
+      { from_currency: data.from, to_currency: data.to, on_date: data.date },
+    )
+    if (error) throw new Error(`The rate could not be loaded (${error.code})`)
+    return rate
+  })
 
 /**
  * CUR-02: HexaRate must know the currency. A currency removed earlier comes back
@@ -124,7 +152,7 @@ export const addCurrency = createServerFn({ method: 'POST' })
       .select('removed_at')
       .eq('code', data.code)
       .maybeSingle()
-    if (error) return failed('currencies', 'lookup', error.code)
+    if (error) return failure('lookup', error)
 
     if (existing) {
       if (existing.removed_at === null) return { ok: true }
@@ -132,9 +160,7 @@ export const addCurrency = createServerFn({ method: 'POST' })
         .from('user_currencies')
         .update({ removed_at: null })
         .eq('code', data.code)
-      return restored.error
-        ? failed('currencies', 'restore', restored.error.code)
-        : { ok: true }
+      return restored.error ? failure('restore', restored.error) : { ok: true }
     }
 
     if (data.code !== 'EUR') {
@@ -144,11 +170,7 @@ export const addCurrency = createServerFn({ method: 'POST' })
     const inserted = await supabase
       .from('user_currencies')
       .insert({ code: data.code })
-    // 23503: not in the ISO list.
-    if (inserted.error?.code === '23503') return { ok: false, error: 'unknown' }
-    return inserted.error
-      ? failed('currencies', 'insert', inserted.error.code)
-      : { ok: true }
+    return inserted.error ? failure('insert', inserted.error) : { ok: true }
   })
 
 /**
@@ -164,33 +186,20 @@ export const removeCurrency = createServerFn({ method: 'POST' })
       .update({ removed_at: new Date().toISOString() })
       .eq('code', data.code)
       .is('removed_at', null)
-    if (error?.message === 'default_currency_cannot_be_removed') {
-      return { ok: false, error: 'isDefault' }
-    }
-    if (error?.message === 'currency_used_by_open_account') {
-      return { ok: false, error: 'usedByAccount' }
-    }
-    return error ? failed('currencies', 'remove', error.code) : { ok: true }
+    return error ? failure('remove', error) : { ok: true }
   })
 
 export const setDefaultCurrency = createServerFn({ method: 'POST' })
   .validator(codeInput)
-  .handler(async ({ data }) => updateProfile({ default_currency: data.code }))
+  .handler(async ({ data }) => setProfile({ default_currency: data.code }))
 
 export const setDisplayCurrency = createServerFn({ method: 'POST' })
   .validator(codeInput)
-  .handler(async ({ data }) => updateProfile({ display_currency: data.code }))
+  .handler(async ({ data }) => setProfile({ display_currency: data.code }))
 
-async function updateProfile(
+async function setProfile(
   values: { default_currency: string } | { display_currency: string },
 ): Promise<CurrencyResult> {
-  const supabase = getSupabase()
-  const { data: auth } = await supabase.auth.getClaims()
-  if (!auth?.claims) return failed('currencies', 'profile', 'no session')
-  // Supabase refuses an update without a filter; RLS limits it to the user anyway.
-  const { error } = await supabase
-    .from('profiles')
-    .update(values)
-    .eq('user_id', auth.claims.sub)
-  return error ? failed('currencies', 'profile', error.code) : { ok: true }
+  const { error } = await updateProfile(values)
+  return error ? failure('profile', error) : { ok: true }
 }

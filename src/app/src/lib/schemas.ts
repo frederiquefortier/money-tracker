@@ -22,6 +22,9 @@ export const VALIDATION_IDS = [
 ] as const
 export type ValidationId = (typeof VALIDATION_IDS)[number]
 
+/** The input of a server function that acts on one row. */
+export const idInput = z.object({ id: z.uuid() })
+
 export const emailSchema = z.email({ error: 'email' })
 
 export const passwordSchema = z

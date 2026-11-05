@@ -9,7 +9,7 @@ import type { Currency } from '#/lib/currencies'
 import { useLocale } from '#/lib/use-locale'
 import { addCurrency } from '#/server/currencies'
 
-type Failure = 'unknown' | 'down' | null
+type Failure = 'unknown' | 'unavailable' | 'failed' | null
 
 /** CUR-02: one ISO currency, checked with HexaRate when it is added. */
 export function AddCurrencyForm({
@@ -28,13 +28,15 @@ export function AddCurrencyForm({
   const [failure, submit, pending] = useActionState(
     async (): Promise<Failure> => {
       if (!code) return null
-      const result = await addCurrency({ data: { code } })
-      if (result.ok) {
+      const result = await addCurrency({ data: { code } }).catch(() => null)
+      if (result?.ok) {
         toast({ text: t('currencies.added', { code }) })
         closeSheet()
         return null
       }
-      return result.error === 'unknown' ? 'unknown' : 'down'
+      if (result?.error === 'unknown' || result?.error === 'unavailable')
+        return result.error
+      return 'failed'
     },
     null,
   )
@@ -56,9 +58,11 @@ export function AddCurrencyForm({
       pendingLabel={t('currencies.adding')}
       error={
         failure &&
-        (failure === 'unknown'
-          ? t('currencies.unknown', { code })
-          : t('currencies.hexaRateDown'))
+        {
+          unknown: t('currencies.unknown', { code }),
+          unavailable: t('currencies.hexaRateDown'),
+          failed: t('common.saveFailed'),
+        }[failure]
       }
     >
       <Combobox

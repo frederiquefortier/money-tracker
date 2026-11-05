@@ -5,7 +5,6 @@ import {
   withPicked,
   draftFromTransaction,
   emptyDraft,
-  forInput,
   validateDraft,
 } from '#/lib/transaction-draft'
 import {
@@ -34,15 +33,6 @@ function draft(changes: Partial<Draft> = {}): Draft {
 }
 
 const context = { accountCurrency: 'CAD', rate: null }
-
-describe('forInput', () => {
-  it('writes a stored amount as typed in the locale', () => {
-    expect(forInput('-84.1200', 'CAD', 'fr')).toBe('84,12')
-    expect(forInput('84.1000', 'CAD', 'en')).toBe('84.10')
-    expect(forInput('1500.0000', 'JPY', 'fr')).toBe('1500')
-    expect(forInput('1.5000', null, 'fr')).toBe('1,5')
-  })
-})
 
 describe('validateDraft', () => {
   it('needs an amount and a category', () => {

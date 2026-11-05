@@ -1,9 +1,9 @@
-import { parseAmount } from '#/lib/accounts'
 import {
   convertMinor,
   fromMinor,
   isHundred,
   minorDigits,
+  parseAmount,
   percentOf,
   ratio,
   splitMinor,

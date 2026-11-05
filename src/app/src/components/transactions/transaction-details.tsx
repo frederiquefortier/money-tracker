@@ -1,5 +1,4 @@
 import { MerchantPicker } from '#/components/merchants/merchant-picker'
-import type { TransactionFormData } from '#/components/transactions/transaction-form'
 import {
   AccountPicker,
   DateField,
@@ -8,7 +7,7 @@ import {
 import type { Merchant } from '#/lib/merchants'
 import { withMerchant } from '#/lib/transaction-draft'
 import type { Draft } from '#/lib/transaction-draft'
-import type { FormAccount } from '#/lib/transactions'
+import type { FormAccount, TransactionFormData } from '#/lib/transactions'
 
 /** The currency follows the account, unless another one was chosen. */
 function accountChanges(

@@ -6,12 +6,14 @@ import {
   categoryInputSchema,
   resolveColors,
 } from '#/lib/categories'
-import type { Category, CategoryEvent, Kind } from '#/lib/categories'
+import type { Category, CategoryEvent } from '#/lib/categories'
+import { loaded, saveRow } from '#/lib/db.server'
 import { NECESSITIES } from '#/lib/necessity'
-import type { Necessity } from '#/lib/necessity'
-import { failed } from '#/lib/result'
+import { failed, failureFor } from '#/lib/result'
 import type { Result } from '#/lib/result'
+import { idInput } from '#/lib/schemas'
 import { getSupabase } from '#/lib/supabase.server'
+import { isOneOf } from '#/lib/utils'
 
 export type CategoryError =
   | 'nameTaken'
@@ -23,57 +25,45 @@ export type CategoryError =
   | 'failed'
 type CategoryResult<T = object> = Result<CategoryError, T>
 
-const idInput = z.object({ id: z.uuid() })
-
-// Raised by the triggers and functions in the categories migrations.
-const RAISED: Partial<Record<string, CategoryError>> = {
+const KNOWN: Partial<Record<string, CategoryError>> = {
+  '23505': 'nameTaken',
+  '23503': 'inUse',
+  // Raised by the triggers and functions in the categories migrations.
   category_parent_archived: 'parentArchived',
   category_event_before_previous: 'beforePrevious',
   category_pause_overlaps: 'pauseOverlaps',
   category_not_found: 'notFound',
 }
 
-function failure(
-  context: string,
-  error: { code?: string; message?: string },
-): { ok: false; error: CategoryError } {
-  if (error.code === '23505') return { ok: false, error: 'nameTaken' }
-  if (error.code === '23503') return { ok: false, error: 'inUse' }
-  const raised = error.message ? RAISED[error.message] : undefined
-  if (raised) return { ok: false, error: raised }
-  return failed('categories', context, error.code)
-}
+const failure = failureFor('categories', KNOWN)
 
-const isKind = (kind: string): kind is Kind =>
-  (KINDS as ReadonlyArray<string>).includes(kind)
-const isNecessity = (value: string | null): value is Necessity =>
-  (NECESSITIES as ReadonlyArray<string | null>).includes(value)
+const isKind = isOneOf(KINDS)
+const isNecessity = isOneOf(NECESSITIES)
 
 export const getCategories = createServerFn({ method: 'GET' }).handler(
   async (): Promise<Array<Category>> => {
     const supabase = getSupabase()
-    const [categories, events, periods] = await Promise.all([
-      supabase
-        .from('categories')
-        .select(
-          'id, parent_id, name, kind, icon, icon_is_auto, color, color_is_auto, necessity',
-        ),
-      supabase
-        .from('category_status_events')
-        .select('category_id, status, effective_on')
-        .order('effective_on', { ascending: false })
-        .order('id', { ascending: false }),
-      supabase
-        .from('category_active_periods')
-        .select('category_id, active_from, active_to'),
-    ])
-    if (categories.error || events.error || periods.error) {
-      const code = (categories.error ?? events.error ?? periods.error)?.code
-      throw new Error(`Categories could not be loaded (${code})`)
-    }
+    const [categories, events, periods] = loaded(
+      'Categories',
+      ...(await Promise.all([
+        supabase
+          .from('categories')
+          .select(
+            'id, parent_id, name, kind, icon, icon_is_auto, color, color_is_auto, necessity',
+          ),
+        supabase
+          .from('category_status_events')
+          .select('category_id, status, effective_on')
+          .order('effective_on', { ascending: false })
+          .order('id', { ascending: false }),
+        supabase
+          .from('category_active_periods')
+          .select('category_id, active_from, active_to'),
+      ])),
+    )
 
     const history = new Map<string, Array<CategoryEvent>>()
-    for (const e of events.data) {
+    for (const e of events) {
       const list = history.get(e.category_id) ?? []
       list.push({
         status: e.status === 'archived' ? 'archived' : 'active',
@@ -81,7 +71,7 @@ export const getCategories = createServerFn({ method: 'GET' }).handler(
       })
       history.set(e.category_id, list)
     }
-    return categories.data.map((c) => ({
+    return categories.map((c) => ({
       id: c.id,
       parentId: c.parent_id,
       name: c.name,
@@ -92,7 +82,7 @@ export const getCategories = createServerFn({ method: 'GET' }).handler(
       colorIsAuto: c.color_is_auto,
       necessity: isNecessity(c.necessity) ? c.necessity : null,
       history: history.get(c.id) ?? [],
-      periods: periods.data
+      periods: periods
         .filter((p) => p.category_id === c.id)
         .map((p) => ({ from: p.active_from, to: p.active_to })),
     }))
@@ -136,11 +126,7 @@ export const saveCategory = createServerFn({ method: 'POST' })
       // Only expense takes a mark (CAT-10); the database refuses it on other kinds.
       necessity: data.kind === 'expense' ? data.necessity : null,
     }
-    const supabase = getSupabase()
-    const query = data.id
-      ? supabase.from('categories').update(values).eq('id', data.id)
-      : supabase.from('categories').insert(values)
-    const { data: saved, error } = await query.select('id').maybeSingle()
+    const { saved, error } = await saveRow('categories', data.id, values)
     if (error) return failure('save', error)
     if (!saved) return { ok: false, error: 'notFound' }
     // The category is saved; a failed recolour only leaves a colour behind until the next save.

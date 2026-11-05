@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
-import { ComingSoon } from '#/components/coming-soon'
+import { MessageCard } from '#/components/message-card'
 
 export const Route = createFileRoute('/_authed/dashboard')({
   component: Dashboard,
@@ -9,6 +9,6 @@ export const Route = createFileRoute('/_authed/dashboard')({
 function Dashboard() {
   const { t } = useTranslation()
   return (
-    <ComingSoon title={t('nav.dashboard')} text={t('comingSoon.dashboard')} />
+    <MessageCard title={t('nav.dashboard')} text={t('comingSoon.dashboard')} />
   )
 }

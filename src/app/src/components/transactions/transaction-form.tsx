@@ -8,24 +8,14 @@ import { CategoryScreen } from '#/components/transactions/category-screen'
 import { ReceiptAmount } from '#/components/transactions/receipt-amount'
 import type { PickTarget } from '#/components/transactions/receipt-amount'
 import { Details } from '#/components/transactions/transaction-details'
-import type { Category } from '#/lib/categories'
 import { useFocusFirstError, useValidationMessage } from '#/lib/form'
 import type { FieldErrors } from '#/lib/form'
-import type { Merchant } from '#/lib/merchants'
 import { validateDraft, withPicked } from '#/lib/transaction-draft'
 import type { Draft } from '#/lib/transaction-draft'
-import type { FormAccount } from '#/lib/transactions'
+import type { FormAccount, TransactionFormData } from '#/lib/transactions'
 import { useMyCurrencies } from '#/lib/use-my-currencies'
 import { useRate } from '#/lib/use-rate'
-import type { FrequentCategories } from '#/server/transactions'
 import { saveTransaction } from '#/server/transactions'
-
-export type TransactionFormData = {
-  accounts: Array<FormAccount>
-  categories: Array<Category>
-  merchants: Array<Merchant>
-  frequent: FrequentCategories
-}
 
 type State = { errors: FieldErrors; failed: boolean; submitted: boolean }
 
@@ -45,11 +35,14 @@ function useDraft(initial: Draft, accounts: ReadonlyArray<FormAccount>) {
 
 function useSubmit({
   check,
+  savedText,
   onSaved,
 }: {
   check: () => ReturnType<typeof validateDraft>
-  onSaved: (accountId: string) => void
+  savedText: string
+  onSaved?: (accountId: string) => void
 }) {
+  const toast = useToast()
   const closeSheet = useCloseSheet()
   return useActionState(
     async (): Promise<State> => {
@@ -57,7 +50,8 @@ function useSubmit({
       if (!input) return { errors, failed: false, submitted: true }
       const result = await saveTransaction({ data: input }).catch(() => null)
       if (!result?.ok) return { errors: {}, failed: true, submitted: true }
-      onSaved(input.accountId)
+      onSaved?.(input.accountId)
+      toast({ text: savedText })
       closeSheet()
       return { errors: {}, failed: false, submitted: true }
     },
@@ -106,12 +100,14 @@ export function TransactionForm({
   id,
   initial,
   data,
+  savedText,
   onSaved,
 }: {
   id?: string
   initial: Draft
   data: TransactionFormData
-  onSaved: (accountId: string) => void
+  savedText: string
+  onSaved?: (accountId: string) => void
 }) {
   const { t } = useTranslation()
   const message = useValidationMessage()
@@ -124,7 +120,7 @@ export function TransactionForm({
   )
   const check = () =>
     validateDraft(draft, { id, accountCurrency, rate: rate ?? null })
-  const [state, submit, pending] = useSubmit({ check, onSaved })
+  const [state, submit, pending] = useSubmit({ check, savedText, onSaved })
   // After a first submit, errors follow the fields as they are corrected.
   const errors = state.submitted ? (check().errors ?? {}) : {}
   const error = (name: string) => message(errors[name])

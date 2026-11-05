@@ -3,8 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { MerchantActions } from '#/components/merchants/merchant-actions'
 import { MerchantForm } from '#/components/merchants/merchant-form'
 import { RouteSheet } from '#/components/route-sheet'
-import { useToast } from '#/components/toaster'
-import { useMerchantsPage } from '#/lib/use-merchants-page'
+import { useMerchantsPage } from '#/lib/use-page-data'
 
 export const Route = createFileRoute('/_authed/settings/merchants/$merchantId')(
   {
@@ -15,7 +14,6 @@ export const Route = createFileRoute('/_authed/settings/merchants/$merchantId')(
 
 function EditMerchant() {
   const { t } = useTranslation()
-  const toast = useToast()
   const { merchants, categories } = useMerchantsPage()
   const { merchantId } = Route.useParams()
   const merchant = merchants.find((m) => m.id === merchantId)
@@ -37,7 +35,7 @@ function EditMerchant() {
         key={merchant.id}
         merchant={merchant}
         categories={categories}
-        onSaved={() => toast({ text: t('merchants.updated') })}
+        savedText={t('merchants.updated')}
       />
     </RouteSheet>
   )

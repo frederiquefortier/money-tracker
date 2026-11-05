@@ -4,7 +4,7 @@ import { EditHint } from '#/components/edit-hint'
 import { categoryPath } from '#/lib/categories'
 import type { Category } from '#/lib/categories'
 import type { TransactionKind } from '#/lib/transactions'
-import { cn, focusRing } from '#/lib/utils'
+import { cn, focusRing, indexById } from '#/lib/utils'
 
 /**
  * Spec 15: the category as a round button, on the receipt beside the amount or on a split
@@ -36,7 +36,7 @@ export function CategoryButton({
   onOpen: () => void
 }) {
   const { t } = useTranslation()
-  const byId = new Map(categories.map((c) => [c.id, c]))
+  const byId = indexById(categories)
   const refund = category && kind === 'income' && category.kind !== 'income'
   const name = category
     ? categoryPath(category, byId)

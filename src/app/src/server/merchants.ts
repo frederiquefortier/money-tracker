@@ -1,39 +1,40 @@
 import { createServerFn } from '@tanstack/react-start'
 import { z } from 'zod'
+import { loaded, saveRow } from '#/lib/db.server'
 import { merchantInputSchema } from '#/lib/merchants'
 import type { Merchant } from '#/lib/merchants'
-import { failed } from '#/lib/result'
+import { failureFor } from '#/lib/result'
 import type { Result } from '#/lib/result'
+import { idInput } from '#/lib/schemas'
 import { getSupabase } from '#/lib/supabase.server'
 
 export type MerchantError = 'nameTaken' | 'notFound' | 'failed'
 type MerchantResult<T = object> = Result<MerchantError, T>
 
-function failure(
-  context: string,
-  error: { code?: string },
-): { ok: false; error: MerchantError } {
-  if (error.code === '23505') return { ok: false, error: 'nameTaken' }
+const KNOWN: Partial<Record<string, MerchantError>> = {
+  '23505': 'nameTaken',
   // merge_merchants raises it for a merchant the user cannot see.
-  if (error.code === 'P0002') return { ok: false, error: 'notFound' }
-  return failed('merchants', context, error.code)
+  P0002: 'notFound',
 }
+
+const failure = failureFor('merchants', KNOWN)
 
 export const getMerchants = createServerFn({ method: 'GET' }).handler(
   async (): Promise<Array<Merchant>> => {
     const supabase = getSupabase()
-    const [merchants, usage] = await Promise.all([
-      supabase.from('merchants').select('id, name, default_category_id'),
-      supabase.from('merchant_usage').select('merchant_id, transaction_count'),
-    ])
-    if (merchants.error || usage.error) {
-      const code = (merchants.error ?? usage.error)?.code
-      throw new Error(`Merchants could not be loaded (${code})`)
-    }
-    const counts = new Map(
-      usage.data.map((u) => [u.merchant_id, u.transaction_count ?? 0]),
+    const [merchants, usage] = loaded(
+      'Merchants',
+      ...(await Promise.all([
+        supabase.from('merchants').select('id, name, default_category_id'),
+        supabase
+          .from('merchant_usage')
+          .select('merchant_id, transaction_count'),
+      ])),
     )
-    return merchants.data.map((m) => ({
+    const counts = new Map(
+      usage.map((u) => [u.merchant_id, u.transaction_count ?? 0]),
+    )
+    return merchants.map((m) => ({
       id: m.id,
       name: m.name,
       defaultCategoryId: m.default_category_id,
@@ -45,22 +46,17 @@ export const getMerchants = createServerFn({ method: 'GET' }).handler(
 export const saveMerchant = createServerFn({ method: 'POST' })
   .validator(merchantInputSchema)
   .handler(async ({ data }): Promise<MerchantResult<{ id: string }>> => {
-    const values = {
+    const { saved, error } = await saveRow('merchants', data.id, {
       name: data.name,
       default_category_id: data.defaultCategoryId,
-    }
-    const supabase = getSupabase()
-    const query = data.id
-      ? supabase.from('merchants').update(values).eq('id', data.id)
-      : supabase.from('merchants').insert(values)
-    const { data: saved, error } = await query.select('id').maybeSingle()
+    })
     if (error) return failure('save', error)
     if (!saved) return { ok: false, error: 'notFound' }
     return { ok: true, id: saved.id }
   })
 
 export const deleteMerchant = createServerFn({ method: 'POST' })
-  .validator(z.object({ id: z.uuid() }))
+  .validator(idInput)
   .handler(async ({ data }): Promise<MerchantResult> => {
     const { error } = await getSupabase()
       .from('merchants')

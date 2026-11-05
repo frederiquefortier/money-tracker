@@ -1,5 +1,7 @@
 import { z } from 'zod'
+import type { Category } from '#/lib/categories'
 import { currencyCodeSchema } from '#/lib/currencies'
+import type { Merchant } from '#/lib/merchants'
 
 // Shared by the transaction form (spec 15) and its server functions.
 
@@ -16,6 +18,17 @@ export type FormAccount = {
   institution: string | null
   closedOn: string | null
   hiddenForNew: boolean
+}
+
+/** Per kind, the ids of the categories used most lately, most used first (CAT-06). */
+export type FrequentCategories = Record<TransactionKind, Array<string>>
+
+/** What the transaction form's pickers need. */
+export type TransactionFormData = {
+  accounts: Array<FormAccount>
+  categories: Array<Category>
+  merchants: Array<Merchant>
+  frequent: FrequentCategories
 }
 
 /** A saved expense or income as the form loads it; amounts signed, as stored. */

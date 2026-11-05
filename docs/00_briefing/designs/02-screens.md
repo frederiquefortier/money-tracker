@@ -33,9 +33,9 @@ component to use, so a screen is assembled, not redrawn.
   (`SortMenu`, an outline button with a chevron, like a select, showing the sort icon and
   the current order, "Trier: …" as its accessible name; kept per browser). Adding is
   never beside the title: every screen, at every width, has one round + button bottom
-  right (`FloatingAddButton`), above the tab bar on phones, with "Ajouter un compte" as
-  its accessible name. A screen that adds one thing goes straight to its form; one that
-  adds several (Comptes: Compte, Institution) turns the + into a ✕ and fans the choices
+  right, above the tab bar on phones, with "Ajouter un compte" as its accessible name. A
+  screen that adds one thing goes straight to its form (`FloatingAddLink`); one that
+  adds several (`FloatingAddButton`) (Comptes: Compte, Institution) turns the + into a ✕ and fans the choices
   out on a quarter circle as round icons only, the noun as tooltip and accessible name. Escape, a tap
   outside or a choice closes it. A
   menu opens at least as wide as its button, aligned to it, and grows to fit its labels
@@ -64,20 +64,26 @@ component to use, so a screen is assembled, not redrawn.
 - **Archive:** the interface word is "Archiver"; a dialog asks the date (default today).
   Archived items sit in a collapsed "… archivé(e)s ({count})" section under the list, flat
   and muted, with "Archivé(e) le …" and the actions on the first line.
+- **Errors and missing pages:** a page that cannot load, or an address that leads
+  nowhere, shows a centred card (`MessageCard`, as for the screens still to come) in the
+  user's language, with Réessayer or Retour à l’accueil. The router uses them for every
+  route (`RouteError`, `RouteNotFound`).
 - **Confirmations:** `ConfirmDialog`, red title and button: "Supprimer “{name}”" and
   "Cette action est irréversible.", or a sentence naming what else is affected.
 - **Forms:** a route sheet over the list (`RouteSheet`, `SheetForm`) with its own URL:
   full screen on a phone, a panel from the right from `md` up. Its body only edits: no
   archive or delete buttons among the fields (on phones they are in the header, above).
   Closing with something typed or chosen asks "Abandonner les modifications?" first. Annuler and one "Enregistrer" in the footer; saving closes it
-  with a toast. Errors from the server show in the sheet above the buttons; validation
-  stays under each field, and focus moves to the first one (SET-07). Opening, closing or
+  with a toast. Errors from the server, a lost connection included, show in the sheet
+  above the buttons; validation stays under each field, and focus moves to the first one
+  (SET-07). Every such form runs on `useSheetForm`, which owns all of this. Opening, closing or
   switching sheets keeps the list's scroll: sheet routes carry `staticData.sheet`, and
   the router skips scroll restoration for them.
 - **Fields:** the shared ones (`FormField`, `SelectField`, `CheckboxField`,
   `LinkedFields`). Dates are native (`FormField` with `type="date"`, ADR-024). `LinkedFields` wraps only the sub-field, never the field it belongs to. Required fields carry an asterisk, no legend, no "(facultatif)".
 - **Choosing from the user's own items:** `Combobox`, typed into the field: it filters,
-  offers "Créer « … »" when that makes sense, and a × clears it. Nothing chosen is an
+  offers "Créer « … »" when that makes sense (`useInlineCreate`: a failure is a toast,
+  the new item is chosen), and a × clears it. Nothing chosen is an
   empty field, never "Aucun(e)". The chosen option is tinted (the accent background,
   semibold), as in a native select, with no check and no slot for one; options under a
   group heading (an institution, a category type) sit one step in; hover and the

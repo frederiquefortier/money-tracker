@@ -33,3 +33,27 @@ export function useStoredState<T>(
 
   return [value, update] as const
 }
+
+const parseIds = (v: unknown) =>
+  Array.isArray(v) && v.every((x) => typeof x === 'string') ? v : undefined
+
+/** A set of ids kept per browser: open branches, collapsed groups. */
+export function useStoredIds(key: string) {
+  const [list, setList] = useStoredState<Array<string>>(key, [], parseIds)
+  const ids = new Set(list)
+  return {
+    ids,
+    toggle: (id: string) =>
+      setList(ids.has(id) ? list.filter((x) => x !== id) : [...list, id]),
+    add: (id: string) => {
+      if (!ids.has(id)) setList([...list, id])
+    },
+    /** Puts all of `group` in, or takes it all out; ids outside the group stay. */
+    setAll: (group: ReadonlyArray<string>, included: boolean) =>
+      setList(
+        included
+          ? [...new Set([...list, ...group])]
+          : list.filter((id) => !group.includes(id)),
+      ),
+  }
+}

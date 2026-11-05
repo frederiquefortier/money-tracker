@@ -2,10 +2,9 @@ import { createFileRoute } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { AccountForm } from '#/components/accounts/account-form'
 import { RouteSheet } from '#/components/route-sheet'
-import { useToast } from '#/components/toaster'
 import { DEFAULT_ACCOUNT_TYPE } from '#/lib/accounts'
 import { todayIso } from '#/lib/format'
-import { useAccountsPage } from '#/lib/use-accounts-page'
+import { useAccountsPage } from '#/lib/use-page-data'
 import { useMyCurrencies } from '#/lib/use-my-currencies'
 
 export const Route = createFileRoute('/_authed/settings/accounts/new')({
@@ -15,7 +14,6 @@ export const Route = createFileRoute('/_authed/settings/accounts/new')({
 
 function NewAccount() {
   const { t } = useTranslation()
-  const toast = useToast()
   const { institutions, types } = useAccountsPage()
   const { defaultCurrency } = useMyCurrencies()
   const type = types.some((ty) => ty.code === DEFAULT_ACCOUNT_TYPE)
@@ -36,7 +34,7 @@ function NewAccount() {
         initialInstitutionId={null}
         institutions={institutions}
         types={types}
-        onSaved={() => toast({ text: t('accounts.created') })}
+        savedText={t('accounts.created')}
       />
     </RouteSheet>
   )

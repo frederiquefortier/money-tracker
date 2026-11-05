@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { InstitutionActions } from '#/components/accounts/institution-actions'
 import { InstitutionForm } from '#/components/accounts/institution-form'
 import { RouteSheet } from '#/components/route-sheet'
-import { useAccountsPage } from '#/lib/use-accounts-page'
+import { useAccountsPage } from '#/lib/use-page-data'
 
 export const Route = createFileRoute(
   '/_authed/settings/accounts/institutions/$institutionId',

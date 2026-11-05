@@ -1,10 +1,10 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
-import { ComingSoon } from '#/components/coming-soon'
+import { MessageCard } from '#/components/message-card'
 
 export const Route = createFileRoute('/_authed/budget')({ component: Budget })
 
 function Budget() {
   const { t } = useTranslation()
-  return <ComingSoon title={t('nav.budget')} text={t('comingSoon.budget')} />
+  return <MessageCard title={t('nav.budget')} text={t('comingSoon.budget')} />
 }

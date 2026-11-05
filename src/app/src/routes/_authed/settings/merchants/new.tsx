@@ -2,8 +2,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { MerchantForm } from '#/components/merchants/merchant-form'
 import { RouteSheet } from '#/components/route-sheet'
-import { useToast } from '#/components/toaster'
-import { useMerchantsPage } from '#/lib/use-merchants-page'
+import { useMerchantsPage } from '#/lib/use-page-data'
 
 export const Route = createFileRoute('/_authed/settings/merchants/new')({
   staticData: { sheet: true },
@@ -12,7 +11,6 @@ export const Route = createFileRoute('/_authed/settings/merchants/new')({
 
 function NewMerchant() {
   const { t } = useTranslation()
-  const toast = useToast()
   const { categories } = useMerchantsPage()
 
   return (
@@ -20,7 +18,7 @@ function NewMerchant() {
       <MerchantForm
         merchant={null}
         categories={categories}
-        onSaved={() => toast({ text: t('merchants.created') })}
+        savedText={t('merchants.created')}
       />
     </RouteSheet>
   )

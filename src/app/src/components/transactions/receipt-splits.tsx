@@ -17,7 +17,7 @@ import { splitPreview } from '#/lib/transaction-preview'
 import { SPLIT_MODES } from '#/lib/transactions'
 import type { SplitMode } from '#/lib/transactions'
 import { useLocale } from '#/lib/use-locale'
-import { cn } from '#/lib/utils'
+import { cn, indexById } from '#/lib/utils'
 
 type Update = (changes: Partial<Draft>) => void
 
@@ -88,7 +88,7 @@ function SplitLine({
   const { t } = useTranslation()
   const locale = useLocale()
   const category = categories.find((c) => c.id === line.categoryId)
-  const byId = new Map(categories.map((c) => [c.id, c]))
+  const byId = indexById(categories)
   const setValue = (value: string) =>
     onChange({
       lines: draft.lines.map((l) =>

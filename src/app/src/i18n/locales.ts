@@ -1,3 +1,5 @@
+import { isOneOf } from '#/lib/utils'
+
 // Keep in sync with the check constraint on profiles.locale (migrations).
 export const LOCALES = ['fr', 'en'] as const
 export type Locale = (typeof LOCALES)[number]
@@ -16,12 +18,7 @@ export function inLocale<T>(locale: Locale, fr: T, en: T): T {
   return locale === 'fr' ? fr : en
 }
 
-export function isLocale(value: unknown): value is Locale {
-  return (
-    typeof value === 'string' &&
-    (LOCALES as ReadonlyArray<string>).includes(value)
-  )
-}
+export const isLocale = isOneOf(LOCALES)
 
 /** Reads a cookie or Accept-Language tag, regional ones included (`fr-CH`). */
 export function toLocale(value: unknown): Locale | undefined {

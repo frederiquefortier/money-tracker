@@ -10,6 +10,7 @@ import { typeLabel } from '#/lib/accounts'
 import { currencyName } from '#/lib/currencies'
 import { useLocale } from '#/lib/use-locale'
 import type { Currency } from '#/lib/currencies'
+import type { FieldBinding } from '#/components/use-sheet-form'
 import type { AccountType, Institution } from '#/server/accounts'
 
 export type AccountValues = {
@@ -21,11 +22,7 @@ export type AccountValues = {
   hiddenForNew: boolean
 }
 
-type FieldProps = {
-  error: (name: string) => string | undefined
-  onBlur: (event: React.FocusEvent<HTMLInputElement>) => void
-  onChange: (event: React.ChangeEvent<HTMLInputElement>) => void
-}
+type Field = (name: keyof AccountValues) => FieldBinding
 
 // A currency the user removed still shows on an account that uses it.
 function currencyOptions(
@@ -50,35 +47,22 @@ function typeOptions(types: ReadonlyArray<AccountType>, locale: Locale) {
 }
 
 /** The opening date, with the balance on that date as its sub-field. */
-function OpeningFields({
-  values,
-  fields,
-}: {
-  values: AccountValues
-  fields: FieldProps
-}) {
+function OpeningFields({ field }: { field: Field }) {
   const { t } = useTranslation()
-  const events = { onBlur: fields.onBlur, onChange: fields.onChange }
   return (
     <>
       <FormField
-        name="openedOn"
+        {...field('openedOn')}
         type="date"
         required
         label={t('accounts.openedOn')}
-        defaultValue={values.openedOn}
-        error={fields.error('openedOn')}
-        {...events}
       />
       <LinkedFields>
         <FormField
-          name="openingBalance"
+          {...field('openingBalance')}
           inputMode="decimal"
           autoComplete="off"
           label={t('accounts.openingBalance')}
-          defaultValue={values.openingBalance}
-          error={fields.error('openingBalance')}
-          {...events}
         />
       </LinkedFields>
     </>
@@ -88,7 +72,7 @@ function OpeningFields({
 /** The account form's fields (spec 11). Uncontrolled except the institution and currency. */
 export function AccountFields({
   values,
-  fields,
+  field,
   types,
   currencies,
   institutions,
@@ -98,12 +82,12 @@ export function AccountFields({
   onCurrencyChange,
 }: {
   values: AccountValues
-  fields: FieldProps
+  field: Field
   types: ReadonlyArray<AccountType>
   currencies: ReadonlyArray<Currency>
   institutions: ReadonlyArray<Institution>
   institutionId: string | null
-  onInstitutionChange: (id: string | null, created?: Institution) => void
+  onInstitutionChange: (id: string | null) => void
   currency: string
   onCurrencyChange: (code: string) => void
 }) {
@@ -112,15 +96,7 @@ export function AccountFields({
 
   return (
     <>
-      <FormField
-        name="name"
-        label={t('accounts.name')}
-        required
-        defaultValue={values.name}
-        error={fields.error('name')}
-        onBlur={fields.onBlur}
-        onChange={fields.onChange}
-      />
+      <FormField {...field('name')} label={t('accounts.name')} required />
       <SelectField
         name="type"
         required
@@ -141,7 +117,7 @@ export function AccountFields({
         onChange={(event) => onCurrencyChange(event.target.value)}
         options={currencyOptions(currencies, currency, locale)}
       />
-      <OpeningFields values={values} fields={fields} />
+      <OpeningFields field={field} />
       <CheckboxField
         name="hiddenForNew"
         label={t('accounts.hideFromNew')}

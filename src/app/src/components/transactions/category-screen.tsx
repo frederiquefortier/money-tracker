@@ -3,25 +3,23 @@ import { useTranslation } from 'react-i18next'
 import { CategoryBadge } from '#/components/categories/category-badge'
 import { CategoryTree } from '#/components/categories/category-tree'
 import { KindTabs } from '#/components/categories/kind-tabs'
+import { useExpandedBranches } from '#/components/categories/use-expanded-branches'
 import { ExpandAllButton } from '#/components/expand-all-button'
 import { IconButton } from '#/components/icon-button'
-import { rowHover } from '#/components/list-card'
+import { EmptyState, rowHover } from '#/components/list-card'
 import { SearchField } from '#/components/search-field'
 import { SortMenu } from '#/components/sort-menu'
 import { useSheetEscape } from '#/components/route-sheet'
 import { SheetBody } from '#/components/ui/sheet'
-import { FORMAT_LOCALE } from '#/i18n/locales'
 import { CATEGORY_SORTS, categoryPath } from '#/lib/categories'
 import type { Category, CategorySort, Kind } from '#/lib/categories'
 import { categoryChildren, frequentCategories } from '#/lib/category-list'
-import { useLocale } from '#/lib/use-locale'
+import { useFormatLocale } from '#/lib/use-locale'
 import { useStoredState } from '#/lib/use-stored-state'
-import { cn, focusRing } from '#/lib/utils'
-import type { FrequentCategories } from '#/server/transactions'
+import { cn, focusRing, indexById, oneOf } from '#/lib/utils'
+import type { FrequentCategories } from '#/lib/transactions'
 
-const parseSort = (v: unknown) => CATEGORY_SORTS.find((s) => s === v)
-const parseIds = (v: unknown) =>
-  Array.isArray(v) && v.every((x) => typeof x === 'string') ? v : undefined
+const parseSort = oneOf(CATEGORY_SORTS)
 
 /**
  * CAT-06: the most used ones of this type as a row of round icons under their heading,
@@ -74,33 +72,6 @@ function Frequent({
       </ul>
     </section>
   )
-}
-
-/** Open branches, remembered per browser and shared with the Catégories page. */
-function useBranches(parents: ReadonlyArray<string>) {
-  const [expanded, setExpanded] = useStoredState<Array<string>>(
-    'categories.expanded',
-    [],
-    parseIds,
-  )
-  const allExpanded =
-    parents.length > 0 && parents.every((id) => expanded.includes(id))
-  return {
-    expanded: new Set(expanded),
-    allExpanded,
-    toggle: (id: string) =>
-      setExpanded(
-        expanded.includes(id)
-          ? expanded.filter((x) => x !== id)
-          : [...expanded, id],
-      ),
-    toggleAll: () =>
-      setExpanded(
-        allExpanded
-          ? expanded.filter((id) => !parents.includes(id))
-          : [...new Set([...expanded, ...parents])],
-      ),
-  }
 }
 
 function Header({ onBack }: { onBack: () => void }) {
@@ -167,7 +138,7 @@ export function CategoryScreen({
   onBack: () => void
 }) {
   const { t } = useTranslation()
-  const locale = FORMAT_LOCALE[useLocale()]
+  const locale = useFormatLocale()
   useSheetEscape(onBack)
   const panelId = useId()
   const [kind, setKind] = useState<Kind>(transactionKind)
@@ -177,7 +148,7 @@ export function CategoryScreen({
     'name',
     parseSort,
   )
-  const byId = new Map(categories.map((c) => [c.id, c]))
+  const byId = indexById(categories)
   const { childrenOf, open } = categoryChildren(categories, {
     kind,
     query,
@@ -185,7 +156,7 @@ export function CategoryScreen({
     locale,
     date,
   })
-  const branches = useBranches(
+  const branches = useExpandedBranches(
     [...childrenOf.keys()].filter((id) => id !== null),
   )
   const roots = childrenOf.get(null) ?? []
@@ -213,9 +184,7 @@ export function CategoryScreen({
             />
           )}
           {roots.length === 0 ? (
-            <p className="py-6 text-center text-muted-foreground">
-              {t('common.noMatch')}
-            </p>
+            <EmptyState>{t('common.noMatch')}</EmptyState>
           ) : (
             <CategoryTree
               roots={roots}

@@ -1,8 +1,11 @@
 import { describe, expect, it } from 'vitest'
 import {
+  amountForInput,
+  compareDecimal,
   convertMinor,
   fromMinor,
   minorDigits,
+  parseAmount,
   ratio,
   splitMinor,
   toMinor,
@@ -62,5 +65,46 @@ describe('ratio', () => {
   it('is a fraction to three places', () => {
     expect(ratio(11n, 2243n)).toBe('0.005')
     expect(ratio(1n, 0n)).toBeNull()
+  })
+})
+
+describe('parseAmount', () => {
+  it('reads French and English amounts', () => {
+    expect(parseAmount('1 250,50')).toBe('1250.50')
+    expect(parseAmount('1 250,5')).toBe('1250.5')
+    expect(parseAmount('-500')).toBe('-500')
+    expect(parseAmount('12.3456')).toBe('12.3456')
+  })
+
+  it('refuses what is not an amount', () => {
+    expect(parseAmount('12,345,6')).toBeNull()
+    expect(parseAmount('1.23456')).toBeNull()
+    expect(parseAmount('abc')).toBeNull()
+    expect(parseAmount('')).toBeNull()
+  })
+})
+
+describe('compareDecimal', () => {
+  it('orders decimal strings exactly', () => {
+    expect(compareDecimal('10.5', '9.99')).toBe(1)
+    expect(compareDecimal('-10.5', '-9.99')).toBe(-1)
+    expect(compareDecimal('-1', '0')).toBe(-1)
+    expect(compareDecimal('1.50', '1.5')).toBe(0)
+    expect(compareDecimal('90071992547409.93', '90071992547409.92')).toBe(1)
+  })
+})
+
+describe('amountForInput', () => {
+  it('keeps the currency decimals at least, with the language separator', () => {
+    expect(amountForInput('1250.5000', 'CAD', 'fr')).toBe('1250,50')
+    expect(amountForInput('-0.1250', 'CAD', 'en')).toBe('-0.125')
+    expect(amountForInput('0', 'CAD', 'fr')).toBe('0,00')
+    expect(amountForInput('84.1000', 'CAD', 'en')).toBe('84.10')
+    expect(amountForInput('1500.0000', 'JPY', 'fr')).toBe('1500')
+  })
+
+  it('writes a share or percentage with only the decimals it needs', () => {
+    expect(amountForInput('1.5000', null, 'fr')).toBe('1,5')
+    expect(amountForInput('2.0000', null, 'en')).toBe('2')
   })
 })

@@ -3,14 +3,13 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { CategoryBadge } from '#/components/categories/category-badge'
 import { ChoiceMenu } from '#/components/choice-menu'
-import { FloatingAddButton } from '#/components/floating-add-button'
-import { ListCard } from '#/components/list-card'
+import { FloatingAddLink } from '#/components/floating-add-button'
+import { EmptyState, ListCard } from '#/components/list-card'
 import { MerchantRow } from '#/components/merchants/merchant-row'
 import { SearchField } from '#/components/search-field'
 import { SettingsPage } from '#/components/settings-page'
 import { SortMenu } from '#/components/sort-menu'
 import { TreeGuides } from '#/components/tree-guides'
-import { FORMAT_LOCALE } from '#/i18n/locales'
 import { categoryPath } from '#/lib/categories'
 import type { Category } from '#/lib/categories'
 import {
@@ -22,9 +21,9 @@ import {
 import type { Merchant, MerchantFilter, MerchantSort } from '#/lib/merchants'
 import { treeGuides } from '#/lib/tree'
 import type { TreeGuide } from '#/lib/tree'
-import { useLocale } from '#/lib/use-locale'
+import { useFormatLocale } from '#/lib/use-locale'
 import { useStoredState } from '#/lib/use-stored-state'
-import { foldForSearch } from '#/lib/utils'
+import { foldForSearch, indexById, oneOf } from '#/lib/utils'
 import { getCategories } from '#/server/categories'
 import { getMerchants } from '#/server/merchants'
 
@@ -39,10 +38,10 @@ export const Route = createFileRoute('/_authed/settings/merchants')({
   component: Merchants,
 })
 
-const parseSort = (v: unknown) => MERCHANT_SORTS.find((s) => s === v)
+const parseSort = oneOf(MERCHANT_SORTS)
 
 function useCategoryTree(categories: ReadonlyArray<Category>) {
-  const byId = new Map(categories.map((c) => [c.id, c]))
+  const byId = indexById(categories)
   const rows = new Map(
     categories.map((c) => [
       c.id,
@@ -88,12 +87,7 @@ function MerchantList({
   tree: ReturnType<typeof useCategoryTree>
 }) {
   const { t } = useTranslation()
-  if (shown.length === 0)
-    return (
-      <p className="py-6 text-center text-muted-foreground">
-        {t('common.noMatch')}
-      </p>
-    )
+  if (shown.length === 0) return <EmptyState>{t('common.noMatch')}</EmptyState>
   return (
     <ListCard>
       {shown.map((merchant) => (
@@ -115,23 +109,14 @@ function MerchantList({
 function AddMerchantButton() {
   const { t } = useTranslation()
   return (
-    <FloatingAddButton
-      label={t('merchants.add')}
-      options={[
-        {
-          to: '/settings/merchants/new',
-          label: t('merchants.add'),
-          icon: 'plus',
-        },
-      ]}
-    />
+    <FloatingAddLink to="/settings/merchants/new" label={t('merchants.add')} />
   )
 }
 
 function Merchants() {
   const { t } = useTranslation()
   const { merchants, categories } = Route.useLoaderData()
-  const locale = FORMAT_LOCALE[useLocale()]
+  const locale = useFormatLocale()
   const [query, setQuery] = useState('')
   const [sort, setSort] = useStoredState<MerchantSort>(
     'merchants.sort',
@@ -189,9 +174,7 @@ function Merchants() {
       }
     >
       {merchants.length === 0 ? (
-        <p className="py-6 text-center text-muted-foreground">
-          {t('merchants.empty')}
-        </p>
+        <EmptyState>{t('merchants.empty')}</EmptyState>
       ) : (
         <>
           <SearchField value={query} onChange={setQuery} />

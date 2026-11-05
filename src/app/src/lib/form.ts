@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import type { z } from 'zod'
 import { PASSWORD_MIN_LENGTH, VALIDATION_IDS } from '#/lib/schemas'
-import type { ValidationId } from '#/lib/schemas'
+import { isOneOf } from '#/lib/utils'
 
 /** Field name to message id. `null`: rechecked since the submit and now valid. */
 export type FieldErrors = Partial<Record<string, string | null>>
@@ -51,9 +51,7 @@ export function formValues<TName extends string>(
   ) as Record<TName, string>
 }
 
-function isValidationId(value: string): value is ValidationId {
-  return (VALIDATION_IDS as ReadonlyArray<string>).includes(value)
-}
+const isValidationId = isOneOf(VALIDATION_IDS)
 
 /** A validation id's message; undefined when there is no error. */
 export function useValidationMessage() {

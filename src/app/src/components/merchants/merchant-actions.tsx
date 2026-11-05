@@ -6,9 +6,8 @@ import { IconActions, IconButton } from '#/components/icon-button'
 import type { ActionPlacement } from '#/components/icon-button'
 import { useToast } from '#/components/toaster'
 import { useServerAction } from '#/components/use-server-action'
-import { FORMAT_LOCALE } from '#/i18n/locales'
 import type { Merchant } from '#/lib/merchants'
-import { useLocale } from '#/lib/use-locale'
+import { useFormatLocale } from '#/lib/use-locale'
 import { deleteMerchant, mergeMerchants } from '#/server/merchants'
 
 /** MER-05: the chosen merchant keeps its name and default category. */
@@ -22,7 +21,7 @@ function MergeDialog({
   onClose: () => void
 }) {
   const { t } = useTranslation()
-  const locale = FORMAT_LOCALE[useLocale()]
+  const locale = useFormatLocale()
   const { run, busy } = useServerAction()
   const [target, setTarget] = useState<string | null>(null)
   const targetName = merchants.find((m) => m.id === target)?.name

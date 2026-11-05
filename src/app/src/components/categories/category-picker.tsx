@@ -1,11 +1,8 @@
-import { useState } from 'react'
-import { useRouter } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { CategoryBadge } from '#/components/categories/category-badge'
 import { Combobox } from '#/components/combobox'
 import type { ComboboxOption } from '#/components/use-combobox'
-import { useToast } from '#/components/toaster'
-import { FORMAT_LOCALE } from '#/i18n/locales'
+import { useInlineCreate } from '#/components/use-inline-create'
 import {
   KINDS,
   categoryPath,
@@ -16,41 +13,32 @@ import {
 import type { Category, Kind } from '#/lib/categories'
 import { todayIso } from '#/lib/format'
 import { treeOrder } from '#/lib/tree'
-import { useLocale } from '#/lib/use-locale'
+import { useFormatLocale } from '#/lib/use-locale'
 import { saveCategory } from '#/server/categories'
+import { indexById } from '#/lib/utils'
 
 /** "Créer « … »": a top-level category of the picker's type, icon and colour suggested. */
-function useCreate(
-  categories: ReadonlyArray<Category>,
-  kind: Kind,
-  onCreated: (category: Category) => void,
-) {
-  const { t } = useTranslation()
-  const toast = useToast()
-  const router = useRouter()
-  return async (name: string) => {
-    const values = {
-      name,
-      kind,
-      parentId: null,
-      icon: suggestIcon(name),
-      iconIsAuto: true,
-      color: nextTopColor(categories, kind),
-      colorIsAuto: false,
-      necessity: null,
-    }
-    const result = await saveCategory({ data: values }).catch(() => null)
-    if (!result?.ok) {
-      toast({ text: t('common.saveFailed') })
-      return
-    }
-    onCreated({
-      ...values,
-      id: result.id,
-      history: [],
-      periods: [{ from: null, to: null }],
-    })
-    await router.invalidate()
+async function createTopCategory(
+  name: string,
+  { kind, categories }: { kind: Kind; categories: ReadonlyArray<Category> },
+): Promise<Category | null> {
+  const values = {
+    name,
+    kind,
+    parentId: null,
+    icon: suggestIcon(name),
+    iconIsAuto: true,
+    color: nextTopColor(categories, kind),
+    colorIsAuto: false,
+    necessity: null,
+  }
+  const result = await saveCategory({ data: values })
+  if (!result.ok) return null
+  return {
+    ...values,
+    id: result.id,
+    history: [],
+    periods: [{ from: null, to: null }],
   }
 }
 
@@ -109,18 +97,14 @@ export function CategoryPicker({
   error?: string
 }) {
   const { t } = useTranslation()
-  const locale = FORMAT_LOCALE[useLocale()]
-  const [created, setCreated] = useState<Array<Category>>([])
-  const categories = [
-    ...loaded,
-    ...created.filter((c) => !loaded.some((l) => l.id === c.id)),
-  ]
-  const create = useCreate(categories, kind, (category) => {
-    setCreated((list) => [...list, category])
-    onChange(category.id)
+  const locale = useFormatLocale()
+  const { items: categories, create } = useInlineCreate(loaded, {
+    save: (name, listed) =>
+      createTopCategory(name, { kind, categories: listed }),
+    onCreated: (category) => onChange(category.id),
   })
 
-  const byId = new Map(categories.map((c) => [c.id, c]))
+  const byId = indexById(categories)
   const option = (category: Category): ComboboxOption => {
     const active = isActiveOn(category, date)
     return {
@@ -162,7 +146,7 @@ export function CategoryPicker({
       onChange={onChange}
       clearLabel={t('categories.clearCategory')}
       createLabel={(text) => t('common.createText', { text })}
-      onCreate={(name) => void create(name)}
+      onCreate={create}
     />
   )
 }

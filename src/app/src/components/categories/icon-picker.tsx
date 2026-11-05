@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { CategoryBadge } from '#/components/categories/category-badge'
+import { EmptyState } from '#/components/list-card'
 import { SearchField } from '#/components/search-field'
 import { Sheet, SheetBody, SheetContent } from '#/components/ui/sheet'
 import { searchIcons } from '#/lib/categories'
@@ -45,11 +46,7 @@ export function IconPicker({
           <SearchField value={query} onChange={setQuery} />
         </div>
         <SheetBody>
-          {icons.length === 0 && (
-            <p className="py-6 text-center text-muted-foreground">
-              {t('common.noMatch')}
-            </p>
-          )}
+          {icons.length === 0 && <EmptyState>{t('common.noMatch')}</EmptyState>}
           <ul className="grid grid-cols-[repeat(auto-fill,minmax(4rem,1fr))] gap-2">
             {icons.map((icon) => (
               <li key={icon.name}>

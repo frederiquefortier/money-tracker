@@ -1,6 +1,6 @@
 import { childrenByParent, isActiveOn, sortSiblings } from '#/lib/categories'
 import type { Category, CategorySort, Kind } from '#/lib/categories'
-import { foldForSearch } from '#/lib/utils'
+import { foldForSearch, indexById } from '#/lib/utils'
 
 // The transaction form's category list (spec 15): one type's tree, as on Catégories.
 
@@ -9,7 +9,7 @@ function withParents(
   categories: ReadonlyArray<Category>,
   q: string,
 ): Set<string> {
-  const byId = new Map(categories.map((c) => [c.id, c]))
+  const byId = indexById(categories)
   const keep = new Set<string>()
   for (const category of categories) {
     if (!foldForSearch(category.name).includes(q)) continue
@@ -65,7 +65,7 @@ export function frequentCategories(
   ids: ReadonlyArray<string>,
   date: string,
 ): Array<Category> {
-  const byId = new Map(categories.map((c) => [c.id, c]))
+  const byId = indexById(categories)
   return ids.flatMap((id) => {
     const category = byId.get(id)
     return category && isActiveOn(category, date) ? [category] : []

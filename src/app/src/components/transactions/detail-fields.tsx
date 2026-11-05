@@ -3,9 +3,8 @@ import { useTranslation } from 'react-i18next'
 import { Combobox } from '#/components/combobox'
 import { FieldMessage, FormField } from '#/components/form-field'
 import { FieldLabel, fieldControl } from '#/components/ui/field'
-import { FORMAT_LOCALE } from '#/i18n/locales'
 import type { FormAccount } from '#/lib/transactions'
-import { useLocale } from '#/lib/use-locale'
+import { useFormatLocale } from '#/lib/use-locale'
 import { cn } from '#/lib/utils'
 
 /**
@@ -24,7 +23,7 @@ export function AccountPicker({
   onChange: (account: FormAccount | null) => void
 }) {
   const { t } = useTranslation()
-  const locale = FORMAT_LOCALE[useLocale()]
+  const locale = useFormatLocale()
   const group = (a: FormAccount) =>
     a.institution ?? t('transactions.noInstitution')
   const options = accounts
