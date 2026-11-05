@@ -4,6 +4,38 @@ Track future enhancements and feature ideas. Review this file during planning se
 
 <!-- Newest first: a new idea goes directly below this line. Template at the bottom. -->
 
+### 2026-11-05 - Region packs, local purchases and the goal celebration
+
+**Description:**
+- Account-type recommendations by age and country, kept as data per region (LOC-01, 02),
+  with the birth date and home country they need (SET-02, 03).
+- A country of origin per merchant (MER-03) and the share of purchases made locally
+  (YR-06).
+- A celebration animation when a savings or investment goal is reached (BUD-05).
+
+**Motivation:**
+- Taken out of the plan by the author on 2026-11-05: none of them replaces something the
+  spreadsheet does, so they wait until the rest is in use.
+
+**Potential Approach:**
+- Region packs as reference rows in `src/data/reference/`, never code branches (LOC-02).
+- The local share once merchants carry a country, read in the yearly review.
+
+**Priority:**
+- [ ] High - Critical improvement
+- [ ] Medium - Nice to have
+- [x] Low - Future consideration
+
+**Dependencies:**
+- Holdings and net worth (phase 5) for LOC-01; budgets and goals (phase 4) for BUD-05;
+  the yearly review (phase 6) for YR-06.
+
+**Status:**
+- [x] Proposed
+- [ ] In Progress
+- [ ] Completed
+- [ ] Deferred
+
 ### 2026-11-02 - Keep pinned actions up to date
 
 **Description:**
@@ -61,7 +93,7 @@ Track future enhancements and feature ideas. Review this file during planning se
 - [ ] Low - Future consideration
 
 **Dependencies:**
-- v1 (phases 0 to 2), DEM-01, DEM-02.
+- v1 (phases 0 to 4), DEM-01, DEM-02.
 
 **Status:**
 - [x] Proposed
@@ -133,7 +165,7 @@ Track future enhancements and feature ideas. Review this file during planning se
 - [ ] Low - Future consideration
 
 **Dependencies:**
-- Net worth (roadmap phase 4) for NW-06..08; enough categorized history for BUD-07.
+- Net worth (roadmap phase 5) for NW-06..08; enough categorized history for BUD-07.
 
 **Status:**
 - [ ] Proposed

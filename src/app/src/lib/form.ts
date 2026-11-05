@@ -14,14 +14,21 @@ export type FormState<TValues> = {
   failed: boolean
 }
 
-/** A taken name shows under the name field; any other failure above the buttons. */
+// Save failures that belong under one field.
+const FIELD_FAILURES: Partial<Record<string, string>> = {
+  nameTaken: 'name',
+  balanceMatches: 'realBalance',
+}
+
+/** A failure with a field shows under it, as a taken name; any other above the buttons. */
 export function savedState<TValues>(
   values: TValues,
   result: { ok: true } | { ok: false; error: string },
 ): FormState<TValues> {
   if (result.ok) return { values, errors: {}, failed: false }
-  return result.error === 'nameTaken'
-    ? { values, errors: { name: 'nameTaken' }, failed: false }
+  const field = FIELD_FAILURES[result.error]
+  return field
+    ? { values, errors: { [field]: result.error }, failed: false }
     : { values, errors: {}, failed: true }
 }
 

@@ -1,7 +1,7 @@
 begin;
 create extension if not exists pgtap with schema extensions;
 
-select plan(44);
+select plan(50);
 
 insert into auth.users (id, email) values
   ('11111111-1111-1111-1111-111111111111', 'alice@example.test'),
@@ -254,11 +254,11 @@ select throws_ok(
 
 -- Adjustment and balances (TRX-03, TRX-09, ACC-06)
 select lives_ok(
-  $$ select public.save_adjustment('a2000000-0000-0000-0000-000000000004', 32.40, '2026-11-03') $$,
+  $$ select public.save_adjustment(null, 'a2000000-0000-0000-0000-000000000004', 32.40, '2026-11-03') $$,
   'an adjustment saves from the real balance'
 );
 select throws_ok(
-  $$ select public.save_adjustment('a2000000-0000-0000-0000-000000000004', 32.40, '2026-11-03') $$,
+  $$ select public.save_adjustment(null, 'a2000000-0000-0000-0000-000000000004', 32.40, '2026-11-03') $$,
   '23514', 'balance_already_matches', 'an adjustment of zero is refused'
 );
 select lives_ok(
@@ -272,6 +272,35 @@ select results_eq(
      where account_id = 'a2000000-0000-0000-0000-000000000004' $$,
   $$ values (27.40::numeric(19,4), -5::numeric(19,4)) $$,
   'the balance is the opening balance, the adjustment and the pending expense'
+);
+select is(
+  public.adjustment_balance_text('a2000000-0000-0000-0000-000000000004', '2026-11-03',
+    (select id from public.transactions where kind = 'adjustment' and account_id = 'a2000000-0000-0000-0000-000000000004')),
+  '20.0000', 'the balance an adjustment is edited against leaves it out, as text'
+);
+select lives_ok(
+  $$ select public.save_adjustment(
+       (select id from public.transactions where kind = 'adjustment' and account_id = 'a2000000-0000-0000-0000-000000000004'),
+       'a2000000-0000-0000-0000-000000000004', 30, '2026-11-03', ' Recompté ') $$,
+  'an adjustment is edited from a new real balance'
+);
+select results_eq(
+  $$ select amount, note from public.transactions
+     where kind = 'adjustment' and account_id = 'a2000000-0000-0000-0000-000000000004' $$,
+  $$ values (10::numeric(19,4), 'Recompté') $$,
+  'the edited adjustment stores the new gap, not one added to the old'
+);
+select throws_ok(
+  $$ select public.save_adjustment(
+       (select id from public.transactions where kind = 'adjustment' and account_id = 'a2000000-0000-0000-0000-000000000004'),
+       'a2000000-0000-0000-0000-000000000004', 20, '2026-11-03') $$,
+  '23514', 'balance_already_matches', 'an edit to the balance without the adjustment is refused'
+);
+select throws_ok(
+  $$ select public.save_adjustment(
+       (select id from public.transactions where kind = 'adjustment' and account_id = 'a2000000-0000-0000-0000-000000000004'),
+       'a2000000-0000-0000-0000-000000000001', 50, '2026-11-03') $$,
+  'P0002', 'adjustment_not_found', 'an adjustment keeps its account'
 );
 
 -- What transactions hold in place
@@ -303,6 +332,11 @@ select is(
   (select count(*)::int from public.transactions where user_id <> auth.uid())
     + (select count(*)::int from public.transaction_splits where user_id <> auth.uid()),
   0, 'a user sees none of another user''s transactions or splits'
+);
+select throws_ok(
+  $$ select public.save_adjustment('b3000000-0000-0000-0000-000000000001',
+       'b2000000-0000-0000-0000-000000000001', 50, '2026-11-03') $$,
+  'P0002', 'account_not_found', 'a user cannot adjust another user''s account'
 );
 delete from public.transactions where id = 'b3000000-0000-0000-0000-000000000001';
 reset role;

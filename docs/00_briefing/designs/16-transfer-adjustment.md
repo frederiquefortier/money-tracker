@@ -1,7 +1,8 @@
 # Transfer and adjustment
 
 **Status:** reviewed 2026-11-03; aligned with the built screens 2026-11-03. Transfer
-built 2026-11-05 on the receipt slip of spec 15; the adjustment is not built yet. Shared rules:
+built 2026-11-05 on the receipt slip of spec 15; the adjustment built 2026-11-05, opened
+from the account's balance on Comptes. Shared rules:
 [02-screens.md](02-screens.md#shared-patterns).
 
 ## Purpose
@@ -107,27 +108,46 @@ same route sheet as spec 15, its title following the tab. A saved transfer opens
 
 ```
 ┌──────────────────────────────┐
-│ AJUSTER “CHÈQUE”           ✕ │
+│ AJUSTER UN SOLDE           ✕ │
+│ ┌──────────────────────────┐ │
+│ │ SOLDE RÉEL               │ │
+│ │ (⚖)  1 216,50_____  CAD  │ │
+│ │ - - - - - - - - - - - -  │ │
+│ │ DANS L'APP    1 204,10 $ │ │
+│ │ ÉCART           +12,40 $ │ │
+│ └/\/\/\/\/\/\/\/\/\/\/\/\/\┘ │
+│ Compte *  [Chèque (Desjardins)]│
 │ Date *         [2026-11-03  ]│
-│ Solde dans l'app  1 204,10 $ │
-│ │ Solde réel * [ 1 216,50 $ ]│
-│ │ Écart         +12,40 $     │
 │ Note           [            ]│
 │          Annuler  Enregistrer│
 └──────────────────────────────┘
 ```
 
-- Opened from an account: "Ajuster le solde" in the header of the account-filtered list
-  (spec 14). A route sheet, like every form.
+- On the receipt slip of spec 15 (`AmountInput`, `ReceiptLine`, the dashed rule): the
+  real balance typed big beside a scale icon, under a "Solde réel" caption, with the
+  account's currency fixed; then the app's balance and the écart, signed, both plain
+  lines of the slip.
+  Account (the transaction form's picker, preselected when there is only one), date and
+  note follow the slip, as on the other forms. Until an account is chosen, the amounts
+  show a dash.
+- Opened from Comptes (spec 11): "Ajuster un solde", a third choice under the round +,
+  opens `/settings/accounts/adjust`. A route sheet, like every form; saving goes back to
+  Comptes with the new balance. The + keeps its three tabs, and the transactions list
+  carries no account actions (decided 2026-11-05). Adjustments are rare: a few cents the
+  owner cannot trace.
 - Shows the account's balance in the app as of the chosen date (pending included, like
-  the accounts screen).
+  the accounts screen), reloaded when the date changes.
 - **Solde réel**: the balance the bank shows. The **Écart**, read-only, is the
   difference; it updates as the date or the balance changes.
 - Saving sends the real balance and the date; the server computes and stores the
   difference (database.md), so a transaction added meanwhile cannot make it wrong.
 - An écart of zero is a validation error under Solde réel: "Le solde correspond déjà."
-- **Editing** an adjustment from the list shows its stored écart, editable. Deleting it
-  follows the transactions: on its row, or in its sheet header on phones (spec 15).
+- **Editing** an adjustment from its row in the list (`/transactions/adjustments/{id}`):
+  titled "Modifier l'ajustement de “{account}”" with its institution ("Chèque
+  (Desjardins)"), without the account picker, the app's balance without it, and Solde
+  réel filled with the balance it made, so the écart shows as stored. The account stays. Deleting it follows the transactions: on its
+  row, or in its sheet header on phones (spec 15).
+- **History:** the transactions list filtered to the account.
 - Adjustments count neither as expenses nor as incomes and have no category.
 
 ## States
@@ -142,7 +162,8 @@ same route sheet as spec 15, its title following the tab. A saved transfer opens
 - Reads: open accounts, the rate for (De currency, Vers currency, date),
   `profiles.transfer_fee_category_id`, the account balance as of a date.
 - Writes: `saveTransfer`, `deleteTransfer`, `setTransferFeeCategory`,
-  `saveAdjustment({ accountId, realBalance, date, note })`, `deleteAdjustment`.
+  `saveAdjustment({ id?, accountId, realBalance, occurredOn, note })`, `deleteAdjustment`.
+  The balance on a date comes from `getAdjustmentBalance` (`adjustment_balance_text`).
 
 ## Copy
 
@@ -156,4 +177,4 @@ same route sheet as spec 15, its title following the tab. A saved transfer opens
 | Delete transfer | Supprimer le transfert de {amount} du {date}; Le transfert de {from} vers {to} sera supprimé. / et ses frais seront supprimés. / et ses frais, le cas échéant, seront supprimés. |
 | Same account | Choisissez un autre compte que celui de départ. |
 | One account | Il faut deux comptes pour un transfert. |
-| Adjustment | Ajuster le solde, Ajuster “{name}”, Solde dans l'app, Solde réel, Écart, Le solde correspond déjà., Supprimer l'ajustement |
+| Adjustment | Ajuster un solde, Modifier l'ajustement de “{account}”, Solde dans l'app, Solde réel, Écart, Le solde correspond déjà., Solde ajusté., Ajustement enregistré., Supprimer l'ajustement, Supprimer l'ajustement de {amount} du {date}, Le solde de {account} reviendra à celui de ses transactions. |

@@ -64,6 +64,7 @@ export const en: Messages = {
     percentTotal: 'Percentages must total 100.',
     duplicateCategory: 'Each category only once.',
     feeCategoryUnset: 'First choose the fee category in',
+    balanceMatches: 'The balance already matches.',
     sameAccount: 'Choose another account than the one it leaves.',
   },
   signIn: {

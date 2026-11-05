@@ -591,6 +591,14 @@ export type Database = {
         Args: { active_from: string; archive_from: string; category: string }
         Returns: number
       }
+      adjustment_balance_text: {
+        Args: { account_id: string; adjustment_id?: string; on_date: string }
+        Returns: string
+      }
+      adjustment_base: {
+        Args: { account_id: string; adjustment_id: string; on_date: string }
+        Returns: number
+      }
       archive_category: {
         Args: { archive_from: string; category: string }
         Returns: number
@@ -674,6 +682,7 @@ export type Database = {
       save_adjustment: {
         Args: {
           account_id: string
+          adjustment_id: string
           note?: string
           occurred_on: string
           real_balance: number

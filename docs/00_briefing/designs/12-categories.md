@@ -13,7 +13,7 @@ spec 15. Reached from Réglages.
 ## Requirements
 
 CAT-01, 02, 03, 05, 07, 09, 10. CAT-04 and CAT-06 (Fréquentes, in the picker) are spec 15.
-CAT-08 (emergency fund exclusion) is phase 2.
+CAT-08 (emergency fund exclusion) is phase 4.
 
 ## Catégories
 

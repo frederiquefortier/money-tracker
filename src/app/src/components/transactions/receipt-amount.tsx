@@ -104,11 +104,14 @@ function ForeignLines({
 /** The large amount, typed positive in the chip's currency (TRX-02). */
 export function AmountInput({
   value,
+  label,
   invalid,
   autoFocus,
   onChange,
 }: {
   value: string
+  /** The accessible name; Montant by default. */
+  label?: string
   invalid: boolean
   autoFocus: boolean
   onChange: (amount: string) => void
@@ -116,7 +119,7 @@ export function AmountInput({
   const { t } = useTranslation()
   return (
     <input
-      aria-label={t('transactions.amount')}
+      aria-label={label ?? t('transactions.amount')}
       aria-invalid={invalid || undefined}
       inputMode="decimal"
       autoComplete="off"

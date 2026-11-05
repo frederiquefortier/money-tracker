@@ -73,7 +73,7 @@ per ADR-008. User-owned rows (categories, merchants, notes) store one string, as
 | Table | Columns | Req |
 |---|---|---|
 | `institutions` | `name`, `website_url` (`https://` only) | ACC-05. Names unique per user, ignoring case. Deleting one that accounts use fails on the foreign key. |
-| `accounts` | `institution_id` (nullable), `name`, `type` (→ `account_types`), `currency`, `opening_balance`, `opened_on`, `closed_on`, `hidden_for_new` | ACC-01..04. Names unique among open accounts of the same institution, ignoring case; accounts with no institution count as one group. `(user_id, currency)` references `user_currencies`, so an account books in one of the user's currencies; a trigger keeps an open account off a removed currency. Also `unique (user_id, id, currency)`, the target of the transactions currency FK. An account's currency cannot change once it has transactions: the transactions' composite key to `(user_id, id, currency)` refuses it. An account with transactions cannot be deleted. `last_reconciled_on` comes with ACC-08 (phase 2). |
+| `accounts` | `institution_id` (nullable), `name`, `type` (→ `account_types`), `currency`, `opening_balance`, `opened_on`, `closed_on`, `hidden_for_new` | ACC-01..04. Names unique among open accounts of the same institution, ignoring case; accounts with no institution count as one group. `(user_id, currency)` references `user_currencies`, so an account books in one of the user's currencies; a trigger keeps an open account off a removed currency. Also `unique (user_id, id, currency)`, the target of the transactions currency FK. An account's currency cannot change once it has transactions: the transactions' composite key to `(user_id, id, currency)` refuses it. An account with transactions cannot be deleted. `last_reconciled_on` comes with ACC-08 (phase 4). |
 | view `account_balances` | `account_id`, `currency`, `balance`, `pending`, `display_currency`, `display_balance` | ACC-06. The opening balance plus every transaction, pending included; `pending` is the pending part alone. `display_balance` is in the profile's display currency at today's rate, null when a rate is missing. |
 | view `institution_totals` | `institution_id` (null: no institution), `display_currency`, `total`, `converted` | ACC-06, CUR-09. Open accounts only. One missing rate makes the total null, never a partial sum. |
 
@@ -81,7 +81,7 @@ per ADR-008. User-owned rows (categories, merchants, notes) store one string, as
 
 | Table | Columns | Req |
 |---|---|---|
-| `categories` | `parent_id` (nullable, self, composite FK with `user_id`), `name`, `kind` (`expense`/`income`/`investment`), `icon` (a coolicons name, ADR-020, default `tag`), `icon_is_auto`, `color` (hex `#rrggbb`, free choice; a sub-category starts from a variation of its parent's), `color_is_auto` (designs/12-categories.md), `necessity` (`need`/`want`, nullable: null follows the nearest marked parent) | CAT-01, 02, 07, 10. A check allows `necessity` on `expense` categories only. `is_favourite` was dropped on 2026-11-04 (CAT-06 now works out frequent categories from transactions). Names unique among siblings of the same kind, ignoring case; top-level categories count as siblings. Deleting one with children fails on the foreign key. `exclude_from_emergency_fund` comes with CAT-08 (phase 2). |
+| `categories` | `parent_id` (nullable, self, composite FK with `user_id`), `name`, `kind` (`expense`/`income`/`investment`), `icon` (a coolicons name, ADR-020, default `tag`), `icon_is_auto`, `color` (hex `#rrggbb`, free choice; a sub-category starts from a variation of its parent's), `color_is_auto` (designs/12-categories.md), `necessity` (`need`/`want`, nullable: null follows the nearest marked parent) | CAT-01, 02, 07, 10. A check allows `necessity` on `expense` categories only. `is_favourite` was dropped on 2026-11-04 (CAT-06 now works out frequent categories from transactions). Names unique among siblings of the same kind, ignoring case; top-level categories count as siblings. Deleting one with children fails on the foreign key. `exclude_from_emergency_fund` comes with CAT-08 (phase 4). |
 | `category_status_events` | `category_id`, `status` (`archived`/`active`), `effective_on`, `via_category_id` | CAT-03. Append-only: insert and select grants only. A category with no events is active; a trigger makes events alternate starting with an archive, refuses a date before the previous event, and refuses reactivating a sub-category whose parent is archived. `via_category_id` names the category an event came through (the parent that archived the branch, the sub-category that brought its parents back), null for an event of its own; its foreign key includes `user_id` and is set to null when that category is deleted. Deleted with its category. |
 | view `category_active_periods` | `category_id`, `active_from`, `active_to` | Periods `[active_from, active_to)`, null bounds open; one open period when there is no history. Pickers (CAT-04) and charts (DSH-03) both read this, so they never disagree. |
 | view `category_necessity` (comes with DSH-09) | `category_id`, `necessity` (`need`/`want`/null) | DSH-09. Expense categories only. A recursive walk up `parent_id` to the nearest category with a mark; null when none has one. `security_invoker`, so RLS on `categories` applies. The category form works the same rule out from the tree it already loads (`inheritedNecessity`). |
@@ -112,7 +112,7 @@ branch, in one statement; a colour picked by hand is never touched (ADR-012).
 
 | Table | Columns | Req |
 |---|---|---|
-| `merchants` | `name`, `default_category_id` (nullable, composite FK with `user_id`, cleared when the category is deleted) | MER-01. Names unique per user ignoring case and accents: a unique index on `fold_name(name)`. `country` comes with MER-03 (phase 5). |
+| `merchants` | `name`, `default_category_id` (nullable, composite FK with `user_id`, cleared when the category is deleted) | MER-01. Names unique per user ignoring case and accents: a unique index on `fold_name(name)`. `country` comes with MER-03 (later). |
 | `merchant_aliases` | `merchant_id`, `pattern` | MER-02, **later** (with the import wizard). Not created in v1. `merge_merchants` then moves the source's aliases to the target and adds the source's name as one. |
 
 `fold_name(text)` is `lower(unaccent(text))`, marked immutable so an index can use it
@@ -149,7 +149,7 @@ Notes:
   spending wherever it happens. On a purchase it is the fee above; on a transfer between
   currencies, what was sent minus what arrived valued back at that day's rate. Neither
   is stored: the balances are already right, and the cost follows from the rates. The
-  dashboard (phase 2) counts it in `profiles.transfer_fee_category_id`'s category, and a
+  dashboard (phase 4) counts it in `profiles.transfer_fee_category_id`'s category, and a
   purchase's own categories count only its market value, so nothing is counted twice.
 - **Opening balance** lives on `accounts`, not as a fake transaction.
 - **Adjustment** (TRX-03): the form takes the real balance; the server computes and stores
@@ -166,9 +166,12 @@ Notes:
     the fee goes to the profile's fee category and is refused without one.
     `delete_transfer(transfer_id)`. `set_transfer_fee_category(category)` sets that
     category (an expense one) and moves every transfer fee already saved to it.
-  - `save_adjustment(account_id, real_balance, occurred_on, note)` stores the difference
-    with `account_balance_on(account_id, on_date)`, the balance at the end of that day,
-    pending included. A saved adjustment is edited with a plain update.
+  - `save_adjustment(adjustment_id, account_id, real_balance, occurred_on, note)` stores
+    the difference with `adjustment_base(account_id, on_date, adjustment_id)`: the balance
+    at the end of that day, pending included (`account_balance_on`), without the
+    adjustment being edited. A null `adjustment_id` adds one; an edit keeps its account and
+    stores the new gap. `adjustment_balance_text` returns the same balance as text for the
+    form, since a numeric over the API arrives as a float (ADR-004).
 - **Deferred checks.** Constraint triggers on both tables run at commit:
   `check_transaction_splits` (above) and `check_transfer` (one leg out, one leg in, two
   accounts, at most one fee on the departure account, mirrored amounts in one currency).

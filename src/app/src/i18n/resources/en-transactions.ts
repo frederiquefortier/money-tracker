@@ -47,6 +47,19 @@ export const transactionsEn: typeof transactionsFr = {
     'It was recorded in the {{account}} account and assigned to the {{categories}} category.',
   deleteCategories_other:
     'It was recorded in the {{account}} account and split between the {{categories}} categories.',
+  adjustment: {
+    newTitle: 'Adjust a balance',
+    editTitle: 'Edit the adjustment of “{{name}}”',
+    appBalance: 'Balance in the app',
+    realBalance: 'Real balance',
+    gap: 'Difference',
+    created: 'Balance adjusted.',
+    updated: 'Adjustment saved.',
+    deleteLabel: 'Delete the adjustment',
+    deleteTitle: 'Delete the {{amount}} adjustment of {{date}}',
+    deleteText:
+      'The balance of {{account}} goes back to that of its transactions.',
+  },
   transfer: {
     newTitle: 'New transfer',
     editTitle: 'Edit transfer',
@@ -117,6 +130,5 @@ export const transactionsEn: typeof transactionsFr = {
     pendingCount_one: '{{count}} pending',
     pendingCount_other: '{{count}} pending',
     transferFee: 'Transfer fee: {{from}} → {{to}}',
-    adjustSoon: 'Adjustments come with the next screen.',
   },
 }

@@ -73,6 +73,11 @@ function AddMenu() {
           label: t('accounts.addInstitution'),
           icon: 'bank',
         },
+        {
+          to: '/settings/accounts/adjust',
+          label: t('transactions.adjustment.newTitle'),
+          icon: 'scale',
+        },
       ]}
     />
   )

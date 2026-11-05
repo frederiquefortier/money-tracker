@@ -12,7 +12,7 @@ accounts and institutions. Reached from Réglages.
 
 ## Requirements
 
-ACC-01, 02, 03, 04, 05, 06, 07. ACC-08 (last reconciled, last transaction) is phase 2.
+ACC-01, 02, 03, 04, 05, 06, 07. ACC-08 (last reconciled, last transaction) is phase 4.
 
 ## Comptes
 
@@ -88,8 +88,8 @@ ACC-01, 02, 03, 04, 05, 06, 07. ACC-08 (last reconciled, last transaction) is ph
 
 ### Adding
 
-The round + bottom right (`FloatingAddButton`) fans out two choices, Compte and
-Institution, each opening its sheet. From `md` up the amounts keep 16px more room before
+The round + bottom right (`FloatingAddButton`) fans out three choices, Compte,
+Institution and Ajuster un solde (spec 16), each opening its sheet. From `md` up the amounts keep 16px more room before
 the row actions, so they never read as part of the icons.
 
 ## Account form
@@ -172,7 +172,7 @@ The `multi_currency` account type is dropped.
 |---|---|
 | Screen title | Comptes |
 | Sort | Nom, Type, Devise, Solde −, Solde +; Trier: {sort} (accessible name) |
-| Add buttons | Institution, Compte (named Ajouter une institution, Ajouter un compte) |
+| Add buttons | Institution, Compte, Ajuster un solde (named Ajouter une institution, Ajouter un compte, Ajuster un solde) |
 | Archived section | Comptes archivés ({count}), Archivé le {date} |
 | Hidden label | Masqué des nouvelles transactions |
 | No institution group | Sans institution |

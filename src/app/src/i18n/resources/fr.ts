@@ -64,6 +64,7 @@ export const fr = {
     percentTotal: 'Les pourcentages doivent totaliser 100.',
     duplicateCategory: 'Chaque catégorie une seule fois.',
     feeCategoryUnset: 'Choisissez d’abord la catégorie des frais dans',
+    balanceMatches: 'Le solde correspond déjà.',
     sameAccount: 'Choisissez un autre compte que celui de départ.',
   },
   signIn: {

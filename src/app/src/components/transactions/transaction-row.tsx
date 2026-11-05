@@ -186,8 +186,8 @@ function RowContent({
 const rowLayout = 'flex min-w-0 flex-1 flex-col gap-1 py-3 pl-4 text-left'
 
 /**
- * One transaction. An expense or income opens its form, and a transfer or its fee the
- * transfer's (spec 16); an adjustment waits for its form, so a tap says so.
+ * One transaction. An expense, income or adjustment opens its form, and a transfer or
+ * its fee the transfer's (spec 16).
  */
 export function TransactionRow({
   row,

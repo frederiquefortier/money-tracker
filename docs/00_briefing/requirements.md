@@ -11,8 +11,8 @@ The organized feature list. It merges four sources and removes the duplicates be
 | `sheet` | Something the current spreadsheets do that the notes never mention ([reference-sheets.md](reference-sheets.md)) |
 
 Each requirement has a stable ID (`ACC-03`) so ADRs, issues and commits can point at it.
-**Phase** refers to [roadmap.md](../03_planning/roadmap.md). **v1 is phases 0 to 3**: the
-point where the spreadsheet can be retired. Phase 4 is v2, phase 5 is v3, and
+**Phase** refers to [roadmap.md](../03_planning/roadmap.md). **v1 is phases 0 to 4**: the
+point where the spreadsheet can be retired. Phase 5 is v2, phase 6 is v3, and
 `later` is tracked in [improvements.md](../03_planning/improvements.md). The UI ships in French and
 English; this file is in English like every other meta-doc.
 
@@ -23,8 +23,8 @@ English; this file is in English like every other meta-doc.
 | ID | Requirement | Source | Phase |
 |---|---|---|---|
 | SET-01 | A new user is walked through choosing a language and a default currency (both required), then creating their first accounts and categories (each can wait). No starter category set in v1. | v1 | 1 |
-| SET-02 | Birth date (drives the age-based account recommendations in `LOC`). | v1 | 5 |
-| SET-03 | Home country, used for "local purchase" stats and for which region pack applies. | v1, inferred | 5 |
+| SET-02 | Birth date (drives the age-based account recommendations in `LOC`). | v1 | later |
+| SET-03 | Home country, used for "local purchase" stats and for which region pack applies. | v1, inferred | later |
 | SET-04 | The interface is available in French and English, nothing regional (ADR-019). Dates and amounts use Canadian conventions in either language ("15 janvier 2024", "1 234,50 $" / "January 15, 2024", "$1,234.50"). | C10, brief | 0 |
 | SET-05 | The language is chosen at onboarding (defaulting to the browser's), saved on the profile, and switchable from any page. | brief | 0 |
 | SET-06 | Reference labels (account and holding types, currency names) exist in both languages. What the user types (their own category names, merchants, notes) is stored as typed and never translated. | brief | 1 |
@@ -41,7 +41,7 @@ English; this file is in English like every other meta-doc.
 | ACC-05 | Institutions are reusable records with a name and an optional website URL. CRUD, inline "create" from the account form. | add, C1 | 1 |
 | ACC-06 | The accounts page groups accounts by institution: collapsible sections, institution name links to its site, per-institution balance total. | add, C1 | 1 |
 | ACC-07 | Sort accounts within each group by name, type, currency, balance ascending, balance descending. The choice persists per browser. | add, C2 | 1 |
-| ACC-08 | Each account shows when it was last reconciled and when its last transaction was. | sheet | 2 |
+| ACC-08 | Each account shows when it was last reconciled and when its last transaction was. | sheet | 4 |
 
 ## 3. Transactions (`TRX`)
 
@@ -53,8 +53,8 @@ English; this file is in English like every other meta-doc.
 | TRX-04 | Transfer between two accounts. Optional fee, recorded as an expense on the source account in the category chosen once in settings. Edit and delete act on all legs together, with a confirmation before delete. List shows "Transfert: A → B". | add, C5 | 1 |
 | TRX-05 | A transaction can be linked to a merchant. | v1, ai | 1 |
 | TRX-06 | Split a transaction across several categories by amount, share or percentage. | v1, ai | 1 |
-| TRX-07 | Link an income to an expense as its reimbursement. | v1, ai | 3 |
-| TRX-08 | Recurring transactions. Changing the amount keeps the old amount and the change date as history. The recurrence can be stopped. | v1, ai | 2 |
+| TRX-07 | Link an income to an expense as its reimbursement. | v1, ai | 2 |
+| TRX-08 | Recurring transactions. Changing the amount keeps the old amount and the change date as history. The recurrence can be stopped. | v1, ai | 4 |
 | TRX-09 | Status: pending or cleared, so a pending card charge does not count as reconciled. Pending rows stand out in the list (blue, as in the spreadsheet) and can be listed alone. | sheet | 1 |
 | TRX-10 | A transaction can carry a free-text note (the memo). | sheet | 1 |
 | TRX-11 | A transfer between accounts in different currencies records what left one and what arrived in the other; the gap against that day's market rate shows as the conversion cost, which counts as spending. | net-worth data (CAD to CHF) | 1 |
@@ -87,7 +87,7 @@ English; this file is in English like every other meta-doc.
 | CAT-05 | The category page shows active categories first and archived ones in a collapsed section with a count and "archivée depuis [date]", drawn as a tree. | add, C9 | 1 |
 | CAT-06 | The picker starts with a "Fréquemment utilisées" group (first called "Fréquentes"): the most used categories of the transaction's type, worked out from recent transactions and shown as "Parent > Enfant". They also keep their place in the tree below, which lists categories as the category page draws them. Hand-picked favourites were dropped on 2026-11-04. | v1, ai, add, C7, author | 1 (with the transaction form) |
 | CAT-07 | A category has a coolicons icon, chosen in a searchable picker of a curated subset of the set (ADR-020). A default is suggested from the name; picking the suggested icon returns to it. Each category has its own colour, chosen freely; a sub-category starts from a variation of its parent's colour. | v1, ai, add, C11 | 1 |
-| CAT-08 | A category can be excluded from the emergency-fund calculation. | v1, ai | 2 |
+| CAT-08 | A category can be excluded from the emergency-fund calculation. | v1, ai | 4 |
 | CAT-09 | The category tree sorts by name or by colour (rainbow order), kept per browser. One button opens or closes every branch, in every tab. A search filters the open tab by name, keeping each match's parents. | author | 1 |
 | CAT-10 | An expense category can be marked a need or a want. A sub-category with no mark follows its nearest marked parent and can set its own (Santé a need, Massothérapie a want). A category with no mark anywhere up its branch is unclassified. Income categories have no mark; investment categories count as savings. | author | 1 |
 
@@ -97,8 +97,8 @@ English; this file is in English like every other meta-doc.
 |---|---|---|---|
 | MER-01 | A merchant can have a default category, prefilled on new transactions. | v1, ai | 1 |
 | MER-02 | A merchant has aliases, used to match bank-CSV descriptions on import. A merge (MER-05) keeps the source's name and aliases as aliases of the target. | v1, ai | later (with IMP-03) |
-| MER-03 | A merchant has a country of origin. | v1 | 5 |
-| MER-04 | For one merchant, see how the bill has changed over time, in percent. | v1, ai | 2 |
+| MER-03 | A merchant has a country of origin. | v1 | later |
+| MER-04 | For one merchant, see how the bill has changed over time, in percent. | v1, ai | 4 |
 | MER-06 | The merchant list sorts by name (A–Z, Z–A) or by category, kept per browser, and filters by default category (a parent keeps its branch) or none. | author | 1 |
 | MER-05 | Merge two merchants: the transactions of one move to the other, which keeps its name and default category; the source's name becomes an alias (MER-02). | author | 1 |
 
@@ -106,82 +106,82 @@ English; this file is in English like every other meta-doc.
 
 | ID | Requirement | Source | Phase |
 |---|---|---|---|
-| TAG-01 | Create tags; a transaction can have several. | v1, ai | 3 |
-| TAG-02 | A tag can carry a date range and categories. In that range, it attaches itself to every transaction in at least one of those categories. Automatic tags are marked as such and can be removed by hand. | ai | 3 |
-| TAG-03 | Per tag: most and least expensive transactions. | misc ("Tag + expensive, less expensive") | 3 |
+| TAG-01 | Create tags; a transaction can have several. | v1, ai | 2 |
+| TAG-02 | A tag can carry a date range and categories. In that range, it attaches itself to every transaction in at least one of those categories. Automatic tags are marked as such and can be removed by hand. | ai | 2 |
+| TAG-03 | Per tag: most and least expensive transactions. | misc ("Tag + expensive, less expensive") | 2 |
 
 ## 8. People and groups (`PPL`)
 
 | ID | Requirement | Source | Phase |
 |---|---|---|---|
-| PPL-01 | People have a name and a custom icon; they can be grouped. | v1, ai | 3 |
-| PPL-02 | A person or a group can be archived and hidden. | ai | 3 |
-| PPL-03 | A transaction can be linked to people or groups, each in a role: invited (I paid for them) or owes (they will pay me back). Their part is set by amount, share or percentage. | v1, ai | 3 |
-| PPL-04 | Without naming anyone: tick "I treated someone" with an amount and a head count, or "I expect a reimbursement" with an amount. | v1 | 3 |
-| PPL-05 | Reminders for money owed in both directions. | misc | 3 |
+| PPL-01 | People have a name and a custom icon; they can be grouped. | v1, ai | 2 |
+| PPL-02 | A person or a group can be archived and hidden. | ai | 2 |
+| PPL-03 | A transaction can be linked to people or groups, each in a role: invited (I paid for them) or owes (they will pay me back). Their part is set by amount, share or percentage. | v1, ai | 2 |
+| PPL-04 | Without naming anyone: tick "I treated someone" with an amount and a head count, or "I expect a reimbursement" with an amount. | v1 | 2 |
+| PPL-05 | Reminders for money owed in both directions. | misc | 2 |
 
 ## 9. Events (`EVT`)
 
 | ID | Requirement | Source | Phase |
 |---|---|---|---|
-| EVT-01 | User-defined event types. | ai | 3 |
-| EVT-02 | An event has a name, a date (or range), a type and optional people. | v1, ai | 3 |
-| EVT-03 | Transactions can be linked to an event. | v1, ai | 3 |
-| EVT-04 | Calendar view of events with the total spent on each. | v1, ai | 3 |
-| EVT-05 | Compare events of the same type. | ai | 3 |
-| EVT-06 | Give an event a budget and follow it live. | ai | 3 |
+| EVT-01 | User-defined event types. | ai | 2 |
+| EVT-02 | An event has a name, a date (or range), a type and optional people. | v1, ai | 2 |
+| EVT-03 | Transactions can be linked to an event. | v1, ai | 2 |
+| EVT-04 | Calendar view of events with the total spent on each. | v1, ai | 2 |
+| EVT-05 | Compare events of the same type. | ai | 2 |
+| EVT-06 | Give an event a budget and follow it live. | ai | 2 |
 
 ## 10. Dashboard and reports (`DSH`)
 
 | ID | Requirement | Source | Phase |
 |---|---|---|---|
-| DSH-01 | Date range picker: a calendar year, last 12 months, last 6 months, custom. | v1, ai | 2 |
-| DSH-02 | Filter by date, category, sub-category and tag. List or chart view of the same data. | v1, ai | 2 |
-| DSH-03 | An archived category is hidden from charts when the range does not overlap its active period. | v1, ai | 2 |
-| DSH-04 | Per category: count, total, mean and median for the period, and the change versus the previous period in percent. | v1, ai | 2 |
-| DSH-05 | Expenses waiting for a reimbursement are highlighted. A reimbursed expense shows its net amount. | v1, ai | 3 |
-| DSH-06 | Header tiles: total available, spent this month, invested this month, pending count. | sheet | 2 |
-| DSH-07 | Category ranking by spend over the range. | sheet | 2 |
-| DSH-08 | Year view and month view. | misc | 2 |
-| DSH-09 | Needs, wants and savings over the range: expenses by their need or want mark (CAT-10), unclassified ones apart, and investments as savings, in amounts and as shares of income. | author | 2 |
+| DSH-01 | Date range picker: a calendar year, last 12 months, last 6 months, custom. | v1, ai | 4 |
+| DSH-02 | Filter by date, category, sub-category and tag. List or chart view of the same data. | v1, ai | 4 |
+| DSH-03 | An archived category is hidden from charts when the range does not overlap its active period. | v1, ai | 4 |
+| DSH-04 | Per category: count, total, mean and median for the period, and the change versus the previous period in percent. | v1, ai | 4 |
+| DSH-05 | Expenses waiting for a reimbursement are highlighted. A reimbursed expense shows its net amount. | v1, ai | 4 |
+| DSH-06 | Header tiles: total available, spent this month, invested this month, pending count. | sheet | 4 |
+| DSH-07 | Category ranking by spend over the range. | sheet | 4 |
+| DSH-08 | Year view and month view. | misc | 4 |
+| DSH-09 | Needs, wants and savings over the range: expenses by their need or want mark (CAT-10), unclassified ones apart, and investments as savings, in amounts and as shares of income. | author | 4 |
 
 ## 11. Budget (`BUD`)
 
 | ID | Requirement | Source | Phase |
 |---|---|---|---|
-| BUD-01 | Per category and date range: an amount ceiling or target. | v1, ai | 2 |
-| BUD-02 | Per category and date range: a transaction-count ceiling or target. | v1, ai | 2 |
-| BUD-03 | Expected monthly income. | v1, ai | 2 |
-| BUD-04 | Emergency fund: target in months, the account that holds it, the categories it covers. Shows progress, or how many months the account already covers. | v1, ai | 2 |
-| BUD-05 | A celebration animation when savings and investment goals are reached. | ai | 5 |
-| BUD-06 | Budget tooltips can be turned off. | v1, ai | 2 |
+| BUD-01 | Per category and date range: an amount ceiling or target. | v1, ai | 4 |
+| BUD-02 | Per category and date range: a transaction-count ceiling or target. | v1, ai | 4 |
+| BUD-03 | Expected monthly income. | v1, ai | 4 |
+| BUD-04 | Emergency fund: target in months, the account that holds it, the categories it covers. Shows progress, or how many months the account already covers. | v1, ai | 4 |
+| BUD-05 | A celebration animation when savings and investment goals are reached. | ai | later |
+| BUD-06 | Budget tooltips can be turned off. | v1, ai | 4 |
 | BUD-07 | Scenario budgets: compare a monthly budget across places (rent, transport, deductions) against a gross salary, as a share of income. | sheet (Prévision budgétaire), misc ("Projections comme suisse") | later |
 
 ## 12. Net worth (`NW`)
 
 | ID | Requirement | Source | Phase |
 |---|---|---|---|
-| NW-01 | Holdings: investment accounts, debts and other assets, each with a type (TFSA/CELI, RRSP/REER, FHSA/CELIAPP, DPSP, 2nd pillar, 3a, life-insurance buyout...) and an institution and country. | v1, ai | 3 |
-| NW-02 | Dated value snapshots per holding. Months with no snapshot can be hidden in charts. | v1, ai | 4 |
-| NW-03 | Contributions per holding, split between my money (transactions linked to the holding) and employer or other money (entered on the holding). Shows amount placed and profit in amount and percent. | v1, ai, net-worth data | 3, 4 |
-| NW-04 | Net worth chart (total, investments, debts) and percent change over any range; default is account start to today. | v1, ai | 4 |
-| NW-05 | A holding can be excluded from the net worth total (the life insurance "with/without" line). | net-worth data | 4 |
+| NW-01 | Holdings: investment accounts, debts and other assets, each with a type (TFSA/CELI, RRSP/REER, FHSA/CELIAPP, DPSP, 2nd pillar, 3a, life-insurance buyout...) and an institution and country. | v1, ai | 2 |
+| NW-02 | Dated value snapshots per holding. Months with no snapshot can be hidden in charts. | v1, ai | 5 |
+| NW-03 | Contributions per holding, split between my money (transactions linked to the holding) and employer or other money (entered on the holding). Shows amount placed and profit in amount and percent. | v1, ai, net-worth data | 2, 5 |
+| NW-04 | Net worth chart (total, investments, debts) and percent change over any range; default is account start to today. | v1, ai | 5 |
+| NW-05 | A holding can be excluded from the net worth total (the life insurance "with/without" line). | net-worth data | 5 |
 | NW-06 | Projections at fixed growth rates (5, 7, 10 %) or custom inputs. | v1, ai | later |
 | NW-07 | Goal solver: "to reach X in N years at r %, invest Y per year", with r defaulting to my actual return. | v1, ai | later |
 | NW-08 | "If this continues, in N years I'll have X." | v1, ai | later |
-| NW-09 | Income by job: salary per employer per year, with a total. | misc ("Séparé par emploi..."), net-worth data | 4 |
+| NW-09 | Income by job: salary per employer per year, with a total. | misc ("Séparé par emploi..."), net-worth data | 5 |
 
 ## 13. Yearly review (`YR`)
 
 | ID | Requirement | Source | Phase |
 |---|---|---|---|
-| YR-01 | Toggle between a money view and a social view. | ai, misc | 5 |
-| YR-02 | Layout: a timeline with sticky months on the left, a calendar on the right that scrolls with it. | ai, misc | 5 |
-| YR-03 | Top 3 most expensive days. | ai | 5 |
-| YR-04 | Who I spent the most with, the least with, and who I shared the most events with. | ai, misc | 5 |
-| YR-05 | Who owes me and whom I owe, at a glance. | ai | 5 |
-| YR-06 | Share of purchases made at local merchants. | v1 | 5 |
-| YR-07 | Export the review as charts in several formats. | ai | 5 |
+| YR-01 | Toggle between a money view and a social view. | ai, misc | 6 |
+| YR-02 | Layout: a timeline with sticky months on the left, a calendar on the right that scrolls with it. | ai, misc | 6 |
+| YR-03 | Top 3 most expensive days. | ai | 6 |
+| YR-04 | Who I spent the most with, the least with, and who I shared the most events with. | ai, misc | 6 |
+| YR-05 | Who owes me and whom I owe, at a glance. | ai | 6 |
+| YR-06 | Share of purchases made at local merchants. | v1 | later |
+| YR-07 | Export the review as charts in several formats. | ai | 6 |
 
 ## 14. Region packs (`LOC`)
 
@@ -189,15 +189,15 @@ The "Canada" section, generalised because the data already spans Canada and Swit
 
 | ID | Requirement | Source | Phase |
 |---|---|---|---|
-| LOC-01 | Account-type recommendations by age and country (TFSA/RRSP/FHSA in Canada; pillars 2 and 3a in Switzerland). | v1 | 5 |
-| LOC-02 | Region packs are data (account types, recommendations), not code branches. | inferred | 5 |
+| LOC-01 | Account-type recommendations by age and country (TFSA/RRSP/FHSA in Canada; pillars 2 and 3a in Switzerland). | v1 | later |
+| LOC-02 | Region packs are data (account types, recommendations), not code branches. | inferred | later |
 
 ## 15. Import (`IMP`)
 
 | ID | Requirement | Source | Phase |
 |---|---|---|---|
 | IMP-01 | Import from one fixed, documented CSV format (accounts, transactions, optional splits). The user prepares their data beforehand. Missing categories, accounts and merchants are created and listed before commit. Files are read in the browser and never stored. See [import.md](../01_building/import.md). | sheet, ADR-010 | 3 |
-| IMP-02 | Net-worth history through the same format (optional holdings and snapshots files). | net-worth data | 4 |
+| IMP-02 | Net-worth history through the same format (optional holdings and snapshots files). | net-worth data | 5 |
 | IMP-03 | Import wizard: source profiles, column and category mapping, merchant-alias matching, suggested transfer pairs and reimbursements. | v1 misc ("Csv importer visual"), MER-02 | later |
 | IMP-04 | Export my data in the import format; export then import reproduces it. This is the export half of SEC-04. | ADR-010, SEC-04 | 3 |
 | IMP-05 | Each import is one all-or-nothing batch that can be undone in one action. Re-importing a row with a known `ref` is skipped. | ADR-010 | 3 |
@@ -221,7 +221,7 @@ Not in the notes, required by the brief. Details in [security.md](../01_building
 | SEC-01 | Multiple users, each seeing only their own data, enforced in the database. | brief | 0 |
 | SEC-02 | Sign-up closed while the app is private; accounts by invitation. The invite email leads to a page that sets the password, then to MFA enrolment. A password change sends a notification email. | brief | 0 |
 | SEC-03 | TOTP two-factor authentication, required to read financial data. | brief | 0 |
-| SEC-04 | Full export of a user's data in an open format (IMP-04, phase 3), and full account deletion (phase 2). | brief | 2, 3 |
+| SEC-04 | Full export of a user's data in an open format (IMP-04, phase 3), and full account deletion (phase 4). | brief | 3, 4 |
 | SEC-05 | Password reset by email, through the same landing page as invitations. If the account has TOTP, the code is required before the new password is saved. | brief | 0 |
 
 ---

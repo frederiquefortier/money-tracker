@@ -10,7 +10,7 @@ over a chosen period, no tiles. Shared rules:
 
 The home tab and the screen used most: what came in and went out, day by day, over the
 period chosen. It replaces scrolling the spreadsheet's ledger. It is a list: totals by
-category and the month's spending belong to the dashboard (phase 2). Every amount reads
+category and the month's spending belong to the dashboard (phase 4). Every amount reads
 in the display currency, and it is always clear which ones were converted.
 
 ## Requirements
@@ -186,9 +186,9 @@ From `md` up: the same list, centred, at most 48rem wide.
 - **Adjustment** (TRX-03): a scale icon, "Ajustement de solde", the account on the
   second line, the signed difference.
 - Tapping a row opens it in its form (spec 15 or 16), a route sheet over the list. A
-  transfer's fee opens the transfer. Until the adjustment form is built, an adjustment
-  answers a tap with a toast saying it comes with the next screen.
-- From `md` up, an expense, an income or a transfer has the trash in its row's action
+  transfer's fee opens the transfer; an adjustment opens
+  `/transactions/adjustments/{id}`.
+- From `md` up, an expense, an income, a transfer or an adjustment has the trash in its row's action
   slot; on phones it is in the sheet header (shared patterns). A transfer's fee has none:
   it goes with its transfer.
 
@@ -230,7 +230,6 @@ From `md` up: the same list, centred, at most 48rem wide.
 | Transfer | Transfert: {from} → {to} |
 | Adjustment | Ajustement de solde |
 | Empty | Aucune transaction en {period}. Aucune transaction du {start} au {end}. Aucune transaction pour l'instant. Aucun résultat. |
-| Actions | Importer un historique, Ajuster le solde |
+| Actions | Importer un historique |
 | Missing rate | Taux manquant |
 | Grids | Année précédente, Année suivante, Années précédentes, Années suivantes |
-| Until the adjustment form | Les ajustements arrivent avec le prochain écran. |

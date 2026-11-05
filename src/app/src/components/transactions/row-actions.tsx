@@ -1,14 +1,13 @@
 import { Link } from '@tanstack/react-router'
-import { useTranslation } from 'react-i18next'
 import { IconActions } from '#/components/icon-button'
-import { useToast } from '#/components/toaster'
+import { AdjustmentActions } from '#/components/transactions/adjustment-actions'
 import { TransactionActions } from '#/components/transactions/transaction-actions'
 import { TransferActions } from '#/components/transactions/transfer-actions'
 import type { ListedTransaction } from '#/lib/transaction-list'
 
 // What a list row (spec 14) opens and deletes, by kind.
 
-/** Where a tap goes: the transaction's form, or the transfer's for a leg or its fee. */
+/** Where a tap goes: the transaction's form, the transfer's for a leg or its fee, or the adjustment's. */
 export function RowLink({
   row,
   className,
@@ -18,8 +17,6 @@ export function RowLink({
   className: string
   children: React.ReactNode
 }) {
-  const { t } = useTranslation()
-  const toast = useToast()
   if (row.transferId)
     return (
       <Link
@@ -32,13 +29,13 @@ export function RowLink({
     )
   if (row.kind === 'adjustment')
     return (
-      <button
-        type="button"
-        onClick={() => toast({ text: t('transactions.list.adjustSoon') })}
+      <Link
+        to="/transactions/adjustments/$adjustmentId"
+        params={{ adjustmentId: row.id }}
         className={className}
       >
         {children}
-      </button>
+      </Link>
     )
   return (
     <Link
@@ -51,7 +48,7 @@ export function RowLink({
   )
 }
 
-/** Delete on the row: an expense or income, or a transfer from its leg (not its fee). */
+/** Delete on the row: an expense, income or adjustment, or a transfer from its leg (not its fee). */
 export function RowActions({ row }: { row: ListedTransaction }) {
   if (row.transfer && row.transferId)
     return (
@@ -67,8 +64,19 @@ export function RowActions({ row }: { row: ListedTransaction }) {
         }}
       />
     )
-  if (row.transferId || row.kind === 'adjustment')
-    return <IconActions slots={1} />
+  if (row.kind === 'adjustment')
+    return (
+      <AdjustmentActions
+        summary={{
+          id: row.id,
+          occurredOn: row.occurredOn,
+          amount: row.amount,
+          currency: row.currency,
+          account: row.account,
+        }}
+      />
+    )
+  if (row.transferId) return <IconActions slots={1} />
   return (
     <TransactionActions
       summary={{

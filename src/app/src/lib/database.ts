@@ -5,6 +5,7 @@ type Accounts = Public['Tables']['accounts']
 type SaveTransaction = Public['Functions']['save_transaction']
 type ListTransactions = Public['Functions']['list_transactions']
 type SaveTransfer = Public['Functions']['save_transfer']
+type SaveAdjustment = Public['Functions']['save_adjustment']
 
 // The generator types numeric as number. Amounts travel as text (ADR-004).
 type WithTextAmount<T> = Omit<T, 'opening_balance'> & {
@@ -35,6 +36,14 @@ type SaveTransferArgs = Omit<
   amount: string
   received: string | null
   fee: string | null
+}
+
+type SaveAdjustmentArgs = Omit<
+  SaveAdjustment['Args'],
+  'adjustment_id' | 'real_balance'
+> & {
+  adjustment_id: string | null
+  real_balance: string
 }
 
 // The generator types a SQL function's columns as never null.
@@ -72,13 +81,19 @@ export type Database = Omit<Generated, 'public'> & {
     }
     Functions: Omit<
       Public['Functions'],
-      'save_transaction' | 'save_transfer' | 'list_transactions'
+      | 'save_transaction'
+      | 'save_transfer'
+      | 'save_adjustment'
+      | 'list_transactions'
     > & {
       save_transaction: Omit<SaveTransaction, 'Args'> & {
         Args: SaveTransactionArgs
       }
       save_transfer: Omit<SaveTransfer, 'Args'> & {
         Args: SaveTransferArgs
+      }
+      save_adjustment: Omit<SaveAdjustment, 'Args'> & {
+        Args: SaveAdjustmentArgs
       }
       list_transactions: Omit<ListTransactions, 'Returns'> & {
         Returns: Array<ListTransactionsRow>

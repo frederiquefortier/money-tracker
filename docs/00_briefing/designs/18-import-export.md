@@ -5,7 +5,7 @@
 
 ## Purpose
 
-The milestone of phase 1: eight years of cleaned history brought in, in one go, onto the
+The milestone of phase 3: eight years of cleaned history brought in, in one go, onto the
 accounts and categories set up in the first run. The import checks everything before
 writing anything, says exactly what it will create, and can be undone as a whole. Export
 gives all the data back in the same format.

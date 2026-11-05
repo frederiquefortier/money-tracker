@@ -8,14 +8,14 @@ come with the transactions migration. Shared rules:
 
 A merchant is where the money went: the grocery store, the landlord, the airline. It
 saves typing, because choosing one prefills the category, and it gives the dashboard a
-second way to read spending (DSH-07, phase 2). Reached from Réglages; most merchants are
+second way to read spending (DSH-07, phase 4). Reached from Réglages; most merchants are
 created inline from the transaction form.
 
 ## Requirements
 
 MER-01, MER-05 (merge), MER-06 (sort and filter). TRX-05 (linking a transaction to a merchant) is the picker below,
-built with the transaction form (spec 15). MER-03 (country) is phase 5, MER-04 (price
-evolution) phase 2.
+built with the transaction form (spec 15). MER-03 (country) is for later, MER-04 (price
+evolution) phase 4.
 
 ## Magasins
 

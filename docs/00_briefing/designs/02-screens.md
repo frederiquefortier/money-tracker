@@ -18,7 +18,7 @@ onto them.
 | 13 | [Merchants](13-merchants.md) | Merchant list and form, merchant picker | MER-01, 05, TRX-05 | Built |
 | 14 | [Transactions](14-transactions.md) | The list (home tab), day groups, converted-amount marker | TRX-04, 09, CUR-06, 07, 09 | Built |
 | 15 | [Transaction form](15-transaction-form.md) | Expense and income, splits, foreign currency, the add button, the category picker (built with spec 13) | TRX-01, 02, 05, 06, 09, 10, CUR-08, CAT-04, 06, MER-01 | Built |
-| 16 | [Transfer and adjustment](16-transfer-adjustment.md) | Transfer form (fee, two currencies), balance adjustment | TRX-03, 04, 11 | Transfer built |
+| 16 | [Transfer and adjustment](16-transfer-adjustment.md) | Transfer form (fee, two currencies), balance adjustment | TRX-03, 04, 11 | Built |
 | 17 | [First run](17-first-run.md) | Language, currencies, first accounts and categories | SET-01 | Reviewed |
 | 18 | [Import and export](18-import-export.md) | File check, summary, commit, undo, export | IMP-01, 04, 05, 06, SEC-04 | Reviewed |
 

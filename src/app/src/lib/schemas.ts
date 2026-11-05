@@ -21,6 +21,7 @@ export const VALIDATION_IDS = [
   'duplicateCategory',
   'sameAccount',
   'feeCategoryUnset',
+  'balanceMatches',
 ] as const
 export type ValidationId = (typeof VALIDATION_IDS)[number]
 

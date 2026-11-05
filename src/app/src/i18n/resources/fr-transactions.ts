@@ -46,6 +46,19 @@ export const transactionsFr = {
     'Elle a été notée dans le compte {{account}} et assignée à la catégorie {{categories}}.',
   deleteCategories_other:
     'Elle a été notée dans le compte {{account}} et répartie entre les catégories {{categories}}.',
+  adjustment: {
+    newTitle: 'Ajuster un solde',
+    editTitle: 'Modifier l’ajustement de “{{name}}”',
+    appBalance: 'Solde dans l’app',
+    realBalance: 'Solde réel',
+    gap: 'Écart',
+    created: 'Solde ajusté.',
+    updated: 'Ajustement enregistré.',
+    deleteLabel: 'Supprimer l’ajustement',
+    deleteTitle: 'Supprimer l’ajustement de {{amount}} du {{date}}',
+    deleteText:
+      'Le solde de {{account}} reviendra à celui de ses transactions.',
+  },
   transfer: {
     newTitle: 'Nouveau transfert',
     editTitle: 'Modifier le transfert',
@@ -115,6 +128,5 @@ export const transactionsFr = {
     pendingCount_one: '{{count}} en attente',
     pendingCount_other: '{{count}} en attente',
     transferFee: 'Frais du transfert: {{from}} → {{to}}',
-    adjustSoon: 'Les ajustements arrivent avec le prochain écran.',
   },
 }
