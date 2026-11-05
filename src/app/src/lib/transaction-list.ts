@@ -1,0 +1,130 @@
+import { z } from 'zod'
+
+// The transactions list (spec 14): a period, its days, a page at a time.
+
+export const LISTED_KINDS = [
+  'expense',
+  'income',
+  'transfer',
+  'adjustment',
+] as const
+export type ListedKind = (typeof LISTED_KINDS)[number]
+
+export const PERIODS = ['all', 'year', 'month', 'custom'] as const
+export type Period = (typeof PERIODS)[number]
+
+/** As the URL carries them: "2026-11" and "2026". */
+export const monthSchema = z.string().regex(/^\d{4}-(0[1-9]|1[0-2])$/)
+export const yearSchema = z.string().regex(/^\d{4}$/)
+
+export function monthOf(isoDate: string): string {
+  return isoDate.slice(0, 7)
+}
+
+export function shiftMonth(month: string, by: number): string {
+  const [year = 0, index = 1] = month.split('-').map(Number)
+  const months = year * 12 + index - 1 + by
+  return `${Math.floor(months / 12)}-${String((months % 12) + 1).padStart(2, '0')}`
+}
+
+function isoDay(date: Date): string {
+  return date.toISOString().slice(0, 10)
+}
+
+/** The 30 days up to `today`, where a custom period starts. */
+export function lastThirtyDays(today: string): { start: string; end: string } {
+  const start = new Date(`${today}T00:00:00Z`)
+  start.setUTCDate(start.getUTCDate() - 29)
+  return { start: isoDay(start), end: today }
+}
+
+/**
+ * The days a period covers, both ends included; null is open. A custom period runs from
+ * `start` to `end`, the last 30 days until they are chosen.
+ */
+export function periodRange(
+  period: Period,
+  {
+    month,
+    year,
+    start,
+    end,
+  }: { month: string; year: string; start: string; end: string },
+): { from: string | null; to: string | null } {
+  if (period === 'all') return { from: null, to: null }
+  if (period === 'year') return { from: `${year}-01-01`, to: `${year}-12-31` }
+  if (period === 'custom') return { from: start, to: end }
+  const [y = 0, m = 1] = month.split('-').map(Number)
+  return { from: `${month}-01`, to: isoDay(new Date(Date.UTC(y, m, 0))) }
+}
+
+export type AccountName = { name: string; institution: string | null }
+
+export type ListedCategory = { name: string; icon: string; color: string }
+
+export type ListedTransaction = {
+  id: string
+  transferId: string | null
+  kind: ListedKind
+  occurredOn: string
+  pending: boolean
+  merchant: string | null
+  note: string | null
+  account: AccountName
+  /** The two accounts of a transfer leg. */
+  transfer: { from: AccountName; to: AccountName } | null
+  /** Every category of the transaction, the largest share first (TRX-06). */
+  categories: Array<ListedCategory>
+  /** As booked, in the account's currency; a transfer is unsigned in the full list. */
+  amount: string
+  currency: string
+  /** In the display currency; null when the rate is missing. */
+  displayAmount: string | null
+  rate: string | null
+}
+
+export type TransactionDay = {
+  date: string
+  /** Incomes minus expenses in the display currency; null when a rate is missing. */
+  net: string | null
+  rows: Array<ListedTransaction>
+}
+
+/** Whole days; `cursor` is the day the next page starts before, null at the end. */
+export type TransactionPage = {
+  days: Array<TransactionDay>
+  cursor: string | null
+}
+
+/** What the list is narrowed to: a period's days, an account, a category, a merchant, a text. */
+export type ListQuery = {
+  from: string | null
+  to: string | null
+  accountIds?: Array<string>
+  categoryIds?: Array<string>
+  merchantIds?: Array<string>
+  search?: string
+}
+
+/** The filters in use with their names, for their chips; gone ones are left out. */
+export type ListFilters = {
+  accounts: Array<AccountName & { id: string }>
+  categories: Array<ListedCategory & { id: string }>
+  merchants: Array<{ id: string; name: string }>
+}
+
+export type PageRow = { row: ListedTransaction; dayNet: string | null }
+
+/** Rows come sorted from SQL, newest day first; this only cuts them into days. */
+export function groupByDay(
+  rows: ReadonlyArray<PageRow>,
+  more: boolean,
+): TransactionPage {
+  const days: Array<TransactionDay> = []
+  for (const { row, dayNet } of rows) {
+    const last = days.at(-1)
+    if (last?.date === row.occurredOn) last.rows.push(row)
+    else days.push({ date: row.occurredOn, net: dayNet, rows: [row] })
+  }
+  return { days, cursor: more ? (days.at(-1)?.date ?? null) : null }
+}

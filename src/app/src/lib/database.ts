@@ -3,6 +3,7 @@ import type { Database as Generated } from './database.gen'
 type Public = Generated['public']
 type Accounts = Public['Tables']['accounts']
 type SaveTransaction = Public['Functions']['save_transaction']
+type ListTransactions = Public['Functions']['list_transactions']
 
 // The generator types numeric as number. Amounts travel as text (ADR-004).
 type WithTextAmount<T> = Omit<T, 'opening_balance'> & {
@@ -25,6 +26,24 @@ type SaveTransactionArgs = Omit<
   merchant_id: string | null
 }
 
+// The generator types a SQL function's columns as never null.
+type ListedRow = ListTransactions['Returns'][number]
+type NullableListed =
+  | 'transfer_id'
+  | 'merchant'
+  | 'note'
+  | 'institution'
+  | 'from_account'
+  | 'from_institution'
+  | 'to_account'
+  | 'to_institution'
+  | 'display_amount'
+  | 'rate'
+  | 'day_net'
+type ListTransactionsRow = Omit<ListedRow, NullableListed> & {
+  [K in NullableListed]: ListedRow[K] | null
+}
+
 /** The generated schema (`npm run db:types`), with amounts as decimal strings. */
 export type Database = Omit<Generated, 'public'> & {
   public: Omit<Public, 'Tables' | 'Functions'> & {
@@ -34,9 +53,15 @@ export type Database = Omit<Generated, 'public'> & {
         Update: WithTextAmount<Accounts['Update']>
       }
     }
-    Functions: Omit<Public['Functions'], 'save_transaction'> & {
+    Functions: Omit<
+      Public['Functions'],
+      'save_transaction' | 'list_transactions'
+    > & {
       save_transaction: Omit<SaveTransaction, 'Args'> & {
         Args: SaveTransactionArgs
+      }
+      list_transactions: Omit<ListTransactions, 'Returns'> & {
+        Returns: Array<ListTransactionsRow>
       }
     }
   }

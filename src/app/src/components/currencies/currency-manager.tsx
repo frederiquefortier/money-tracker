@@ -1,24 +1,19 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { FloatingAddButton } from '#/components/floating-add-button'
+import { FloatingAddLink } from '#/components/floating-add-button'
 import { ConfirmDialog } from '#/components/confirm-dialog'
 import { CurrencyRow } from '#/components/currencies/currency-row'
 import { useCurrencyActions } from '#/components/currencies/use-currency-actions'
 import { ListCard } from '#/components/list-card'
 import { useToast } from '#/components/toaster'
 
+/** One thing to add, so the + goes straight to its form (shared patterns). */
 export function AddCurrencyButton() {
   const { t } = useTranslation()
   return (
-    <FloatingAddButton
+    <FloatingAddLink
+      to="/settings/currencies/add"
       label={t('currencies.add')}
-      options={[
-        {
-          to: '/settings/currencies/add',
-          label: t('currencies.add'),
-          icon: 'plus',
-        },
-      ]}
     />
   )
 }

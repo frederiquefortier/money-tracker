@@ -169,6 +169,24 @@ Notes:
   `security_invoker`. Counted in SQL because PostgREST returns at most 1,000 rows.
   `exchange_rate_text(from, to, on_date)` is `exchange_rate` as text: PostgREST sends a
   numeric result as a JSON number, which the browser would read as a float (ADR-004).
+- **The list** (spec 14, TRX-12..14). `list_transactions(from_date, to_date,
+  account_ids, category_ids, merchant_ids, search, before, max_rows)` returns the
+  transactions between two dates (either open), newest day first and the last entered
+  first within a day, every amount converted to the profile's display currency at the
+  rate of its date (CUR-07), as text. Each list keeps the transactions matching any of
+  its values, an empty list being no filter: `category_ids` with every sub-category (a
+  recursive walk down `parent_id`) and a split matching on any of its categories;
+  `search` keeps the ones where the text appears in the merchant, the note, any split's
+  category, the account or its institution (for a transfer, either side's), compared
+  through `fold_name`. A page holds about `max_rows` (150) rows and always whole days; `more`
+  says older rows remain, and the next page asks for the days `before` the page's last
+  one. `total` counts every row matched before the page is cut (and before `before`),
+  for the filter sheet's "Voir 128 résultats". Without accounts, a transfer is one row (its outgoing leg, unsigned, pending while
+  either leg is) with its fee under it; with them, each row is a chosen account's own
+  leg. Rows carry the account's institution (both of a transfer's), and `categories`,
+  every split's category as JSON, the largest share first. The day net (expenses and
+  incomes as listed) is computed in SQL and null when it includes a missing rate.
+  `security invoker`.
 - `import_ref` is unique per user, so re-running an import is idempotent.
   `import_batch_id` lets a whole import be undone; `import_batches` is described in
   [import.md](import.md#data-model).

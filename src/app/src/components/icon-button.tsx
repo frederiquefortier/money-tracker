@@ -26,18 +26,23 @@ export const iconHover = {
     'relative isolate before:absolute before:-inset-1.5 before:-z-10 before:rounded-lg group-hover:before:bg-secondary',
 }
 
-/** `muted` looks disabled but still answers a tap, so the reason can be shown. */
+/**
+ * `muted` looks disabled but still answers a tap, so the reason can be shown;
+ * `disabled` is for a moment only, as while the next month loads.
+ */
 export function IconButton({
   icon,
   label,
   pressed,
   muted = false,
+  disabled = false,
   onClick,
 }: {
   icon: IconName
   label: string
   pressed?: boolean
   muted?: boolean
+  disabled?: boolean
   onClick?: () => void
 }) {
   return (
@@ -47,8 +52,9 @@ export function IconButton({
       aria-label={label}
       aria-pressed={pressed}
       aria-disabled={muted || undefined}
+      disabled={disabled}
       onClick={onClick}
-      className={iconAction(muted)}
+      className={iconAction(muted || disabled)}
     >
       <Icon name={icon} />
     </button>

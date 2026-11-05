@@ -28,8 +28,11 @@
   --accent-foreground: oklch(0.42 0.14 320);
   --destructive: oklch(0.52 0.19 30);
   --destructive-foreground: oklch(0.52 0.19 30);
+  /* Incomes on the list: 5.4:1 on a card, 4.9:1 on the background (spec 14). */
+  --income: oklch(0.5 0.13 150);
   --border: oklch(0.88 0.04 320);
-  --input: oklch(0.65 0.08 320);
+  /* Every field and outline control: between the cards' border and the old field edge. */
+  --input: oklch(0.765 0.06 320);
   --ring: oklch(0.3 0.06 320);
   --chart-1: oklch(0.48 0.17 320);
   --chart-2: oklch(0.72 0.16 50);
@@ -63,6 +66,7 @@
   --accent-foreground: oklch(0.92 0.04 320);
   --destructive: oklch(0.7 0.17 27);
   --destructive-foreground: oklch(0.7 0.17 27);
+  --income: oklch(0.78 0.13 150);
   --border: oklch(0.34 0.04 320);
   --input: oklch(0.58 0.07 320);
   --ring: oklch(0.96 0.012 320);
@@ -94,6 +98,7 @@
   --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
+  --color-income: var(--income);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);

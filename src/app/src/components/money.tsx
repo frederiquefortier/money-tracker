@@ -1,48 +1,49 @@
 import { useTranslation } from 'react-i18next'
+import { Icon } from '#/components/icon'
 import { moneyFormat } from '#/lib/format'
 import { useLocale } from '#/lib/use-locale'
 import { cn } from '#/lib/utils'
 
 /**
- * An amount in its currency, cents set smaller (layout reference). `converted` adds the
- * ≈ marker of CUR-09; the full marker with the rate details comes with spec 14.
+ * An amount in its currency. `signed` shows the plus of an income. `converted` marks a
+ * total that mixes currencies with ≈ (CUR-09); a converted row shows its original amount
+ * instead. `detail` is the hover text and the screen readers' name.
  */
 export function Money({
   amount,
   currency,
+  signed = false,
   converted = false,
+  detail,
   className,
 }: {
   amount: string
   currency: string
+  signed?: boolean
   converted?: boolean
+  detail?: string
   className?: string
 }) {
   const { t } = useTranslation()
   const locale = useLocale()
-  const parts = moneyFormat(currency, locale).formatToParts(
-    amount as Intl.StringNumericLiteral,
-  )
-  const text = parts.map((p) => p.value).join('')
+  const text = moneyFormat(
+    currency,
+    locale,
+    signed ? 'exceptZero' : 'auto',
+  ).format(amount as Intl.StringNumericLiteral)
+  const label =
+    detail ??
+    (converted ? t('money.converted', { amount: text, currency }) : text)
 
   return (
     <span
       className={cn('whitespace-nowrap tabular-nums', className)}
-      aria-label={
-        converted ? t('money.converted', { amount: text, currency }) : text
-      }
+      title={detail ?? (converted ? label : undefined)}
+      aria-label={label}
     >
       <span aria-hidden="true">
         {converted && <span className="text-muted-foreground">≈ </span>}
-        {parts.map((part, i) =>
-          part.type === 'fraction' ? (
-            <span key={i} className="text-[0.8em]">
-              {part.value}
-            </span>
-          ) : (
-            part.value
-          ),
-        )}
+        {text}
       </span>
     </span>
   )
@@ -52,7 +53,11 @@ export function Money({
 export function MissingRate() {
   const { t } = useTranslation()
   return (
-    <span className="text-sm text-destructive" title={t('money.missingRate')}>
+    <span
+      className="inline-flex items-center gap-1 text-sm text-destructive"
+      title={t('money.missingRate')}
+    >
+      <Icon name="circle-warning" className="size-4" />
       {t('money.missingRateShort')}
     </span>
   )

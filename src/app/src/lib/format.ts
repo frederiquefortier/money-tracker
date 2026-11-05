@@ -1,10 +1,15 @@
 import { FORMAT_LOCALE } from '#/i18n/locales'
 import type { Locale } from '#/i18n/locales'
 
-export function moneyFormat(currency: string, locale: Locale) {
+export function moneyFormat(
+  currency: string,
+  locale: Locale,
+  signDisplay: 'auto' | 'exceptZero' = 'auto',
+) {
   return new Intl.NumberFormat(FORMAT_LOCALE[locale], {
     style: 'currency',
     currency,
+    signDisplay,
   })
 }
 
@@ -26,17 +31,47 @@ export function todayIso(now = new Date()): string {
   return `${now.getFullYear()}-${month}-${day}`
 }
 
+function utcDate(isoDate: string): Date {
+  const [year, month, day = 1] = isoDate.split('-').map(Number)
+  if (!year || !month) throw new RangeError(`Not an ISO date: ${isoDate}`)
+  return new Date(Date.UTC(year, month - 1, day))
+}
+
 /** Read as UTC so a `YYYY-MM-DD` date never shifts a day. */
 export function formatDate(
   isoDate: string,
   locale: Locale,
   style: 'long' | 'medium' | 'short' = 'long',
 ): string {
-  const [year, month, day] = isoDate.split('-').map(Number)
-  if (!year || !month || !day)
-    throw new RangeError(`Not an ISO date: ${isoDate}`)
   return new Intl.DateTimeFormat(FORMAT_LOCALE[locale], {
     dateStyle: style,
     timeZone: 'UTC',
-  }).format(new Date(Date.UTC(year, month - 1, day)))
+  }).format(utcDate(isoDate))
+}
+
+/** "lundi 3 novembre", a day header in the list (spec 14). */
+export function formatDay(isoDate: string, locale: Locale): string {
+  return new Intl.DateTimeFormat(FORMAT_LOCALE[locale], {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    timeZone: 'UTC',
+  }).format(utcDate(isoDate))
+}
+
+/** "novembre 2026" from "2026-11"; `short` gives the month alone, "nov.". */
+export function formatMonth(
+  month: string,
+  locale: Locale,
+  style: 'long' | 'short' = 'long',
+): string {
+  return new Intl.DateTimeFormat(FORMAT_LOCALE[locale], {
+    month: style,
+    year: style === 'long' ? 'numeric' : undefined,
+    timeZone: 'UTC',
+  }).format(utcDate(month))
+}
+
+export function formatCount(count: number, locale: Locale): string {
+  return new Intl.NumberFormat(FORMAT_LOCALE[locale]).format(count)
 }

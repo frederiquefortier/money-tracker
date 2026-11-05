@@ -23,10 +23,15 @@ const round = cn(
 // How far the options fan out from the button's centre, in px.
 const RADIUS = 84
 
-/** Where option `i` of `count` sits on the quarter circle from left (180°) to up (90°). */
-function offset(i: number, count: number) {
-  const angle =
-    (Math.PI / 180) * (180 - (count > 1 ? (i * 90) / (count - 1) : 0))
+// The angle between two options: their 48px circles side by side with a small gap.
+const STEP = 42
+
+/**
+ * Where option `i` sits: one after another on a quarter circle, starting at the button's
+ * left (180°) and going up, however many there are.
+ */
+function offset(i: number) {
+  const angle = (Math.PI / 180) * (180 - i * STEP)
   return {
     x: Math.round(Math.cos(angle) * RADIUS),
     y: Math.round(-Math.sin(angle) * RADIUS),
@@ -64,17 +69,15 @@ function useEscape(active: boolean, onEscape: () => void) {
 function RadialOption({
   option,
   index,
-  count,
   open,
   onPick,
 }: {
   option: AddOption
   index: number
-  count: number
   open: boolean
   onPick: () => void
 }) {
-  const { x, y } = offset(index, count)
+  const { x, y } = offset(index)
   return (
     <li
       className={cn(
@@ -105,7 +108,7 @@ function RadialOption({
 
 /**
  * The round add button of a screen that adds several things: it turns into a ✕ and fans
- * them out on a quarter circle.
+ * them out one after another on a quarter circle, from its left upwards.
  */
 export function FloatingAddButton({
   label,
@@ -154,7 +157,6 @@ export function FloatingAddButton({
               key={option.label}
               option={option}
               index={i}
-              count={options.length}
               open={open}
               onPick={close}
             />

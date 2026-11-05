@@ -16,7 +16,7 @@ onto them.
 | 11 | [Accounts](11-accounts.md) | Accounts by institution, account form, institution form | ACC-01..07 | Built |
 | 12 | [Categories](12-categories.md) | Category tree, category form, icon picker | CAT-01..03, 05, 07 | Built |
 | 13 | [Merchants](13-merchants.md) | Merchant list and form, merchant picker | MER-01, 05, TRX-05 | Built |
-| 14 | [Transactions](14-transactions.md) | The list (home tab), day groups, converted-amount marker | TRX-04, 09, CUR-06, 07, 09 | Reviewed |
+| 14 | [Transactions](14-transactions.md) | The list (home tab), day groups, converted-amount marker | TRX-04, 09, CUR-06, 07, 09 | Built |
 | 15 | [Transaction form](15-transaction-form.md) | Expense and income, splits, foreign currency, the add button, the category picker (built with spec 13) | TRX-01, 02, 05, 06, 09, 10, CUR-08, CAT-04, 06, MER-01 | Built |
 | 16 | [Transfer and adjustment](16-transfer-adjustment.md) | Transfer form (fee, two currencies), balance adjustment | TRX-03, 04, 11 | Reviewed |
 | 17 | [First run](17-first-run.md) | Language, currencies, first accounts and categories | SET-01 | Reviewed |
@@ -36,12 +36,21 @@ component to use, so a screen is assembled, not redrawn.
   right, above the tab bar on phones, with "Ajouter un compte" as its accessible name. A
   screen that adds one thing goes straight to its form (`FloatingAddLink`); one that
   adds several (`FloatingAddButton`) (Comptes: Compte, Institution) turns the + into a ✕ and fans the choices
-  out on a quarter circle as round icons only, the noun as tooltip and accessible name. Escape, a tap
+  out one after another on a quarter circle, from its left upwards, as round icons only, the noun as tooltip and accessible name. Escape, a tap
   outside or a choice closes it. A
   menu opens at least as wide as its button, aligned to it, and grows to fit its labels
   rather than cutting them. A list that filters has the filter before the sort, the
   same kind of button (`ChoiceMenu`): an icon for what it filters and the current choice,
-  "Filtrer: …" as its accessible name. `SortMenu` is built on it. Order, left to right:
+  "Filtrer: …" as its accessible name. `SortMenu` is built on it. A list filtered on
+  several things at once (Transactions) has a row of bubbles instead (`chip`, one height
+  for all): the period, then a button per filter, filled and naming the one ticked or
+  how many while in use; on phones a single Filtres button opening on the first filter.
+  Each opens one sheet on its tab (`FilterSheet`): tabs with
+  counts, a search for the open tab, lists of checkboxes (`CheckList`), several ticked
+  at once, each applying as it is ticked, and a footer with Effacer and "Voir 128
+  résultats". A whole row is the tap target, the box at its end. Only groups fold, each
+  a card like an institution's on Comptes, its name folding it and "Tout" ticking all of
+  it. Order, left to right:
   expand all, filter, sort.
 - **Lists:** cards (`ListCard`), one line per item where it fits. Tapping an item opens
   its form. A card header (an institution) is a row too: tapping the line opens its form,
@@ -96,14 +105,18 @@ component to use, so a screen is assembled, not redrawn.
   draws them, everywhere (the picker, Parent, the Magasins filter): a tree with elbow
   connectors (`TreeGuides`), each with its icon and its name; the field shows the full
   path once chosen. A search keeps each match's parents.
-- **Search:** only on lists that grow long (Magasins, Catégories, the icon picker), a
-  `SearchField` above the list (and above the tabs, when a list has them), filtering as you type, ignoring case and accents. The
+- **Search:** only on lists that grow long (Magasins, Catégories, the icon picker,
+  Transactions), a `SearchField` with a magnifier inside it above the list (and above the tabs, when a list has them), filtering as you type, ignoring case and accents. The
   words are the same everywhere: "Rechercher" and "Aucun résultat.", never naming the
   thing searched.
 - **Round pickers:** a round button that opens a picker (a category's icon) shows a
   small badge in its corner, `EditHint`: a pencil when it holds a choice, on hover and
   focus and always on touch screens; a plus on an empty dashed circle, the same way (hover,
   focus, touch), its border darkening to the primary colour on hover and focus.
+- **Accounts** are always named with their institution, "Chèque (Desjardins)"
+  (`accountLabel`): in lists, fields, pickers and chips. Comptes, which groups them under
+  their institution, is the one place they stand alone.
+- **Amounts** are Inconsolata at one size (`Money`), the cents not shrunk.
 - **Tags:** a short status beside a name ("Par défaut", "Archivée") is a `Tag`.
 - **No helper text:** no hints under fields, legends or explanatory sentences. If a field
   needs explaining, fix its label or the layout. A reason for something unavailable goes

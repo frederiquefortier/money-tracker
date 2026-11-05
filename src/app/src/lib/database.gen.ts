@@ -609,6 +609,41 @@ export type Database = {
         Returns: string
       }
       fold_name: { Args: { name: string }; Returns: string }
+      list_transactions: {
+        Args: {
+          account_ids?: string[]
+          before?: string
+          category_ids?: string[]
+          from_date?: string
+          max_rows?: number
+          merchant_ids?: string[]
+          search?: string
+          to_date?: string
+        }
+        Returns: {
+          account_name: string
+          amount: string
+          categories: Json
+          currency: string
+          day_net: string
+          display_amount: string
+          from_account: string
+          from_institution: string
+          id: string
+          institution: string
+          kind: string
+          merchant: string
+          more: boolean
+          note: string
+          occurred_on: string
+          pending: boolean
+          rate: string
+          to_account: string
+          to_institution: string
+          total: number
+          transfer_id: string
+        }[]
+      }
       merge_merchants: {
         Args: { source: string; target: string }
         Returns: undefined

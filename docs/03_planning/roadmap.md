@@ -45,8 +45,10 @@ adjustments and real balances, with 39 pgTAP tests; a merge now moves transactio
 transaction form (spec 15) is built: amount, foreign currency with its fee, splits,
 merchant and category pickers with "Fréquentes". Currency favourites are dropped (CUR-03)
 and every screen adds through one round + bottom right. Expense categories take a need
-or want mark (CAT-10). The list (spec 14) and transfers
-(spec 16) come next.
+or want mark (CAT-10). The list (spec 14) is built: a chosen period (TRX-13: everything as
+you scroll, a year, a month, custom days), search (TRX-12) and filters by account,
+category and merchant (TRX-14), day groups with their net in SQL, splits as stacked
+icons. Transfers and adjustments (spec 16) come next.
 
 - Currencies, HexaRate validation, the Frankfurter rates job with a backfill to 2018,
   converted-amount markers. CUR-01..09 (ADR-009).
@@ -64,6 +66,8 @@ or want mark (CAT-10). The list (spec 14) and transfers
 - Transactions: expense, income, adjustment, transfer with fee (including between
   currencies), splits, status, notes. TRX-01..06, 09..11. Multi-row writes as SQL functions
   with pgTAP tests (ADR-012).
+- The transactions list over a chosen period, loaded as you scroll, with search and
+  filters by account, category and merchant. TRX-12 (moved from phase 2), 13, 14.
 - Category icon picker over a curated, vendored subset of coolicons. CAT-07 (ADR-020).
 - **Gate before the spreadsheet is retired** (met 2026-11-02): backup workflow enabled, one
   restore tested, the first monthly copy on the offline drive, and the private key in the
@@ -80,7 +84,6 @@ or want mark (CAT-10). The list (spec 14) and transfers
 - Budgets and the emergency fund. BUD-01..04, 06, CAT-08.
 - Tags with automatic rules. TAG-01..03.
 - Recurring transactions. TRX-08.
-- Text search in the transactions list. TRX-12.
 - Merchant price evolution. MER-04.
 - Delete my account and all its data. SEC-04.
 

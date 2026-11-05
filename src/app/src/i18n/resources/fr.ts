@@ -33,6 +33,8 @@ export const fr = {
     delete: 'Supprimer',
     deleteName: 'Supprimer “{{name}}”',
     createText: 'Créer « {{text}} »',
+    expandName: 'Déplier “{{name}}”',
+    collapseName: 'Replier “{{name}}”',
     expandAll: 'Tout déplier',
     collapseAll: 'Tout replier',
     sortLabel: 'Trier: {{sort}}',
@@ -125,8 +127,6 @@ export const fr = {
     settings: 'Réglages',
   },
   comingSoon: {
-    transactions:
-      'Vos comptes et vos transactions arrivent ici, avec l’import de votre historique.',
     dashboard: 'Vos dépenses par catégorie et par mois s’afficheront ici.',
     budget: 'Vos objectifs et votre fonds d’urgence vivront ici.',
   },

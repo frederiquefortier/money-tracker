@@ -68,8 +68,8 @@ ACC-01, 02, 03, 04, 05, 06, 07. ACC-08 (last reconciled, last transaction) is ph
 - **Actions** in the row's action slot from `md` up, in the account sheet's header on
   phones: archive (asks the date, default today) and trash. The institution's website
   and trash move the same way.
-- Tapping a row opens the account form. Once the transactions list exists (spec 14), it
-  opens that list filtered to the account, with a pencil in its header for the form.
+- Tapping a row opens the account form. Its transactions are found through the list's
+  filters (spec 14); the list carries no account actions (decided 2026-11-05).
 
 ### Sort (ACC-07)
 

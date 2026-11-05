@@ -11,6 +11,16 @@ export const NO_INSTITUTION = ''
 
 export const DEFAULT_ACCOUNT_TYPE = 'checking'
 
+/** "Chèque (Desjardins)": an account is always named with its institution. */
+export function accountLabel(account: {
+  name: string
+  institution: string | null
+}): string {
+  return account.institution
+    ? `${account.name} (${account.institution})`
+    : account.name
+}
+
 export function typeLabel(
   type: { labelFr: string; labelEn: string },
   locale: Locale,

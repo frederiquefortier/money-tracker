@@ -1,18 +1,23 @@
 # Transactions
 
-**Status:** reviewed 2026-11-03; aligned with the built screens 2026-11-03. Shared rules:
+**Status:** reviewed 2026-11-03; aligned with the built screens 2026-11-03; built
+2026-11-05, then reworked the same day after the author tried it, and the period and
+filters redone for phones the same day (process.md): a list
+over a chosen period, no tiles. Shared rules:
 [02-screens.md](02-screens.md#shared-patterns).
 
 ## Purpose
 
-The home tab and the screen used most: what came in and went out, day by day, for one
-month at a time. It replaces scrolling the spreadsheet's ledger. Every amount reads in the
-display currency, and it is always clear which ones were converted.
+The home tab and the screen used most: what came in and went out, day by day, over the
+period chosen. It replaces scrolling the spreadsheet's ledger. It is a list: totals by
+category and the month's spending belong to the dashboard (phase 2). Every amount reads
+in the display currency, and it is always clear which ones were converted.
 
 ## Requirements
 
-TRX-04 (how a transfer reads), TRX-09 (pending), CUR-06, 07, 09. The add button and the
-forms are spec 15 and 16; filters, stats and text search (TRX-12) come in phase 2.
+TRX-12 (search), TRX-13 (the period), TRX-14 (filters), TRX-04 (how a transfer reads), TRX-06 (several categories), TRX-09
+(pending), TRX-10 (the note), CUR-06, 07, 09. The add button and the forms are spec 15
+and 16.
 
 ## Layout
 
@@ -20,109 +25,184 @@ forms are spec 15 and 16; filters, stats and text search (TRX-12) come in phase 
 ┌──────────────────────────────┐
 │ [logo] MONEY TRACKER CAD▾ FR EN│
 ├──────────────────────────────┤
-│   ‹   NOVEMBRE 2026   ›      │
-│ ┌─────────────┐┌───────────┐ │
-│ │ DÉPENSES    ││ REVENUS   │ │
-│ │ 1 286,84 $  ││ 3 400,00 $│ │
-│ └─────────────┘└───────────┘ │
+│ TRANSACTIONS                 │
+│ [Rechercher               ]  │
+│‹(▣ Novembre 2026▾)› (⧩ Filtres)│
 │ LUNDI 3 NOVEMBRE    −96,40 $ │
 │ ┌──────────────────────────┐ │
 │ │(◉) IGA          −84,12 $ │ │
-│ │    Épicerie · Chèque      │ │
-│ │(◉) Café Olimpico ≈−6,28 $│ │
-│ │    Café · Wise EUR  4,20 €│ │
-│ │(⇄) Transfert: Chèque →    │ │
-│ │    Épargne       500,00 $ │ │
+│ │    Épicerie · Chèque (Des…│ │
+│ │(◉◉) Costco     −120,00 $ │ │
+│ │    Épicerie, Maison · Visa│ │
+│ │(◉) Café Olimpico −6,28 $ │ │
+│ │    Café · Wise      4,20 €│ │
+│ │(⇄) Transfert: Chèque      │ │
+│ │    (Desjardins) → Épargne │ │
+│ │                  500,00 $ │ │
 │ └──────────────────────────┘ │
 │ DIMANCHE 2 NOVEMBRE  ...     │
+│            (more as you scroll)│
 │                         (+)  │
 ├──────────────────────────────┤
 │  Transactions Dashboard ...  │
 └──────────────────────────────┘
 ```
 
-From `md` up: the same list, centred, at most 48rem wide; the tiles sit side by side
-above it.
+From `md` up: the same list, centred, at most 48rem wide.
 
 ## Content and behaviour
 
-### Month
+### Period
 
-- "‹ Novembre 2026 ›" at the top: the arrows step one month; tapping the label opens a
-  month and year picker. The current month by default; the last one viewed is kept for
-  the session.
-- Filtered to one account when opened from the accounts screen (spec 11): a chip under
-  the month, "Chèque ✕", removes the filter. The header then carries the account's icon
-  actions: a pencil (the account form) and "Ajuster le solde" (spec 16).
+- First in the row under the search, a bubble (`chip`) with the calendar icon: the
+  month, the year, "Toutes les dates", or the two days ("1 oct. 2026 – 30 oct. 2026"),
+  "Période: …" as its accessible name. For a month or a year, ‹ and › on either side
+  step one back or forward; › stops at the current one. Tout by default.
+- The bubble opens a popover: the four periods as the shared tabs (`TabList`: Tout,
+  Année, Mois, Personnalisée), over the year grid (twelve years ending with the current
+  one, filled column by column so they follow one another down each, arrows to earlier
+  ones), the month grid (a year with arrows over its twelve months), or two date
+  fields, Du and Au (native, ADR-024). Each tab is as wide as its label, so
+  Personnalisée fits on a phone. Nothing after the current year, month or day can
+  be picked, and the two days never cross. Tout applies and closes; a year or month
+  applies and closes; Personnalisée applies at once on the last 30 days, the dates as
+  they change.
+- Every period loads a page at a time: about 150 transactions, always whole days, and
+  the next page as the end of the list comes into view. Tout is the whole history this
+  way.
 
-### Tiles
+### Search
 
-- Two tiles: Dépenses and Revenus for the month, in the display currency. Transfers and
-  adjustments count in neither.
-- A refund (an income on an expense category) lowers Dépenses instead of raising
-  Revenus, so the tile matches what the category charts will show (database.md).
-- If any amount in a tile was converted, the tile total carries the converted marker and
-  "Inclut des montants convertis" on tap (CUR-09).
+- The shared `SearchField` under the title, looking within the period and the filters:
+  "Rechercher" finds the text in anything a row shows (TRX-12): the merchant, the note,
+  any of its categories, the account and its institution, and for a transfer either
+  side. Case and accents are ignored; it runs once typing pauses.
+
+### The row under the search
+
+- One row, all bubbles the same height (`chip`): the period, then the filters. When the
+  row runs out of room it scrolls sideways and fades at the right edge, so the list
+  never moves down.
+- On phones, one Filtres button with the filter icon, "Filtres · 3" and filled while
+  any are in use, opens the sheet on Comptes.
+- From `md` up, a button per filter instead, Comptes, Catégories, Magasins, each with a
+  chevron. A filter's button names the one ticked ("Épicerie", the category's with its icon,
+  "Chèque (Desjardins)"), or how many ("Catégories · 2"), and is filled while in use.
+  It opens the filter sheet on that filter.
+
+### Filters
+
+- The sheet (from the right from `md` up, full screen on a phone), titled Filtres, has
+  three tabs, Comptes, Catégories, Magasins, each with its count ("Catégories · 2"),
+  and a search under them for the open tab only ("Rechercher une catégorie"). Both stay
+  put while the list scrolls (TRX-14). Only the groups fold, each a card like an
+  institution's on Comptes: its name folds it and shows how many are ticked inside, and
+  "Tout" on its right ticks all of it ("Aucun" once it is).
+  - **Comptes**: a card per institution with its accounts, closed ones too, all open
+    while there are four institutions or fewer.
+  - **Catégories**: a card per type (Dépenses, Revenus, Placements) with the whole tree
+    inside, Dépenses open, archived categories too; sub-categories hang from their
+    parent on the tree's line. Ticking a category takes its whole branch: its
+    sub-categories show ticked and greyed. Unticking one of those keeps the rest of the
+    branch ticked (the parent gives way to its other children). A parent with some
+    ticked below it shows partly ticked.
+  - **Magasins**: one card, the ticked ones first, then the eight most used, fifty more
+    with each "Afficher plus"; the search reaches all of them, however many there are.
+  - A search lists the matches flat in one card, accounts with their institution and
+    categories by their full path.
+- Every row is one tap target, 48px tall, the checkbox at its end.
+- The footer: Effacer clears the open tab's ticks; "Voir 128 résultats" closes the
+  sheet. The count is every row the period, the filters and the search match, all pages
+  together; "Voir les résultats" while it loads, "Aucun résultat" at none.
+- Each tick applies at once, the list updating behind the sheet. A transaction shows
+  when it matches any ticked account, any ticked category and any ticked merchant; a
+  split matches on any of its categories. Transfers have neither a category nor a
+  merchant, so those filters leave them out. With accounts ticked, each row is that
+  account's own leg, so a transfer between two ticked accounts shows both. Day nets
+  count what is shown.
+- The period, the filters and the search are in the address (`?period=year&year=2026`,
+  `?category=[…]`, `?q=…`), so a form opened over the list closes back to them, and back
+  and reload keep them.
+- No account actions here: this is the transactions page, and an account's form is on
+  Comptes. No side panel on desktop: the list stays one centred column, and the sheet is
+  the one already used for forms. No sort: the day groups are the order.
 
 ### Day groups
 
 - A header per day, newest first: the weekday and date ("Lundi 3 novembre"), and on the
-  right the day's net (incomes minus expenses) in the display currency.
+  right the day's net (incomes minus expenses, as the rows show them) in the display
+  currency: a minus when the day spent more, no plus and no converted marker.
 - Inside a day: the last entered first. Transactions have no time (spec 15).
 
 ### Rows
 
 - **Left:** the category's icon in its colour circle (spec 12). Several categories
-  (TRX-06): a split icon, neutral.
-- **Title:** the merchant, else the note, else the category name.
-- **Second line, muted:** the category (or "3 catégories") and the account.
-- **Amount, right**, in Inconsolata with the cents set smaller (layout reference), in the
-  display currency. Expenses with a minus sign in the text colour; incomes with a plus in
-  green (`--income`, `oklch(0.5 0.13 150)`: 5.4:1 on a card, 4.9:1 on the background).
-  The error red stays off amounts, where it would read as "negative".
-- **Converted** (CUR-09): when the transaction is not in the display currency, the amount
-  starts with `≈` and has a dotted underline; under it, muted, the amount as booked
-  ("4,20 €"). Tap or hover: "4,20 € converti au taux du 3 nov. 2026 (1 € = 1,4952 $)".
-  Native amounts show plain, no marker.
-- **Pending** (TRX-09): a small "En attente" label with a clock icon after the second
-  line. The amount counts in the tiles like any other.
-- **Transfer** (TRX-04): a transfer icon, the title "Transfert: Chèque → Épargne", the
-  amount neutral (no sign). One row per transfer, even though it is two legs. "En
-  attente" shows while either side is pending (spec 16). A fee shows
-  as its own expense row, right under it. In an account-filtered list, the row shows that
-  account's leg with its sign.
-- **Adjustment** (TRX-03): a scale icon, "Ajustement de solde", the signed difference.
+  (TRX-06): every icon, stacked like avatars, the largest share first and on top.
+- **Title:** the merchant, else the categories' names.
+- **Second line, muted:** the categories (when the title is the merchant), the
+  account, named with its institution as everywhere, and the note (TRX-10): "Épicerie ·
+  Chèque (Desjardins) · Épicerie de la semaine", cut with an ellipsis when long.
+- **Amount, right**, in Inconsolata at one size (larger than the title), in the display
+  currency, with room before the row's actions. Expenses with a minus sign in the text colour; incomes with a
+  plus in green (`--income`, `oklch(0.5 0.13 150)`: 5.4:1 on a card, 4.9:1 on the
+  background). The error red stays off amounts, where it would read as "negative".
+- **Converted** (CUR-09): when the transaction is not in the display currency, the
+  amount as booked sits under it, muted and smaller ("4,20 €"); that line is the marker, with no ≈ and
+  no underline. On hover and for screen readers: "4,20 € converti au taux du 3 nov. 2026
+  (1 EUR = 1,4952 CAD)", the rate written as on the transaction form. A tap opens the
+  row, whose form shows the rate.
+- **Pending** (TRX-09): a small "En attente" label with a clock icon at the end of the
+  second line.
+- **Transfer** (TRX-04): a transfer icon, the title "Transfert: Chèque (Desjardins) →
+  Épargne", the amount neutral (no sign). One row per transfer, even though it is two
+  legs. "En attente" shows while either side is pending (spec 16). A fee shows as its own
+  expense row, right under it. In an account-filtered list, the row shows that account's
+  leg with its sign.
+- **Adjustment** (TRX-03): a scale icon, "Ajustement de solde", the account on the
+  second line, the signed difference.
 - Tapping a row opens it in its form (spec 15 or 16), a route sheet over the list.
+  Until spec 16, a transfer, its fee and an adjustment answer a tap with a toast saying
+  they come with the next screen.
+- From `md` up, an expense or income has the trash in its row's action slot; on phones
+  it is in the sheet header (shared patterns).
 
 ## States
 
-- **Empty month:** "Aucune transaction en novembre 2026." and, while there are no
-  transactions at all, "Importer un historique" (spec 18). Adding is the round button.
+- **Empty:** "Aucune transaction en novembre 2026.", "… en 2026.", "Aucune transaction
+  du 1 oct. 2026 au 30 oct. 2026." or, for Tout, "Aucune transaction pour l'instant."
+  With a search or a filter, "Aucun résultat." Adding is the round
+  button. "Importer un historique", while there are no transactions at all, comes with
+  spec 18.
 - **Missing rate** (ADR-004): the amount shows "Taux manquant" with an error icon,
-  never zero, and every total that includes it shows the same error.
-- **Loading:** the month renders on the server. Stepping months shows the previous month
-  until the next one arrives, with the arrows disabled.
+  never zero, and the day net that includes it shows the same error.
+- **Loading:** the first page renders on the server. Changing the period shows the
+  previous one until the next arrives, with the tabs and the period's bubble disabled.
+  The filter sheet's lists load the first time it opens. Older pages show "Chargement…"
+  at the end while they load; a failure is a toast.
 
 ## Data
 
-- Reads: one server function, `listTransactions({ month, accountId? })`, returning the
-  rows, the day totals and the tile totals, already converted in SQL to the display
-  currency (amounts as strings, ADR-004). Conversion uses the rate on each transaction's
-  date (CUR-07).
-- Day and tile totals are computed in SQL, never summed in the browser.
+- Reads: one server function, `listTransactions({ from, to, accountIds?, categoryIds?,
+  merchantIds?, search?, before? })`,
+  over the SQL function `list_transactions` (database.md), returning whole days of rows
+  with their day nets, already converted in SQL to the display currency (amounts as
+  strings, ADR-004), the day the next page starts before, and the names of the filters
+  in use for their bubbles. Conversion uses the rate on each transaction's date (CUR-07).
+- Day nets are computed in SQL, never summed in the browser.
 - Transfers come back as one row per `transfer_id`.
 
 ## Copy
 
 | Key | Français |
 |---|---|
-| Tiles | Dépenses, Revenus |
-| Converted total | Inclut des montants convertis |
+| Period | Tabs Tout, Année, Mois, Personnalisée; Toutes les dates; Période: {period}; Du, Au; Mois précédent, Mois suivant |
+| Filters | Filtres, Filtres · {count}, Comptes, Catégories, Magasins, {name} · {count}; Rechercher un compte, une catégorie, un magasin; Tout, Aucun, Tout cocher dans “{name}”, Tout décocher dans “{name}”; Effacer, Voir {count} résultat(s), Voir les résultats, Aucun résultat |
 | Converted detail | {original} converti au taux du {date} ({rate}) |
-| Several categories | {count} catégories |
 | Pending | En attente |
 | Transfer | Transfert: {from} → {to} |
 | Adjustment | Ajustement de solde |
-| Empty | Aucune transaction en {month}. |
+| Empty | Aucune transaction en {period}. Aucune transaction du {start} au {end}. Aucune transaction pour l'instant. Aucun résultat. |
 | Actions | Importer un historique, Ajuster le solde |
 | Missing rate | Taux manquant |
+| Grids | Année précédente, Année suivante, Années précédentes, Années suivantes |
+| Until spec 16 | Les ajustements arrivent avec le prochain écran. (transfers reuse the form's line) |

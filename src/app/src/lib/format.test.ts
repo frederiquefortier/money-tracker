@@ -1,5 +1,13 @@
 import { describe, expect, it } from 'vitest'
-import { formatDate, formatMoney, todayIso } from './format'
+import {
+  formatCount,
+  formatDate,
+  formatDay,
+  formatMonth,
+  formatMoney,
+  moneyFormat,
+  todayIso,
+} from './format'
 
 // ICU versions differ in which space they use as a separator.
 const plain = (s: string) => s.replace(/[\u00a0\u202f]/g, ' ')
@@ -46,5 +54,35 @@ describe('todayIso', () => {
     // 23:30 local time: in Canada, already the next day in UTC.
     expect(todayIso(new Date(2026, 10, 3, 23, 30))).toBe('2026-11-03')
     expect(todayIso(new Date(2026, 0, 9, 0, 5))).toBe('2026-01-09')
+  })
+})
+
+describe('formatDay and formatMonth', () => {
+  it('names the weekday of a day header', () => {
+    expect(formatDay('2026-11-02', 'fr')).toBe('lundi 2 novembre')
+    expect(formatDay('2026-11-02', 'en')).toBe('Monday, November 2')
+  })
+
+  it('names a month with its year, or alone', () => {
+    expect(formatMonth('2026-11', 'fr')).toBe('novembre 2026')
+    expect(formatMonth('2026-01', 'en')).toBe('January 2026')
+    expect(formatMonth('2026-11', 'fr', 'short')).toBe('nov.')
+  })
+})
+
+describe('signed amounts', () => {
+  it('shows a plus on incomes and nothing on zero', () => {
+    expect(plain(formatMoney('3400', 'CAD', 'fr'))).toBe('3 400,00 $')
+    expect(plain(moneyFormat('CAD', 'fr', 'exceptZero').format(3400))).toBe(
+      '+3 400,00 $',
+    )
+    expect(moneyFormat('CAD', 'en', 'exceptZero').format(0)).toBe('$0.00')
+  })
+})
+
+describe('formatCount', () => {
+  it('groups thousands the locale way', () => {
+    expect(formatCount(1284, 'fr')).toBe('1\u00a0284')
+    expect(formatCount(1284, 'en')).toBe('1,284')
   })
 })

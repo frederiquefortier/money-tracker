@@ -33,6 +33,8 @@ export const en: Messages = {
     delete: 'Delete',
     deleteName: 'Delete “{{name}}”',
     createText: 'Create “{{text}}”',
+    expandName: 'Expand “{{name}}”',
+    collapseName: 'Collapse “{{name}}”',
     expandAll: 'Expand all',
     collapseAll: 'Collapse all',
     sortLabel: 'Sort: {{sort}}',
@@ -123,8 +125,6 @@ export const en: Messages = {
     settings: 'Settings',
   },
   comingSoon: {
-    transactions:
-      'Your accounts and transactions will live here, with the import of your history.',
     dashboard: 'Your spending by category and by month will show here.',
     budget: 'Your goals and your emergency fund will live here.',
   },

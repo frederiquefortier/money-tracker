@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { Combobox } from '#/components/combobox'
 import { FieldMessage, FormField } from '#/components/form-field'
 import { FieldLabel, fieldControl } from '#/components/ui/field'
+import { accountLabel } from '#/lib/accounts'
 import type { FormAccount } from '#/lib/transactions'
 import { useFormatLocale } from '#/lib/use-locale'
 import { cn } from '#/lib/utils'
@@ -36,7 +37,7 @@ export function AccountPicker({
     .map((a) => ({
       value: a.id,
       // Names repeat across institutions: the field says which once chosen.
-      label: a.institution ? `${a.name} · ${a.institution}` : a.name,
+      label: accountLabel(a),
       short: a.name,
       keywords: `${a.institution ?? ''} ${a.currency}`,
       group: group(a),

@@ -24,7 +24,10 @@ viewing are in `references/visual/` (gitignored: third-party images, never commi
   with its tints (secondary, accent) at the same hue (2026-11-03). Text, muted text,
   borders, field borders, the focus outline and the backgrounds are plum tints too (hue
   320): the page is a plum cream (`oklch(0.965 0.014 320)`), cards a near white. Muted
-  text is 5.6:1 on the page; field borders are at least 3:1 in both themes. Only white
+  text is 5.6:1 on the page. Fields and outline controls (sort, filter, bubbles) share
+  one border, `--input`, set on 2026-11-05 halfway between the cards' border and the
+  old 3:1 field edge, by the author's choice: softer, below 3:1 in the light theme. Only
+  white
   button text, the error red and the sunset gradients sit off that hue. White text on it is
   7.2:1 and plum text on cream 6.9:1. It replaced a rose that sat 0.05 from the error red
   in perceptual distance; plum sits 0.21 away, so red is left to errors and deletes.
