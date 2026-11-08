@@ -1,16 +1,24 @@
 import { describe, expect, it } from 'vitest'
 import {
-  peopleErrors,
-  peopleForKind,
-  peopleInput,
-  peoplePreview,
   withHeadCount,
   withPeople,
   withPeopleMode,
-  withSource,
+  withRoleSwitched,
   withoutLine,
   withoutPeople,
 } from './transaction-people'
+import {
+  peopleErrors,
+  typedLeft,
+  peopleInput,
+  peoplePreview,
+} from './people-parts'
+import {
+  ANONYMOUS,
+  peopleForKind,
+  sourceOf,
+  withSource,
+} from './transaction-source'
 import type { PersonLine } from './transaction-people'
 import type { SplitMode, TransactionKind } from './transactions'
 
@@ -75,7 +83,7 @@ describe('peoplePreview', () => {
     }))
     expect(
       peoplePreview(draft(typed, 'expense', 'amount'), 4000n, 'CAD'),
-    ).toEqual({
+    ).toMatchObject({
       amounts: [0n, 4000n],
       remaining: 0n,
     })
@@ -103,6 +111,12 @@ describe('peoplePreview', () => {
 })
 
 describe('an income', () => {
+  it('can come from someone without a name', () => {
+    const anonymous = withSource(ANONYMOUS).people ?? []
+    expect(roles(anonymous)).toEqual([['from', null, '1']])
+    expect(sourceOf({ people: anonymous })).toBe(ANONYMOUS)
+  })
+
   it('has one source, taking the whole amount', () => {
     expect(roles(withSource(ALEX).people)).toEqual([['from', ALEX, '1']])
     expect(withSource(null).people).toEqual([])
@@ -121,15 +135,135 @@ describe('an income', () => {
   })
 })
 
+describe('an empty Me doit part (spec 21)', () => {
+  it('starts empty when the line becomes Me doit', () => {
+    const lines = withPeople(draft(), [SAM]).people ?? []
+    const owes = withRoleSwitched(draft(lines), lines[1].key).people ?? []
+    expect(owes[1].value).toBe('')
+  })
+
+  it('in Parts, sits outside the split: the others share the whole amount', () => {
+    const lines = withPeople(draft(), [ALEX, SAM]).people ?? []
+    const owes = withRoleSwitched(draft(lines), lines[2].key).people ?? []
+    expect(peoplePreview(draft(owes), 9000n, 'CAD')).toMatchObject({
+      amounts: [4500n, 4500n, undefined],
+      remaining: 0n,
+    })
+    expect(peopleInput(draft(owes), 'CAD', 9000n)[2]).toMatchObject({
+      amountUnknown: true,
+    })
+  })
+
+  it('in Montant too, Moi taking the rest until the reimbursement (Moi typed or not)', () => {
+    const lines: Array<PersonLine> = [
+      { key: 1, role: 'me', personId: null, headCount: 1, value: '30' },
+      { key: 2, role: 'owes', personId: SAM, headCount: 1, value: '' },
+    ]
+    const montant = draft(lines, 'expense', 'amount')
+    expect(peoplePreview(montant, 9000n, 'CAD')).toMatchObject({
+      amounts: [9000n, undefined],
+      remaining: 0n,
+    })
+    expect(peopleInput(montant, 'CAD', 9000n)).toMatchObject([
+      { role: 'me', value: '90.00', fillsRest: false },
+      { role: 'owes', amountUnknown: true },
+    ])
+  })
+})
+
+describe('an empty field never stops the save', () => {
+  const line = (key: number, role: PersonLine['role'], value: string) => ({
+    key,
+    role,
+    personId: role === 'me' ? null : ALEX,
+    headCount: 1,
+    value,
+  })
+
+  it('in Montant, empty lines share what the typed ones leave, Moi included', () => {
+    const montant = draft(
+      [line(1, 'me', ''), line(2, 'invited', '30')],
+      'expense',
+      'amount',
+    )
+    expect(peoplePreview(montant, 9000n, 'CAD')).toMatchObject({
+      amounts: [6000n, 3000n],
+      remaining: 0n,
+    })
+    expect(peopleErrors(montant, 'CAD', 9000n)).toEqual({})
+  })
+
+  it('in %, empty lines share the percentage left', () => {
+    const percent = draft(
+      [line(1, 'me', ''), line(2, 'invited', '25')],
+      'expense',
+      'percent',
+    )
+    expect(peoplePreview(percent, 8000n, 'CAD').amounts).toEqual([6000n, 2000n])
+    expect(peopleInput(percent, 'CAD', 8000n)[0].value).toBe('75.0000')
+  })
+
+  it('in Parts, an empty line counts one part', () => {
+    const parts = draft([line(1, 'me', ''), line(2, 'invited', '1')])
+    expect(peoplePreview(parts, 1000n, 'CAD').amounts).toEqual([500n, 500n])
+  })
+
+  it('counts only the typed lines in what is left to share, as % does', () => {
+    const montant = draft(
+      [line(1, 'me', ''), line(2, 'invited', '30')],
+      'expense',
+      'amount',
+    )
+    expect(typedLeft(montant, 9000n, 'CAD')).toBe(6000n)
+  })
+
+  it('says the typed lines take everything when nothing is left', () => {
+    const montant = draft(
+      [line(1, 'me', ''), line(2, 'invited', '90')],
+      'expense',
+      'amount',
+    )
+    expect(peopleErrors(montant, 'CAD', 9000n)).toEqual({ people: 'splitsSum' })
+  })
+})
+
 describe('peopleInput', () => {
   it('sends Montant parts in the account currency', () => {
     const lines: Array<PersonLine> = [
-      { key: 1, role: 'me', personId: null, headCount: 1, value: '0' },
-      { key: 2, role: 'owes', personId: ALEX, headCount: 1, value: '12,5' },
+      {
+        key: 1,
+        role: 'me',
+        personId: null,
+        headCount: 1,
+        value: '0',
+      },
+      {
+        key: 2,
+        role: 'owes',
+        personId: ALEX,
+        headCount: 1,
+        value: '12,5',
+      },
     ]
-    expect(peopleInput(draft(lines, 'expense', 'amount'), 'CAD')).toEqual([
-      { role: 'me', personId: null, headCount: 1, value: '0.00' },
-      { role: 'owes', personId: ALEX, headCount: 1, value: '12.50' },
+    expect(
+      peopleInput(draft(lines, 'expense', 'amount'), 'CAD', 1250n),
+    ).toEqual([
+      {
+        role: 'me',
+        personId: null,
+        headCount: 1,
+        amountUnknown: false,
+        fillsRest: false,
+        value: '0.00',
+      },
+      {
+        role: 'owes',
+        personId: ALEX,
+        headCount: 1,
+        amountUnknown: false,
+        fillsRest: false,
+        value: '12.50',
+      },
     ])
   })
 })

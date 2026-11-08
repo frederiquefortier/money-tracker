@@ -34,6 +34,8 @@ export function LineValue({
   mode,
   computed,
   accountCurrency,
+  placeholder,
+  showComputed = mode !== 'amount',
   onChange,
 }: {
   value: string
@@ -41,6 +43,10 @@ export function LineValue({
   mode: SplitMode
   computed: bigint | null | undefined
   accountCurrency: string
+  /** Shown while empty: "?" on a part not known yet (spec 21). */
+  placeholder?: string
+  /** What the line comes to, under it: in Parts and %, or an empty Montant line. */
+  showComputed?: boolean
   onChange: (value: string) => void
 }) {
   return (
@@ -50,10 +56,11 @@ export function LineValue({
         inputMode="decimal"
         autoComplete="off"
         value={value}
+        placeholder={placeholder}
         onChange={(event) => onChange(event.target.value)}
         className={cn(typed, 'w-20')}
       />
-      {mode !== 'amount' && computed != null && (
+      {showComputed && computed != null && (
         <Money
           amount={fromMinor(computed, minorDigits(accountCurrency))}
           currency={accountCurrency}

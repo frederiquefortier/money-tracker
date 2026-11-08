@@ -53,7 +53,7 @@ English; this file is in English like every other meta-doc.
 | TRX-04 | Transfer between two accounts. Optional fee, recorded as an expense on the source account in the category chosen once in settings. Edit and delete act on all legs together, with a confirmation before delete. List shows "Transfert: A → B". | add, C5 | 1 |
 | TRX-05 | A transaction can be linked to a merchant. | v1, ai | 1 |
 | TRX-06 | Split a transaction across several categories by amount, share or percentage. | v1, ai | 1 |
-| TRX-07 | Link an income to an expense as its reimbursement. | v1, ai | 2 |
+| TRX-07 | Link an income to an expense as its reimbursement: from the income, to the lines of its source who owe me, which can be an amount not known yet that the reimbursement sets. The income takes the expense's category by default. | v1, ai, author | 2 |
 | TRX-08 | Recurring transactions. Changing the amount keeps the old amount and the change date as history. The recurrence can be stopped. | v1, ai | 4 |
 | TRX-09 | Status: pending or cleared, so a pending card charge does not count as reconciled. Pending rows stand out in the list (blue, as in the spreadsheet) and can be listed alone. | sheet | 1 |
 | TRX-10 | A transaction can carry a free-text note (the memo). | sheet | 1 |
@@ -118,7 +118,7 @@ English; this file is in English like every other meta-doc.
 | PPL-02 | A person or a group can be archived and hidden. | ai | 2 |
 | PPL-03 | An expense can be linked to people or groups (a group adds its members), each in a role: invited (I paid for them, the default) or owes (they will pay me back), beside my own part. Their part is set by amount, share or percentage. An income names the one person it came from. | v1, ai, author | 2 |
 | PPL-04 | Without naming anyone: tick "I treated someone" with an amount and a head count, or "I expect a reimbursement" with an amount. | v1 | 2 |
-| PPL-05 | Reminders for money owed in both directions. | misc | 2 |
+| PPL-05 | What each person owes me, at a glance: on their row and in their sheet, and the owed bubble on Transactions. Money I owe others is out of scope. | misc, author | 2 |
 | PPL-06 | A person can have aliases, other spellings of their name, so the import finds them by name or alias, ignoring case and accents. A name or an alias points to one person only. | author | 2 |
 
 ## 9. Events (`EVT`)

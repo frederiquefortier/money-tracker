@@ -1,6 +1,7 @@
 import { Navigate, createFileRoute } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { PeopleActions } from '#/components/people/people-actions'
+import { OwedLines } from '#/components/people/owed-summary'
 import { PeopleForm } from '#/components/people/people-form'
 import { RouteSheet } from '#/components/route-sheet'
 import { takenNames, withMemberNames } from '#/lib/people'
@@ -35,7 +36,9 @@ function EditPerson() {
         aliases={person.aliases}
         taken={takenNames(people, person.id)}
         savedText={t('people.personUpdated')}
-      />
+      >
+        <OwedLines personId={person.id} />
+      </PeopleForm>
     </RouteSheet>
   )
 }

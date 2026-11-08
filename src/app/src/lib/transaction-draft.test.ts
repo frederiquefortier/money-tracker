@@ -175,6 +175,7 @@ describe('draftFromTransaction', () => {
         ],
         peopleMode: 'share',
         people: [],
+        reimburses: [],
       },
       'CAD',
       'fr',

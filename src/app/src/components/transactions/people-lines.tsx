@@ -7,17 +7,22 @@ import { EditHint } from '#/components/edit-hint'
 import { IconButton } from '#/components/icon-button'
 import { AnonymousAvatar, PersonAvatar } from '#/components/people/avatars'
 import { SplitRemaining } from '#/components/transactions/receipt-remaining'
-import { LineValue, ModeLine } from '#/components/transactions/receipt-splits'
+import { ModeLine } from '#/components/transactions/receipt-splits'
+import {
+  BackLines,
+  LinePart,
+} from '#/components/transactions/people-line-parts'
 import { rule } from '#/components/transactions/receipt-line'
 import type { Person } from '#/lib/people'
 import type { Draft } from '#/lib/transaction-draft'
 import {
-  peoplePreview,
   withHeadCount,
   withPeopleMode,
   withRoleSwitched,
   withoutLine,
+  isUnknown,
 } from '#/lib/transaction-people'
+import { peoplePreview, typedLeft } from '#/lib/people-parts'
 import type { PersonLine } from '#/lib/transaction-people'
 import { cn, focusRing } from '#/lib/utils'
 
@@ -106,6 +111,7 @@ function PeopleLine({
   draft,
   people,
   computed,
+  filled,
   accountCurrency,
   onChange,
 }: {
@@ -113,47 +119,53 @@ function PeopleLine({
   draft: Draft
   people: ReadonlyArray<Person>
   computed: bigint | null | undefined
+  filled: boolean
   accountCurrency: string
   onChange: Update
 }) {
   const { t } = useTranslation()
   const name = lineName(line, people, t)
   return (
-    <li className="flex items-start gap-2 text-sm">
-      <LineAvatar line={line} name={name} />
-      {/* The role on the name's line, on its right; a long name ends with "…". */}
-      <span className="flex min-w-0 flex-1 items-center gap-2">
-        <span className="min-w-0 flex-1 truncate leading-8">{name}</span>
-        <LineControls
-          line={line}
-          name={name}
-          draft={draft}
-          onChange={onChange}
+    <li className="flex flex-col gap-1 text-sm">
+      <div className="flex items-start gap-2">
+        <LineAvatar line={line} name={name} />
+        {/* The role on the name's line, on its right; a long name ends with "…". */}
+        <span className="flex min-w-0 flex-1 items-center gap-2">
+          <span className="min-w-0 flex-1 truncate leading-8">{name}</span>
+          <LineControls
+            line={line}
+            name={name}
+            draft={draft}
+            onChange={onChange}
+          />
+        </span>
+        <LinePart
+          {...{
+            line,
+            name,
+            draft,
+            computed,
+            filled,
+            accountCurrency,
+            onChange,
+          }}
         />
-      </span>
-      <LineValue
-        value={line.value}
-        label={t('transactions.people.part', { name })}
-        mode={draft.peopleMode}
+        {line.role === 'me' ? (
+          <span aria-hidden="true" className="size-8 shrink-0" />
+        ) : (
+          <IconButton
+            icon="close"
+            label={t('transactions.removeLine')}
+            onClick={() => onChange(withoutLine(draft, line.key))}
+          />
+        )}
+      </div>
+      <BackLines
+        line={line}
+        unknown={isUnknown(line)}
         computed={computed}
         accountCurrency={accountCurrency}
-        onChange={(value) =>
-          onChange({
-            people: draft.people.map((l) =>
-              l.key === line.key ? { ...l, value } : l,
-            ),
-          })
-        }
       />
-      {line.role === 'me' ? (
-        <span aria-hidden="true" className="size-8 shrink-0" />
-      ) : (
-        <IconButton
-          icon="close"
-          label={t('transactions.removeLine')}
-          onClick={() => onChange(withoutLine(draft, line.key))}
-        />
-      )}
     </li>
   )
 }
@@ -203,7 +215,11 @@ export function PeopleLines({
   onOpen: () => void
 }) {
   const { t } = useTranslation()
-  const { amounts, remaining } = peoplePreview(draft, total, accountCurrency)
+  const { amounts, remaining, filled } = peoplePreview(
+    draft,
+    total,
+    accountCurrency,
+  )
   if (draft.people.length === 0)
     return (
       <>
@@ -226,6 +242,7 @@ export function PeopleLines({
             key={line.key}
             {...{ line, draft, people, accountCurrency, onChange }}
             computed={amounts[i]}
+            filled={filled.has(line.key)}
           />
         ))}
       </ul>
@@ -235,7 +252,7 @@ export function PeopleLines({
           <SplitRemaining
             mode={draft.peopleMode}
             values={draft.people.map((l) => l.value)}
-            remaining={remaining}
+            remaining={typedLeft(draft, total, accountCurrency)}
             accountCurrency={accountCurrency}
           />
         )}

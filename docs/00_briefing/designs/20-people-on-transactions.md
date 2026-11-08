@@ -97,8 +97,12 @@ Over the whole sheet, like the category list (spec 15): a back arrow and the tit
 - **A line without a name** (PPL-04), with the person icon or a group's icon past one,
   reads "{count} personnes", its − and + before the
   role bubble, so they read as people, not as the amount.
+- **An empty field means not known yet** and never stops the save (spec 21): an empty
+  Me doit is set by its reimbursement; an empty Moi or Invité takes what is left.
 - **The remaining line** works as for the splits; in Montant and %, everything must be
-  shared to save. Parts always share everything; the last line takes the rounding cent.
+  shared to save. It counts the typed lines only, in Montant as in %, so with empty
+  lines it says what is left for them ("Reste 60,00 $ à répartir"), never "Tout est
+  réparti" when nothing is set (asked by the author 2026-11-08). Parts always share everything; the last line takes the rounding cent.
 - The amounts are in the account's currency, the transaction's `amount`.
 - **With splits**, each person's part comes off each category in proportion (Q5).
 

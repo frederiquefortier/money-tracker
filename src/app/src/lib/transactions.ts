@@ -59,7 +59,14 @@ export type Transaction = {
     personId: string | null
     headCount: number
     value: string
+    amountUnknown: boolean
+    /** Left empty: takes what the other lines leave (decided 2026-11-08). */
+    fillsRest: boolean
+    /** What came back for an owed line (spec 21). */
+    back: Array<{ amount: string; date: string }>
   }>
+  /** On an income, the owed lines it pays back, in order (spec 21). */
+  reimburses: Array<string>
 }
 
 export const positiveDecimal = z
@@ -91,11 +98,14 @@ export const transactionInputSchema = z
           role: z.enum(PERSON_ROLES),
           personId: z.uuid().nullable(),
           headCount: z.number().int().min(1).max(999),
+          amountUnknown: z.boolean(),
+          fillsRest: z.boolean(),
           // Moi can be zero (spec 20).
           value: z.string().regex(/^\d{1,15}(\.\d{1,4})?$/),
         }),
       )
       .max(100),
+    reimburses: z.array(z.uuid()).max(50),
   })
   .refine((t) => (t.originalAmount === null) === (t.originalCurrency === null))
 export type TransactionInput = z.input<typeof transactionInputSchema>

@@ -1,10 +1,13 @@
 import { useTranslation } from 'react-i18next'
 import { accountLabel } from '#/lib/accounts'
+import { formatDate } from '#/lib/format'
+import { useLocale } from '#/lib/use-locale'
 import type { ListedTransaction } from '#/lib/transaction-list'
 
 /** The title, then the muted line: categories, account and note. */
 export function useRowText(row: ListedTransaction) {
   const { t } = useTranslation()
+  const locale = useLocale()
   const categories = row.categories.map((c) => c.name).join(', ')
   const join = (parts: Array<string | null | undefined>) =>
     parts.filter(Boolean).join(' · ')
@@ -28,9 +31,18 @@ export function useRowText(row: ListedTransaction) {
       title: t('transactions.list.adjustment'),
       details: join([accountLabel(row.account), row.note]),
     }
+  // Spec 21: what an income pays back, first on its line.
+  const reimburses = row.reimburses
+    .map((r) =>
+      [r.label, formatDate(r.date, locale, 'medium')]
+        .filter(Boolean)
+        .join(', '),
+    )
+    .join('; ')
   return {
     title: row.merchant ?? categories,
     details: join([
+      reimburses && t('transactions.list.reimburses', { what: reimburses }),
       row.merchant ? categories : '',
       accountLabel(row.account),
       row.note,

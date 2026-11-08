@@ -66,11 +66,13 @@ export type ListedPerson = {
   name: string | null
   count: number
   role: 'invited' | 'owes' | 'from'
+  /** An owed part not fully paid back yet, or not known yet (spec 21). */
+  open: boolean
 }
 
-/** Someone on it owes me their part (spec 20; settled with spec 21). */
+/** Someone on it still owes me their part (spec 20, 21). */
 export const isOwed = (row: { people: ReadonlyArray<ListedPerson> }) =>
-  row.people.some((p) => p.role === 'owes')
+  row.people.some((p) => p.open)
 
 export type ListedTransaction = {
   id: string
@@ -90,6 +92,8 @@ export type ListedTransaction = {
    * has no name and a count; `owes` lines colour the row.
    */
   people: Array<ListedPerson>
+  /** On an income, the expenses it pays back: merchant or category, and date. */
+  reimburses: Array<{ label: string | null; date: string }>
   /** As booked, in the account's currency; a transfer is unsigned in the full list. */
   amount: string
   currency: string

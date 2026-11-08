@@ -108,6 +108,7 @@ export function PeopleForm({
   aliases: initialAliases = [],
   taken = new Set(),
   savedText,
+  children,
 }: {
   kind: PeopleKind
   row: Named | null
@@ -116,6 +117,8 @@ export function PeopleForm({
   aliases?: ReadonlyArray<string>
   taken?: ReadonlySet<string>
   savedText: string
+  /** Read-only content after the fields: what the person owes (spec 21). */
+  children?: React.ReactNode
 }) {
   const { t } = useTranslation()
   const [ids, setIds] = useState<Array<string>>([...linkedIds])
@@ -137,6 +140,7 @@ export function PeopleForm({
       {kind === 'person' && (
         <AliasList aliases={aliases} taken={taken} onChange={setAliases} />
       )}
+      {children}
     </SheetForm>
   )
 }

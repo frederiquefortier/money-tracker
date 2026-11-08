@@ -20,10 +20,16 @@ import type { PeopleSort, PeopleTab, Person, PersonGroup } from '#/lib/people'
 import { useFormatLocale } from '#/lib/use-locale'
 import { useStoredState } from '#/lib/use-stored-state'
 import { foldForSearch, oneOf } from '#/lib/utils'
+import { getBalances } from '#/server/owed'
+import type { Balance } from '#/server/owed'
 import { getPeople } from '#/server/people'
+import { OwedTag } from '#/components/people/owed-summary'
 
 export const Route = createFileRoute('/_authed/settings/people')({
-  loader: () => getPeople(),
+  loader: async () => {
+    const [people, balances] = await Promise.all([getPeople(), getBalances()])
+    return { ...people, balances }
+  },
   component: People,
 })
 
@@ -55,9 +61,11 @@ function AddMenu() {
 function PersonRows({
   people,
   groups,
+  balances,
 }: {
   people: ReadonlyArray<Person>
   groups: ReadonlyArray<PersonGroup>
+  balances: Record<string, Balance>
 }) {
   const locale = useFormatLocale()
   return people.map((person) => (
@@ -67,7 +75,13 @@ function PersonRows({
       row={person}
       details={namesOf(person.groupIds, groups, locale)}
       memberNames={[]}
-      aside={person.archivedOn && <ArchivedOn date={person.archivedOn} />}
+      aside={
+        person.archivedOn ? (
+          <ArchivedOn date={person.archivedOn} />
+        ) : (
+          <OwedTag balance={balances[person.id]} />
+        )
+      }
     />
   ))
 }
@@ -139,7 +153,7 @@ function TabPanel<T extends { name: string; archivedOn: string | null }>({
 
 function People() {
   const { t } = useTranslation()
-  const { people, groups } = Route.useLoaderData()
+  const { people, groups, balances } = Route.useLoaderData()
   const [tab, setTab] = useStoredState<PeopleTab>(
     'people.tab',
     'people',
@@ -188,7 +202,9 @@ function People() {
             empty={t('people.empty')}
             archivedLabel={(count) => t('people.archivedPeople', { count })}
             storageKey="people.archivedExpanded"
-            rows={(items) => <PersonRows people={items} groups={groups} />}
+            rows={(items) => (
+              <PersonRows people={items} groups={groups} balances={balances} />
+            )}
           />
         ) : (
           <TabPanel

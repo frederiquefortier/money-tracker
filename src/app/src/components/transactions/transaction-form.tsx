@@ -12,7 +12,7 @@ import { Details } from '#/components/transactions/transaction-details'
 import { useFocusFirstError, useValidationMessage } from '#/lib/form'
 import type { FieldErrors } from '#/lib/form'
 import { validateDraft, withPicked } from '#/lib/transaction-draft'
-import { peopleForKind } from '#/lib/transaction-people'
+import { peopleForKind } from '#/lib/transaction-source'
 import type { Draft } from '#/lib/transaction-draft'
 import type { FormAccount, TransactionFormData } from '#/lib/transactions'
 import { useMyCurrencies } from '#/lib/use-my-currencies'
@@ -192,7 +192,7 @@ export function TransactionForm({
           onPick={setLayer}
           onOpenPeople={() => setLayer('people')}
         />
-        <Details draft={draft} data={data} error={error} onChange={update} />
+        <Details {...{ id, draft, data, error }} onChange={update} />
       </div>
     </SheetForm>
   )

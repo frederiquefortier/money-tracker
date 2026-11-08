@@ -81,6 +81,11 @@ export const transactionsEn: typeof transactionsFr = {
       'The transfer from {{from}} to {{to}} and its fee, if any, will be deleted.',
   },
   people: {
+    unknownMark: '?',
+    returned: 'Paid back on {{date}}',
+    left: 'Left',
+    reimburses: 'Pays back',
+    unknownShort: 'amount unknown',
     source: 'Person',
     add: 'Add a person',
     title: 'People',
@@ -100,6 +105,7 @@ export const transactionsEn: typeof transactionsFr = {
     part: 'Share of {{name}}',
   },
   list: {
+    reimburses: 'Pays back: {{what}}',
     owedCount_one: '{{count}} owes me',
     owedCount_other: '{{count}} owe me',
     owed: 'Someone owes me their part',

@@ -7,7 +7,7 @@ import {
   linesFromTransaction,
   peopleErrors,
   peopleInput,
-} from '#/lib/transaction-people'
+} from '#/lib/people-parts'
 import type { PersonLine } from '#/lib/transaction-people'
 import {
   bookedMinor,
@@ -48,6 +48,8 @@ export type Draft = {
   /** Empty when no one is on the transaction (spec 20). */
   people: Array<PersonLine>
   peopleMode: SplitMode
+  /** An income's owed lines it pays back, in order (spec 21). */
+  reimburses: Array<string>
 }
 
 export function emptyDraft(
@@ -71,6 +73,7 @@ export function emptyDraft(
     pending: false,
     people: [],
     peopleMode: 'share',
+    reimburses: [],
   }
 }
 
@@ -143,6 +146,7 @@ export function draftFromTransaction(
     people: linesFromTransaction(transaction, (value, inAccount) =>
       forInput(value, inAccount ? accountCurrency : null),
     ),
+    reimburses: transaction.reimburses,
   }
 }
 
@@ -246,7 +250,8 @@ export function validateDraft(
       splitMode: draft.splitMode ?? 'amount',
       splits: splitValues(draft, accountCurrency, total),
       peopleMode: draft.peopleMode,
-      people: peopleInput(draft, accountCurrency),
+      people: peopleInput(draft, accountCurrency, total),
+      reimburses: draft.kind === 'income' ? draft.reimburses : [],
     },
   }
 }

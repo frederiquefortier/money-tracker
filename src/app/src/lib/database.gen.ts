@@ -487,10 +487,54 @@ export type Database = {
           },
         ]
       }
-      transaction_people: {
+      reimbursements: {
         Row: {
           amount: number
           created_at: string
+          id: string
+          income_id: string
+          owed_line_id: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          id?: string
+          income_id: string
+          owed_line_id: string
+          user_id?: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          id?: string
+          income_id?: string
+          owed_line_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reimbursements_user_id_income_id_fkey"
+            columns: ["user_id", "income_id"]
+            isOneToOne: false
+            referencedRelation: "transactions"
+            referencedColumns: ["user_id", "id"]
+          },
+          {
+            foreignKeyName: "reimbursements_user_id_owed_line_id_fkey"
+            columns: ["user_id", "owed_line_id"]
+            isOneToOne: false
+            referencedRelation: "transaction_people"
+            referencedColumns: ["user_id", "id"]
+          },
+        ]
+      }
+      transaction_people: {
+        Row: {
+          amount: number | null
+          amount_unknown: boolean
+          created_at: string
+          fills_rest: boolean
           head_count: number
           id: string
           input_mode: string
@@ -502,8 +546,10 @@ export type Database = {
           user_id: string
         }
         Insert: {
-          amount: number
+          amount?: number | null
+          amount_unknown?: boolean
           created_at?: string
+          fills_rest?: boolean
           head_count?: number
           id?: string
           input_mode: string
@@ -515,8 +561,10 @@ export type Database = {
           user_id?: string
         }
         Update: {
-          amount?: number
+          amount?: number | null
+          amount_unknown?: boolean
           created_at?: string
+          fills_rest?: boolean
           head_count?: number
           id?: string
           input_mode?: string
@@ -751,6 +799,32 @@ export type Database = {
         }
         Relationships: []
       }
+      owed_lines: {
+        Row: {
+          amount_unknown: boolean | null
+          back: number | null
+          category: string | null
+          category_id: string | null
+          currency: string | null
+          id: string | null
+          merchant: string | null
+          occurred_on: string | null
+          open: boolean | null
+          part: number | null
+          person_id: string | null
+          transaction_id: string | null
+        }
+        Relationships: []
+      }
+      person_balances: {
+        Row: {
+          currency: string | null
+          open_amount: number | null
+          person_id: string | null
+          unknown_count: number | null
+        }
+        Relationships: []
+      }
       person_usage: {
         Row: {
           last_on: string | null
@@ -762,6 +836,16 @@ export type Database = {
       }
     }
     Functions: {
+      absorbs: {
+        Args: {
+          amount_unknown: boolean
+          any_empty: boolean
+          fills_rest: boolean
+          input_mode: string
+          role: string
+        }
+        Returns: boolean
+      }
       account_balance_on: {
         Args: { account_id: string; on_date: string }
         Returns: number
@@ -801,6 +885,7 @@ export type Database = {
       }
       check_transfer: { Args: { transfer: string }; Returns: undefined }
       delete_transfer: { Args: { transfer_id: string }; Returns: undefined }
+      empty_part_room: { Args: { transaction: string }; Returns: number }
       exchange_rate: {
         Args: { from_currency: string; on_date: string; to_currency: string }
         Returns: number
@@ -851,6 +936,7 @@ export type Database = {
           received_amount: string
           received_currency: string
           received_value: string
+          reimburses: Json
           to_account: string
           to_institution: string
           total: number
@@ -866,6 +952,7 @@ export type Database = {
         Returns: number
       }
       recolor_categories: { Args: { colors: Json }; Returns: undefined }
+      recompute_people: { Args: { transaction: string }; Returns: undefined }
       save_adjustment: {
         Args: {
           account_id: string
@@ -900,6 +987,7 @@ export type Database = {
           original_amount?: number
           original_currency?: string
           people?: Json
+          reimburses?: string[]
           splits: Json
           status?: string
           transaction_id: string

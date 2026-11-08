@@ -23,6 +23,7 @@ onto them.
 | 18 | [Import and export](18-import-export.md) | File check, summary, commit, undo, export | IMP-01, 04, 05, 06, SEC-04 | Reviewed |
 | 19 | [People](19-people.md) | Proches and groups, their forms, aliases, in the Réglages menu | PPL-01, 02, 06 | Built |
 | 20 | [People on a transaction](20-people-on-transactions.md) | The people list, the people's lines and round add on the receipt, an income's Proche field, avatars and a Proches filter on the list | PPL-03, 04 | Built |
+| 21 | [Reimbursements](21-reimbursements.md) | Unknown owed amounts, linking an income to owed lines, what each proche owes | TRX-07, PPL-05 | Built |
 
 ## Shared patterns
 
@@ -106,8 +107,9 @@ component to use, so a screen is assembled, not redrawn.
   are the filters' `CheckList` under a field label, as in a filter sheet; creating one
   there is the card's last row, a "+ Nouveau …" button that becomes a name field
   (`CreateRow`). Escape leaves the field only: `useSheetEscape` keeps a stack, the
-  innermost layer first. People are grouped the same way everywhere they are
-  ticked (the filter, a transaction's people list): `usePeopleTree`. A list over the
+  innermost layer first. A check row can carry a muted second line and something on
+  its right (`detail`, `aside`), as a transaction row does. People are grouped the same
+  way everywhere they are ticked (the filter, a transaction's people list): `usePeopleTree`. A list over the
   form (the categories, the people) takes the field's radius and border too.
   When creating needs a whole form (a category from the
   transaction form), the same "+ …" row (`CreateButton`) opens it in a `FormSheet` over

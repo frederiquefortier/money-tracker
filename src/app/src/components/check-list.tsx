@@ -15,6 +15,10 @@ export type CheckNode = {
   id: string
   label: string
   icon?: React.ReactNode
+  /** A second, muted line under the label (a transaction's date). */
+  detail?: string
+  /** Before the box, on the right (a transaction's amount). */
+  aside?: React.ReactNode
   children?: Array<CheckNode>
 }
 
@@ -48,12 +52,19 @@ function CheckRow({
       {node.icon}
       <span
         className={cn(
-          'min-w-0 flex-1 truncate font-medium',
+          'flex min-w-0 flex-1 flex-col py-2',
           state === 'implied' && 'text-muted-foreground',
         )}
       >
-        {node.label}
+        <span className="truncate font-medium">{node.label}</span>
+        {node.detail && (
+          // Relative, so it stays a step under the label at either size.
+          <span className="truncate text-[0.875em] text-muted-foreground">
+            {node.detail}
+          </span>
+        )}
       </span>
+      {node.aside}
       <Checkbox
         checked={state === 'on' || state === 'implied'}
         indeterminate={state === 'mixed'}
@@ -166,12 +177,15 @@ function GroupCard({
 export function CheckList({
   nodes,
   openCount = 0,
+  small = false,
   stateOf,
   onToggle,
   children,
 }: {
   nodes: ReadonlyArray<CheckNode>
   openCount?: number
+  /** Rows at a field's text size, in a form (an income's Rembourse). */
+  small?: boolean
   children?: React.ReactNode
 } & Ticks) {
   if (nodes.length === 0 && !children) return null
@@ -190,7 +204,7 @@ export function CheckList({
       </div>
     )
   return (
-    <div className={fieldCard}>
+    <div className={cn(fieldCard, small && 'text-sm')}>
       {nodes.length > 0 && <CheckRows nodes={nodes} ticks={ticks} />}
       {children}
     </div>

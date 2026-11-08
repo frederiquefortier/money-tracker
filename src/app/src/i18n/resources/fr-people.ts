@@ -32,4 +32,8 @@ export const peopleFr = {
     'La transaction garde son montant; sa ligne passe à “Sans nom”.',
   deleteKeeps_other:
     'Les {{count}} transactions gardent leurs montants; ses lignes passent à “Sans nom”.',
+  owes: 'Me doit {{amount}}',
+  plusUnknown: '+ inconnu',
+  owesUnknown: 'Me doit, montant inconnu',
+  owedTitle: 'Me doit',
 }

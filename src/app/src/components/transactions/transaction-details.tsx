@@ -1,5 +1,6 @@
 import { MerchantPicker } from '#/components/merchants/merchant-picker'
 import { PersonPicker } from '#/components/people/person-picker'
+import { ReimbursesField } from '#/components/transactions/reimburses-field'
 import {
   AccountPicker,
   DateField,
@@ -7,7 +8,7 @@ import {
 } from '#/components/transactions/detail-fields'
 import type { Merchant } from '#/lib/merchants'
 import { withMerchant } from '#/lib/transaction-draft'
-import { sourceOf, withSource } from '#/lib/transaction-people'
+import { sourceOf, withSource } from '#/lib/transaction-source'
 import type { Draft } from '#/lib/transaction-draft'
 import type { FormAccount, TransactionFormData } from '#/lib/transactions'
 
@@ -39,6 +40,8 @@ function merchantChanges(
 }
 
 type DetailsProps = {
+  /** The transaction's id when editing, for an income's reimbursements. */
+  id?: string
   draft: Draft
   data: TransactionFormData
   error: (name: string) => string | undefined
@@ -49,7 +52,7 @@ type DetailsProps = {
  * Spec 15, under the receipt: the store, full width, which can fill the category
  * (MER-01), or on an income who it came from (spec 20); the account, the date, the note.
  */
-export function Details({ draft, data, error, onChange }: DetailsProps) {
+export function Details({ id, draft, data, error, onChange }: DetailsProps) {
   const currentCurrency = data.accounts.find(
     (a) => a.id === draft.accountId,
   )?.currency
@@ -57,11 +60,21 @@ export function Details({ draft, data, error, onChange }: DetailsProps) {
   return (
     <>
       {draft.kind === 'income' ? (
-        <PersonPicker
-          people={data.people}
-          value={sourceOf(draft)}
-          onChange={(personId) => onChange(withSource(personId))}
-        />
+        <>
+          <PersonPicker
+            people={data.people}
+            value={sourceOf(draft)}
+            onChange={(personId) =>
+              onChange({ ...withSource(personId), reimburses: [] })
+            }
+          />
+          <ReimbursesField
+            id={id}
+            draft={draft}
+            categories={data.categories}
+            onChange={onChange}
+          />
+        </>
       ) : (
         <MerchantPicker
           merchants={data.merchants}

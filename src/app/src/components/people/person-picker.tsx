@@ -1,15 +1,16 @@
 import { useTranslation } from 'react-i18next'
 import { Combobox } from '#/components/combobox'
-import { PersonAvatar } from '#/components/people/avatars'
+import { AnonymousAvatar, PersonAvatar } from '#/components/people/avatars'
 import { useInlineCreate } from '#/components/use-inline-create'
 import { byName } from '#/lib/people'
 import type { Person } from '#/lib/people'
 import { useFormatLocale } from '#/lib/use-locale'
+import { ANONYMOUS } from '#/lib/transaction-source'
 import { savePerson } from '#/server/people'
 
 /**
  * One person, typed into the field: who an income came from (spec 20), in place of the
- * merchant. Names and aliases match; "Créer « … »" adds someone. Archived people are
+ * merchant, or Sans nom. Names and aliases match; "Créer « … »" adds someone. Archived people are
  * listed only while chosen.
  */
 export function PersonPicker({
@@ -41,15 +42,23 @@ export function PersonPicker({
     },
     onCreated: (person) => onChange(person.id),
   })
-  const options = byName(
-    people.filter((p) => !p.archivedOn || p.id === value),
-    locale,
-  ).map((p) => ({
-    value: p.id,
-    label: p.name,
-    keywords: p.aliases.join(' '),
-    icon: <PersonAvatar name={p.name} size="sm" />,
-  }))
+  // Sans nom first: an income from someone without a name pays back their lines (spec 21).
+  const options = [
+    {
+      value: ANONYMOUS,
+      label: t('transactions.people.anonymous'),
+      icon: <AnonymousAvatar count={1} size="sm" />,
+    },
+    ...byName(
+      people.filter((p) => !p.archivedOn || p.id === value),
+      locale,
+    ).map((p) => ({
+      value: p.id,
+      label: p.name,
+      keywords: p.aliases.join(' '),
+      icon: <PersonAvatar name={p.name} size="sm" />,
+    })),
+  ]
   return (
     <Combobox
       label={t('transactions.people.source')}

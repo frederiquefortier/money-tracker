@@ -35,7 +35,12 @@ const peopleSchema = z.array(
     name: z.string().nullable(),
     count: z.number().int(),
     role: z.enum(['invited', 'owes', 'from']),
+    open: z.boolean(),
   }),
+)
+
+const reimbursesSchema = z.array(
+  z.object({ label: z.string().nullable(), date: z.string() }),
 )
 
 type ListRow =
@@ -64,6 +69,7 @@ function toPageRow(r: ListRow): Array<PageRow> {
             : null,
         categories: categories.success ? categories.data : [],
         people: peopleSchema.safeParse(r.people).data ?? [],
+        reimburses: reimbursesSchema.safeParse(r.reimburses).data ?? [],
         amount: r.amount,
         currency: r.currency,
         displayAmount: r.display_amount,

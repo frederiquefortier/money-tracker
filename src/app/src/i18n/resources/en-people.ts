@@ -33,4 +33,8 @@ export const peopleEn: typeof peopleFr = {
     'The transaction keeps its amount; their line becomes “Unnamed”.',
   deleteKeeps_other:
     'The {{count}} transactions keep their amounts; their lines become “Unnamed”.',
+  owes: 'Owes me {{amount}}',
+  plusUnknown: '+ unknown',
+  owesUnknown: 'Owes me, amount unknown',
+  owedTitle: 'Owes me',
 }

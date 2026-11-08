@@ -80,6 +80,11 @@ export const transactionsFr = {
       'Le transfert de {{from}} vers {{to}} et ses frais, le cas échéant, seront supprimés.',
   },
   people: {
+    unknownMark: '?',
+    returned: 'Remboursé le {{date}}',
+    left: 'Reste',
+    reimburses: 'Rembourse',
+    unknownShort: 'montant inconnu',
     source: 'Proche',
     add: 'Ajouter un proche',
     title: 'Proches',
@@ -99,6 +104,7 @@ export const transactionsFr = {
     part: 'Part de {{name}}',
   },
   list: {
+    reimburses: 'Rembourse: {{what}}',
     owedCount_one: '{{count}} me doit',
     owedCount_other: '{{count}} me doivent',
     owed: 'Quelqu’un me doit sa part',
