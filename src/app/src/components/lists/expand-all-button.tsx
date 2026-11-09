@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import { Icon } from '#/components/display/icon'
-import { Button } from '#/components/ui/button'
+import { chipSurface } from '#/components/styles'
+import { cn } from '#/lib/utils'
 
 /** Opens every collapsible section of a list, or closes them all once all are open. */
 export function ExpandAllButton({
@@ -13,10 +14,9 @@ export function ExpandAllButton({
   const { t } = useTranslation()
   const label = t(allExpanded ? 'common.collapseAll' : 'common.expandAll')
   return (
-    <Button
+    <button
       type="button"
-      variant="outline"
-      size="icon"
+      className={cn(chipSurface, 'size-8 justify-center px-0')}
       aria-label={label}
       title={label}
       onClick={onToggle}
@@ -25,6 +25,6 @@ export function ExpandAllButton({
         name={allExpanded ? 'unfold-less' : 'unfold-more'}
         className="size-5"
       />
-    </Button>
+    </button>
   )
 }

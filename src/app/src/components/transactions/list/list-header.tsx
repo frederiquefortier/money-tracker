@@ -23,7 +23,7 @@ import type {
 } from '#/lib/transactions/transaction-filters'
 import { useFilterLabel } from '#/hooks/transactions/use-filter-label'
 
-const inUse = 'border-primary bg-accent text-accent-foreground'
+const inUse = 'border-primary text-primary'
 
 /** The one ticked in a filter, named on its button; null with none or several. */
 function onlyPicked(tab: FilterTab, names: ListFilters | null) {

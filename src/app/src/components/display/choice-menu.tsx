@@ -1,6 +1,6 @@
 import { Icon } from '#/components/display/icon'
 import type { IconName } from '#/components/display/icon'
-import { Button } from '#/components/ui/button'
+import { chipSurface } from '#/components/styles'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -34,11 +34,16 @@ export function ChoiceMenu<TValue extends string>({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" aria-label={label} title={label}>
+        <button
+          type="button"
+          className={chipSurface}
+          aria-label={label}
+          title={label}
+        >
           <Icon name={icon} className="size-4" />
           {labelOf(value)}
           <Icon name="chevron-down" className="size-4" />
-        </Button>
+        </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="max-h-80 overflow-y-auto">
         <DropdownMenuRadioGroup
