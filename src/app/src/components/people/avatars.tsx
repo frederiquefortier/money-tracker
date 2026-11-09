@@ -1,8 +1,8 @@
-import { Icon } from '#/components/icon'
-import { stackRing } from '#/components/list-card'
-import { initialOf } from '#/lib/people'
-import { useFormatLocale } from '#/lib/use-locale'
+import { Icon } from '#/components/display/icon'
+import { initialOf } from '#/lib/people/person'
+import { useFormatLocale } from '#/hooks/app/use-locale'
 import { cn } from '#/lib/utils'
+import { stackRing } from '#/components/styles'
 
 const SIZES = {
   sm: 'size-6 text-xs',

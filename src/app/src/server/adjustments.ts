@@ -1,13 +1,12 @@
 import { createServerFn } from '@tanstack/react-start'
 import { z } from 'zod'
-import { adjustmentInputSchema } from '#/lib/adjustments'
-import type { Adjustment } from '#/lib/adjustments'
-import { failureFor } from '#/lib/result'
-import type { Result } from '#/lib/result'
-import { idInput } from '#/lib/schemas'
-import { getSupabase } from '#/lib/supabase.server'
+import { adjustmentInputSchema } from '#/lib/adjustments/adjustment'
+import type { Adjustment, AdjustmentError } from '#/lib/adjustments/adjustment'
+import { failureFor } from '#/lib/shared/result'
+import type { Result } from '#/lib/shared/result'
+import { idInput } from '#/lib/shared/validation'
+import { getSupabase } from '#/lib/server/supabase.server'
 
-export type AdjustmentError = 'notFound' | 'balanceMatches' | 'failed'
 type AdjustmentResult<T = object> = Result<AdjustmentError, T>
 
 const failure = failureFor<AdjustmentError>('adjustments', {

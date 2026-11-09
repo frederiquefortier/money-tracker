@@ -1,11 +1,11 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
-import { AccountForm } from '#/components/accounts/account-form'
-import { RouteSheet } from '#/components/route-sheet'
-import { DEFAULT_ACCOUNT_TYPE } from '#/lib/accounts'
-import { todayIso } from '#/lib/format'
-import { useAccountsPage } from '#/lib/use-page-data'
-import { useMyCurrencies } from '#/lib/use-my-currencies'
+import { AccountForm } from '#/components/accounts/form/account-form'
+import { RouteSheet } from '#/components/sheet/route-sheet'
+import { DEFAULT_ACCOUNT_TYPE } from '#/lib/accounts/account'
+import { todayIso } from '#/lib/shared/format'
+import { useAccountsPage } from '#/hooks/app/use-page-data'
+import { useMyCurrencies } from '#/hooks/currencies/use-my-currencies'
 
 export const Route = createFileRoute('/_authed/accounts/new')({
   staticData: { sheet: true },

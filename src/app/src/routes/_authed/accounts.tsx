@@ -1,23 +1,27 @@
 import { Outlet, createFileRoute } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
-import { AccountGroup } from '#/components/accounts/account-group'
-import type { ListedAccount } from '#/components/accounts/account-row'
-import { ClosedAccounts } from '#/components/accounts/closed-accounts'
-import { EmptyState } from '#/components/list-card'
-import { ExpandAllButton } from '#/components/expand-all-button'
-import { FloatingAddButton } from '#/components/floating-add-button'
-import { ListPage } from '#/components/list-page'
-import { SortMenu } from '#/components/sort-menu'
+import { AccountGroup } from '#/components/accounts/list/account-group'
+import type { ListedAccount } from '#/components/accounts/list/account-row'
+import { ClosedAccounts } from '#/components/accounts/list/closed-accounts'
+import { EmptyState } from '#/components/lists/list-card'
+import { ExpandAllButton } from '#/components/lists/expand-all-button'
+import { FloatingAddButton } from '#/components/layout/floating-add-button'
+import { ListPage } from '#/components/layout/list-page'
+import { SortMenu } from '#/components/lists/sort-menu'
 import { FORMAT_LOCALE } from '#/i18n/locales'
 import type { Locale } from '#/i18n/locales'
-import { NO_INSTITUTION, SORTS, sortAccounts, typeLabel } from '#/lib/accounts'
-import type { Sort } from '#/lib/accounts'
-import { useLocale } from '#/lib/use-locale'
-import { useMyCurrencies } from '#/lib/use-my-currencies'
-import { useStoredIds, useStoredState } from '#/lib/use-stored-state'
-import { oneOf } from '#/lib/utils'
+import {
+  NO_INSTITUTION,
+  SORTS,
+  sortAccounts,
+  typeLabel,
+} from '#/lib/accounts/account'
+import type { Sort, AccountsPage } from '#/lib/accounts/account'
+import { useLocale } from '#/hooks/app/use-locale'
+import { useMyCurrencies } from '#/hooks/currencies/use-my-currencies'
+import { useStoredIds, useStoredState } from '#/hooks/app/use-stored-state'
 import { getAccounts } from '#/server/accounts'
-import type { AccountsPage } from '#/server/accounts'
+import { oneOf } from '#/lib/shared/collections'
 
 export const Route = createFileRoute('/_authed/accounts')({
   loader: () => getAccounts(),

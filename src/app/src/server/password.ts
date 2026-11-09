@@ -1,10 +1,12 @@
 import { createServerFn } from '@tanstack/react-start'
 import { z } from 'zod'
-import { forgotPasswordSchema, passwordSchema } from '#/lib/schemas'
-import type { Result } from '#/lib/result'
-import { getSupabase } from '#/lib/supabase.server'
-
-export const EMAIL_LINK_TYPES = ['invite', 'recovery'] as const
+import type { Result } from '#/lib/shared/result'
+import { getSupabase } from '#/lib/server/supabase.server'
+import {
+  EMAIL_LINK_TYPES,
+  forgotPasswordSchema,
+  passwordSchema,
+} from '#/lib/auth/auth-schema'
 
 // POST: email scanners follow GET links and would spend the token.
 export const verifyEmailLink = createServerFn({ method: 'POST' })

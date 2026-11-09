@@ -4,48 +4,18 @@ import {
   NO_INSTITUTION,
   accountInputSchema,
   institutionInputSchema,
-} from '#/lib/accounts'
-import { loaded, saveRow } from '#/lib/db.server'
-import { failureFor } from '#/lib/result'
-import type { Result } from '#/lib/result'
-import { idInput } from '#/lib/schemas'
-import { getSupabase } from '#/lib/supabase.server'
+} from '#/lib/accounts/account'
+import { loaded, saveRow } from '#/lib/server/db.server'
+import { failureFor } from '#/lib/shared/result'
+import type { Result } from '#/lib/shared/result'
+import { idInput } from '#/lib/shared/validation'
+import { getSupabase } from '#/lib/server/supabase.server'
+import type {
+  Institution,
+  AccountsPage,
+  AccountError,
+} from '#/lib/accounts/account'
 
-export type AccountType = { code: string; labelFr: string; labelEn: string }
-
-export type Account = {
-  id: string
-  name: string
-  type: string
-  currency: string
-  institutionId: string | null
-  openingBalance: string
-  openedOn: string
-  closedOn: string | null
-  hiddenForNew: boolean
-  balance: string
-  pending: string
-  displayBalance: string | null
-}
-
-export type Institution = {
-  id: string
-  name: string
-  websiteUrl: string | null
-}
-
-export type GroupTotal = { total: string | null; converted: boolean }
-
-export type AccountsPage = {
-  accounts: Array<Account>
-  institutions: Array<Institution>
-  /** Keyed by institution id, or NO_INSTITUTION. */
-  totals: Record<string, GroupTotal>
-  types: Array<AccountType>
-}
-
-export type AccountError =
-  'nameTaken' | 'inUse' | 'currencyRemoved' | 'notFound' | 'failed'
 type AccountResult<T = object> = Result<AccountError, T>
 
 const KNOWN: Partial<Record<string, AccountError>> = {

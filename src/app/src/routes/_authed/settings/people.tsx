@@ -1,29 +1,38 @@
 import { Outlet, createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { FloatingAddButton } from '#/components/floating-add-button'
-import { EmptyState, ListCard } from '#/components/list-card'
-import { ListPage } from '#/components/list-page'
-import { ArchivedOn, ArchivedPeople } from '#/components/people/archived-people'
-import { PeopleRow } from '#/components/people/people-row'
-import { SearchField } from '#/components/search-field'
-import { SortMenu } from '#/components/sort-menu'
-import { TabList } from '#/components/tab-list'
+import { FloatingAddButton } from '#/components/layout/floating-add-button'
+import { EmptyState, ListCard } from '#/components/lists/list-card'
+import { ListPage } from '#/components/layout/list-page'
+import {
+  ArchivedOn,
+  ArchivedPeople,
+} from '#/components/people/list/archived-people'
+import { PeopleRow } from '#/components/people/list/people-row'
+import { SearchField } from '#/components/forms/search-field'
+import { SortMenu } from '#/components/lists/sort-menu'
+import { TabList } from '#/components/lists/tab-list'
 import {
   PEOPLE_SORTS,
   PEOPLE_TABS,
   byName,
   namesOf,
   withMemberNames,
-} from '#/lib/people'
-import type { PeopleSort, PeopleTab, Person, PersonGroup } from '#/lib/people'
-import { useFormatLocale } from '#/lib/use-locale'
-import { useStoredState } from '#/lib/use-stored-state'
-import { foldForSearch, oneOf } from '#/lib/utils'
+} from '#/lib/people/person'
+import type {
+  PeopleSort,
+  PeopleTab,
+  Person,
+  PersonGroup,
+} from '#/lib/people/person'
+import { useFormatLocale } from '#/hooks/app/use-locale'
+import { useStoredState } from '#/hooks/app/use-stored-state'
 import { getBalances } from '#/server/owed'
-import type { Balance } from '#/server/owed'
 import { getPeople } from '#/server/people'
-import { OwedTag } from '#/components/people/owed-summary'
+import { OwedTag } from '#/components/people/list/owed-summary'
+import { oneOf } from '#/lib/shared/collections'
+import { foldForSearch } from '#/lib/shared/search'
+import type { Balance } from '#/lib/people/owed'
 
 export const Route = createFileRoute('/_authed/settings/people')({
   loader: async () => {

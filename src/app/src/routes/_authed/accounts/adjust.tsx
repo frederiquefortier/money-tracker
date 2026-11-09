@@ -1,10 +1,10 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
-import { RouteSheet } from '#/components/route-sheet'
-import { AdjustmentForm } from '#/components/transactions/adjustment-form'
-import { todayIso } from '#/lib/format'
-import type { FormAccount } from '#/lib/transactions'
-import { useAccountsPage } from '#/lib/use-page-data'
+import { RouteSheet } from '#/components/sheet/route-sheet'
+import { AdjustmentForm } from '#/components/transactions/entry/adjustment-form'
+import { todayIso } from '#/lib/shared/format'
+import type { FormAccount } from '#/lib/transactions/transaction'
+import { useAccountsPage } from '#/hooks/app/use-page-data'
 
 export const Route = createFileRoute('/_authed/accounts/adjust')({
   staticData: { sheet: true },

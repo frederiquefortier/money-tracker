@@ -5,19 +5,13 @@ import {
   setCookie,
 } from '@tanstack/react-start/server'
 import { z } from 'zod'
-import { signInSchema, totpCodeSchema } from '#/lib/schemas'
 import { LOCALES, LOCALE_COOKIE, isLocale, resolveLocale } from '#/i18n/locales'
 import type { Locale } from '#/i18n/locales'
-import type { Result } from '#/lib/result'
-import { SIGNED_OUT, updateProfile } from '#/lib/db.server'
-import { getSupabase } from '#/lib/supabase.server'
-
-export type Session = {
-  locale: Locale
-  user: { email: string } | null
-  aal: 'aal1' | 'aal2' | null
-  hasTotp: boolean
-}
+import type { Result } from '#/lib/shared/result'
+import { SIGNED_OUT, updateProfile } from '#/lib/server/db.server'
+import { getSupabase } from '#/lib/server/supabase.server'
+import { signInSchema, totpCodeSchema } from '#/lib/auth/auth-schema'
+import type { Session } from '#/lib/auth/session'
 
 const ONE_YEAR = 60 * 60 * 24 * 365
 

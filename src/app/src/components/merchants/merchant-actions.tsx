@@ -1,14 +1,14 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Combobox } from '#/components/combobox'
-import { ConfirmDialog } from '#/components/confirm-dialog'
-import { IconActions, IconButton } from '#/components/icon-button'
-import type { ActionPlacement } from '#/components/icon-button'
-import { useToast } from '#/components/toaster'
-import { useServerAction } from '#/components/use-server-action'
-import type { Merchant } from '#/lib/merchants'
-import { useFormatLocale } from '#/lib/use-locale'
+import { Combobox } from '#/components/combobox/combobox'
+import { ConfirmDialog } from '#/components/feedback/confirm-dialog'
+import { IconActions, IconButton } from '#/components/display/icon-button'
+import type { ActionPlacement } from '#/components/display/icon-button'
+import { useServerAction } from '#/hooks/app/use-server-action'
+import type { Merchant } from '#/lib/merchants/merchant'
+import { useFormatLocale } from '#/hooks/app/use-locale'
 import { deleteMerchant, mergeMerchants } from '#/server/merchants'
+import { useToast } from '#/hooks/app/use-toast'
 
 /** MER-05: the chosen merchant keeps its name and default category. */
 function MergeDialog({

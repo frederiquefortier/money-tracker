@@ -1,26 +1,29 @@
 import { useTranslation } from 'react-i18next'
 import { CategoryBadge } from '#/components/categories/category-badge'
-import { Combobox } from '#/components/combobox'
-import type { ComboboxOption } from '#/components/use-combobox'
-import { useInlineCreate } from '#/components/use-inline-create'
+import { Combobox } from '#/components/combobox/combobox'
+import type { ComboboxOption } from '#/hooks/forms/use-combobox'
+import { useInlineCreate } from '#/hooks/forms/use-inline-create'
 import {
   KINDS,
   categoryPath,
   isActiveOn,
   nextTopColor,
   suggestIcon,
-} from '#/lib/categories'
-import type { Category, Kind } from '#/lib/categories'
-import { todayIso } from '#/lib/format'
-import { treeOrder } from '#/lib/tree'
-import { useFormatLocale } from '#/lib/use-locale'
+} from '#/lib/categories/category'
+import type { Category, CategoryKind } from '#/lib/categories/category'
+import { todayIso } from '#/lib/shared/format'
+import { treeOrder } from '#/lib/shared/tree-layout'
+import { useFormatLocale } from '#/hooks/app/use-locale'
 import { saveCategory } from '#/server/categories'
-import { indexById } from '#/lib/utils'
+import { indexById } from '#/lib/shared/collections'
 
 /** "Créer « … »": a top-level category of the picker's type, icon and colour suggested. */
 async function createTopCategory(
   name: string,
-  { kind, categories }: { kind: Kind; categories: ReadonlyArray<Category> },
+  {
+    kind,
+    categories,
+  }: { kind: CategoryKind; categories: ReadonlyArray<Category> },
 ): Promise<Category | null> {
   const values = {
     name,
@@ -50,7 +53,7 @@ function treeOptions(
     locale,
     option,
   }: {
-    kind: Kind
+    kind: CategoryKind
     locale: string
     option: (category: Category) => ComboboxOption
   },
@@ -89,7 +92,7 @@ export function CategoryPicker({
   categories: ReadonlyArray<Category>
   value: string | null
   onChange: (id: string | null) => void
-  kind?: Kind
+  kind?: CategoryKind
   date?: string
   /** The most used category ids of `kind`, most used first. */
   frequent?: ReadonlyArray<string>

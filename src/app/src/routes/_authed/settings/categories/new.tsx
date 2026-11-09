@@ -1,14 +1,19 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
-import { CategoryForm } from '#/components/categories/category-form'
-import { RouteSheet } from '#/components/route-sheet'
-import { DEFAULT_ICON, KINDS, isArchived, nextTopColor } from '#/lib/categories'
-import type { Kind } from '#/lib/categories'
-import { oneOf } from '#/lib/utils'
-import { useCategoriesPage } from '#/lib/use-page-data'
+import { CategoryForm } from '#/components/categories/form/category-form'
+import { RouteSheet } from '#/components/sheet/route-sheet'
+import {
+  DEFAULT_ICON,
+  KINDS,
+  isArchived,
+  nextTopColor,
+} from '#/lib/categories/category'
+import type { CategoryKind } from '#/lib/categories/category'
+import { useCategoriesPage } from '#/hooks/app/use-page-data'
+import { oneOf } from '#/lib/shared/collections'
 
 export const Route = createFileRoute('/_authed/settings/categories/new')({
-  validateSearch: (search): { kind?: Kind; parent?: string } => ({
+  validateSearch: (search): { kind?: CategoryKind; parent?: string } => ({
     kind: oneOf(KINDS)(search.kind),
     parent: typeof search.parent === 'string' ? search.parent : undefined,
   }),

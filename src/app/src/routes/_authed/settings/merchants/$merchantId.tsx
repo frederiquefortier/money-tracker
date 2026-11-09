@@ -2,8 +2,8 @@ import { Navigate, createFileRoute } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { MerchantActions } from '#/components/merchants/merchant-actions'
 import { MerchantForm } from '#/components/merchants/merchant-form'
-import { RouteSheet } from '#/components/route-sheet'
-import { useMerchantsPage } from '#/lib/use-page-data'
+import { RouteSheet } from '#/components/sheet/route-sheet'
+import { useMerchantsPage } from '#/hooks/app/use-page-data'
 
 export const Route = createFileRoute('/_authed/settings/merchants/$merchantId')(
   {

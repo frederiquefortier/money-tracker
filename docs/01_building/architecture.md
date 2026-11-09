@@ -29,6 +29,27 @@
 | Hosting | Netlify | brief |
 | Language | TypeScript everywhere, strict mode | |
 
+## Code layout
+
+`src/app/src/`, with the reasoning in ADR-026.
+
+| Folder | Holds |
+|---|---|
+| `routes/` | File routes; the path is the URL. |
+| `server/` | Server functions, one file per feature. Nothing else is exported from here. |
+| `components/ui/` | shadcn primitives. |
+| `components/<role>/` | Shared pieces by role: `layout`, `forms`, `sheet`, `combobox`, `lists`, `feedback`, `display`. `styles.ts` holds shared class strings. |
+| `components/<feature>/` | One feature's screens and pickers; `list/` and `form/` inside the large ones. |
+| `hooks/` | Every hook: `app/`, `forms/`, then one folder per feature. |
+| `lib/shared/` | Money, format, color, collections, search, validation, result. |
+| `lib/<feature>/` | `<entity>.ts` the model, `<entity>-draft.ts` form state, `<entity>-list.ts` list logic. |
+| `lib/server/`, `lib/db/`, `lib/auth/`, `lib/forms/` | Server-only modules, database types, auth schemas, form state. |
+| `i18n/fr/`, `i18n/en/` | The same files in both languages; French is the source. |
+| `icons/` | `ui-icons.json`, `categories/keywords.json`, `categories/glyphs.json`. |
+
+`lib/` and `server/` never import from `components/`, `hooks/` or `routes/`. A component
+calls a server function but takes its types from `lib/`.
+
 ## Who writes what
 
 | Writer | Writes | How |

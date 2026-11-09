@@ -1,14 +1,13 @@
 import { createServerFn } from '@tanstack/react-start'
 import { z } from 'zod'
-import { loaded, saveRow } from '#/lib/db.server'
-import { merchantInputSchema } from '#/lib/merchants'
-import type { Merchant } from '#/lib/merchants'
-import { failureFor } from '#/lib/result'
-import type { Result } from '#/lib/result'
-import { idInput } from '#/lib/schemas'
-import { getSupabase } from '#/lib/supabase.server'
+import { loaded, saveRow } from '#/lib/server/db.server'
+import { merchantInputSchema } from '#/lib/merchants/merchant'
+import type { Merchant, MerchantError } from '#/lib/merchants/merchant'
+import { failureFor } from '#/lib/shared/result'
+import type { Result } from '#/lib/shared/result'
+import { idInput } from '#/lib/shared/validation'
+import { getSupabase } from '#/lib/server/supabase.server'
 
-export type MerchantError = 'nameTaken' | 'notFound' | 'failed'
 type MerchantResult<T = object> = Result<MerchantError, T>
 
 const KNOWN: Partial<Record<string, MerchantError>> = {

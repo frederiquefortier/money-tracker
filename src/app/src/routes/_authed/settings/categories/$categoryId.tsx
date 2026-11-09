@@ -1,14 +1,14 @@
 import { Navigate, createFileRoute } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
-import { CategoryActions } from '#/components/categories/category-actions'
-import { CategoryForm } from '#/components/categories/category-form'
-import { CategoryHistory } from '#/components/categories/category-history'
-import { RouteSheet } from '#/components/route-sheet'
-import { isArchived } from '#/lib/categories'
-import { categoryContext } from '#/lib/category-tree'
-import { useCategoriesPage } from '#/lib/use-page-data'
-import { indexById } from '#/lib/utils'
-import { useFormatLocale } from '#/lib/use-locale'
+import { CategoryActions } from '#/components/categories/list/category-actions'
+import { CategoryForm } from '#/components/categories/form/category-form'
+import { CategoryHistory } from '#/components/categories/form/category-history'
+import { RouteSheet } from '#/components/sheet/route-sheet'
+import { isArchived } from '#/lib/categories/category'
+import { categoryContext } from '#/lib/categories/category-tree'
+import { useCategoriesPage } from '#/hooks/app/use-page-data'
+import { useFormatLocale } from '#/hooks/app/use-locale'
+import { indexById } from '#/lib/shared/collections'
 
 export const Route = createFileRoute(
   '/_authed/settings/categories/$categoryId',

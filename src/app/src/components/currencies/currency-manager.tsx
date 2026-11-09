@@ -1,11 +1,11 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { FloatingAddLink } from '#/components/floating-add-button'
-import { ConfirmDialog } from '#/components/confirm-dialog'
+import { FloatingAddLink } from '#/components/layout/floating-add-button'
+import { ConfirmDialog } from '#/components/feedback/confirm-dialog'
 import { CurrencyRow } from '#/components/currencies/currency-row'
-import { useCurrencyActions } from '#/components/currencies/use-currency-actions'
-import { ListCard } from '#/components/list-card'
-import { useToast } from '#/components/toaster'
+import { useCurrencyActions } from '#/hooks/currencies/use-currency-actions'
+import { ListCard } from '#/components/lists/list-card'
+import { useToast } from '#/hooks/app/use-toast'
 
 /** One thing to add, so the + goes straight to its form (shared patterns). */
 export function AddCurrencyButton() {

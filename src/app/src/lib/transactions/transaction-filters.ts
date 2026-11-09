@@ -1,0 +1,23 @@
+// The filters of the transactions list (spec 14): the tabs and what each one holds.
+
+export type FilterValues = {
+  accountIds: Array<string>
+  categoryIds: Array<string>
+  merchantIds: Array<string>
+  personIds: Array<string>
+}
+
+export const FILTER_TABS = [
+  'accounts',
+  'categories',
+  'merchants',
+  'people',
+] as const
+export type FilterTab = (typeof FILTER_TABS)[number]
+
+export const FILTER_KEYS = {
+  accounts: 'accountIds',
+  categories: 'categoryIds',
+  merchants: 'merchantIds',
+  people: 'personIds',
+} as const satisfies Record<FilterTab, keyof FilterValues>

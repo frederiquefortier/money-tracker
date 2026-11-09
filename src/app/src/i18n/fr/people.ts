@@ -1,0 +1,41 @@
+// The Proches screens (spec 19).
+export const peopleFr = {
+  people: {
+    title: 'Proches',
+    tabsLabel: 'Proches ou groupes',
+    sort: { nameAsc: 'Nom A–Z', nameDesc: 'Nom Z–A' },
+    tabs: {
+      people: 'Personnes',
+      groups: 'Groupes',
+    },
+    empty: 'Aucune personne pour le moment.',
+    emptyGroups: 'Aucun groupe pour l’instant.',
+    addPerson: 'Ajouter un proche',
+    addGroup: 'Ajouter un groupe',
+    newPerson: 'Nouveau proche',
+    editPerson: 'Modifier le proche',
+    newGroup: 'Nouveau groupe',
+    editGroup: 'Modifier le groupe',
+    name: 'Nom',
+    groups: 'Groupes',
+    members: 'Membres',
+    aliases: 'Alias',
+    newAlias: 'Nouvel alias',
+    personCreated: 'Proche créé.',
+    personUpdated: 'Proche enregistré.',
+    groupCreated: 'Groupe créé.',
+    groupUpdated: 'Groupe enregistré.',
+    archivedPeople: 'Proches archivés ({{count}})',
+    archivedGroups: 'Groupes archivés ({{count}})',
+    archivedOn: 'Archivé le {{date}}',
+    archivedOnField: 'Date d’archivage',
+    deleteKeeps_one:
+      'La transaction garde son montant; sa ligne passe à “Sans nom”.',
+    deleteKeeps_other:
+      'Les {{count}} transactions gardent leurs montants; ses lignes passent à “Sans nom”.',
+    owes: 'Me doit {{amount}}',
+    plusUnknown: '+ inconnu',
+    owesUnknown: 'Me doit, montant inconnu',
+    owedTitle: 'Me doit',
+  },
+}

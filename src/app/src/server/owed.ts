@@ -1,27 +1,16 @@
 import { createServerFn } from '@tanstack/react-start'
 import { z } from 'zod'
-import { loaded } from '#/lib/db.server'
-import { fromMinor, toMinor } from '#/lib/money'
-import { ANONYMOUS } from '#/lib/transaction-source'
-import { getSupabase } from '#/lib/supabase.server'
+import { loaded } from '#/lib/server/db.server'
+import { fromMinor, toMinor } from '#/lib/shared/money'
+import { ANONYMOUS } from '#/lib/transactions/transaction-source'
+import { getSupabase } from '#/lib/server/supabase.server'
+import type { OwedLine, Balance } from '#/lib/people/owed'
 
 // What people owe me (spec 21): the owed lines an income can pay back, and balances.
 
 // Amounts as stored, to four places, so nothing goes through a float (ADR-004).
 const minor4 = (value: string | null | undefined) =>
   toMinor(value ?? '0', 4) ?? 0n
-
-export type OwedLine = {
-  id: string
-  transactionId: string
-  occurredOn: string
-  /** The expense's merchant, or its largest category. */
-  label: string
-  categoryId: string | null
-  currency: string
-  /** What is still owed, as text (ADR-004); null while the part is not known. */
-  left: string | null
-}
 
 /** A person's owed lines, or those without a name. */
 function ownedBy<
@@ -90,12 +79,6 @@ export const getOwedLines = createServerFn({ method: 'GET' })
       ]
     })
   })
-
-/** PPL-05: what someone still owes me, per currency, and how many parts are unknown. */
-export type Balance = {
-  amounts: Array<{ amount: string; currency: string }>
-  unknown: number
-}
 
 export const getBalances = createServerFn({ method: 'GET' }).handler(
   async (): Promise<Record<string, Balance>> => {

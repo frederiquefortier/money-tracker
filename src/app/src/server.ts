@@ -3,7 +3,10 @@ import {
   defaultStreamHandler,
 } from '@tanstack/react-start/server'
 import { createServerEntry } from '@tanstack/react-start/server-entry'
-import { SECURITY_HEADERS, contentSecurityPolicy } from '#/lib/csp'
+import {
+  SECURITY_HEADERS,
+  contentSecurityPolicy,
+} from '#/lib/server/security-headers'
 
 const handle = createStartHandler(defaultStreamHandler)
 

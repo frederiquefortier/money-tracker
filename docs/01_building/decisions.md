@@ -4,6 +4,50 @@ Document architectural choices with context, alternatives considered, and trade-
 
 <!-- Newest first: a new ADR goes directly below this line. Template at the bottom. -->
 
+### ADR-026: The code is grouped by role and by feature, with one naming rule per layer (2026-11-08)
+
+**Context:**
+- `components/` had 45 loose files, `lib/` 58, and hooks lived in five places. Nine file
+  names existed in both `lib/` and `server/`. Shared types were exported from
+  `server/*.ts`, so 35 files imported types from the server layer. `utils.ts`,
+  `schemas.ts` and `form.ts` each held three unrelated things, and two unrelated types
+  were both called `Period`. The three icon files did not say which held drawings and
+  which held search words.
+
+**Decision:**
+- `components/`: no file at the root. `ui/` is shadcn. Shared pieces are grouped by role
+  in `layout/`, `forms/`, `sheet/`, `combobox/`, `lists/`, `feedback/` and `display/`.
+  `styles.ts` holds the class strings several components share. A feature gets its own
+  folder, split into `list/`, `form/` and similar once it passes about eight files.
+- `hooks/`: every hook, with the shared ones in `app/`, `forms/` and per-feature folders.
+  A context lives in the file of its hook.
+- `lib/`: `shared/` (money, format, color, collections, search, validation), then one
+  folder per feature, plus `auth/`, `forms/`, `db/` and `server/` (the `*.server.ts`
+  files keep that suffix). In a feature folder, `<entity>.ts` is the model (types,
+  constants, zod schemas), `<entity>-draft.ts` the form state and `<entity>-list.ts` the
+  list logic. `lib/utils.ts` keeps only `cn`, which shadcn expects there.
+- `server/<feature>.ts` holds server functions only. Types and constants a component
+  needs are imported from `lib/`, never from `server/`.
+- `i18n/fr/` and `i18n/en/`: the same files in each, one per area. French is the source;
+  the English files are typed against it.
+- `icons/`: `ui-icons.json` (drawings), `categories/keywords.json` (search words) and
+  `categories/glyphs.json` (drawings).
+- An export is named for what it is (`TransactionDetails`, not `Details`), and no name is
+  exported by two files.
+
+**Alternatives Considered:**
+- Group `lib/` by layer only (`domain/`, `server/`, `db/`) -> a feature's files would
+  still sit in one flat list, and `components/` is already grouped by feature.
+- Keep feature hooks next to their components -> the author asked for every hook in one
+  place.
+- A barrel `index.ts` per folder -> hides where code lives and slows the dev server.
+
+**Consequences:**
+- Imports are longer (`#/lib/transactions/transaction-draft`) and every path in the
+  journal before this date points to the old layout. Old entries are left as written.
+- A new file has one obvious home, and a new name can be checked against the rules above.
+- No import cycle exists between modules (checked with a script, types included).
+
 ### ADR-025: Each repeated form, picker and server pattern lives in one place (2026-11-05)
 
 **Context:**

@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
-import { Icon } from '#/components/icon'
-import { cn, focusRing } from '#/lib/utils'
+import { Icon } from '#/components/display/icon'
+import { cn } from '#/lib/utils'
+import { focusRing } from '#/components/styles'
 
 /**
  * A native checkbox drawn with the field border and radius; FormData still reads it.

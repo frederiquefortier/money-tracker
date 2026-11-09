@@ -1,8 +1,8 @@
 import { createFileRoute, useLoaderData } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { AddCurrencyForm } from '#/components/currencies/add-currency-form'
-import { RouteSheet } from '#/components/route-sheet'
-import { useMyCurrencies } from '#/lib/use-my-currencies'
+import { RouteSheet } from '#/components/sheet/route-sheet'
+import { useMyCurrencies } from '#/hooks/currencies/use-my-currencies'
 
 export const Route = createFileRoute('/_authed/settings/currencies/add')({
   staticData: { sheet: true },

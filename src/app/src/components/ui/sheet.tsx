@@ -1,8 +1,8 @@
 import * as React from 'react'
 import { Dialog as SheetPrimitive } from 'radix-ui'
-import { Icon } from '#/components/icon'
-import { iconAction } from '#/components/icon-button'
+import { Icon } from '#/components/display/icon'
 import { cn } from '#/lib/utils'
+import { iconAction } from '#/components/styles'
 
 // Based on shadcn's sheet: full screen on phones, a panel from the right from md up (from
 // the left with side="left", sliding in from there at every width), its animations in

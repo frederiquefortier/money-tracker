@@ -1,24 +1,24 @@
 import { createServerFn } from '@tanstack/react-start'
-import { loaded } from '#/lib/db.server'
-import { absDecimal, compareDecimal } from '#/lib/money'
-import { failureFor } from '#/lib/result'
-import type { Result } from '#/lib/result'
-import { idInput } from '#/lib/schemas'
-import { getSupabase } from '#/lib/supabase.server'
+import { loaded } from '#/lib/server/db.server'
+import { absDecimal, compareDecimal } from '#/lib/shared/money'
+import { failureFor } from '#/lib/shared/result'
+import type { Result } from '#/lib/shared/result'
+import { idInput } from '#/lib/shared/validation'
+import { getSupabase } from '#/lib/server/supabase.server'
 import {
+  PERSON_ROLES,
   SPLIT_MODES,
   TRANSACTION_KINDS,
   transactionInputSchema,
-} from '#/lib/transactions'
-import { PERSON_ROLES } from '#/lib/transaction-people'
-import { isOneOf } from '#/lib/utils'
+} from '#/lib/transactions/transaction'
 import type {
   FormAccount,
   FrequentCategories,
   Transaction,
-} from '#/lib/transactions'
+  TransactionError,
+} from '#/lib/transactions/transaction'
+import { isOneOf } from '#/lib/shared/collections'
 
-export type TransactionError = 'notFound' | 'failed'
 type TransactionResult<T = object> = Result<TransactionError, T>
 
 const failure = failureFor<TransactionError>('transactions', {

@@ -1,19 +1,22 @@
 import { useState } from 'react'
 import { Link, createFileRoute } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
-import { RouteSheet } from '#/components/route-sheet'
-import { TransactionForm } from '#/components/transactions/transaction-form'
-import { TransferForm } from '#/components/transactions/transfer-form'
+import { RouteSheet } from '#/components/sheet/route-sheet'
+import { TransactionForm } from '#/components/transactions/form/transaction-form'
+import { TransferForm } from '#/components/transactions/entry/transfer-form'
 import { SheetBody } from '#/components/ui/sheet'
-import { todayIso } from '#/lib/format'
-import { emptyDraft } from '#/lib/transaction-draft'
-import type { Draft } from '#/lib/transaction-draft'
-import { loadTransactionForm } from '#/lib/transaction-form-data'
-import { emptyTransfer } from '#/lib/transfer-draft'
-import type { TransferDraft } from '#/lib/transfer-draft'
-import type { FormAccount, TransactionFormData } from '#/lib/transactions'
-import { useStoredState } from '#/lib/use-stored-state'
+import { todayIso } from '#/lib/shared/format'
+import { emptyDraft } from '#/lib/transactions/transaction-draft'
+import { loadTransactionForm } from '#/server/transaction-form'
+import { emptyTransfer } from '#/lib/transfers/transfer-draft'
+import type { TransferDraft } from '#/lib/transfers/transfer-draft'
+import type {
+  FormAccount,
+  TransactionFormData,
+} from '#/lib/transactions/transaction'
+import { useStoredState } from '#/hooks/app/use-stored-state'
 import { getTransferFeeCategory } from '#/server/transfers'
+import type { TransactionDraft } from '#/lib/transactions/transaction-draft-types'
 
 export const Route = createFileRoute('/_authed/transactions/new')({
   loader: async () => {
@@ -31,7 +34,7 @@ const parseId = (v: unknown) => (typeof v === 'string' ? v : undefined)
 
 /** What the sheet shows: the transaction form, or the transfer form after its tab. */
 type Entry =
-  | { form: 'transaction'; initial: Draft }
+  | { form: 'transaction'; initial: TransactionDraft }
   | {
       form: 'transfer'
       initial: TransferDraft

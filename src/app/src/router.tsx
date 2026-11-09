@@ -1,7 +1,7 @@
 import { createRouter as createTanStackRouter } from '@tanstack/react-router'
 import type { ParsedLocation } from '@tanstack/react-router'
 import { getGlobalStartContext } from '@tanstack/react-start'
-import { RouteError, RouteNotFound } from './components/route-fallbacks'
+import { RouteError, RouteNotFound } from '#/components/layout/route-fallbacks'
 import { routeTree } from './routeTree.gen'
 
 // Set per request by the server entry (server.ts); undefined in the browser.

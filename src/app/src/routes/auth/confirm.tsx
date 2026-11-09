@@ -2,10 +2,11 @@ import { useActionState } from 'react'
 import { createFileRoute, useRouter } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { z } from 'zod'
-import { AuthShell } from '#/components/auth-shell'
-import { FormAlert } from '#/components/form-field'
+import { AuthShell } from '#/components/layout/auth-shell'
+import { FormAlert } from '#/components/forms/form-field'
 import { Button } from '#/components/ui/button'
-import { EMAIL_LINK_TYPES, verifyEmailLink } from '#/server/password'
+import { EMAIL_LINK_TYPES } from '#/lib/auth/auth-schema'
+import { verifyEmailLink } from '#/server/password'
 
 // Invitation and reset email links land here.
 export const Route = createFileRoute('/auth/confirm')({

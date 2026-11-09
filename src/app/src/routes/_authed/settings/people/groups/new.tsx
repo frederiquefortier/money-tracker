@@ -1,8 +1,8 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
-import { PeopleForm } from '#/components/people/people-form'
-import { RouteSheet } from '#/components/route-sheet'
-import { usePeoplePage } from '#/lib/use-page-data'
+import { PeopleForm } from '#/components/people/form/people-form'
+import { RouteSheet } from '#/components/sheet/route-sheet'
+import { usePeoplePage } from '#/hooks/app/use-page-data'
 
 export const Route = createFileRoute('/_authed/settings/people/groups/new')({
   staticData: { sheet: true },

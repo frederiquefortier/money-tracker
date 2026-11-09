@@ -7,26 +7,26 @@ import {
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { z } from 'zod'
-import { FloatingAddLink } from '#/components/floating-add-button'
-import { EmptyState } from '#/components/list-card'
-import type { FilterValues } from '#/components/transactions/filter-sheet'
-import { ListHeader } from '#/components/transactions/list-header'
-import type { PeriodChoice } from '#/components/transactions/period-controls'
-import { TransactionDayGroup } from '#/components/transactions/transaction-day'
-import { useTransactionPages } from '#/components/transactions/use-transaction-pages'
-import { formatDate, formatMonth, todayIso } from '#/lib/format'
+import { FloatingAddLink } from '#/components/layout/floating-add-button'
+import { EmptyState } from '#/components/lists/list-card'
+import { ListHeader } from '#/components/transactions/list/list-header'
+import { TransactionDayGroup } from '#/components/transactions/list/transaction-day'
+import { useTransactionPages } from '#/hooks/transactions/use-transaction-pages'
+import { formatDate, formatMonth, todayIso } from '#/lib/shared/format'
 import {
-  PERIODS,
+  PERIOD_UNITS,
   lastThirtyDays,
   monthOf,
   monthSchema,
   periodRange,
   yearSchema,
-} from '#/lib/transaction-list'
-import { useLocale } from '#/lib/use-locale'
-import { useMyCurrencies } from '#/lib/use-my-currencies'
+} from '#/lib/transactions/transaction-list'
+import { useLocale } from '#/hooks/app/use-locale'
+import { useMyCurrencies } from '#/hooks/currencies/use-my-currencies'
 import { listTransactions } from '#/server/transaction-list'
 import { getFeeCategory } from '#/server/transfers'
+import type { FilterValues } from '#/lib/transactions/transaction-filters'
+import type { PeriodChoice } from '#/lib/transactions/transaction-list'
 
 const KEPT = [
   'period',
@@ -47,7 +47,7 @@ const ids = z.array(z.uuid()).max(100).optional().catch(undefined)
 
 export const Route = createFileRoute('/_authed/transactions')({
   validateSearch: z.object({
-    period: z.enum(PERIODS).optional().catch(undefined),
+    period: z.enum(PERIOD_UNITS).optional().catch(undefined),
     month: monthSchema.optional().catch(undefined),
     year: yearSchema.optional().catch(undefined),
     start: z.iso.date().optional().catch(undefined),

@@ -4,7 +4,7 @@ import {
   AddCurrencyButton,
   CurrencyManager,
 } from '#/components/currencies/currency-manager'
-import { ListPage } from '#/components/list-page'
+import { ListPage } from '#/components/layout/list-page'
 import { getCurrencySettings } from '#/server/currencies'
 
 export const Route = createFileRoute('/_authed/settings/currencies')({

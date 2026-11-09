@@ -1,12 +1,12 @@
 import { Navigate, createFileRoute } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
-import { PeopleActions } from '#/components/people/people-actions'
-import { OwedLines } from '#/components/people/owed-summary'
-import { PeopleForm } from '#/components/people/people-form'
-import { RouteSheet } from '#/components/route-sheet'
-import { takenNames, withMemberNames } from '#/lib/people'
-import { usePeoplePage } from '#/lib/use-page-data'
-import { useFormatLocale } from '#/lib/use-locale'
+import { PeopleActions } from '#/components/people/list/people-actions'
+import { OwedLines } from '#/components/people/list/owed-summary'
+import { PeopleForm } from '#/components/people/form/people-form'
+import { RouteSheet } from '#/components/sheet/route-sheet'
+import { takenNames, withMemberNames } from '#/lib/people/person'
+import { usePeoplePage } from '#/hooks/app/use-page-data'
+import { useFormatLocale } from '#/hooks/app/use-locale'
 
 export const Route = createFileRoute('/_authed/settings/people/$personId')({
   staticData: { sheet: true },

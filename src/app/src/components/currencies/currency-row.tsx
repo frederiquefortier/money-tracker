@@ -1,10 +1,10 @@
 import { useTranslation } from 'react-i18next'
-import { IconActions, IconButton } from '#/components/icon-button'
-import { Tag } from '#/components/tag'
-import { RATES_HISTORY_START, currencyName } from '#/lib/currencies'
-import type { Currency } from '#/lib/currencies'
-import { formatDate } from '#/lib/format'
-import { useLocale } from '#/lib/use-locale'
+import { IconActions, IconButton } from '#/components/display/icon-button'
+import { Tag } from '#/components/display/tag'
+import { RATES_HISTORY_START, currencyName } from '#/lib/currencies/currency'
+import type { Currency } from '#/lib/currencies/currency'
+import { formatDate } from '#/lib/shared/format'
+import { useLocale } from '#/hooks/app/use-locale'
 
 /** Code, then the name with its symbol in parentheses, then the tag. */
 function CurrencyLabel({

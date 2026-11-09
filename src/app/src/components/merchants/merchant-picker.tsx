@@ -1,8 +1,8 @@
 import { useTranslation } from 'react-i18next'
-import { Combobox } from '#/components/combobox'
-import { useInlineCreate } from '#/components/use-inline-create'
-import type { Merchant } from '#/lib/merchants'
-import { useFormatLocale } from '#/lib/use-locale'
+import { Combobox } from '#/components/combobox/combobox'
+import { useInlineCreate } from '#/hooks/forms/use-inline-create'
+import type { Merchant } from '#/lib/merchants/merchant'
+import { useFormatLocale } from '#/hooks/app/use-locale'
 import { saveMerchant } from '#/server/merchants'
 
 /**

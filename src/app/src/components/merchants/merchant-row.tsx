@@ -1,9 +1,9 @@
 import { Link } from '@tanstack/react-router'
 import { CategoryBadge } from '#/components/categories/category-badge'
-import { rowHover } from '#/components/list-card'
 import { MerchantActions } from '#/components/merchants/merchant-actions'
-import type { Merchant } from '#/lib/merchants'
-import { cn, focusRing } from '#/lib/utils'
+import type { Merchant } from '#/lib/merchants/merchant'
+import { cn } from '#/lib/utils'
+import { rowHover, focusRing } from '#/components/styles'
 
 /**
  * The default category's icon (MER-01) as tall as the two lines beside it: the name, then

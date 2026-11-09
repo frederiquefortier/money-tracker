@@ -1,19 +1,18 @@
 import { useActionState } from 'react'
 import { Link, createFileRoute, redirect } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
-import { AuthShell } from '#/components/auth-shell'
-import { FormAlert, FormField } from '#/components/form-field'
-import { Icon } from '#/components/icon'
+import { AuthShell } from '#/components/layout/auth-shell'
+import { FormAlert, FormField } from '#/components/forms/form-field'
+import { Icon } from '#/components/display/icon'
 import { Button } from '#/components/ui/button'
+import { formValues, validate } from '#/lib/forms/form-state'
+import type { FieldErrors } from '#/lib/forms/form-state'
+import { requestPasswordReset } from '#/server/password'
 import {
-  formValues,
   useFieldValidation,
   useFocusFirstError,
-  validate,
-} from '#/lib/form'
-import type { FieldErrors } from '#/lib/form'
-import { forgotPasswordSchema } from '#/lib/schemas'
-import { requestPasswordReset } from '#/server/password'
+} from '#/hooks/forms/use-validation'
+import { forgotPasswordSchema } from '#/lib/auth/auth-schema'
 
 export const Route = createFileRoute('/forgot-password')({
   beforeLoad: ({ context }) => {

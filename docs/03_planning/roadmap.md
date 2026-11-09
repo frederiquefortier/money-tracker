@@ -91,7 +91,8 @@ later; events took their automatic linking (2026-11-05).
   the import. PPL-01..06.
 - Reimbursement links. TRX-07.
 - Events, linked by hand or automatically by date range and categories, shown as a tag
-  on the transaction; calendar, comparison, event budgets. EVT-01..07.
+  on the transaction; calendar and comparison. EVT-01..05, 07. Next: spec 22 (types,
+  events, linking, EVT-01..03, 07), then spec 23 (calendar, comparison, EVT-04, 05).
 - Holdings, and transactions linked to the holding they pay into (the `holding` column
   of the import), on the Comptes tab with the accounts. NW-01, and the my-money part of
   NW-03.
@@ -109,7 +110,8 @@ so the dashboard and budgets are built and tried on real history.
 ## Phase 4: Seeing it
 - Dashboard: range picker, filters, per-category stats, tiles, ranking, needs, wants and
   savings, expenses waiting for a reimbursement. DSH-01..09.
-- Budgets and the emergency fund. BUD-01..04, 06, CAT-08.
+- Budgets and the emergency fund, event budgets included. BUD-01..04, 06, CAT-08, EVT-06
+  (moved from phase 2, 2026-11-08).
 - Recurring transactions. TRX-08.
 - Merchant price evolution. MER-04.
 - Last reconciled and last transaction per account. ACC-08.

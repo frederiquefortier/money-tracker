@@ -1,11 +1,11 @@
 import { Navigate, createFileRoute } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
-import { RouteSheet } from '#/components/route-sheet'
-import { TransactionActions } from '#/components/transactions/transaction-actions'
-import { TransactionForm } from '#/components/transactions/transaction-form'
-import { draftFromTransaction } from '#/lib/transaction-draft'
-import { loadTransactionForm } from '#/lib/transaction-form-data'
-import { useLocale } from '#/lib/use-locale'
+import { RouteSheet } from '#/components/sheet/route-sheet'
+import { TransactionActions } from '#/components/transactions/list/transaction-actions'
+import { TransactionForm } from '#/components/transactions/form/transaction-form'
+import { draftFromTransaction } from '#/lib/transactions/transaction-draft'
+import { loadTransactionForm } from '#/server/transaction-form'
+import { useLocale } from '#/hooks/app/use-locale'
 import { getTransaction } from '#/server/transactions'
 
 export const Route = createFileRoute('/_authed/transactions/$transactionId')({

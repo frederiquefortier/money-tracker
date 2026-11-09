@@ -1,9 +1,9 @@
 import { Navigate, createFileRoute } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
-import { InstitutionActions } from '#/components/accounts/institution-actions'
-import { InstitutionForm } from '#/components/accounts/institution-form'
-import { RouteSheet } from '#/components/route-sheet'
-import { useAccountsPage } from '#/lib/use-page-data'
+import { InstitutionActions } from '#/components/accounts/institutions/institution-actions'
+import { InstitutionForm } from '#/components/accounts/institutions/institution-form'
+import { RouteSheet } from '#/components/sheet/route-sheet'
+import { useAccountsPage } from '#/hooks/app/use-page-data'
 
 export const Route = createFileRoute(
   '/_authed/accounts/institutions/$institutionId',

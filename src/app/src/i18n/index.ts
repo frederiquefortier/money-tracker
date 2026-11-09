@@ -1,7 +1,7 @@
 import i18next from 'i18next'
 import { initReactI18next } from 'react-i18next'
-import { en } from './resources/en'
-import { fr } from './resources/fr'
+import { en } from './en'
+import { fr } from './fr'
 import { DEFAULT_LOCALE } from './locales'
 import type { Locale } from './locales'
 

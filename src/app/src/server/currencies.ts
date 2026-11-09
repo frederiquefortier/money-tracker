@@ -1,15 +1,17 @@
 import { createServerFn } from '@tanstack/react-start'
 import { z } from 'zod'
-import { currencyCodeSchema } from '#/lib/currencies'
-import type { Currency, MyCurrencies } from '#/lib/currencies'
-import { loaded, updateProfile } from '#/lib/db.server'
-import { fetchHexaRate } from '#/lib/rates'
-import { failureFor } from '#/lib/result'
-import type { Result } from '#/lib/result'
-import { getSupabase } from '#/lib/supabase.server'
+import { currencyCodeSchema } from '#/lib/currencies/currency'
+import type {
+  Currency,
+  MyCurrencies,
+  CurrencyError,
+} from '#/lib/currencies/currency'
+import { loaded, updateProfile } from '#/lib/server/db.server'
+import { fetchHexaRate } from '#/lib/currencies/rate-sources'
+import { failureFor } from '#/lib/shared/result'
+import type { Result } from '#/lib/shared/result'
+import { getSupabase } from '#/lib/server/supabase.server'
 
-export type CurrencyError =
-  'unavailable' | 'unknown' | 'isDefault' | 'usedByAccount' | 'failed'
 type CurrencyResult = Result<CurrencyError>
 
 const codeInput = z.object({ code: currencyCodeSchema })

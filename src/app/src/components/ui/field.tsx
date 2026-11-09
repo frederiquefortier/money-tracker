@@ -1,5 +1,6 @@
 import { Label } from '#/components/ui/label'
-import { cn, focusRing } from '#/lib/utils'
+import { cn } from '#/lib/utils'
+import { focusRing } from '#/components/styles'
 
 /**
  * The control every form field shares: text inputs, native selects and picker triggers.

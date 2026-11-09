@@ -2,4 +2,4 @@ package-lock.json
 src/routeTree.gen.ts
 dist
 .netlify
-src/lib/database.gen.ts
+src/lib/db/database.gen.ts

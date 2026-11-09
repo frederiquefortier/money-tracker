@@ -1,14 +1,13 @@
 import { createServerFn } from '@tanstack/react-start'
 import { z } from 'zod'
-import { loaded } from '#/lib/db.server'
-import { groupInputSchema, personInputSchema } from '#/lib/people'
-import type { Person, PersonGroup } from '#/lib/people'
-import { failureFor } from '#/lib/result'
-import type { Result } from '#/lib/result'
-import { idInput } from '#/lib/schemas'
-import { getSupabase } from '#/lib/supabase.server'
+import { loaded } from '#/lib/server/db.server'
+import { groupInputSchema, personInputSchema } from '#/lib/people/person'
+import type { Person, PersonGroup, PeopleError } from '#/lib/people/person'
+import { failureFor } from '#/lib/shared/result'
+import type { Result } from '#/lib/shared/result'
+import { idInput } from '#/lib/shared/validation'
+import { getSupabase } from '#/lib/server/supabase.server'
 
-export type PeopleError = 'nameTaken' | 'aliasTaken' | 'notFound' | 'failed'
 type PeopleResult<T = object> = Result<PeopleError, T>
 
 const KNOWN: Partial<Record<string, PeopleError>> = {

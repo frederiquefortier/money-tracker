@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
-import { InstitutionForm } from '#/components/accounts/institution-form'
-import { RouteSheet } from '#/components/route-sheet'
+import { InstitutionForm } from '#/components/accounts/institutions/institution-form'
+import { RouteSheet } from '#/components/sheet/route-sheet'
 
 export const Route = createFileRoute('/_authed/accounts/institutions/new')({
   staticData: { sheet: true },

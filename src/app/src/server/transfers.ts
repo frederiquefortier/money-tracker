@@ -1,15 +1,14 @@
 import { createServerFn } from '@tanstack/react-start'
-import { loaded } from '#/lib/db.server'
-import { absDecimal } from '#/lib/money'
-import { failureFor } from '#/lib/result'
-import type { Result } from '#/lib/result'
-import { idInput } from '#/lib/schemas'
-import { getSupabase } from '#/lib/supabase.server'
-import { transferInputSchema } from '#/lib/transfers'
-import type { Transfer } from '#/lib/transfers'
-import type { ListedCategory } from '#/lib/transaction-list'
+import { loaded } from '#/lib/server/db.server'
+import { absDecimal } from '#/lib/shared/money'
+import { failureFor } from '#/lib/shared/result'
+import type { Result } from '#/lib/shared/result'
+import { idInput } from '#/lib/shared/validation'
+import { getSupabase } from '#/lib/server/supabase.server'
+import { transferInputSchema } from '#/lib/transfers/transfer'
+import type { Transfer, TransferError } from '#/lib/transfers/transfer'
+import type { ListedCategory } from '#/lib/transactions/transaction-list'
 
-export type TransferError = 'notFound' | 'failed'
 type TransferResult<T = object> = Result<TransferError, T>
 
 const failure = failureFor<TransferError>('transfers', {

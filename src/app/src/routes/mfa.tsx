@@ -2,18 +2,17 @@ import { useActionState, useState, useTransition } from 'react'
 import { createFileRoute, redirect, useRouter } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { z } from 'zod'
-import { AuthShell } from '#/components/auth-shell'
-import { FormAlert, FormField } from '#/components/form-field'
+import { AuthShell } from '#/components/layout/auth-shell'
+import { FormAlert, FormField } from '#/components/forms/form-field'
 import { Button } from '#/components/ui/button'
+import { formValues, validate } from '#/lib/forms/form-state'
+import type { FieldErrors } from '#/lib/forms/form-state'
+import { startTotpEnrollment, verifyTotp } from '#/server/session'
 import {
-  formValues,
   useFieldValidation,
   useFocusFirstError,
-  validate,
-} from '#/lib/form'
-import type { FieldErrors } from '#/lib/form'
-import { totpFormSchema } from '#/lib/schemas'
-import { startTotpEnrollment, verifyTotp } from '#/server/session'
+} from '#/hooks/forms/use-validation'
+import { totpFormSchema } from '#/lib/auth/auth-schema'
 
 // An allowlist: `next` cannot become an open redirect.
 const NEXT = ['/', '/set-password'] as const

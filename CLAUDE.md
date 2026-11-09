@@ -34,6 +34,13 @@ There is no seed of user data; history comes in through the fixed-format CSV imp
 root keeps only `README.md`, `CLAUDE.md`, `.gitignore`, `.github/`, `.claude/` and `docs/`
 ([ADR-007](docs/01_building/decisions.md)).
 
+Inside `src/app/src/`, where a file goes ([ADR-026](docs/01_building/decisions.md)): no file
+at the root of `components/`; shared pieces in a role folder (`layout`, `forms`, `sheet`,
+`combobox`, `lists`, `feedback`, `display`), a feature's own in its folder; every hook in
+`hooks/`; `lib/<feature>/` holds `<entity>.ts` (model), `<entity>-draft.ts` and
+`<entity>-list.ts`; `server/` holds server functions only, so types come from `lib/`;
+shared class strings go in `components/styles.ts`.
+
 **Every command runs from `src/app/`**, including the Supabase CLI:
 `npx supabase --workdir .. <command>` (`--workdir ..` points it at `src/supabase/`). Until real data exists, the Supabase project is the dev database: push migrations from the
 laptop with `npm run db:push` and try work locally before it reaches `main` (ADR-022). There is one account, the owner's; unfinished work is tried there (ADR-021).
@@ -79,6 +86,9 @@ with no scope and no requirement ID in it.
   and Postgres already provide before adding a dependency ([ADR-011](docs/01_building/decisions.md)).
   When a dependency is warranted, name the widely used, maintained option; mention a newer
   or niche one only as a labelled alternative. A new dependency gets a line in ADR-011.
+- **One home, one name.** Before adding a file, find its folder in the layout above. An
+  export is named for what it is, and no two files export the same name. A shared class
+  string, hook or type that a second file needs moves to its shared folder first.
 - **No real financial data or real names in Git.** Figures, memos and people from the
   spreadsheets stay in `src/data/local/`. Docs describe the *shape* of that data. Tests and
   demo data use invented people and invented amounts.

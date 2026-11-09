@@ -1,8 +1,8 @@
 import * as React from 'react'
 import { Dialog as DialogPrimitive } from 'radix-ui'
-import { Icon } from '#/components/icon'
-import { iconAction } from '#/components/icon-button'
+import { Icon } from '#/components/display/icon'
 import { cn } from '#/lib/utils'
+import { iconAction } from '#/components/styles'
 
 // shadcn's dialog, as a bottom sheet on phones and a centred card from sm up.
 function Dialog(props: React.ComponentProps<typeof DialogPrimitive.Root>) {

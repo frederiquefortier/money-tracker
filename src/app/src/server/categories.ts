@@ -5,24 +5,20 @@ import {
   KINDS,
   categoryInputSchema,
   resolveColors,
-} from '#/lib/categories'
-import type { Category, CategoryEvent } from '#/lib/categories'
-import { loaded, saveRow } from '#/lib/db.server'
-import { NECESSITIES } from '#/lib/necessity'
-import { failed, failureFor } from '#/lib/result'
-import type { Result } from '#/lib/result'
-import { idInput } from '#/lib/schemas'
-import { getSupabase } from '#/lib/supabase.server'
-import { isOneOf } from '#/lib/utils'
+} from '#/lib/categories/category'
+import type {
+  Category,
+  CategoryEvent,
+  CategoryError,
+} from '#/lib/categories/category'
+import { loaded, saveRow } from '#/lib/server/db.server'
+import { NECESSITIES } from '#/lib/categories/category-necessity'
+import { failed, failureFor } from '#/lib/shared/result'
+import type { Result } from '#/lib/shared/result'
+import { idInput } from '#/lib/shared/validation'
+import { getSupabase } from '#/lib/server/supabase.server'
+import { isOneOf } from '#/lib/shared/collections'
 
-export type CategoryError =
-  | 'nameTaken'
-  | 'inUse'
-  | 'parentArchived'
-  | 'beforePrevious'
-  | 'pauseOverlaps'
-  | 'notFound'
-  | 'failed'
 type CategoryResult<T = object> = Result<CategoryError, T>
 
 const KNOWN: Partial<Record<string, CategoryError>> = {

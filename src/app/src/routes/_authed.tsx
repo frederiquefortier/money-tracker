@@ -1,14 +1,14 @@
 import { Outlet, createFileRoute, redirect } from '@tanstack/react-router'
-import { AppMenu } from '#/components/app-menu'
-import { AppNav } from '#/components/app-nav'
+import { AppMenu } from '#/components/layout/app-menu'
+import { AppNav } from '#/components/layout/app-nav'
 import {
   AddButtonSlot,
   AddButtonTarget,
-} from '#/components/floating-add-button'
-import { DisplayCurrencySwitcher } from '#/components/display-currency-switcher'
-import { LocaleSwitcher } from '#/components/locale-switcher'
-import { Logo } from '#/components/logo'
-import { Toaster } from '#/components/toaster'
+} from '#/components/layout/floating-add-button'
+import { DisplayCurrencySwitcher } from '#/components/layout/display-currency-switcher'
+import { LocaleSwitcher } from '#/components/layout/locale-switcher'
+import { Logo } from '#/components/layout/logo'
+import { Toaster } from '#/components/feedback/toaster'
 import { getMyCurrencies } from '#/server/currencies'
 
 // UI guard only; RLS is the real one.

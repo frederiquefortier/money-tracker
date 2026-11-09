@@ -1,16 +1,16 @@
 import { Outlet, createFileRoute } from '@tanstack/react-router'
 import { useId, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { ArchivedCategories } from '#/components/categories/archived-categories'
-import { CategoryTree } from '#/components/categories/category-tree'
-import { EmptyState } from '#/components/list-card'
-import { KindTabs } from '#/components/categories/kind-tabs'
-import { useExpandedBranches } from '#/components/categories/use-expanded-branches'
-import { ExpandAllButton } from '#/components/expand-all-button'
-import { FloatingAddLink } from '#/components/floating-add-button'
-import { SearchField } from '#/components/search-field'
-import { ListPage } from '#/components/list-page'
-import { SortMenu } from '#/components/sort-menu'
+import { ArchivedCategories } from '#/components/categories/list/archived-categories'
+import { CategoryTree } from '#/components/categories/list/category-tree'
+import { EmptyState } from '#/components/lists/list-card'
+import { KindTabs } from '#/components/categories/list/kind-tabs'
+import { useExpandedBranches } from '#/hooks/categories/use-expanded-branches'
+import { ExpandAllButton } from '#/components/lists/expand-all-button'
+import { FloatingAddLink } from '#/components/layout/floating-add-button'
+import { SearchField } from '#/components/forms/search-field'
+import { ListPage } from '#/components/layout/list-page'
+import { SortMenu } from '#/components/lists/sort-menu'
 import { FORMAT_LOCALE } from '#/i18n/locales'
 import type { Locale } from '#/i18n/locales'
 import {
@@ -20,13 +20,18 @@ import {
   childrenByParent,
   isArchived,
   sortSiblings,
-} from '#/lib/categories'
-import type { Category, CategorySort, Kind } from '#/lib/categories'
-import { archivedTree, categoryContext } from '#/lib/category-tree'
-import { useLocale } from '#/lib/use-locale'
-import { useStoredState } from '#/lib/use-stored-state'
-import { foldForSearch, indexById, oneOf } from '#/lib/utils'
+} from '#/lib/categories/category'
+import type {
+  Category,
+  CategorySort,
+  CategoryKind,
+} from '#/lib/categories/category'
+import { archivedTree, categoryContext } from '#/lib/categories/category-tree'
+import { useLocale } from '#/hooks/app/use-locale'
+import { useStoredState } from '#/hooks/app/use-stored-state'
 import { getCategories } from '#/server/categories'
+import { indexById, oneOf } from '#/lib/shared/collections'
+import { foldForSearch } from '#/lib/shared/search'
 
 export const Route = createFileRoute('/_authed/settings/categories')({
   loader: () => getCategories(),
@@ -67,7 +72,7 @@ function shape(
     sort,
     locale,
     query,
-  }: { kind: Kind; sort: CategorySort; locale: Locale; query: string },
+  }: { kind: CategoryKind; sort: CategorySort; locale: Locale; query: string },
 ) {
   const collator = FORMAT_LOCALE[locale]
   const byId = indexById(categories)
@@ -115,7 +120,7 @@ function shape(
   }
 }
 
-function AddCategoryButton({ kind }: { kind: Kind }) {
+function AddCategoryButton({ kind }: { kind: CategoryKind }) {
   const { t } = useTranslation()
   return (
     <FloatingAddLink
@@ -128,7 +133,7 @@ function AddCategoryButton({ kind }: { kind: Kind }) {
 
 /** The tab and the sort, remembered per browser. */
 function useView() {
-  const [kind, setKind] = useStoredState<Kind>(
+  const [kind, setKind] = useStoredState<CategoryKind>(
     'categories.kind',
     'expense',
     parseKind,

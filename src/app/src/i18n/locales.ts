@@ -1,4 +1,4 @@
-import { isOneOf } from '#/lib/utils'
+import { isOneOf } from '#/lib/shared/collections'
 
 // Keep in sync with the check constraint on profiles.locale (migrations).
 export const LOCALES = ['fr', 'en'] as const

@@ -1,12 +1,12 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { CategoryPicker } from '#/components/categories/category-picker'
-import { FormField } from '#/components/form-field'
-import { SheetForm } from '#/components/sheet-form'
-import { useSheetForm } from '#/components/use-sheet-form'
-import type { Category } from '#/lib/categories'
-import { merchantFormSchema } from '#/lib/merchants'
-import type { Merchant } from '#/lib/merchants'
+import { FormField } from '#/components/forms/form-field'
+import { SheetForm } from '#/components/sheet/sheet-form'
+import { useSheetForm } from '#/hooks/forms/use-sheet-form'
+import type { Category } from '#/lib/categories/category'
+import { merchantFormSchema } from '#/lib/merchants/merchant'
+import type { Merchant } from '#/lib/merchants/merchant'
 import { saveMerchant } from '#/server/merchants'
 
 /** Spec 13. A new default category applies to new transactions only (MER-01). */

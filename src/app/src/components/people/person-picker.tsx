@@ -1,11 +1,11 @@
 import { useTranslation } from 'react-i18next'
-import { Combobox } from '#/components/combobox'
+import { Combobox } from '#/components/combobox/combobox'
 import { AnonymousAvatar, PersonAvatar } from '#/components/people/avatars'
-import { useInlineCreate } from '#/components/use-inline-create'
-import { byName } from '#/lib/people'
-import type { Person } from '#/lib/people'
-import { useFormatLocale } from '#/lib/use-locale'
-import { ANONYMOUS } from '#/lib/transaction-source'
+import { useInlineCreate } from '#/hooks/forms/use-inline-create'
+import { byName } from '#/lib/people/person'
+import type { Person } from '#/lib/people/person'
+import { useFormatLocale } from '#/hooks/app/use-locale'
+import { ANONYMOUS } from '#/lib/transactions/transaction-source'
 import { savePerson } from '#/server/people'
 
 /**

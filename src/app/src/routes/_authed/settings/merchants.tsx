@@ -2,30 +2,35 @@ import { Outlet, createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { CategoryBadge } from '#/components/categories/category-badge'
-import { ChoiceMenu } from '#/components/choice-menu'
-import { FloatingAddLink } from '#/components/floating-add-button'
-import { EmptyState, ListCard } from '#/components/list-card'
+import { ChoiceMenu } from '#/components/display/choice-menu'
+import { FloatingAddLink } from '#/components/layout/floating-add-button'
+import { EmptyState, ListCard } from '#/components/lists/list-card'
 import { MerchantRow } from '#/components/merchants/merchant-row'
-import { SearchField } from '#/components/search-field'
-import { ListPage } from '#/components/list-page'
-import { SortMenu } from '#/components/sort-menu'
-import { TreeGuides } from '#/components/tree-guides'
-import { categoryPath } from '#/lib/categories'
-import type { Category } from '#/lib/categories'
+import { SearchField } from '#/components/forms/search-field'
+import { ListPage } from '#/components/layout/list-page'
+import { SortMenu } from '#/components/lists/sort-menu'
+import { TreeGuides } from '#/components/lists/tree-guides'
+import { categoryPath } from '#/lib/categories/category'
+import type { Category } from '#/lib/categories/category'
 import {
   MERCHANT_SORTS,
   filterMerchants,
   merchantFilters,
   sortMerchants,
-} from '#/lib/merchants'
-import type { Merchant, MerchantFilter, MerchantSort } from '#/lib/merchants'
-import { treeGuides } from '#/lib/tree'
-import type { TreeGuide } from '#/lib/tree'
-import { useFormatLocale } from '#/lib/use-locale'
-import { useStoredState } from '#/lib/use-stored-state'
-import { foldForSearch, indexById, oneOf } from '#/lib/utils'
+} from '#/lib/merchants/merchant'
+import type {
+  Merchant,
+  MerchantFilter,
+  MerchantSort,
+} from '#/lib/merchants/merchant'
+import { treeGuides } from '#/lib/shared/tree-layout'
+import type { TreeGuide } from '#/lib/shared/tree-layout'
+import { useFormatLocale } from '#/hooks/app/use-locale'
+import { useStoredState } from '#/hooks/app/use-stored-state'
 import { getCategories } from '#/server/categories'
 import { getMerchants } from '#/server/merchants'
+import { indexById, oneOf } from '#/lib/shared/collections'
+import { foldForSearch } from '#/lib/shared/search'
 
 export const Route = createFileRoute('/_authed/settings/merchants')({
   loader: async () => {
