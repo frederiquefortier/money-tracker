@@ -1,11 +1,10 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { ConfirmDialog } from '#/components/feedback/confirm-dialog'
+import { DeleteDialog } from '#/components/feedback/delete-dialog'
 import { IconActions, IconButton } from '#/components/display/icon-button'
 import type { ActionPlacement } from '#/components/display/icon-button'
-import { useServerAction } from '#/hooks/app/use-server-action'
 import { accountLabel } from '#/lib/accounts/account'
-import { formatDate, formatMoney } from '#/lib/shared/format'
+import { formatDate, formatMoney, formatQuoted } from '#/lib/shared/format'
 import { absDecimal } from '#/lib/shared/money'
 import { useLocale } from '#/hooks/app/use-locale'
 import { deleteTransfer } from '#/server/transfers'
@@ -40,9 +39,8 @@ export function TransferActions({
 }) {
   const { t } = useTranslation()
   const locale = useLocale()
-  const { run, busy } = useServerAction()
   const [confirming, setConfirming] = useState(false)
-  const quoted = (account: Account) => `“${accountLabel(account)}”`
+  const quoted = (account: Account) => formatQuoted(accountLabel(account))
 
   return (
     <IconActions slots={1} placement={placement}>
@@ -51,7 +49,7 @@ export function TransferActions({
         label={t('transactions.transfer.deleteLabel')}
         onClick={() => setConfirming(true)}
       />
-      <ConfirmDialog
+      <DeleteDialog
         open={confirming}
         title={t('transactions.transfer.deleteTitle', {
           amount: formatMoney(
@@ -65,14 +63,8 @@ export function TransferActions({
           from: quoted(summary.from),
           to: quoted(summary.to),
         })}
-        confirmLabel={t('common.delete')}
-        busy={busy}
-        onCancel={() => setConfirming(false)}
-        onConfirm={() =>
-          run(() => deleteTransfer({ data: { id: summary.transferId } }), {
-            onResult: () => setConfirming(false),
-          })
-        }
+        onDelete={() => deleteTransfer({ data: { id: summary.transferId } })}
+        onClose={() => setConfirming(false)}
       />
     </IconActions>
   )

@@ -1,11 +1,10 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { ConfirmDialog } from '#/components/feedback/confirm-dialog'
+import { DeleteDialog } from '#/components/feedback/delete-dialog'
 import { IconActions, IconButton } from '#/components/display/icon-button'
 import type { ActionPlacement } from '#/components/display/icon-button'
-import { useServerAction } from '#/hooks/app/use-server-action'
 import { accountLabel } from '#/lib/accounts/account'
-import { formatDate, formatMoney } from '#/lib/shared/format'
+import { formatDate, formatMoney, formatQuoted } from '#/lib/shared/format'
 import { useLocale } from '#/hooks/app/use-locale'
 import { deleteAdjustment } from '#/server/adjustments'
 
@@ -27,7 +26,6 @@ export function AdjustmentActions({
 }) {
   const { t } = useTranslation()
   const locale = useLocale()
-  const { run, busy } = useServerAction()
   const [confirming, setConfirming] = useState(false)
 
   return (
@@ -37,23 +35,17 @@ export function AdjustmentActions({
         label={t('transactions.adjustment.deleteLabel')}
         onClick={() => setConfirming(true)}
       />
-      <ConfirmDialog
+      <DeleteDialog
         open={confirming}
         title={t('transactions.adjustment.deleteTitle', {
           amount: formatMoney(summary.amount, summary.currency, locale),
           date: formatDate(summary.occurredOn, locale),
         })}
         description={t('transactions.adjustment.deleteText', {
-          account: `“${accountLabel(summary.account)}”`,
+          account: formatQuoted(accountLabel(summary.account)),
         })}
-        confirmLabel={t('common.delete')}
-        busy={busy}
-        onCancel={() => setConfirming(false)}
-        onConfirm={() =>
-          run(() => deleteAdjustment({ data: { id: summary.id } }), {
-            onResult: () => setConfirming(false),
-          })
-        }
+        onDelete={() => deleteAdjustment({ data: { id: summary.id } })}
+        onClose={() => setConfirming(false)}
       />
     </IconActions>
   )

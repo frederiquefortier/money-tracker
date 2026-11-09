@@ -1,10 +1,8 @@
-import { Link } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { AccountActions } from '#/components/accounts/list/account-actions'
 import { Icon } from '#/components/display/icon'
-import { cn } from '#/lib/utils'
+import { ListRow } from '#/components/lists/list-row'
 import type { Account } from '#/lib/accounts/account'
-import { rowHover, focusRing } from '#/components/styles'
 
 export type ListedAccount = Account & { typeLabel: string }
 
@@ -24,38 +22,36 @@ export function AccountRow({
   alignTop?: boolean
 }) {
   const { t } = useTranslation()
-  const align = alignTop ? 'items-start' : 'items-center'
   return (
-    <li className={cn('flex pr-2', align, rowHover)}>
-      <Link
-        to="/accounts/$accountId"
-        params={{ accountId: account.id }}
-        className={cn('flex min-w-0 flex-1 gap-3 py-3 pl-4', align, focusRing)}
-      >
-        <span className="min-w-0 flex-1">
-          <span className="flex items-center gap-1.5 font-semibold">
-            {account.hiddenForNew && (
-              <span title={t('accounts.hidden')}>
-                <Icon
-                  name="eye-off"
-                  label={t('accounts.hidden')}
-                  className="text-muted-foreground"
-                />
-              </span>
-            )}
-            <span className="truncate">{account.name}</span>
-          </span>
-          <span className="block truncate text-sm text-muted-foreground">
-            {details}{' '}
-            <span className="font-mono font-semibold">{account.currency}</span>
-          </span>
+    <ListRow
+      link={{ to: '/accounts/$accountId', params: { accountId: account.id } }}
+      alignTop={alignTop}
+      actions={
+        <AccountActions
+          account={account}
+          className={alignTop ? 'pt-2' : undefined}
+        />
+      }
+    >
+      <span className="min-w-0 flex-1">
+        <span className="flex items-center gap-1.5 font-semibold">
+          {account.hiddenForNew && (
+            <span title={t('accounts.hidden')}>
+              <Icon
+                name="eye-off"
+                label={t('accounts.hidden')}
+                className="text-muted-foreground"
+              />
+            </span>
+          )}
+          <span className="truncate">{account.name}</span>
         </span>
-        <span className="text-right md:pr-4">{aside}</span>
-      </Link>
-      <AccountActions
-        account={account}
-        className={alignTop ? 'pt-2' : undefined}
-      />
-    </li>
+        <span className="block truncate text-sm text-muted-foreground">
+          {details}{' '}
+          <span className="font-mono font-semibold">{account.currency}</span>
+        </span>
+      </span>
+      <span className="text-right md:pr-4">{aside}</span>
+    </ListRow>
   )
 }

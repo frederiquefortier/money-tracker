@@ -1,5 +1,7 @@
 import { z } from 'zod'
+import { compareNames } from '#/lib/shared/collections'
 import { treeOrder } from '#/lib/shared/tree-layout'
+import { nameFormSchema } from '#/lib/shared/validation'
 
 // Shared by the Marchands screens and the server functions (spec 13).
 
@@ -10,15 +12,7 @@ export type Merchant = {
   transactionCount: number
 }
 
-export const merchantFormSchema = z.object({
-  name: z
-    .string()
-    .trim()
-    .min(1, { error: 'required' })
-    .max(100, { error: 'invalid' }),
-})
-
-export const merchantInputSchema = merchantFormSchema.extend({
+export const merchantInputSchema = nameFormSchema.extend({
   id: z.uuid().optional(),
   defaultCategoryId: z.uuid().nullable(),
 })
@@ -103,8 +97,7 @@ export function sortMerchants(
     locale,
   }: { sort: MerchantSort; pathOf: Tree['pathOf']; locale: string },
 ) {
-  const byName = (a: Merchant, b: Merchant) =>
-    a.name.localeCompare(b.name, locale)
+  const byName = compareNames(locale)
   const path = (m: Merchant) =>
     m.defaultCategoryId ? pathOf(m.defaultCategoryId) : undefined
   const compare: Record<MerchantSort, (a: Merchant, b: Merchant) => number> = {
@@ -120,6 +113,13 @@ export function sortMerchants(
     },
   }
   return [...merchants].sort(compare[sort])
+}
+
+/** Most used first, then by name: the order of every merchant choice (TRX-05). */
+export function compareByUse(locale: string) {
+  const byName = compareNames(locale)
+  return (a: Merchant, b: Merchant) =>
+    b.transactionCount - a.transactionCount || byName(a, b)
 }
 
 export type MerchantError = 'nameTaken' | 'notFound' | 'failed'

@@ -1,8 +1,9 @@
 import type { CheckNode, CheckState } from '#/components/forms/check-list'
 import type { Category } from '#/lib/categories/category'
+import { compareByUse } from '#/lib/merchants/merchant'
 import type { Merchant } from '#/lib/merchants/merchant'
 import { indexById } from '#/lib/shared/collections'
-import { foldForSearch } from '#/lib/shared/search'
+import { matcher } from '#/lib/shared/search'
 
 // How a tick spreads in the check lists: filters (spec 14, TRX-14) and the people on a
 // transaction.
@@ -115,14 +116,14 @@ export function merchantNodes(
     locale,
   }: { query: string; picked: Picked; shown: number; locale: string },
 ) {
-  const q = foldForSearch(query)
+  const matches = matcher(query)
+  const byUse = compareByUse(locale)
   const matching = merchants
-    .filter((m) => !q || foldForSearch(m.name).includes(q))
+    .filter((m) => matches(m.name))
     .sort(
       (a, b) =>
         Number(picked.includes(b.id)) - Number(picked.includes(a.id)) ||
-        b.transactionCount - a.transactionCount ||
-        a.name.localeCompare(b.name, locale),
+        byUse(a, b),
     )
   return {
     nodes: matching.slice(0, shown).map((m) => ({ id: m.id, label: m.name })),

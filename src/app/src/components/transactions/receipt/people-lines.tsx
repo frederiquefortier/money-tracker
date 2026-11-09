@@ -18,7 +18,7 @@ import {
   withHeadCount,
   withPeopleMode,
   withRoleSwitched,
-  withoutLine,
+  withoutPersonLine,
   isUnknown,
 } from '#/lib/transactions/transaction-people'
 import {
@@ -27,9 +27,10 @@ import {
 } from '#/lib/transactions/transaction-people-draft'
 import type { PersonLine } from '#/lib/transactions/transaction-people'
 import { cn } from '#/lib/utils'
-import type { TransactionDraft } from '#/lib/transactions/transaction-draft-types'
-
-type Update = (changes: Partial<TransactionDraft>) => void
+import type {
+  DraftUpdate,
+  TransactionDraft,
+} from '#/lib/transactions/transaction-draft-types'
 
 const avatarBox =
   'grid size-8 shrink-0 place-items-center rounded-full bg-secondary text-primary'
@@ -57,7 +58,7 @@ function LineControls({
   line: PersonLine
   name: string
   draft: TransactionDraft
-  onChange: Update
+  onChange: DraftUpdate
 }) {
   const { t } = useTranslation()
   // Only an expense's lines have controls: an income's one source is a field.
@@ -124,7 +125,7 @@ function PeopleLine({
   computed: bigint | null | undefined
   filled: boolean
   accountCurrency: string
-  onChange: Update
+  onChange: DraftUpdate
 }) {
   const { t } = useTranslation()
   const name = lineName(line, people, t)
@@ -159,7 +160,7 @@ function PeopleLine({
           <IconButton
             icon="close"
             label={t('transactions.removeLine')}
-            onClick={() => onChange(withoutLine(draft, line.key))}
+            onClick={() => onChange(withoutPersonLine(draft, line.key))}
           />
         )}
       </div>
@@ -214,7 +215,7 @@ export function PeopleLines({
   total: bigint | null
   accountCurrency: string
   error: string | undefined
-  onChange: Update
+  onChange: DraftUpdate
   onOpen: () => void
 }) {
   const { t } = useTranslation()

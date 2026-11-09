@@ -1,56 +1,13 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { ConfirmDialog } from '#/components/feedback/confirm-dialog'
-import { FormField } from '#/components/forms/form-field'
+import { ArchiveDialog } from '#/components/feedback/archive-dialog'
+import { DeleteDialog } from '#/components/feedback/delete-dialog'
 import { IconActions, IconButton } from '#/components/display/icon-button'
 import type { ActionPlacement } from '#/components/display/icon-button'
 import { useServerAction } from '#/hooks/app/use-server-action'
-import { todayIso } from '#/lib/shared/format'
 import { archivePeopleRow, deletePeopleRow } from '#/server/people'
 
 export type PeopleKind = 'person' | 'group'
-
-/** PPL-02: the shared archive dialog, its date today unless changed. */
-function ArchiveDialog({
-  kind,
-  id,
-  name,
-  onClose,
-}: {
-  kind: PeopleKind
-  id: string
-  name: string
-  onClose: () => void
-}) {
-  const { t } = useTranslation()
-  const { run, busy } = useServerAction()
-  const [archivedOn, setArchivedOn] = useState(todayIso)
-  return (
-    <ConfirmDialog
-      open
-      tone="default"
-      title={t('common.archiveName', { name })}
-      confirmLabel={t('common.archive')}
-      busy={busy}
-      canConfirm={archivedOn !== ''}
-      onCancel={onClose}
-      onConfirm={() =>
-        run(() => archivePeopleRow({ data: { kind, id, archivedOn } }), {
-          onResult: onClose,
-        })
-      }
-    >
-      <FormField
-        name="archivedOn"
-        type="date"
-        required
-        label={t('people.archivedOnField')}
-        value={archivedOn}
-        onChange={(event) => setArchivedOn(event.target.value)}
-      />
-    </ConfirmDialog>
-  )
-}
 
 /** Archive or reactivate (PPL-02) and delete, on a person's or a group's row or sheet. */
 export function PeopleActions({
@@ -68,10 +25,12 @@ export function PeopleActions({
   placement?: ActionPlacement
 }) {
   const { t } = useTranslation()
-  const { run, busy } = useServerAction()
+  const { run } = useServerAction()
   const [dialog, setDialog] = useState<'archive' | 'delete' | null>(null)
   const { id, name } = row
   const close = () => setDialog(null)
+  const archiveLabel = t('common.archiveName', { name })
+  const deleteLabel = t('common.deleteName', { name })
 
   return (
     <IconActions slots={2} placement={placement}>
@@ -88,29 +47,30 @@ export function PeopleActions({
       ) : (
         <IconButton
           icon="archive"
-          label={t('common.archiveName', { name })}
+          label={archiveLabel}
           onClick={() => setDialog('archive')}
         />
       )}
       <IconButton
         icon="trash-full"
-        label={t('common.deleteName', { name })}
+        label={deleteLabel}
         onClick={() => setDialog('delete')}
       />
       {dialog === 'archive' && (
-        <ArchiveDialog kind={kind} id={id} name={name} onClose={close} />
+        <ArchiveDialog
+          title={archiveLabel}
+          dateLabel={t('people.archivedOnField')}
+          onArchive={(archivedOn) =>
+            archivePeopleRow({ data: { kind, id, archivedOn } })
+          }
+          onClose={close}
+        />
       )}
-      <ConfirmDialog
+      <DeleteDialog
         open={dialog === 'delete'}
-        title={t('common.deleteName', { name })}
-        confirmLabel={t('common.delete')}
-        busy={busy}
-        onCancel={close}
-        onConfirm={() =>
-          run(() => deletePeopleRow({ data: { kind, id } }), {
-            onResult: close,
-          })
-        }
+        title={deleteLabel}
+        onDelete={() => deletePeopleRow({ data: { kind, id } })}
+        onClose={close}
       >
         {/* Spec 20: their lines stay without a name, so no amount changes. */}
         {(row.transactionCount ?? 0) > 0 && (
@@ -118,7 +78,7 @@ export function PeopleActions({
             {t('people.deleteKeeps', { count: row.transactionCount })}
           </p>
         )}
-      </ConfirmDialog>
+      </DeleteDialog>
     </IconActions>
   )
 }

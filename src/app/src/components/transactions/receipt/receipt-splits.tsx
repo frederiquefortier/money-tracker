@@ -23,15 +23,14 @@ import { useLocale } from '#/hooks/app/use-locale'
 import { cn } from '#/lib/utils'
 import { indexById } from '#/lib/shared/collections'
 import type {
+  DraftUpdate,
   TransactionDraft,
   SplitLine,
 } from '#/lib/transactions/transaction-draft-types'
 import type { PickTarget } from '#/components/transactions/receipt/receipt-line'
 
-type Update = (changes: Partial<TransactionDraft>) => void
-
 /** Removing down to one line goes back to the single category (spec 15). */
-function withoutLine(
+function withoutSplitLine(
   lines: ReadonlyArray<SplitLine>,
   key: number,
 ): Partial<TransactionDraft> {
@@ -84,7 +83,7 @@ export function LineValue({
   )
 }
 
-function SplitLine({
+function SplitRow({
   line,
   n,
   draft,
@@ -100,7 +99,7 @@ function SplitLine({
   categories: ReadonlyArray<Category>
   computed: bigint | null | undefined
   accountCurrency: string
-  onChange: Update
+  onChange: DraftUpdate
   onPick: (target: PickTarget) => void
 }) {
   const { t } = useTranslation()
@@ -148,7 +147,7 @@ function SplitLine({
       <IconButton
         icon="close"
         label={t('transactions.removeLine')}
-        onClick={() => onChange(withoutLine(draft.lines, line.key))}
+        onClick={() => onChange(withoutSplitLine(draft.lines, line.key))}
       />
     </li>
   )
@@ -205,7 +204,7 @@ export function SplitLines({
   total: bigint | null
   accountCurrency: string
   error: string | undefined
-  onChange: Update
+  onChange: DraftUpdate
   onPick: (target: PickTarget) => void
 }) {
   const { t } = useTranslation()
@@ -226,7 +225,7 @@ export function SplitLines({
       />
       <ul className="flex flex-col gap-2">
         {draft.lines.map((line, i) => (
-          <SplitLine
+          <SplitRow
             key={line.key}
             {...{ line, draft, categories, accountCurrency, onChange, onPick }}
             n={i + 1}

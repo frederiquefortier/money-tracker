@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { noteSchema } from '#/lib/shared/validation'
 import { positiveDecimal } from '#/lib/transactions/transaction'
 
 // Shared by the transfer form (spec 16) and its server functions.
@@ -26,7 +27,7 @@ export const transferInputSchema = z
     amount: positiveDecimal,
     received: positiveDecimal.nullable(),
     fee: positiveDecimal.nullable(),
-    note: z.string().trim().max(1000),
+    note: noteSchema,
     fromPending: z.boolean(),
     toPending: z.boolean(),
   })

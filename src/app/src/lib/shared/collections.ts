@@ -9,6 +9,19 @@ export function oneOf<T>(list: ReadonlyArray<T>) {
   return (value: unknown): T | undefined => list.find((item) => item === value)
 }
 
+/** For `sort`, or as the tie-break after another order. */
+export function compareNames(locale: string) {
+  return (a: { name: string }, b: { name: string }) =>
+    a.name.localeCompare(b.name, locale)
+}
+
+export function byName<T extends { name: string }>(
+  items: ReadonlyArray<T>,
+  locale: string,
+) {
+  return [...items].sort(compareNames(locale))
+}
+
 export function indexById<T extends { id: string }>(items: ReadonlyArray<T>) {
   return new Map(items.map((item) => [item.id, item]))
 }

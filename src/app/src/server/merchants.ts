@@ -1,6 +1,6 @@
 import { createServerFn } from '@tanstack/react-start'
 import { z } from 'zod'
-import { loaded, saveRow } from '#/lib/server/db.server'
+import { deleteRow, loaded, saveRow } from '#/lib/server/db.server'
 import { merchantInputSchema } from '#/lib/merchants/merchant'
 import type { Merchant, MerchantError } from '#/lib/merchants/merchant'
 import { failureFor } from '#/lib/shared/result'
@@ -57,10 +57,7 @@ export const saveMerchant = createServerFn({ method: 'POST' })
 export const deleteMerchant = createServerFn({ method: 'POST' })
   .validator(idInput)
   .handler(async ({ data }): Promise<MerchantResult> => {
-    const { error } = await getSupabase()
-      .from('merchants')
-      .delete()
-      .eq('id', data.id)
+    const error = await deleteRow('merchants', data.id)
     return error ? failure('delete', error) : { ok: true }
   })
 

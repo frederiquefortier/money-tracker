@@ -2,10 +2,11 @@ import { useTransition } from 'react'
 import { useRouter } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { useToast } from '#/hooks/app/use-toast'
+import type { Result } from '#/lib/shared/result'
 
-type Outcome = { ok: true } | { ok: false; error: string }
+type Outcome = Result<string>
 
-type Options = {
+export type ServerActionOptions = {
   /** Runs first, saved or not: close a dialog, drop an optimistic change. */
   onResult?: (ok: boolean) => void
   /** The toast for a failure; the generic one when it returns undefined. */
@@ -22,7 +23,10 @@ export function useServerAction() {
   const toast = useToast()
   const [busy, startTransition] = useTransition()
 
-  function run(call: () => Promise<Outcome>, options: Options = {}) {
+  function run(
+    call: () => Promise<Outcome>,
+    options: ServerActionOptions = {},
+  ) {
     startTransition(async () => {
       const result = await call().catch((): Outcome => ({
         ok: false,

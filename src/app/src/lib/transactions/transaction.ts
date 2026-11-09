@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { noteSchema } from '#/lib/shared/validation'
 import type { Category } from '#/lib/categories/category'
 import { currencyCodeSchema } from '#/lib/currencies/currency'
 import type { Merchant } from '#/lib/merchants/merchant'
@@ -86,7 +87,7 @@ export const transactionInputSchema = z
     originalCurrency: currencyCodeSchema.nullable(),
     pending: z.boolean(),
     merchantId: z.uuid().nullable(),
-    note: z.string().trim().max(1000),
+    note: noteSchema,
     splitMode: z.enum(SPLIT_MODES),
     splits: z
       .array(z.object({ categoryId: z.uuid(), value: positiveDecimal }))

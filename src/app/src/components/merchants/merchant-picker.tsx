@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import { Combobox } from '#/components/combobox/combobox'
 import { useInlineCreate } from '#/hooks/forms/use-inline-create'
+import { compareByUse } from '#/lib/merchants/merchant'
 import type { Merchant } from '#/lib/merchants/merchant'
 import { useFormatLocale } from '#/hooks/app/use-locale'
 import { saveMerchant } from '#/server/merchants'
@@ -32,11 +33,7 @@ export function MerchantPicker({
     onCreated: onChange,
   })
   const options = [...merchants]
-    .sort(
-      (a, b) =>
-        b.transactionCount - a.transactionCount ||
-        a.name.localeCompare(b.name, locale),
-    )
+    .sort(compareByUse(locale))
     .map((m) => ({ value: m.id, label: m.name }))
 
   return (

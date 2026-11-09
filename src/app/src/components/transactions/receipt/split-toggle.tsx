@@ -2,9 +2,10 @@ import { useTranslation } from 'react-i18next'
 import { slipSmall } from '#/components/transactions/receipt/receipt-line'
 import { cn } from '#/lib/utils'
 import { focusRing } from '#/components/styles'
-import type { TransactionDraft } from '#/lib/transactions/transaction-draft-types'
-
-type Update = (changes: Partial<TransactionDraft>) => void
+import type {
+  DraftUpdate,
+  TransactionDraft,
+} from '#/lib/transactions/transaction-draft-types'
 
 /** Répartir itemizes the slip; in the same place, "Ne pas répartir" goes back. */
 export function SplitToggle({
@@ -12,7 +13,7 @@ export function SplitToggle({
   onChange,
 }: {
   draft: TransactionDraft
-  onChange: Update
+  onChange: DraftUpdate
 }) {
   const { t } = useTranslation()
   const split = draft.splitMode !== null

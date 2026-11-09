@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { noteSchema } from '#/lib/shared/validation'
 import {
   fromMinor,
   minorDigits,
@@ -28,7 +29,7 @@ export const adjustmentFormSchema = z.object({
     }
     return amount
   }),
-  note: z.string().trim().max(1000),
+  note: noteSchema,
 })
 
 export const adjustmentInputSchema = adjustmentFormSchema.extend({

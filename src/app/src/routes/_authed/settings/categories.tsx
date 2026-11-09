@@ -27,6 +27,7 @@ import type {
   CategoryKind,
 } from '#/lib/categories/category'
 import { archivedTree, categoryContext } from '#/lib/categories/category-tree'
+import { matchesWithParents } from '#/lib/categories/category-list'
 import { useLocale } from '#/hooks/app/use-locale'
 import { useStoredState } from '#/hooks/app/use-stored-state'
 import { getCategories } from '#/server/categories'
@@ -40,25 +41,6 @@ export const Route = createFileRoute('/_authed/settings/categories')({
 
 const parseKind = oneOf(KINDS)
 const parseSort = oneOf(CATEGORY_SORTS)
-
-/** The categories whose name matches, with their parents so each keeps its path. */
-function matchesWithParents(
-  list: ReadonlyArray<Category>,
-  query: string,
-  byId: ReadonlyMap<string, Category>,
-) {
-  const keep = new Set<string>()
-  for (const category of list) {
-    if (!foldForSearch(category.name).includes(query)) continue
-    for (
-      let c: Category | undefined = category;
-      c && !keep.has(c.id);
-      c = c.parentId ? byId.get(c.parentId) : undefined
-    )
-      keep.add(c.id)
-  }
-  return keep
-}
 
 /**
  * One kind's active tree in the chosen order, its archived tree, each row's context, and

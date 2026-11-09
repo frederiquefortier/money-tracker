@@ -1,3 +1,5 @@
+import { compareNames } from '#/lib/shared/collections'
+
 /**
  * The lines before one row of a tree drawn as a flat list (spec 12): `continues[k]` is a
  * vertical line through the row at level k + 1, and the last slot is the elbow, cut short
@@ -41,8 +43,7 @@ export function treeOrder<
     const key = item.parentId && ids.has(item.parentId) ? item.parentId : null
     children.set(key, [...(children.get(key) ?? []), item])
   }
-  for (const list of children.values())
-    list.sort((a, b) => a.name.localeCompare(b.name, locale))
+  for (const list of children.values()) list.sort(compareNames(locale))
   const out: Array<{ item: T; depth: number }> = []
   const walk = (parent: string | null, depth: number) => {
     for (const item of children.get(parent) ?? []) {

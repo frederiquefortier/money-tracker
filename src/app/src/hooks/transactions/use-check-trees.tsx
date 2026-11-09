@@ -6,12 +6,11 @@ import { useFormatLocale } from '#/hooks/app/use-locale'
 import { accountLabel } from '#/lib/accounts/account'
 import { KINDS, categoryPath } from '#/lib/categories/category'
 import type { Category } from '#/lib/categories/category'
-import { byName } from '#/lib/people/person'
 import type { Person, PersonGroup } from '#/lib/people/person'
 import type { FormAccount } from '#/lib/transactions/transaction'
 import { treeOrder } from '#/lib/shared/tree-layout'
-import { indexById } from '#/lib/shared/collections'
-import { foldForSearch } from '#/lib/shared/search'
+import { byName, indexById } from '#/lib/shared/collections'
+import { matcher } from '#/lib/shared/search'
 
 // The trees the check lists show: accounts, people and categories as nodes.
 
@@ -22,13 +21,11 @@ export function useAccountTree(
 ) {
   const { t } = useTranslation()
   const locale = useFormatLocale()
-  const q = foldForSearch(query)
-  const sorted = [...accounts].sort((a, b) =>
-    a.name.localeCompare(b.name, locale),
-  )
-  if (q)
+  const matches = matcher(query)
+  const sorted = byName(accounts, locale)
+  if (query.trim())
     return sorted
-      .filter((a) => foldForSearch(accountLabel(a)).includes(q))
+      .filter((a) => matches(accountLabel(a)))
       .map((a) => ({ id: a.id, label: accountLabel(a) }))
   const groups = new Map<string, Array<CheckNode>>()
   for (const a of sorted) {
@@ -56,15 +53,11 @@ export function usePeopleTree(
 ): Array<CheckNode> {
   const { t } = useTranslation()
   const locale = useFormatLocale()
-  const q = foldForSearch(query)
+  const matches = matcher(query)
   const sorted = byName(people, locale)
   const leaf = (p: Person) => ({ id: p.id, label: p.name })
-  if (q || groups.length === 0)
-    return sorted
-      .filter((p) =>
-        [p.name, ...p.aliases].some((n) => foldForSearch(n).includes(q)),
-      )
-      .map(leaf)
+  if (query.trim() || groups.length === 0)
+    return sorted.filter((p) => [p.name, ...p.aliases].some(matches)).map(leaf)
   const cards = byName(groups, locale)
     .map((g) => ({
       id: `${GROUP}${g.id}`,
@@ -93,14 +86,14 @@ export function useCategoryTree(
   const { t } = useTranslation()
   const locale = useFormatLocale()
   const byId = indexById(categories)
-  const q = foldForSearch(query)
+  const matches = matcher(query)
   const icon = (c: Category) => (
     <CategoryBadge icon={c.icon} color={c.color} size="sm" />
   )
-  if (q)
+  if (query.trim())
     return categories
       .map((c) => ({ id: c.id, label: categoryPath(c, byId), icon: icon(c) }))
-      .filter((n) => foldForSearch(n.label).includes(q))
+      .filter((n) => matches(n.label))
       .sort((a, b) => a.label.localeCompare(b.label, locale))
   const nodeOf = (c: Category): CheckNode => {
     const children = categories.filter((k) => k.parentId === c.id)

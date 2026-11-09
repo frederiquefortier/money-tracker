@@ -30,7 +30,7 @@ import { useStoredState } from '#/hooks/app/use-stored-state'
 import { getCategories } from '#/server/categories'
 import { getMerchants } from '#/server/merchants'
 import { indexById, oneOf } from '#/lib/shared/collections'
-import { foldForSearch } from '#/lib/shared/search'
+import { matcher } from '#/lib/shared/search'
 
 export const Route = createFileRoute('/_authed/settings/merchants')({
   loader: async () => {
@@ -45,7 +45,7 @@ export const Route = createFileRoute('/_authed/settings/merchants')({
 
 const parseSort = oneOf(MERCHANT_SORTS)
 
-function useCategoryTree(categories: ReadonlyArray<Category>) {
+function categoryLookup(categories: ReadonlyArray<Category>) {
   const byId = indexById(categories)
   const rows = new Map(
     categories.map((c) => [
@@ -89,7 +89,7 @@ function MerchantList({
 }: {
   merchants: ReadonlyArray<Merchant>
   shown: ReadonlyArray<Merchant>
-  tree: ReturnType<typeof useCategoryTree>
+  tree: ReturnType<typeof categoryLookup>
 }) {
   const { t } = useTranslation()
   if (shown.length === 0) return <EmptyState>{t('common.noMatch')}</EmptyState>
@@ -128,16 +128,14 @@ function Merchants() {
     'nameAsc',
     parseSort,
   )
-  const tree = useCategoryTree(categories)
+  const tree = categoryLookup(categories)
   const filters = merchantFilters(merchants, categories, locale)
   const values = filters.map((f) => f.value)
   const [chosen, setFilter] = useState<MerchantFilter>('all')
   const filter = values.includes(chosen) ? chosen : 'all'
-  const q = foldForSearch(query)
+  const matches = matcher(query)
   const shown = sortMerchants(
-    filterMerchants(merchants, filter, tree).filter((m) =>
-      foldForSearch(m.name).includes(q),
-    ),
+    filterMerchants(merchants, filter, tree).filter((m) => matches(m.name)),
     { sort, pathOf: tree.pathOf, locale },
   )
   const guides = treeGuides(filters.map((f) => f.depth))

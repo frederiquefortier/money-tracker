@@ -1,5 +1,5 @@
 import { createServerFn } from '@tanstack/react-start'
-import { loaded } from '#/lib/server/db.server'
+import { loadFeeCategoryId, loaded } from '#/lib/server/db.server'
 import { absDecimal } from '#/lib/shared/money'
 import { failureFor } from '#/lib/shared/result'
 import type { Result } from '#/lib/shared/result'
@@ -50,16 +50,7 @@ export const getTransfer = createServerFn({ method: 'GET' })
 
 /** The category every transfer fee goes to, set in Réglages (TRX-04). */
 export const getTransferFeeCategory = createServerFn({ method: 'GET' }).handler(
-  async (): Promise<string | null> => {
-    const [profile] = loaded(
-      'Transfer fee category',
-      await getSupabase()
-        .from('profiles')
-        .select('transfer_fee_category_id')
-        .single(),
-    )
-    return profile.transfer_fee_category_id
-  },
+  loadFeeCategoryId,
 )
 
 /** One SQL function writes both legs and the fee under one transfer_id (ADR-012). */
@@ -96,21 +87,14 @@ export const deleteTransfer = createServerFn({ method: 'POST' })
 /** The fee category's name and look, for the fee lines of the list (spec 14). */
 export const getFeeCategory = createServerFn({ method: 'GET' }).handler(
   async (): Promise<ListedCategory | null> => {
-    const supabase = getSupabase()
-    const [profile] = loaded(
-      'Fee category',
-      await supabase
-        .from('profiles')
-        .select('transfer_fee_category_id')
-        .single(),
-    )
-    if (!profile.transfer_fee_category_id) return null
+    const feeId = await loadFeeCategoryId()
+    if (!feeId) return null
     const [category] = loaded(
       'Fee category',
-      await supabase
+      await getSupabase()
         .from('categories')
         .select('name, icon, color')
-        .eq('id', profile.transfer_fee_category_id)
+        .eq('id', feeId)
         .maybeSingle(),
     )
     return category

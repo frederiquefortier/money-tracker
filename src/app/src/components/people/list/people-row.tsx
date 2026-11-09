@@ -1,9 +1,7 @@
-import { Link } from '@tanstack/react-router'
+import { ListRow } from '#/components/lists/list-row'
 import { GroupAvatars, PersonAvatar } from '#/components/people/avatars'
 import { PeopleActions } from '#/components/people/list/people-actions'
 import type { PeopleKind } from '#/components/people/list/people-actions'
-import { cn } from '#/lib/utils'
-import { rowHover, focusRing } from '#/components/styles'
 
 /**
  * A person (their avatar, then their groups under the name) or a group (its members'
@@ -34,30 +32,21 @@ export function PeopleRow({
         } as const)
 
   return (
-    <li className={cn('flex items-center pr-2', rowHover)}>
-      <Link
-        {...link}
-        className={cn(
-          'flex min-w-0 flex-1 items-center gap-3 py-3 pl-4',
-          focusRing,
+    <ListRow link={link} actions={<PeopleActions kind={kind} row={row} />}>
+      {kind === 'person' ? (
+        <PersonAvatar name={row.name} />
+      ) : (
+        <GroupAvatars names={memberNames} />
+      )}
+      <span className="flex min-w-0 flex-1 flex-col">
+        <span className="truncate font-semibold">{row.name}</span>
+        {details && (
+          <span className="truncate text-sm text-muted-foreground">
+            {details}
+          </span>
         )}
-      >
-        {kind === 'person' ? (
-          <PersonAvatar name={row.name} />
-        ) : (
-          <GroupAvatars names={memberNames} />
-        )}
-        <span className="flex min-w-0 flex-1 flex-col">
-          <span className="truncate font-semibold">{row.name}</span>
-          {details && (
-            <span className="truncate text-sm text-muted-foreground">
-              {details}
-            </span>
-          )}
-        </span>
-        {aside}
-      </Link>
-      <PeopleActions kind={kind} row={row} />
-    </li>
+      </span>
+      {aside}
+    </ListRow>
   )
 }

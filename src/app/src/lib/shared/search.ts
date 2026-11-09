@@ -6,3 +6,9 @@ export function foldForSearch(text: string) {
     .toLowerCase()
     .trim()
 }
+
+/** Whether a text contains the query, folded the same way; an empty query matches all. */
+export function matcher(query: string) {
+  const q = foldForSearch(query)
+  return (text: string) => foldForSearch(text).includes(q)
+}

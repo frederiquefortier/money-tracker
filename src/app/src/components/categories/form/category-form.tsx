@@ -15,8 +15,8 @@ import { FormField } from '#/components/forms/form-field'
 import { SheetForm } from '#/components/sheet/sheet-form'
 import { useSheetForm } from '#/hooks/forms/use-sheet-form'
 import { FORMAT_LOCALE } from '#/i18n/locales'
+import { nameFormSchema } from '#/lib/shared/validation'
 import {
-  categoryFormSchema,
   categoryPath,
   childrenByParent,
   descendantIds,
@@ -129,7 +129,7 @@ export function CategoryForm({
   const panelId = useId()
   const draft = useCategoryDraft(categoryId, initial, categories)
   const form = useSheetForm({
-    schema: categoryFormSchema,
+    schema: nameFormSchema,
     initial: { name: initial.name },
     save: async (data) => {
       const result = await saveCategory({ data: draft.input(data.name) })

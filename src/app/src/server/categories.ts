@@ -11,7 +11,12 @@ import type {
   CategoryEvent,
   CategoryError,
 } from '#/lib/categories/category'
-import { loaded, saveRow } from '#/lib/server/db.server'
+import {
+  deleteRow,
+  loadFeeCategoryId,
+  loaded,
+  saveRow,
+} from '#/lib/server/db.server'
 import { NECESSITIES } from '#/lib/categories/category-necessity'
 import { failed, failureFor } from '#/lib/shared/result'
 import type { Result } from '#/lib/shared/result'
@@ -39,9 +44,8 @@ const isNecessity = isOneOf(NECESSITIES)
 export const getCategories = createServerFn({ method: 'GET' }).handler(
   async (): Promise<Array<Category>> => {
     const supabase = getSupabase()
-    const [categories, events, periods, profile] = loaded(
-      'Categories',
-      ...(await Promise.all([
+    const [results, feeId] = await Promise.all([
+      Promise.all([
         supabase
           .from('categories')
           .select(
@@ -55,9 +59,10 @@ export const getCategories = createServerFn({ method: 'GET' }).handler(
         supabase
           .from('category_active_periods')
           .select('category_id, active_from, active_to'),
-        supabase.from('profiles').select('transfer_fee_category_id').single(),
-      ])),
-    )
+      ]),
+      loadFeeCategoryId(),
+    ])
+    const [categories, events, periods] = loaded('Categories', ...results)
 
     const history = new Map<string, Array<CategoryEvent>>()
     for (const e of events) {
@@ -83,7 +88,7 @@ export const getCategories = createServerFn({ method: 'GET' }).handler(
       periods: periods
         .filter((p) => p.category_id === c.id)
         .map((p) => ({ from: p.active_from, to: p.active_to })),
-      isFee: c.id === profile.transfer_fee_category_id,
+      isFee: c.id === feeId,
     }))
   },
 )
@@ -183,10 +188,7 @@ export const reactivateCategory = createServerFn({ method: 'POST' })
 export const deleteCategory = createServerFn({ method: 'POST' })
   .validator(idInput)
   .handler(async ({ data }): Promise<CategoryResult> => {
-    const { error } = await getSupabase()
-      .from('categories')
-      .delete()
-      .eq('id', data.id)
+    const error = await deleteRow('categories', data.id)
     if (error) return failure('delete', error)
     const recolorError = await recolor()
     if (recolorError) failed('categories', 'recolor', recolorError.code)

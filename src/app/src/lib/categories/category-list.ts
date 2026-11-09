@@ -9,19 +9,23 @@ import type {
   CategoryKind,
 } from '#/lib/categories/category'
 import { indexById } from '#/lib/shared/collections'
-import { foldForSearch } from '#/lib/shared/search'
+import { foldForSearch, matcher } from '#/lib/shared/search'
 
 // The transaction form's category list (spec 15): one type's tree, as on Catégories.
 
-/** The matches and their parents, so each keeps its place in the tree. */
-function withParents(
+/**
+ * The ids of the categories whose name matches the folded query `q`, with their parents
+ * so each keeps its place in the tree. `byId` finds parents outside `categories`.
+ */
+export function matchesWithParents(
   categories: ReadonlyArray<Category>,
   q: string,
+  byId: ReadonlyMap<string, Category> = indexById(categories),
 ): Set<string> {
-  const byId = indexById(categories)
+  const matches = matcher(q)
   const keep = new Set<string>()
   for (const category of categories) {
-    if (!foldForSearch(category.name).includes(q)) continue
+    if (!matches(category.name)) continue
     for (
       let c: Category | undefined = category;
       c && !keep.has(c.id);
@@ -59,8 +63,8 @@ export function categoryChildren(
   const ofKind = categories.filter(
     (c) => c.kind === kind && isActiveOn(c, date),
   )
-  const q = foldForSearch(query.trim())
-  const keep = q ? withParents(ofKind, q) : null
+  const q = foldForSearch(query)
+  const keep = q ? matchesWithParents(ofKind, q) : null
   const shown = keep ? ofKind.filter((c) => keep.has(c.id)) : ofKind
   return {
     childrenOf: sortSiblings(childrenByParent(shown, locale), sort, locale),

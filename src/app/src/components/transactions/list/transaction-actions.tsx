@@ -1,10 +1,15 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { ConfirmDialog } from '#/components/feedback/confirm-dialog'
+import { DeleteDialog } from '#/components/feedback/delete-dialog'
 import { IconActions, IconButton } from '#/components/display/icon-button'
 import type { ActionPlacement } from '#/components/display/icon-button'
-import { useServerAction } from '#/hooks/app/use-server-action'
-import { formatDate, formatMoney, formatQuotedList } from '#/lib/shared/format'
+import { accountLabel } from '#/lib/accounts/account'
+import {
+  formatDate,
+  formatMoney,
+  formatQuoted,
+  formatQuotedList,
+} from '#/lib/shared/format'
 import { absDecimal } from '#/lib/shared/money'
 import { useLocale } from '#/hooks/app/use-locale'
 import { deleteTransaction } from '#/server/transactions'
@@ -28,7 +33,6 @@ function useDeleteText(summary: TransactionSummary) {
   const { t } = useTranslation()
   const locale = useLocale()
   const { merchant, categories } = summary
-  const { name, institution } = summary.account
   return {
     title: t(
       merchant ? 'transactions.deleteTitleAt' : 'transactions.deleteTitleOn',
@@ -47,7 +51,7 @@ function useDeleteText(summary: TransactionSummary) {
         ? 'transactions.deleteCategories'
         : 'transactions.deleteAccount',
       {
-        account: institution ? `“${name}” (${institution})` : `“${name}”`,
+        account: formatQuoted(accountLabel(summary.account)),
         categories: formatQuotedList(categories, locale),
         count: categories.length,
       },
@@ -64,30 +68,22 @@ export function TransactionActions({
   placement?: ActionPlacement
 }) {
   const { t } = useTranslation()
-  const { run, busy } = useServerAction()
   const [confirming, setConfirming] = useState(false)
-  const label = t('transactions.deleteTitle')
   const text = useDeleteText(summary)
 
   return (
     <IconActions slots={1} placement={placement}>
       <IconButton
         icon="trash-full"
-        label={label}
+        label={t('transactions.deleteTitle')}
         onClick={() => setConfirming(true)}
       />
-      <ConfirmDialog
+      <DeleteDialog
         open={confirming}
         title={text.title}
         description={text.description}
-        confirmLabel={t('common.delete')}
-        busy={busy}
-        onCancel={() => setConfirming(false)}
-        onConfirm={() =>
-          run(() => deleteTransaction({ data: { id: summary.id } }), {
-            onResult: () => setConfirming(false),
-          })
-        }
+        onDelete={() => deleteTransaction({ data: { id: summary.id } })}
+        onClose={() => setConfirming(false)}
       />
     </IconActions>
   )

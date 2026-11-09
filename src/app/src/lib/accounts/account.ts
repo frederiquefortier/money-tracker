@@ -3,6 +3,8 @@ import { inLocale } from '#/i18n/locales'
 import type { Locale } from '#/i18n/locales'
 import { currencyCodeSchema } from '#/lib/currencies/currency'
 import { compareDecimal, parseAmount } from '#/lib/shared/money'
+import { compareNames } from '#/lib/shared/collections'
+import { nameSchema } from '#/lib/shared/validation'
 
 // Shared by the account forms and their server functions (SET-07).
 
@@ -29,12 +31,6 @@ export function typeLabel(
 }
 
 const isoDate = z.iso.date({ error: 'date' })
-
-const nameSchema = z
-  .string()
-  .trim()
-  .min(1, { error: 'required' })
-  .max(100, { error: 'invalid' })
 
 export const accountFormSchema = z.object({
   name: nameSchema,
@@ -95,7 +91,7 @@ export function sortAccounts<T extends Sortable>(
   sort: Sort,
   locale: string,
 ): Array<T> {
-  const byName = (a: T, b: T) => a.name.localeCompare(b.name, locale)
+  const byName = compareNames(locale)
   const byBalance = (a: T, b: T, direction: number) => {
     if (a.displayBalance === null || b.displayBalance === null)
       return (

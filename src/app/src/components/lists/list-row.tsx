@@ -1,0 +1,34 @@
+import { Link } from '@tanstack/react-router'
+import type { LinkOptions } from '@tanstack/react-router'
+import { focusRing, rowHover } from '#/components/styles'
+import { cn } from '#/lib/utils'
+
+/**
+ * A list row: the whole row opens `link` (the entity's sheet), and `actions` stays
+ * outside the link, on the right.
+ */
+export function ListRow({
+  link,
+  actions,
+  alignTop = false,
+  children,
+}: {
+  link: LinkOptions
+  actions: React.ReactNode
+  /** Sets the content and the actions level with the first line. */
+  alignTop?: boolean
+  children: React.ReactNode
+}) {
+  const align = alignTop ? 'items-start' : 'items-center'
+  return (
+    <li className={cn('flex pr-2', align, rowHover)}>
+      <Link
+        {...link}
+        className={cn('flex min-w-0 flex-1 gap-3 py-3 pl-4', align, focusRing)}
+      >
+        {children}
+      </Link>
+      {actions}
+    </li>
+  )
+}

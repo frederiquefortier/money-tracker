@@ -8,9 +8,10 @@ import { isUnknown } from '#/lib/transactions/transaction-people'
 import type { PersonLine } from '#/lib/transactions/transaction-people'
 import { useLocale } from '#/hooks/app/use-locale'
 import { cn } from '#/lib/utils'
-import type { TransactionDraft } from '#/lib/transactions/transaction-draft-types'
-
-type Update = (changes: Partial<TransactionDraft>) => void
+import type {
+  DraftUpdate,
+  TransactionDraft,
+} from '#/lib/transactions/transaction-draft-types'
 
 /**
  * A line's part as typed. Left empty, a Me doit part is not known yet ("?" in the
@@ -32,7 +33,7 @@ export function LinePart({
   computed: bigint | null | undefined
   filled: boolean
   accountCurrency: string
-  onChange: Update
+  onChange: DraftUpdate
 }) {
   const { t } = useTranslation()
   // An empty field shows what it comes to under it (spec 21).

@@ -4,7 +4,7 @@ import {
   withPeople,
   withPeopleMode,
   withRoleSwitched,
-  withoutLine,
+  withoutPersonLine,
   withoutPeople,
 } from '#/lib/transactions/transaction-people'
 import {
@@ -55,11 +55,13 @@ describe('removing', () => {
   it('down to Moi alone removes the section', () => {
     const left = withoutPeople(draft(lines), [ALEX]).people ?? []
     const anonymous = left.find((l) => l.personId === null && l.role !== 'me')
-    expect(withoutLine(draft(left), anonymous?.key ?? -1).people).toEqual([])
+    expect(withoutPersonLine(draft(left), anonymous?.key ?? -1).people).toEqual(
+      [],
+    )
   })
 
   it('never removes Moi by key', () => {
-    expect(withoutLine(draft(lines), lines[0].key).people).toHaveLength(3)
+    expect(withoutPersonLine(draft(lines), lines[0].key).people).toHaveLength(3)
   })
 })
 

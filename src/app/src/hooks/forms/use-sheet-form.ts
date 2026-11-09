@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import type { z } from 'zod'
 import { formValues, savedState, validate } from '#/lib/forms/form-state'
 import type { FormState } from '#/lib/forms/form-state'
+import type { Result } from '#/lib/shared/result'
 import { useToast } from '#/hooks/app/use-toast'
 import {
   useFieldValidation,
@@ -10,7 +11,7 @@ import {
 } from '#/hooks/forms/use-validation'
 import { useCloseSheet } from '#/hooks/forms/use-sheet'
 
-type Outcome = { ok: true } | { ok: false; error: string }
+type Outcome = Result<string>
 
 /** What a FormField needs from the form: its value, its error, its events. */
 export type FieldBinding = {

@@ -4,6 +4,7 @@ import { Combobox } from '#/components/combobox/combobox'
 import { FieldMessage, FormField } from '#/components/forms/form-field'
 import { FieldLabel, fieldControl } from '#/components/ui/field'
 import { accountLabel } from '#/lib/accounts/account'
+import { compareNames } from '#/lib/shared/collections'
 import type { FormAccount } from '#/lib/transactions/transaction'
 import { useFormatLocale } from '#/hooks/app/use-locale'
 import { cn } from '#/lib/utils'
@@ -29,6 +30,7 @@ export function AccountPicker({
 }) {
   const { t } = useTranslation()
   const locale = useFormatLocale()
+  const byName = compareNames(locale)
   const group = (a: FormAccount) =>
     a.institution ?? t('transactions.noInstitution')
   const options = accounts
@@ -36,11 +38,7 @@ export function AccountPicker({
       (a) =>
         a.id === value || (!a.closedOn && !a.hiddenForNew && a.id !== exclude),
     )
-    .sort(
-      (a, b) =>
-        group(a).localeCompare(group(b), locale) ||
-        a.name.localeCompare(b.name, locale),
-    )
+    .sort((a, b) => group(a).localeCompare(group(b), locale) || byName(a, b))
     .map((a) => ({
       value: a.id,
       // Names repeat across institutions: the field says which once chosen.

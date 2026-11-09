@@ -15,7 +15,6 @@ import { TabList } from '#/components/lists/tab-list'
 import {
   PEOPLE_SORTS,
   PEOPLE_TABS,
-  byName,
   namesOf,
   withMemberNames,
 } from '#/lib/people/person'
@@ -30,8 +29,8 @@ import { useStoredState } from '#/hooks/app/use-stored-state'
 import { getBalances } from '#/server/owed'
 import { getPeople } from '#/server/people'
 import { OwedTag } from '#/components/people/list/owed-summary'
-import { oneOf } from '#/lib/shared/collections'
-import { foldForSearch } from '#/lib/shared/search'
+import { byName, oneOf } from '#/lib/shared/collections'
+import { matcher } from '#/lib/shared/search'
 import type { Balance } from '#/lib/people/owed'
 
 export const Route = createFileRoute('/_authed/settings/people')({
@@ -136,9 +135,9 @@ function TabPanel<T extends { name: string; archivedOn: string | null }>({
   const { t } = useTranslation()
   const locale = useFormatLocale()
   if (all.length === 0) return <EmptyState>{empty}</EmptyState>
-  const q = foldForSearch(query)
+  const matches = matcher(query)
   const sorted = byName(
-    all.filter((item) => foldForSearch(item.name).includes(q)),
+    all.filter((item) => matches(item.name)),
     locale,
   )
   const shown = sort === 'nameDesc' ? sorted.reverse() : sorted

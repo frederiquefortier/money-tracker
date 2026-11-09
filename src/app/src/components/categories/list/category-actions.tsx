@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ConfirmDialog } from '#/components/feedback/confirm-dialog'
+import { DeleteDialog } from '#/components/feedback/delete-dialog'
 import { FormField } from '#/components/forms/form-field'
 import {
   IconActions,
@@ -146,31 +147,6 @@ function StatusDialog({
   )
 }
 
-function DeleteDialog({
-  category,
-  onClose,
-}: {
-  category: Category
-  onClose: () => void
-}) {
-  const { t } = useTranslation()
-  const { run, busy } = useServerAction()
-  return (
-    <ConfirmDialog
-      open
-      title={t('common.deleteName', { name: category.name })}
-      confirmLabel={t('common.delete')}
-      busy={busy}
-      onCancel={onClose}
-      onConfirm={() =>
-        run(() => deleteCategory({ data: { id: category.id } }), {
-          onResult: onClose,
-        })
-      }
-    />
-  )
-}
-
 /**
  * Add a sub-category (in the tree only, through `onAddChild`), archive or reactivate
  * (CAT-03) and delete, as icons on the category's row or its sheet. Delete stays muted
@@ -199,9 +175,10 @@ export function CategoryActions({
   const { t } = useTranslation()
   const toast = useToast()
   const [dialog, setDialog] = useState<StatusMode | 'delete' | null>(null)
-  const { name } = category
+  const { id, name } = category
   const archived = isArchived(category)
   const close = () => setDialog(null)
+  const deleteLabel = t('common.deleteName', { name })
 
   return (
     <IconActions
@@ -225,11 +202,7 @@ export function CategoryActions({
       />
       <IconButton
         icon="trash-full"
-        label={
-          hasChildren
-            ? t('categories.hasChildren')
-            : t('common.deleteName', { name })
-        }
+        label={hasChildren ? t('categories.hasChildren') : deleteLabel}
         muted={hasChildren}
         onClick={() =>
           hasChildren
@@ -237,9 +210,12 @@ export function CategoryActions({
             : setDialog('delete')
         }
       />
-      {dialog === 'delete' && (
-        <DeleteDialog category={category} onClose={close} />
-      )}
+      <DeleteDialog
+        open={dialog === 'delete'}
+        title={deleteLabel}
+        onDelete={() => deleteCategory({ data: { id } })}
+        onClose={close}
+      />
       {dialog && dialog !== 'delete' && (
         <StatusDialog
           {...{ category, parent, branch, archivedParents }}

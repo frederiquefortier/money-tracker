@@ -30,11 +30,20 @@ type SelectId = {
   }
 }
 
-// What saveRow uses of a table. supabase-js cannot type a query on a table chosen by a
-// type parameter; the values are still checked against that table in saveRow's signature.
+type Done = PromiseLike<{ error: PostgrestError | null }>
+
+// What the row helpers use of a table. supabase-js cannot type a query on a table chosen
+// by a type parameter; the values are still checked against that table in each signature.
 type Rows = {
   insert: (values: object) => SelectId
-  update: (values: object) => { eq: (column: 'id', id: string) => SelectId }
+  update: (values: object) => {
+    eq: (column: 'id', id: string) => SelectId & Done
+  }
+  delete: () => { eq: (column: 'id', id: string) => Done }
+}
+
+function rowsOf(table: keyof Tables) {
+  return getSupabase().from(table) as unknown as Rows
 }
 
 /**
@@ -46,10 +55,37 @@ export async function saveRow<TTable extends keyof Tables>(
   id: string | undefined,
   values: Tables[TTable]['Insert'] & Tables[TTable]['Update'],
 ) {
-  const rows = getSupabase().from(table) as unknown as Rows
+  const rows = rowsOf(table)
   const query = id ? rows.update(values).eq('id', id) : rows.insert(values)
   const { data, error } = await query.select('id').maybeSingle()
   return { saved: data, error }
+}
+
+/** Changes some columns of one row; a row RLS hides is left alone without an error. */
+export async function updateRow<TTable extends keyof Tables>(
+  table: TTable,
+  id: string,
+  values: Tables[TTable]['Update'],
+) {
+  const { error } = await rowsOf(table).update(values).eq('id', id)
+  return error
+}
+
+export async function deleteRow(table: keyof Tables, id: string) {
+  const { error } = await rowsOf(table).delete().eq('id', id)
+  return error
+}
+
+/** The category every transfer fee goes to (TRX-04), from the user's profile. */
+export async function loadFeeCategoryId(): Promise<string | null> {
+  const [profile] = loaded(
+    'Transfer fee category',
+    await getSupabase()
+      .from('profiles')
+      .select('transfer_fee_category_id')
+      .single(),
+  )
+  return profile.transfer_fee_category_id
 }
 
 export const SIGNED_OUT = { code: 'signed_out' }

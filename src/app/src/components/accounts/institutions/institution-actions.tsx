@@ -1,12 +1,11 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { ConfirmDialog } from '#/components/feedback/confirm-dialog'
+import { DeleteDialog } from '#/components/feedback/delete-dialog'
 import {
   IconActions,
   IconAnchor,
   IconButton,
 } from '#/components/display/icon-button'
-import { useServerAction } from '#/hooks/app/use-server-action'
 import { deleteInstitution } from '#/server/accounts'
 import { useToast } from '#/hooks/app/use-toast'
 import type { Institution } from '#/lib/accounts/account'
@@ -27,9 +26,9 @@ export function InstitutionActions({
 }) {
   const { t } = useTranslation()
   const toast = useToast()
-  const { run, busy } = useServerAction()
   const [confirming, setConfirming] = useState(false)
   const { id, name } = institution
+  const deleteLabel = t('common.deleteName', { name })
 
   return (
     <>
@@ -51,9 +50,7 @@ export function InstitutionActions({
         )}
         <IconButton
           icon="trash-full"
-          label={
-            inUse ? t('institutions.inUse') : t('common.deleteName', { name })
-          }
+          label={inUse ? t('institutions.inUse') : deleteLabel}
           muted={inUse}
           onClick={() =>
             inUse
@@ -62,17 +59,11 @@ export function InstitutionActions({
           }
         />
       </IconActions>
-      <ConfirmDialog
+      <DeleteDialog
         open={confirming}
-        title={t('common.deleteName', { name })}
-        confirmLabel={t('common.delete')}
-        busy={busy}
-        onCancel={() => setConfirming(false)}
-        onConfirm={() =>
-          run(() => deleteInstitution({ data: { id } }), {
-            onResult: () => setConfirming(false),
-          })
-        }
+        title={deleteLabel}
+        onDelete={() => deleteInstitution({ data: { id } })}
+        onClose={() => setConfirming(false)}
       />
     </>
   )

@@ -1,11 +1,10 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { ConfirmDialog } from '#/components/feedback/confirm-dialog'
-import { FormField } from '#/components/forms/form-field'
+import { ArchiveDialog } from '#/components/feedback/archive-dialog'
+import { DeleteDialog } from '#/components/feedback/delete-dialog'
 import { IconActions, IconButton } from '#/components/display/icon-button'
 import type { ActionPlacement } from '#/components/display/icon-button'
 import { useServerAction } from '#/hooks/app/use-server-action'
-import { todayIso } from '#/lib/shared/format'
 import { closeAccount, deleteAccount, reopenAccount } from '#/server/accounts'
 import type { Account } from '#/lib/accounts/account'
 
@@ -22,25 +21,16 @@ export function AccountActions({
   className?: string
 }) {
   const { t } = useTranslation()
-  const { run, busy } = useServerAction()
+  const { run } = useServerAction()
   const [dialog, setDialog] = useState<'close' | 'delete' | null>(null)
-  const [closedOn, setClosedOn] = useState('')
   const { id, name } = account
-
-  function save(call: Parameters<typeof run>[0]) {
-    run(call, {
-      onResult: () => setDialog(null),
-      failureText: (error) =>
-        error === 'currencyRemoved'
-          ? t('accounts.currencyRemoved', { code: account.currency })
-          : undefined,
-    })
-  }
-
-  function startClosing() {
-    setClosedOn(todayIso())
-    setDialog('close')
-  }
+  const close = () => setDialog(null)
+  const archiveLabel = t('common.archiveName', { name })
+  const deleteLabel = t('common.deleteName', { name })
+  const failureText = (error: string) =>
+    error === 'currencyRemoved'
+      ? t('accounts.currencyRemoved', { code: account.currency })
+      : undefined
 
   return (
     <IconActions slots={2} placement={placement} className={className}>
@@ -48,46 +38,37 @@ export function AccountActions({
         <IconButton
           icon="undo"
           label={t('common.reactivateName', { name })}
-          onClick={() => save(() => reopenAccount({ data: { id } }))}
+          onClick={() =>
+            run(() => reopenAccount({ data: { id } }), { failureText })
+          }
         />
       ) : (
         <IconButton
           icon="archive"
-          label={t('common.archiveName', { name })}
-          onClick={startClosing}
+          label={archiveLabel}
+          onClick={() => setDialog('close')}
         />
       )}
       <IconButton
         icon="trash-full"
-        label={t('common.deleteName', { name })}
+        label={deleteLabel}
         onClick={() => setDialog('delete')}
       />
-      <ConfirmDialog
-        open={dialog === 'close'}
-        tone="default"
-        title={t('common.archiveName', { name })}
-        confirmLabel={t('common.archive')}
-        busy={busy}
-        canConfirm={closedOn !== ''}
-        onCancel={() => setDialog(null)}
-        onConfirm={() => save(() => closeAccount({ data: { id, closedOn } }))}
-      >
-        <FormField
-          name="closedOn"
-          type="date"
-          required
-          label={t('accounts.closedOnField')}
-          value={closedOn}
-          onChange={(event) => setClosedOn(event.target.value)}
+      {dialog === 'close' && (
+        <ArchiveDialog
+          title={archiveLabel}
+          dateLabel={t('accounts.closedOnField')}
+          failureText={failureText}
+          onArchive={(closedOn) => closeAccount({ data: { id, closedOn } })}
+          onClose={close}
         />
-      </ConfirmDialog>
-      <ConfirmDialog
+      )}
+      <DeleteDialog
         open={dialog === 'delete'}
-        title={t('common.deleteName', { name })}
-        confirmLabel={t('common.delete')}
-        busy={busy}
-        onCancel={() => setDialog(null)}
-        onConfirm={() => save(() => deleteAccount({ data: { id } }))}
+        title={deleteLabel}
+        failureText={failureText}
+        onDelete={() => deleteAccount({ data: { id } })}
+        onClose={close}
       />
     </IconActions>
   )

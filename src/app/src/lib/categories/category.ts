@@ -4,6 +4,8 @@ import { hexToOklch, siblingVariation } from '#/lib/shared/color'
 import { NECESSITIES } from '#/lib/categories/category-necessity'
 import type { Necessity } from '#/lib/categories/category-necessity'
 import { foldForSearch } from '#/lib/shared/search'
+import { compareNames } from '#/lib/shared/collections'
+import { nameFormSchema } from '#/lib/shared/validation'
 
 // Shared by the category screens, the picker and the server functions (spec 12).
 
@@ -136,8 +138,7 @@ export function childrenByParent<T extends Pick<Category, 'parentId' | 'name'>>(
     list.push(category)
     map.set(category.parentId, list)
   }
-  for (const list of map.values())
-    list.sort((a, b) => a.name.localeCompare(b.name, locale))
+  for (const list of map.values()) list.sort(compareNames(locale))
   return map
 }
 
@@ -157,9 +158,10 @@ export function sortSiblings<T extends Pick<Category, 'name' | 'color'>>(
   locale: string,
 ) {
   if (sort === 'name') return children
+  const byName = compareNames(locale)
   const byColor = (a: T, b: T) => {
     const [x, y] = [rainbowKey(a.color), rainbowKey(b.color)]
-    return x[0] - y[0] || x[1] - y[1] || a.name.localeCompare(b.name, locale)
+    return x[0] - y[0] || x[1] - y[1] || byName(a, b)
   }
   return new Map(
     [...children].map(([id, list]) => [id, [...list].sort(byColor)] as const),
@@ -269,15 +271,7 @@ export function nextTopColor(
 
 export const HEX_COLOR = /^#[0-9a-f]{6}$/
 
-export const categoryFormSchema = z.object({
-  name: z
-    .string()
-    .trim()
-    .min(1, { error: 'required' })
-    .max(100, { error: 'invalid' }),
-})
-
-export const categoryInputSchema = categoryFormSchema.extend({
+export const categoryInputSchema = nameFormSchema.extend({
   id: z.uuid().optional(),
   kind: z.enum(KINDS),
   parentId: z.uuid().nullable(),

@@ -2,8 +2,8 @@ import { useId } from 'react'
 import { useTranslation } from 'react-i18next'
 import { CurrencyChip } from '#/components/display/currency-chip'
 import { FieldMessage } from '#/components/forms/form-field'
-import { MissingRate, Money } from '#/components/display/money'
 import { CategoryButton } from '#/components/transactions/receipt/category-button'
+import { ForeignLines } from '#/components/transactions/receipt/receipt-foreign'
 import {
   ReceiptLine,
   slipRule,
@@ -13,97 +13,16 @@ import { PeopleLines } from '#/components/transactions/receipt/people-lines'
 import { SplitLines } from '#/components/transactions/receipt/receipt-splits'
 import { SplitToggle } from '#/components/transactions/receipt/split-toggle'
 import { Checkbox } from '#/components/ui/checkbox'
-import { FORMAT_LOCALE } from '#/i18n/locales'
 import type { Category } from '#/lib/categories/category'
 import type { Currency } from '#/lib/currencies/currency'
 import type { Person } from '#/lib/people/person'
-import { absDecimal, amountForInput } from '#/lib/shared/money'
-import {
-  bookedMinor,
-  foreignPreview,
-} from '#/lib/transactions/transaction-preview'
-import { useLocale } from '#/hooks/app/use-locale'
+import { bookedMinor } from '#/lib/transactions/transaction-preview'
 import { cn } from '#/lib/utils'
-import type { TransactionDraft } from '#/lib/transactions/transaction-draft-types'
+import type {
+  DraftUpdate,
+  TransactionDraft,
+} from '#/lib/transactions/transaction-draft-types'
 import type { PickTarget } from '#/components/transactions/receipt/receipt-line'
-
-type Update = (changes: Partial<TransactionDraft>) => void
-
-/** Which category the list is choosing: the transaction's, or a split line's (by key). */
-
-/**
- * CUR-08: what left the account, prefilled at the day's rate and editable, with the rate
- * close under it; then the fee against the market value.
- */
-function ForeignLines({
-  draft,
-  accountCurrency,
-  rate,
-  error,
-  onChange,
-}: {
-  draft: TransactionDraft
-  accountCurrency: string
-  rate: string | null | undefined
-  error: string | undefined
-  onChange: Update
-}) {
-  const { t } = useTranslation()
-  const locale = useLocale()
-  const id = useId()
-  const format = FORMAT_LOCALE[locale]
-  const preview = foreignPreview(draft, accountCurrency, rate ?? null)
-  const paid = draft.paidByHand
-    ? draft.paid
-    : preview.prefill &&
-      amountForInput(absDecimal(preview.prefill), accountCurrency, locale)
-  const percent = new Intl.NumberFormat(format, {
-    style: 'percent',
-    maximumFractionDigits: 1,
-  })
-  return (
-    <>
-      <div className="flex flex-col gap-0.5">
-        <ReceiptLine label={t('transactions.paid')} htmlFor={id}>
-          <input
-            id={id}
-            inputMode="decimal"
-            autoComplete="off"
-            value={paid}
-            aria-invalid={error ? true : undefined}
-            onChange={(event) =>
-              onChange({ paid: event.target.value, paidByHand: true })
-            }
-            className={cn(slipTyped, 'w-24')}
-          />
-          {accountCurrency}
-        </ReceiptLine>
-        {rate && (
-          <ReceiptLine label={t('transactions.rateLabel')} muted>
-            {t('transactions.rate', {
-              from: draft.currency,
-              to: accountCurrency,
-              rate: new Intl.NumberFormat(format, {
-                maximumFractionDigits: 4,
-              }).format(rate as Intl.StringNumericLiteral),
-            })}
-          </ReceiptLine>
-        )}
-      </div>
-      {error && <FieldMessage>{error}</FieldMessage>}
-      <ReceiptLine label={t('transactions.conversionFee')}>
-        {rate === null && <MissingRate />}
-        {rate !== null && preview.fee !== null && (
-          <>
-            <Money amount={preview.fee} currency={accountCurrency} />
-            {preview.feeRatio !== null &&
-              ` (${percent.format(preview.feeRatio as Intl.StringNumericLiteral)})`}
-          </>
-        )}
-      </ReceiptLine>
-    </>
-  )
-}
 
 /** The large amount, typed positive in the chip's currency (TRX-02). */
 export function AmountInput({
@@ -152,7 +71,7 @@ type ReceiptProps = {
   }
   people: ReadonlyArray<Person>
   autoFocus: boolean
-  onChange: Update
+  onChange: DraftUpdate
   onPick: (target: PickTarget) => void
   onOpenPeople: () => void
 }

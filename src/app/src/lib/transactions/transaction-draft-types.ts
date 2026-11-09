@@ -32,3 +32,6 @@ export type TransactionDraft = {
   /** An income's owed lines it pays back, in order (spec 21). */
   reimburses: Array<string>
 }
+
+/** How a part of the form hands its changes up to the draft. */
+export type DraftUpdate = (changes: Partial<TransactionDraft>) => void

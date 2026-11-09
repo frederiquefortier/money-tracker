@@ -21,13 +21,19 @@ import { savePerson } from '#/server/people'
 import { useSheetEscape } from '#/hooks/forms/use-sheet'
 import { usePeopleTree } from '#/hooks/transactions/use-check-trees'
 import { fieldCard } from '#/components/styles'
-import type { TransactionDraft } from '#/lib/transactions/transaction-draft-types'
+import type {
+  DraftUpdate,
+  TransactionDraft,
+} from '#/lib/transactions/transaction-draft-types'
 
-type Update = (changes: Partial<TransactionDraft>) => void
 type Data = Pick<TransactionFormData, 'people' | 'groups' | 'frequentPeople'>
 
 /** Who is ticked, ticking one or several, and a new person ticked at once. */
-function usePeoplePick(draft: TransactionDraft, data: Data, onChange: Update) {
+function usePeoplePick(
+  draft: TransactionDraft,
+  data: Data,
+  onChange: DraftUpdate,
+) {
   const onIt = new Set(
     draft.people.flatMap((l) => (l.personId ? [l.personId] : [])),
   )
@@ -70,7 +76,7 @@ export function PeopleScreen({
 }: {
   draft: TransactionDraft
   data: Data
-  onChange: Update
+  onChange: DraftUpdate
   onBack: () => void
 }) {
   const { t } = useTranslation()

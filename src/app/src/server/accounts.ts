@@ -5,7 +5,7 @@ import {
   accountInputSchema,
   institutionInputSchema,
 } from '#/lib/accounts/account'
-import { loaded, saveRow } from '#/lib/server/db.server'
+import { deleteRow, loaded, saveRow, updateRow } from '#/lib/server/db.server'
 import { failureFor } from '#/lib/shared/result'
 import type { Result } from '#/lib/shared/result'
 import { idInput } from '#/lib/shared/validation'
@@ -150,20 +150,16 @@ export const saveAccount = createServerFn({ method: 'POST' })
 export const closeAccount = createServerFn({ method: 'POST' })
   .validator(idInput.extend({ closedOn: z.iso.date() }))
   .handler(async ({ data }): Promise<AccountResult> => {
-    const { error } = await getSupabase()
-      .from('accounts')
-      .update({ closed_on: data.closedOn })
-      .eq('id', data.id)
+    const error = await updateRow('accounts', data.id, {
+      closed_on: data.closedOn,
+    })
     return error ? failure('close', error) : { ok: true }
   })
 
 export const reopenAccount = createServerFn({ method: 'POST' })
   .validator(idInput)
   .handler(async ({ data }): Promise<AccountResult> => {
-    const { error } = await getSupabase()
-      .from('accounts')
-      .update({ closed_on: null })
-      .eq('id', data.id)
+    const error = await updateRow('accounts', data.id, { closed_on: null })
     return error ? failure('reopen', error) : { ok: true }
   })
 
@@ -171,10 +167,7 @@ export const reopenAccount = createServerFn({ method: 'POST' })
 export const deleteAccount = createServerFn({ method: 'POST' })
   .validator(idInput)
   .handler(async ({ data }): Promise<AccountResult> => {
-    const { error } = await getSupabase()
-      .from('accounts')
-      .delete()
-      .eq('id', data.id)
+    const error = await deleteRow('accounts', data.id)
     return error ? failure('delete', error) : { ok: true }
   })
 
@@ -193,9 +186,6 @@ export const saveInstitution = createServerFn({ method: 'POST' })
 export const deleteInstitution = createServerFn({ method: 'POST' })
   .validator(idInput)
   .handler(async ({ data }): Promise<AccountResult> => {
-    const { error } = await getSupabase()
-      .from('institutions')
-      .delete()
-      .eq('id', data.id)
+    const error = await deleteRow('institutions', data.id)
     return error ? failure('delete institution', error) : { ok: true }
   })

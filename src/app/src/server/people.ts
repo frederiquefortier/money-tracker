@@ -1,6 +1,6 @@
 import { createServerFn } from '@tanstack/react-start'
 import { z } from 'zod'
-import { loaded } from '#/lib/server/db.server'
+import { deleteRow, loaded, updateRow } from '#/lib/server/db.server'
 import { groupInputSchema, personInputSchema } from '#/lib/people/person'
 import type { Person, PersonGroup, PeopleError } from '#/lib/people/person'
 import { failureFor } from '#/lib/shared/result'
@@ -96,10 +96,9 @@ export const saveGroup = createServerFn({ method: 'POST' })
 export const archivePeopleRow = createServerFn({ method: 'POST' })
   .validator(kindInput.extend({ archivedOn: z.iso.date().nullable() }))
   .handler(async ({ data }): Promise<PeopleResult> => {
-    const { error } = await getSupabase()
-      .from(TABLES[data.kind])
-      .update({ archived_on: data.archivedOn })
-      .eq('id', data.id)
+    const error = await updateRow(TABLES[data.kind], data.id, {
+      archived_on: data.archivedOn,
+    })
     return error ? failure('archive', error) : { ok: true }
   })
 
@@ -107,9 +106,6 @@ export const archivePeopleRow = createServerFn({ method: 'POST' })
 export const deletePeopleRow = createServerFn({ method: 'POST' })
   .validator(kindInput)
   .handler(async ({ data }): Promise<PeopleResult> => {
-    const { error } = await getSupabase()
-      .from(TABLES[data.kind])
-      .delete()
-      .eq('id', data.id)
+    const error = await deleteRow(TABLES[data.kind], data.id)
     return error ? failure('delete', error) : { ok: true }
   })

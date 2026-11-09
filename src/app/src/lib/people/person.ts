@@ -1,5 +1,7 @@
 import { z } from 'zod'
+import { byName } from '#/lib/shared/collections'
 import { foldForSearch } from '#/lib/shared/search'
+import { nameFormSchema } from '#/lib/shared/validation'
 
 // Shared by the Proches screens and the server functions (spec 19).
 
@@ -27,14 +29,6 @@ export type PeopleTab = (typeof PEOPLE_TABS)[number]
 export const PEOPLE_SORTS = ['nameAsc', 'nameDesc'] as const
 export type PeopleSort = (typeof PEOPLE_SORTS)[number]
 
-export const nameFormSchema = z.object({
-  name: z
-    .string()
-    .trim()
-    .min(1, { error: 'required' })
-    .max(100, { error: 'invalid' }),
-})
-
 export const personInputSchema = nameFormSchema.extend({
   id: z.uuid().optional(),
   groupIds: z.array(z.uuid()),
@@ -50,13 +44,6 @@ export const groupInputSchema = nameFormSchema.extend({
 /** A person's avatar for now: the first letter of the name (spec 19). */
 export function initialOf(name: string, locale: string) {
   return ([...name.trim()][0] ?? '').toLocaleUpperCase(locale)
-}
-
-export function byName<T extends { name: string }>(
-  items: ReadonlyArray<T>,
-  locale: string,
-) {
-  return [...items].sort((a, b) => a.name.localeCompare(b.name, locale))
 }
 
 /**

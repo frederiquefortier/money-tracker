@@ -4,6 +4,28 @@ Document new concepts, techniques, and knowledge gained. Reference this file to 
 
 <!-- Newest first: a new entry goes directly below this line. Template at the bottom. -->
 
+### 2026-11-09 - Passing a typed link to a shared component
+
+**What Was New:**
+- `ListRow` takes the link its row opens. The people row picks one of two routes, and
+  that union did not type-check against the generic `ValidateLinkOptions`.
+
+**Key Points:**
+- `LinkOptions` from `@tanstack/react-router`, used as a plain prop type, still checks
+  `to` against the registered routes and rejects a param key the route does not have.
+  It does not insist on every required param, which the route's own `Link` would.
+- `ValidateLinkOptions` with a type parameter checks everything, but only for one
+  literal at a time; a conditional between two routes fails.
+
+**Sources:**
+- TanStack Router docs, "Type utilities" (`ValidateLinkOptions`, `linkOptions`).
+
+**Where to Learn More:**
+- TanStack Router docs, "Link options".
+
+**Applied In:**
+- `src/app/src/components/lists/list-row.tsx`.
+
 ### 2026-11-05 - Text fields match :focus-visible on a click
 
 **What Was New:**

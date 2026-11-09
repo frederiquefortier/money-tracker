@@ -5,15 +5,16 @@ import type { Person } from '#/lib/people/person'
 import {
   withHeadCount,
   withPeople,
-  withoutLine,
+  withoutPersonLine,
 } from '#/lib/transactions/transaction-people'
 import { cn } from '#/lib/utils'
 import { rowHover, focusRing, insetFocus } from '#/components/styles'
-import type { TransactionDraft } from '#/lib/transactions/transaction-draft-types'
+import type {
+  DraftUpdate,
+  TransactionDraft,
+} from '#/lib/transactions/transaction-draft-types'
 
 // The people list's own rows (spec 20): Fréquents, and the count of people without a name.
-
-type Update = (changes: Partial<TransactionDraft>) => void
 
 /** The most frequent people as a row of avatars; a tap ticks or unticks one. */
 export function FrequentPeople({
@@ -67,14 +68,14 @@ export function AnonymousRow({
   onChange,
 }: {
   draft: TransactionDraft
-  onChange: Update
+  onChange: DraftUpdate
 }) {
   const { t } = useTranslation()
   const line = draft.people.find((l) => l.role !== 'me' && !l.personId)
   const count = line?.headCount ?? 0
   const set = (next: number) => {
     if (!line) onChange(withPeople(draft, [null]))
-    else if (next === 0) onChange(withoutLine(draft, line.key))
+    else if (next === 0) onChange(withoutPersonLine(draft, line.key))
     else onChange(withHeadCount(draft, line.key, next))
   }
   return (

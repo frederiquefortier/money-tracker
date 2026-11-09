@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Combobox } from '#/components/combobox/combobox'
 import { ConfirmDialog } from '#/components/feedback/confirm-dialog'
+import { DeleteDialog } from '#/components/feedback/delete-dialog'
 import { IconActions, IconButton } from '#/components/display/icon-button'
 import type { ActionPlacement } from '#/components/display/icon-button'
 import { useServerAction } from '#/hooks/app/use-server-action'
@@ -78,11 +79,11 @@ export function MerchantActions({
 }) {
   const { t } = useTranslation()
   const toast = useToast()
-  const { run, busy } = useServerAction()
   const [dialog, setDialog] = useState<'merge' | 'delete' | null>(null)
   const alone = merchants.length < 2
   const { id, name } = merchant
   const close = () => setDialog(null)
+  const deleteLabel = t('common.deleteName', { name })
 
   return (
     <IconActions slots={2} placement={placement}>
@@ -98,7 +99,7 @@ export function MerchantActions({
       />
       <IconButton
         icon="trash-full"
-        label={t('common.deleteName', { name })}
+        label={deleteLabel}
         onClick={() => setDialog('delete')}
       />
       {dialog === 'merge' && (
@@ -108,22 +109,18 @@ export function MerchantActions({
           onClose={close}
         />
       )}
-      <ConfirmDialog
+      <DeleteDialog
         open={dialog === 'delete'}
-        title={t('common.deleteName', { name })}
-        confirmLabel={t('common.delete')}
-        busy={busy}
-        onCancel={close}
-        onConfirm={() =>
-          run(() => deleteMerchant({ data: { id } }), { onResult: close })
-        }
+        title={deleteLabel}
+        onDelete={() => deleteMerchant({ data: { id } })}
+        onClose={close}
       >
         {merchant.transactionCount > 0 && (
           <p className="text-sm">
             {t('merchants.deleteKeeps', { count: merchant.transactionCount })}
           </p>
         )}
-      </ConfirmDialog>
+      </DeleteDialog>
     </IconActions>
   )
 }

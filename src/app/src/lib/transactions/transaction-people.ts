@@ -108,7 +108,7 @@ export function withoutPeople(
   )
 }
 
-export function withoutLine(
+export function withoutPersonLine(
   draft: TransactionPeople,
   key: number,
 ): PeopleChanges {
