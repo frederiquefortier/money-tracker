@@ -4,7 +4,10 @@ import { useServerAction } from '#/hooks/app/use-server-action'
 import type { ServerActionOptions } from '#/hooks/app/use-server-action'
 import type { Result } from '#/lib/shared/result'
 
-/** Every delete from a row or a sheet: confirm, run, close. `children` says what stays. */
+/**
+ * Every delete from a row or a sheet: confirm, run, close. The title is asked as a
+ * question, with no "irréversible" line; `description` says what stays.
+ */
 export function DeleteDialog({
   open,
   title,
@@ -27,7 +30,8 @@ export function DeleteDialog({
   return (
     <ConfirmDialog
       open={open}
-      title={title}
+      title={`${title}?`}
+      irreversible={false}
       description={description}
       confirmLabel={t('common.delete')}
       busy={busy}

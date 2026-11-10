@@ -1,11 +1,39 @@
 import { cn } from '#/lib/utils'
 import { focusRing } from '#/components/styles'
 
+const STEPS: Partial<Record<string, number>> = { ArrowRight: 1, ArrowLeft: -1 }
+
+function TabCount({ n }: { n: number }) {
+  if (n === 0) return null
+  return (
+    <span className="ml-1.5 rounded-full bg-primary px-1.5 py-0.5 text-xs text-primary-foreground">
+      {n}
+    </span>
+  )
+}
+
+type TabListProps<TTab extends string> = {
+  label: string
+  tabs: ReadonlyArray<TTab>
+  value: TTab
+  labelOf: (tab: TTab) => string
+  panelId: string
+  idPrefix: string
+  muted?: (tab: TTab) => boolean
+  disabled?: boolean
+  fit?: boolean
+  wrap?: boolean
+  count?: (tab: TTab) => number
+  onSelect: (tab: TTab) => void
+}
+
 /**
  * A row of tabs over one panel (`panelId`); arrows move between them. Each tab's id is
  * `{idPrefix}-{tab}`, for the panel's aria-labelledby. A `muted` tab looks unavailable but
  * still answers, so the caller can say why. `disabled` turns the whole row off. `fit`
  * sizes each tab to its label, for labels of very different lengths in a narrow row.
+ * `wrap` lets the tabs fall onto more lines instead of squeezing. `count` shows a number
+ * after a tab's label while it is above zero.
  */
 export function TabList<TTab extends string>({
   label,
@@ -17,34 +45,19 @@ export function TabList<TTab extends string>({
   muted,
   disabled = false,
   fit = false,
+  wrap = false,
+  count,
   onSelect,
-}: {
-  label: string
-  tabs: ReadonlyArray<TTab>
-  value: TTab
-  labelOf: (tab: TTab) => string
-  panelId: string
-  idPrefix: string
-  muted?: (tab: TTab) => boolean
-  disabled?: boolean
-  fit?: boolean
-  onSelect: (tab: TTab) => void
-}) {
+}: TabListProps<TTab>) {
   const idOf = (tab: TTab) => `${idPrefix}-${tab}`
-
   function onKeyDown(event: React.KeyboardEvent) {
-    const steps: Partial<Record<string, number>> = {
-      ArrowRight: 1,
-      ArrowLeft: -1,
-    }
-    const step = steps[event.key]
+    const step = STEPS[event.key]
     if (!step) return
     const next = tabs[(tabs.indexOf(value) + step + tabs.length) % tabs.length]
     if (muted?.(next)) return
     onSelect(next)
     document.getElementById(idOf(next))?.focus()
   }
-
   return (
     <div
       role="tablist"
@@ -52,8 +65,9 @@ export function TabList<TTab extends string>({
       aria-disabled={disabled || undefined}
       onKeyDown={onKeyDown}
       className={cn(
-        'grid grid-flow-col gap-1 rounded-xl bg-secondary p-1',
-        fit ? 'auto-cols-auto' : 'auto-cols-fr',
+        'gap-1 rounded-xl bg-secondary p-1',
+        wrap ? 'flex flex-wrap' : 'grid auto-cols-fr grid-flow-col',
+        fit && !wrap && 'auto-cols-auto',
         disabled && 'opacity-50',
       )}
     >
@@ -71,7 +85,8 @@ export function TabList<TTab extends string>({
           onClick={() => onSelect(tab)}
           className={cn(
             'rounded-lg px-2 py-1.5 text-sm font-semibold',
-            fit && 'whitespace-nowrap',
+            wrap && 'flex-1',
+            (fit || wrap) && 'whitespace-nowrap',
             tab === value
               ? 'bg-card text-primary shadow-sm'
               : 'text-muted-foreground hover:text-foreground',
@@ -82,6 +97,7 @@ export function TabList<TTab extends string>({
           )}
         >
           {labelOf(tab)}
+          <TabCount n={count?.(tab) ?? 0} />
         </button>
       ))}
     </div>

@@ -221,3 +221,19 @@ describe('colours', () => {
         if (a !== b) expect(distance(a.hex, b.hex)).toBeGreaterThan(8)
   })
 })
+
+describe('sorting by name backwards', () => {
+  it('reverses the siblings', () => {
+    const list = [
+      category('a', 'Alimentation'),
+      category('b', 'Bleu'),
+      category('c', 'Café'),
+    ]
+    const sorted = sortSiblings(
+      childrenByParent(list, 'fr-CA'),
+      'nameDesc',
+      'fr-CA',
+    )
+    expect(sorted.get(null)?.map((c) => c.id)).toEqual(['c', 'b', 'a'])
+  })
+})

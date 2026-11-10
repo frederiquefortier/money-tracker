@@ -1,4 +1,4 @@
-import { useEffect, useId, useState } from 'react'
+import { useEffect, useId, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { FilterList } from '#/components/transactions/filters/filter-lists'
 import type { FilterOptions } from '#/components/transactions/filters/filter-lists'
@@ -28,20 +28,21 @@ import type {
   FilterTab,
   FilterValues,
 } from '#/lib/transactions/transaction-filters'
-import { useFilterLabel } from '#/hooks/transactions/use-filter-label'
 
-function useOptions(open: boolean) {
+/** Only what the open tabs need is fetched. */
+function useOptions(open: boolean, tabs: ReadonlyArray<FilterTab>) {
   const { t } = useTranslation()
   const toast = useToast()
   const [options, setOptions] = useState<FilterOptions | null>(null)
   useEffect(() => {
     if (!open || options) return
+    const has = (tab: FilterTab) => tabs.includes(tab)
     Promise.all([
-      getFormAccounts(),
-      getCategories(),
-      getMerchants(),
-      getPeople(),
-      getEvents(),
+      has('accounts') ? getFormAccounts() : [],
+      has('categories') ? getCategories() : [],
+      has('merchants') ? getMerchants() : [],
+      has('people') ? getPeople() : { people: [], groups: [] },
+      has('events') ? getEvents() : { events: [], types: [] },
     ])
       .then(([accounts, categories, merchants, people, events]) =>
         setOptions({
@@ -54,7 +55,7 @@ function useOptions(open: boolean) {
         }),
       )
       .catch(() => toast({ text: t('common.genericError') }))
-  }, [open, options, toast, t])
+  }, [open, options, tabs, toast, t])
   return options
 }
 
@@ -71,11 +72,66 @@ function ResultCount({ total }: { total: number | null }) {
 }
 
 /**
+ * The ticks as the sheet shows them: at once, while the list behind is told once the
+ * ticking pauses, and again on closing, so a tick never waits for the list to reload.
+ */
+function useLocalValues(
+  values: FilterValues,
+  send: (values: FilterValues) => void,
+) {
+  const [local, setLocal] = useState(values)
+  const pending = useRef<FilterValues | null>(null)
+  const latest = useRef(send)
+  latest.current = send
+  const timer = useRef<ReturnType<typeof setTimeout>>(undefined)
+  const flush = () => {
+    clearTimeout(timer.current)
+    if (pending.current) latest.current(pending.current)
+    pending.current = null
+  }
+  useEffect(() => flush, [])
+  return [
+    local,
+    (next: FilterValues) => {
+      setLocal(next)
+      pending.current = next
+      clearTimeout(timer.current)
+      timer.current = setTimeout(flush, 400)
+    },
+  ] as const
+}
+
+function FilterFooter({
+  cleared,
+  total,
+  onClear,
+  onClose,
+}: {
+  cleared: boolean
+  total: number | null
+  onClear: () => void
+  onClose: () => void
+}) {
+  const { t } = useTranslation()
+  return (
+    <SheetFooter className="justify-between">
+      <Button variant="ghost" disabled={cleared} onClick={onClear}>
+        {t('common.clear')}
+      </Button>
+      <Button onClick={onClose}>
+        <ResultCount total={total} />
+      </Button>
+    </SheetFooter>
+  )
+}
+
+/**
  * Mounted while the sheet is open, so the search starts empty each time. The tabs and
  * the search stay put over the list; the footer clears the open tab or closes, saying how
- * many rows the list now shows.
+ * many rows the list now shows. With one tab, there is no tab row.
  */
 function FilterPanel({
+  tabs,
   tab,
   options,
   values,
@@ -84,6 +140,7 @@ function FilterPanel({
   onChange,
   onClose,
 }: {
+  tabs: ReadonlyArray<FilterTab>
   tab: FilterTab
   options: FilterOptions | null
   values: FilterValues
@@ -95,23 +152,27 @@ function FilterPanel({
   const { t } = useTranslation()
   const id = useId()
   const [query, setQuery] = useState('')
-  const labelOf = useFilterLabel(values)
+  const [local, setLocal] = useLocalValues(values, onChange)
   const key = FILTER_KEYS[tab]
   return (
     <>
       <SheetHead>
-        <TabList
-          label={t('transactions.list.filters')}
-          tabs={FILTER_TABS}
-          value={tab}
-          labelOf={labelOf}
-          panelId={`${id}-panel`}
-          idPrefix={id}
-          onSelect={(next) => {
-            setQuery('')
-            onTab(next)
-          }}
-        />
+        {tabs.length > 1 && (
+          <TabList
+            label={t('transactions.list.filters')}
+            tabs={tabs}
+            value={tab}
+            labelOf={(next) => t(`transactions.list.${next}`)}
+            count={(next) => local[FILTER_KEYS[next]].length}
+            wrap
+            panelId={`${id}-panel`}
+            idPrefix={id}
+            onSelect={(next) => {
+              setQuery('')
+              onTab(next)
+            }}
+          />
+        )}
         <SearchField
           value={query}
           onChange={setQuery}
@@ -129,37 +190,31 @@ function FilterPanel({
             tab={tab}
             query={query}
             options={options}
-            values={values}
-            onChange={onChange}
+            values={local}
+            onChange={setLocal}
           />
         ) : (
           <p className="text-muted-foreground">{t('common.loading')}</p>
         )}
       </SheetBody>
-      <SheetFooter className="justify-between">
-        <Button
-          variant="ghost"
-          disabled={values[key].length === 0}
-          onClick={() => onChange({ ...values, [key]: [] })}
-        >
-          {t('common.clear')}
-        </Button>
-        <Button onClick={onClose}>
-          <ResultCount total={total} />
-        </Button>
-      </SheetFooter>
+      <FilterFooter
+        cleared={local[key].length === 0}
+        total={total}
+        onClear={() => setLocal({ ...local, [key]: [] })}
+        onClose={onClose}
+      />
     </>
   )
 }
 
 /**
- * The filters' sheet (spec 14, TRX-14), opened on one tab by its button in the row under
- * the search: checkboxes for accounts, categories (a category keeps its sub-categories)
- * merchants or people, several at once. Each tick applies at once. The choices load the first
- * time it opens.
+ * The filters' sheet (spec 14, TRX-14), opened on one of `tabs`: checkboxes for accounts,
+ * categories (a category keeps its sub-categories) merchants, people or events, several at
+ * once. Each tick applies at once. The choices load the first time it opens.
  */
 export function FilterSheet({
   open,
+  tabs = FILTER_TABS,
   tab,
   values,
   total,
@@ -168,6 +223,7 @@ export function FilterSheet({
   onChange,
 }: {
   open: boolean
+  tabs?: ReadonlyArray<FilterTab>
   tab: FilterTab
   values: FilterValues
   /** How many rows the list matches; null while the next one loads. */
@@ -177,7 +233,7 @@ export function FilterSheet({
   onChange: (values: FilterValues) => void
 }) {
   const { t } = useTranslation()
-  const options = useOptions(open)
+  const options = useOptions(open, tabs)
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
@@ -185,6 +241,7 @@ export function FilterSheet({
         closeLabel={t('common.close')}
       >
         <FilterPanel
+          tabs={tabs}
           tab={tab}
           options={options}
           values={values}

@@ -8,10 +8,9 @@ import {
 } from '#/components/ui/dropdown-menu'
 import type { Currency } from '#/lib/currencies/currency'
 import { cn } from '#/lib/utils'
-import { focusRing } from '#/components/styles'
+import { chipSurface, focusRing } from '#/components/styles'
 
-const chip =
-  'inline-flex items-center gap-1 rounded-full border border-input bg-transparent px-3 py-1.5 font-mono text-sm font-semibold'
+const chip = cn(chipSurface, 'font-mono')
 
 /** A currency the field cannot change, drawn like the chip (a transfer's, spec 16). */
 export function FixedCurrency({ value }: { value: string }) {

@@ -87,6 +87,8 @@ export function CategoryPicker({
   frequent = [],
   required = false,
   error,
+  creatable = true,
+  extra = [],
 }: {
   label: string
   categories: ReadonlyArray<Category>
@@ -98,6 +100,10 @@ export function CategoryPicker({
   frequent?: ReadonlyArray<string>
   required?: boolean
   error?: string
+  /** False in a filter, where typing a name must not create a category. */
+  creatable?: boolean
+  /** Choices listed first, before the categories ("No category" in a filter). */
+  extra?: ReadonlyArray<ComboboxOption>
 }) {
   const { t } = useTranslation()
   const locale = useFormatLocale()
@@ -135,6 +141,7 @@ export function CategoryPicker({
     ]
   })
   const options = [
+    ...extra,
     ...frequentOptions,
     ...treeOptions(categories, { kind, locale, option }),
   ]
@@ -148,8 +155,10 @@ export function CategoryPicker({
       value={value}
       onChange={onChange}
       clearLabel={t('categories.clearCategory')}
-      createLabel={(text) => t('common.createText', { text })}
-      onCreate={create}
+      createLabel={
+        creatable ? (text) => t('common.createText', { text }) : undefined
+      }
+      onCreate={creatable ? create : undefined}
     />
   )
 }

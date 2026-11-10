@@ -1,30 +1,24 @@
 import { Outlet, createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { CategoryBadge } from '#/components/categories/category-badge'
-import { ChoiceMenu } from '#/components/display/choice-menu'
 import { FloatingAddLink } from '#/components/layout/floating-add-button'
 import { EmptyState, ListCard } from '#/components/lists/list-card'
 import { MerchantRow } from '#/components/merchants/merchant-row'
 import { SearchField } from '#/components/forms/search-field'
 import { ListPage } from '#/components/layout/list-page'
 import { SortMenu } from '#/components/lists/sort-menu'
-import { TreeGuides } from '#/components/lists/tree-guides'
+import { CategoryBadge } from '#/components/categories/category-badge'
+import { FilterBubble } from '#/components/transactions/filters/filter-bubble'
+import { FilterSheet } from '#/components/transactions/filters/filter-sheet'
 import { categoryPath } from '#/lib/categories/category'
 import type { Category } from '#/lib/categories/category'
 import {
   MERCHANT_SORTS,
   filterMerchants,
-  merchantFilters,
   sortMerchants,
 } from '#/lib/merchants/merchant'
-import type {
-  Merchant,
-  MerchantFilter,
-  MerchantSort,
-} from '#/lib/merchants/merchant'
-import { treeGuides } from '#/lib/shared/tree-layout'
-import type { TreeGuide } from '#/lib/shared/tree-layout'
+import type { Merchant, MerchantSort } from '#/lib/merchants/merchant'
+import type { FilterValues } from '#/lib/transactions/transaction-filters'
 import { useFormatLocale } from '#/hooks/app/use-locale'
 import { useStoredState } from '#/hooks/app/use-stored-state'
 import { getCategories } from '#/server/categories'
@@ -44,6 +38,13 @@ export const Route = createFileRoute('/_authed/settings/merchants')({
 })
 
 const parseSort = oneOf(MERCHANT_SORTS)
+const NO_FILTERS: FilterValues = {
+  accountIds: [],
+  categoryIds: [],
+  merchantIds: [],
+  personIds: [],
+  eventIds: [],
+}
 
 function categoryLookup(categories: ReadonlyArray<Category>) {
   const byId = indexById(categories)
@@ -56,29 +57,60 @@ function categoryLookup(categories: ReadonlyArray<Category>) {
   return {
     rows,
     pathOf: (id: string) => rows.get(id)?.path,
-    nameOf: (id: string) => byId.get(id)?.name,
     parentOf: (id: string) => byId.get(id)?.parentId,
   }
 }
 
-/** A filter choice drawn like the Catégories tree: connectors, badge, name. */
-function FilterOption({
-  category,
-  name,
-  guide,
+const CATEGORY_TABS = ['categories'] as const
+
+/** The same bubble and sheet as the transactions' Catégories filter. */
+function CategoryFilter({
+  categories,
+  picked,
+  total,
+  onChange,
 }: {
-  category: { icon: string; color: string } | undefined
-  name: string
-  guide: TreeGuide | undefined
+  categories: ReadonlyArray<Category>
+  picked: ReadonlyArray<string>
+  total: number
+  onChange: (ids: Array<string>) => void
 }) {
+  const { t } = useTranslation()
+  const [open, setOpen] = useState(false)
+  const only = categories.find((c) => c.id === picked[0])
   return (
-    <>
-      {guide && <TreeGuides guide={guide} className="-my-1.5" />}
-      {category && (
-        <CategoryBadge icon={category.icon} color={category.color} size="sm" />
-      )}
-      <span className="truncate">{name}</span>
-    </>
+    <div>
+      <FilterBubble
+        label={t('transactions.list.categories')}
+        count={picked.length}
+        only={
+          picked.length === 1 && only
+            ? {
+                name: only.name,
+                icon: (
+                  <CategoryBadge
+                    icon={only.icon}
+                    color={only.color}
+                    size="sm"
+                    className="size-6 [&_svg]:size-3.5"
+                  />
+                ),
+              }
+            : null
+        }
+        onOpen={() => setOpen(true)}
+      />
+      <FilterSheet
+        open={open}
+        tabs={CATEGORY_TABS}
+        tab="categories"
+        values={{ ...NO_FILTERS, categoryIds: [...picked] }}
+        total={total}
+        onOpenChange={setOpen}
+        onTab={() => {}}
+        onChange={(values) => onChange(values.categoryIds)}
+      />
+    </div>
   )
 }
 
@@ -129,51 +161,23 @@ function Merchants() {
     parseSort,
   )
   const tree = categoryLookup(categories)
-  const filters = merchantFilters(merchants, categories, locale)
-  const values = filters.map((f) => f.value)
-  const [chosen, setFilter] = useState<MerchantFilter>('all')
-  const filter = values.includes(chosen) ? chosen : 'all'
+  const [picked, setPicked] = useState<Array<string>>([])
   const matches = matcher(query)
   const shown = sortMerchants(
-    filterMerchants(merchants, filter, tree).filter((m) => matches(m.name)),
+    filterMerchants(merchants, picked, tree).filter((m) => matches(m.name)),
     { sort, pathOf: tree.pathOf, locale },
   )
-  const guides = treeGuides(filters.map((f) => f.depth))
-  const filterLabel = (f: MerchantFilter) => {
-    if (f === 'all') return t('merchants.filterAll')
-    if (f === 'none') return t('merchants.filterNone')
-    return tree.pathOf(f) ?? ''
-  }
 
   return (
     <ListPage
       title={t('merchants.title')}
       actions={
-        <>
-          {filters.length > 2 && (
-            <ChoiceMenu
-              icon="tags"
-              label={t('common.filterLabel', { filter: filterLabel(filter) })}
-              value={filter}
-              options={values}
-              labelOf={filterLabel}
-              renderOption={(f, i) => (
-                <FilterOption
-                  category={tree.rows.get(f)}
-                  name={tree.nameOf(f) ?? filterLabel(f)}
-                  guide={guides[i]}
-                />
-              )}
-              onChange={setFilter}
-            />
-          )}
-          <SortMenu
-            sort={sort}
-            options={MERCHANT_SORTS}
-            labelOf={(option) => t(`merchants.sort.${option}`)}
-            onChange={setSort}
-          />
-        </>
+        <SortMenu
+          sort={sort}
+          options={MERCHANT_SORTS}
+          labelOf={(option) => t(`merchants.sort.${option}`)}
+          onChange={setSort}
+        />
       }
     >
       {merchants.length === 0 ? (
@@ -181,6 +185,12 @@ function Merchants() {
       ) : (
         <>
           <SearchField value={query} onChange={setQuery} />
+          <CategoryFilter
+            categories={categories}
+            picked={picked}
+            total={shown.length}
+            onChange={setPicked}
+          />
           <MerchantList merchants={merchants} shown={shown} tree={tree} />
         </>
       )}

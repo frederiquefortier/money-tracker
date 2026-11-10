@@ -33,7 +33,6 @@ export function EventRow({
   type: EventType | undefined
   people: ReadonlyArray<Person>
 }) {
-  const { t } = useTranslation()
   const dates = useDateRange(event)
   const names = people
     .filter((p) => event.personIds.includes(p.id))
@@ -58,16 +57,12 @@ export function EventRow({
         <span className="truncate text-sm text-muted-foreground">{dates}</span>
       </span>
       {names.length > 0 && <AvatarStack items={names} size="md" />}
-      <span className="shrink-0 text-sm whitespace-nowrap text-muted-foreground">
-        {t('events.transactionCount', { count: event.transactionCount })}
-      </span>
     </ListRow>
   )
 }
 
 /** A type: its icon in its colour, the name, how many events have it. */
 export function TypeRow({ type }: { type: EventType }) {
-  const { t } = useTranslation()
   return (
     <ListRow
       link={{
@@ -83,9 +78,6 @@ export function TypeRow({ type }: { type: EventType }) {
     >
       <EventBadge color={type.color} />
       <span className="min-w-0 flex-1 truncate font-semibold">{type.name}</span>
-      <span className="shrink-0 text-sm whitespace-nowrap text-muted-foreground">
-        {t('events.eventCount', { count: type.eventCount })}
-      </span>
     </ListRow>
   )
 }

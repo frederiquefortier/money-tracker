@@ -5,7 +5,13 @@ import {
   accountInputSchema,
   institutionInputSchema,
 } from '#/lib/accounts/account'
-import { deleteRow, loaded, saveRow, updateRow } from '#/lib/server/db.server'
+import {
+  deleteRow,
+  inUseIds,
+  loaded,
+  saveRow,
+  updateRow,
+} from '#/lib/server/db.server'
 import { failureFor } from '#/lib/shared/result'
 import type { Result } from '#/lib/shared/result'
 import { idInput } from '#/lib/shared/validation'
@@ -91,6 +97,15 @@ export const getAccounts = createServerFn({ method: 'GET' }).handler(
       getTypes(),
     ])
     const [accounts, balances, totals] = loaded('Accounts', ...results)
+    const used = await inUseIds(
+      accounts.map((a) => a.id),
+      (id) =>
+        supabase
+          .from('transactions')
+          .select('id')
+          .eq('account_id', id)
+          .limit(1),
+    )
 
     const byAccount = new Map(balances.map((b) => [b.account_id, b]))
     return {
@@ -101,6 +116,7 @@ export const getAccounts = createServerFn({ method: 'GET' }).handler(
           balance: b?.balance ?? a.opening_balance,
           pending: b?.pending ?? '0',
           displayBalance: b?.display_balance ?? null,
+          inUse: used.has(a.id),
         }
       }),
       institutions,

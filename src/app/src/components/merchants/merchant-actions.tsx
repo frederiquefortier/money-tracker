@@ -112,15 +112,14 @@ export function MerchantActions({
       <DeleteDialog
         open={dialog === 'delete'}
         title={deleteLabel}
+        description={
+          merchant.transactionCount > 0
+            ? t('merchants.deleteKeeps', { count: merchant.transactionCount })
+            : undefined
+        }
         onDelete={() => deleteMerchant({ data: { id } })}
         onClose={close}
-      >
-        {merchant.transactionCount > 0 && (
-          <p className="text-sm">
-            {t('merchants.deleteKeeps', { count: merchant.transactionCount })}
-          </p>
-        )}
-      </DeleteDialog>
+      />
     </IconActions>
   )
 }

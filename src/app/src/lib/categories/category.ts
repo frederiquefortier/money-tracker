@@ -40,6 +40,8 @@ export type Category = {
   periods: Array<DateRange>
   /** The one category of every fee, conversion and transaction (TRX-04, CUR-08). */
   isFee?: boolean
+  /** A transaction has a split in it, so it cannot be deleted. */
+  inUse?: boolean
 }
 
 export function isArchived(category: Pick<Category, 'history'>) {
@@ -142,7 +144,7 @@ export function childrenByParent<T extends Pick<Category, 'parentId' | 'name'>>(
   return map
 }
 
-export const CATEGORY_SORTS = ['name', 'color'] as const
+export const CATEGORY_SORTS = ['name', 'nameDesc', 'color'] as const
 export type CategorySort = (typeof CATEGORY_SORTS)[number]
 
 // Rainbow order from red; greys last, darker first.
@@ -151,13 +153,17 @@ function rainbowKey(hex: string) {
   return [c < 0.05 ? 1 : 0, c < 0.05 ? l : (h - 10 + 360) % 360] as const
 }
 
-/** Siblings in the chosen order: by name (CAT-01), or by colour, like a rainbow. */
+/** Siblings in the chosen order: by name (CAT-01), by name backwards, or by colour, like a rainbow. */
 export function sortSiblings<T extends Pick<Category, 'name' | 'color'>>(
   children: ReadonlyMap<string | null, ReadonlyArray<T>>,
   sort: CategorySort,
   locale: string,
 ) {
   if (sort === 'name') return children
+  if (sort === 'nameDesc')
+    return new Map(
+      [...children].map(([id, list]) => [id, [...list].reverse()] as const),
+    )
   const byName = compareNames(locale)
   const byColor = (a: T, b: T) => {
     const [x, y] = [rainbowKey(a.color), rainbowKey(b.color)]

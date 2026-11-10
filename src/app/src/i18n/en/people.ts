@@ -4,7 +4,7 @@ export const peopleEn: typeof peopleFr = {
   people: {
     title: 'People',
     tabsLabel: 'People or groups',
-    sort: { nameAsc: 'Name A–Z', nameDesc: 'Name Z–A' },
+    sort: { nameAsc: 'Name (A to Z)', nameDesc: 'Name (Z to A)' },
     tabs: {
       people: 'People',
       groups: 'Groups',

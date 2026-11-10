@@ -7,11 +7,11 @@ export const accountsEn: typeof accountsFr = {
     noInstitution: 'No institution',
     accountsOf: 'Accounts of “{{name}}”',
     sort: {
-      name: 'Name',
+      name: 'Name (A to Z)',
       type: 'Type',
       currency: 'Currency',
-      balanceAsc: 'Balance ascending',
-      balanceDesc: 'Balance descending',
+      balanceAsc: 'Balance (lowest)',
+      balanceDesc: 'Balance (highest)',
     },
     website: '{{name}} website',
     noWebsite: 'No website for {{name}}.',
@@ -35,6 +35,7 @@ export const accountsEn: typeof accountsFr = {
     openedOn: 'Opening date',
     hideFromNew: 'Hide from new transactions',
     closedOnField: 'Archive date',
+    inUse: 'Transactions are in this account. Archive it instead.',
     currencyRemoved:
       'Add {{code}} back to your currencies to reactivate this account.',
   },

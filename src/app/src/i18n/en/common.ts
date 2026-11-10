@@ -36,7 +36,6 @@ export const commonEn: typeof commonFr = {
     expandAll: 'Expand all',
     collapseAll: 'Collapse all',
     sortLabel: 'Sort: {{sort}}',
-    filterLabel: 'Filter: {{filter}}',
     search: 'Search',
     noMatch: 'No results.',
     discardTitle: 'Discard your changes?',

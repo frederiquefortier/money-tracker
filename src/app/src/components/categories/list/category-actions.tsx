@@ -178,6 +178,8 @@ export function CategoryActions({
   const archived = isArchived(category)
   const close = () => setDialog(null)
   const deleteLabel = t('common.deleteName', { name })
+  const inUse = category.inUse ? t('categories.inUse') : null
+  const blocked = hasChildren ? t('categories.hasChildren') : inUse
 
   return (
     <IconActions
@@ -201,17 +203,18 @@ export function CategoryActions({
       />
       <IconButton
         icon="trash-full"
-        label={hasChildren ? t('categories.hasChildren') : deleteLabel}
-        muted={hasChildren}
+        label={blocked ?? deleteLabel}
+        muted={blocked !== null}
         onClick={() =>
-          hasChildren
-            ? toast({ text: t('categories.hasChildren') })
-            : setDialog('delete')
+          blocked ? toast({ text: blocked }) : setDialog('delete')
         }
       />
       <DeleteDialog
         open={dialog === 'delete'}
         title={deleteLabel}
+        failureText={(error) =>
+          error === 'inUse' ? t('categories.inUse') : undefined
+        }
         onDelete={() => deleteCategory({ data: { id } })}
         onClose={close}
       />

@@ -102,3 +102,23 @@ export async function updateProfile(values: Tables['profiles']['Update']) {
     .eq('user_id', auth.claims.sub)
   return { error }
 }
+
+/**
+ * Which of `ids` something still points at, one light query each, run together. The
+ * database has no view for it, and PostgREST returns at most 1,000 rows. A failed probe
+ * counts as in use, so a delete that might fail is never offered.
+ */
+export async function inUseIds(
+  ids: ReadonlyArray<string>,
+  probe: (id: string) => PromiseLike<{
+    data: ReadonlyArray<unknown> | null
+    error: unknown
+  }>,
+): Promise<Set<string>> {
+  const results = await Promise.all(ids.map((id) => probe(id)))
+  return new Set(
+    ids.filter(
+      (_, i) => results[i].error || (results[i].data?.length ?? 0) > 0,
+    ),
+  )
+}

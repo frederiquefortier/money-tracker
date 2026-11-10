@@ -1,9 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import {
-  filterMerchants,
-  merchantFilters,
-  sortMerchants,
-} from '#/lib/merchants/merchant'
+import { filterMerchants, sortMerchants } from '#/lib/merchants/merchant'
 import type { Merchant } from '#/lib/merchants/merchant'
 
 const categories: Partial<
@@ -69,32 +65,12 @@ describe('sortMerchants', () => {
   })
 })
 
-describe('merchant filters', () => {
-  it('offers the categories in use, their parents, and none', () => {
-    const only = [
-      merchant('Épicerie Tau', 'grocery'),
-      merchant('Librairie', null),
-    ]
-    const list = Object.entries(categories).map(([id, c]) => ({
-      id,
-      parentId: c?.parent ?? null,
-      name: c?.path.split(' > ').at(-1) ?? '',
-    }))
-    expect(merchantFilters(only, list, 'fr-CA')).toEqual([
-      { value: 'all', depth: 0 },
-      { value: 'food', depth: 0 },
-      { value: 'grocery', depth: 1 },
-      { value: 'none', depth: 0 },
-    ])
-  })
-
+describe('merchant filter', () => {
   it('keeps a category with its branch', () => {
-    expect(names(filterMerchants(merchants, 'food', tree))).toEqual([
+    expect(names(filterMerchants(merchants, ['food'], tree))).toEqual([
       'Zoo Bistro',
       'Épicerie Tau',
     ])
-    expect(names(filterMerchants(merchants, 'none', tree))).toEqual([
-      'Librairie',
-    ])
+    expect(names(filterMerchants(merchants, [], tree))).toHaveLength(4)
   })
 })

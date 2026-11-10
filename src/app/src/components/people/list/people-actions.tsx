@@ -69,16 +69,15 @@ export function PeopleActions({
       <DeleteDialog
         open={dialog === 'delete'}
         title={deleteLabel}
+        // Spec 20: their lines stay without a name, so no amount changes.
+        description={
+          (row.transactionCount ?? 0) > 0
+            ? t('people.deleteKeeps', { count: row.transactionCount })
+            : undefined
+        }
         onDelete={() => deletePeopleRow({ data: { kind, id } })}
         onClose={close}
-      >
-        {/* Spec 20: their lines stay without a name, so no amount changes. */}
-        {(row.transactionCount ?? 0) > 0 && (
-          <p className="text-sm">
-            {t('people.deleteKeeps', { count: row.transactionCount })}
-          </p>
-        )}
-      </DeleteDialog>
+      />
     </IconActions>
   )
 }

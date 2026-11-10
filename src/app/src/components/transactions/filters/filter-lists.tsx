@@ -66,9 +66,11 @@ function MerchantList({
   const { t } = useTranslation()
   const locale = useFormatLocale()
   const [shown, setShown] = useState(MERCHANTS_FIRST)
+  // Ticked first as the tab opened: a tick never moves its row under the finger.
+  const [pickedAtOpen] = useState(picked)
   const { nodes, more } = merchantNodes(merchants, {
     query,
-    picked,
+    picked: pickedAtOpen,
     shown,
     locale,
   })

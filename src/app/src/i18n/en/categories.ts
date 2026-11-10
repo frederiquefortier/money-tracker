@@ -33,7 +33,7 @@ export const categoriesEn: typeof categoriesFr = {
     swatch: 'Colour {{n}}',
     swatchUsed: 'Colour {{n}}, already used',
     branchName: 'Subcategories of “{{name}}”',
-    sort: { name: 'Name', color: 'Colour' },
+    sort: { name: 'Name (A to Z)', nameDesc: 'Name (Z to A)', color: 'Colour' },
     addChildName: 'Add a subcategory to “{{name}}”',
     archived: 'Archived categories ({{count}})',
     archivedOn: 'Archived on {{date}}',
@@ -52,6 +52,7 @@ export const categoriesEn: typeof categoriesFr = {
     historyArchivedWith: 'Archived with “{{name}}”',
     historyActiveWith: 'Reactivated with “{{name}}”',
     hasChildren: 'This category has subcategories.',
+    inUse: 'Transactions use this category. Archive it instead.',
     icon: {
       choose: 'Choose an icon',
       suggested: 'Suggested',

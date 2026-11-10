@@ -34,7 +34,6 @@ export const commonFr = {
     expandAll: 'Tout déplier',
     collapseAll: 'Tout replier',
     sortLabel: 'Trier: {{sort}}',
-    filterLabel: 'Filtrer: {{filter}}',
     search: 'Rechercher',
     noMatch: 'Aucun résultat.',
     discardTitle: 'Abandonner les modifications?',

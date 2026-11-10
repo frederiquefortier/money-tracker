@@ -125,6 +125,8 @@ export type Account = {
   balance: string
   pending: string
   displayBalance: string | null
+  /** A transaction is in it, so it cannot be deleted. */
+  inUse: boolean
 }
 
 export type Institution = {

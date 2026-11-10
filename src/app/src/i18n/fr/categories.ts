@@ -32,7 +32,7 @@ export const categoriesFr = {
     swatch: 'Couleur {{n}}',
     swatchUsed: 'Couleur {{n}}, déjà utilisée',
     branchName: 'Sous-catégories de “{{name}}”',
-    sort: { name: 'Nom', color: 'Couleur' },
+    sort: { name: 'Nom (A à Z)', nameDesc: 'Nom (Z à A)', color: 'Couleur' },
     addChildName: 'Ajouter une sous-catégorie à “{{name}}”',
     archived: 'Catégories archivées ({{count}})',
     archivedOn: 'Archivée le {{date}}',
@@ -51,6 +51,7 @@ export const categoriesFr = {
     historyArchivedWith: 'Archivée avec “{{name}}”',
     historyActiveWith: 'Réactivée avec “{{name}}”',
     hasChildren: 'Cette catégorie a des sous-catégories.',
+    inUse: 'Des transactions utilisent cette catégorie. Archivez-la plutôt.',
     icon: {
       choose: 'Choisir une icône',
       suggested: 'Suggérée',

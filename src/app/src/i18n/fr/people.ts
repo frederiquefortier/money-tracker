@@ -3,7 +3,7 @@ export const peopleFr = {
   people: {
     title: 'Proches',
     tabsLabel: 'Proches ou groupes',
-    sort: { nameAsc: 'Nom A–Z', nameDesc: 'Nom Z–A' },
+    sort: { nameAsc: 'Nom (A à Z)', nameDesc: 'Nom (Z à A)' },
     tabs: {
       people: 'Personnes',
       groups: 'Groupes',

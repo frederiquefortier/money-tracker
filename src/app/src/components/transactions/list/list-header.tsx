@@ -12,6 +12,10 @@ import type {
   PeriodChoice,
 } from '#/lib/transactions/transaction-list'
 import { chipSurface } from '#/components/styles'
+import {
+  FilterBubble,
+  inUse,
+} from '#/components/transactions/filters/filter-bubble'
 import { cn } from '#/lib/utils'
 import {
   FILTER_KEYS,
@@ -22,8 +26,6 @@ import type {
   FilterValues,
 } from '#/lib/transactions/transaction-filters'
 import { useFilterLabel } from '#/hooks/transactions/use-filter-label'
-
-const inUse = 'border-primary text-primary'
 
 /** The one ticked in a filter, named on its button; null with none or several. */
 function onlyPicked(tab: FilterTab, names: ListFilters | null) {
@@ -69,19 +71,13 @@ function FilterButton({
 }) {
   const labelOf = useFilterLabel(values)
   const count = values[FILTER_KEYS[tab]].length
-  const only = count === 1 ? onlyPicked(tab, names) : null
   return (
-    <button
-      type="button"
-      aria-haspopup="dialog"
-      aria-label={labelOf(tab)}
-      onClick={onOpen}
-      className={cn(chipSurface, count > 0 && inUse, only?.icon && 'pl-1')}
-    >
-      {only?.icon}
-      <span className="max-w-40 truncate">{only?.name ?? labelOf(tab)}</span>
-      <Icon name="chevron-down" className="size-4" />
-    </button>
+    <FilterBubble
+      label={labelOf(tab)}
+      count={count}
+      only={count === 1 ? onlyPicked(tab, names) : null}
+      onOpen={onOpen}
+    />
   )
 }
 
@@ -169,47 +165,42 @@ type BubblesProps = {
   onOpen: (tab: FilterTab) => void
 }
 
-/**
- * Pending, owed, the period and the filters, as bubbles: on phones one row scrolling
- * sideways and fading at the edge; from md up, wrapping onto more lines.
- */
+/** Pending, owed, the period and the filters, as bubbles wrapping onto more lines. */
 function Bubbles(props: BubblesProps) {
   const { choice, filters, names, pending, owed, loading } = props
   return (
-    <div className="-mx-4 -my-1 overflow-x-auto px-4 py-1 [scrollbar-width:none] max-md:[mask-image:linear-gradient(to_right,black_calc(100%-1rem),transparent)] md:mx-0 md:overflow-visible md:px-0">
-      <div className="flex w-max items-center gap-2 md:w-auto md:flex-wrap">
-        <StatusButton
-          status="pending"
-          count={pending.count}
-          on={pending.on}
-          onToggle={props.onPending}
-        />
-        <StatusButton
-          status="owed"
-          count={owed.count}
-          on={owed.on}
-          onToggle={props.onOwed}
-        />
-        <PeriodPicker
-          choice={choice}
-          disabled={loading}
-          onChange={props.onPeriod}
-        />
-        <AllFiltersButton
-          values={filters}
-          onOpen={() => props.onOpen('accounts')}
-        />
-        {FILTER_TABS.map((tab) => (
-          <span key={tab} className="hidden md:contents">
-            <FilterButton
-              tab={tab}
-              values={filters}
-              names={names}
-              onOpen={() => props.onOpen(tab)}
-            />
-          </span>
-        ))}
-      </div>
+    <div className="flex flex-wrap items-center gap-2">
+      <StatusButton
+        status="pending"
+        count={pending.count}
+        on={pending.on}
+        onToggle={props.onPending}
+      />
+      <StatusButton
+        status="owed"
+        count={owed.count}
+        on={owed.on}
+        onToggle={props.onOwed}
+      />
+      <PeriodPicker
+        choice={choice}
+        disabled={loading}
+        onChange={props.onPeriod}
+      />
+      <AllFiltersButton
+        values={filters}
+        onOpen={() => props.onOpen('accounts')}
+      />
+      {FILTER_TABS.map((tab) => (
+        <span key={tab} className="hidden md:contents">
+          <FilterButton
+            tab={tab}
+            values={filters}
+            names={names}
+            onOpen={() => props.onOpen(tab)}
+          />
+        </span>
+      ))}
     </div>
   )
 }

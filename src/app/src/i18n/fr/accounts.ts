@@ -5,11 +5,11 @@ export const accountsFr = {
     noInstitution: 'Sans institution',
     accountsOf: 'Comptes de “{{name}}”',
     sort: {
-      name: 'Nom',
+      name: 'Nom (A à Z)',
       type: 'Type',
       currency: 'Devise',
-      balanceAsc: 'Solde croissant',
-      balanceDesc: 'Solde décroissant',
+      balanceAsc: 'Solde (plus faible)',
+      balanceDesc: 'Solde (plus élevé)',
     },
     website: 'Site web de {{name}}',
     noWebsite: 'Aucun site web pour {{name}}.',
@@ -33,6 +33,7 @@ export const accountsFr = {
     openedOn: 'Date d’ouverture',
     hideFromNew: 'Masquer des nouvelles transactions',
     closedOnField: 'Date d’archivage',
+    inUse: 'Des transactions sont dans ce compte. Archivez-le plutôt.',
     currencyRemoved:
       'Ajoutez d’abord {{code}} à vos devises pour réactiver ce compte.',
   },
