@@ -12,10 +12,13 @@ export const inUse = 'border-primary text-primary'
 export function FilterBubble({
   label,
   count,
+  disabled = false,
   onOpen,
 }: {
   label: string
   count: number
+  /** Nothing to choose from. */
+  disabled?: boolean
   onOpen: () => void
 }) {
   return (
@@ -23,6 +26,7 @@ export function FilterBubble({
       type="button"
       aria-haspopup="dialog"
       aria-label={label}
+      disabled={disabled}
       onClick={onOpen}
       className={cn(chipSurface, count > 0 && inUse)}
     >

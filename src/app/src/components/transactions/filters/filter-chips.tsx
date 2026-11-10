@@ -3,7 +3,11 @@ import { CategoryBadge } from '#/components/categories/category-badge'
 import { Icon } from '#/components/display/icon'
 import { focusRing } from '#/components/styles'
 import { accountLabel } from '#/lib/accounts/account'
-import type { ListFilters } from '#/lib/transactions/transaction-list'
+import type {
+  ListFilters,
+  PeriodChoice,
+} from '#/lib/transactions/transaction-list'
+import { usePeriodLabel } from '#/hooks/transactions/use-period-label'
 import {
   FILTER_KEYS,
   FILTER_TABS,
@@ -50,11 +54,14 @@ export function pickedOf(
 function Chip({
   name,
   icon,
+  capitalize = false,
   removeLabel,
   onRemove,
 }: {
   name: string
   icon?: React.ReactNode
+  /** For a date written in lower case ("novembre 2026"); a typed name is left as it is. */
+  capitalize?: boolean
   removeLabel: string
   onRemove: () => void
 }) {
@@ -66,7 +73,9 @@ function Chip({
       )}
     >
       {icon}
-      <span className="truncate">{name}</span>
+      <span className={cn('truncate', capitalize && 'first-letter:uppercase')}>
+        {name}
+      </span>
       <button
         type="button"
         aria-label={removeLabel}
@@ -84,18 +93,26 @@ function Chip({
 }
 
 /**
- * What is chosen, under the bubbles (ADR-029): a chip per value with a ✕, however many, and Tout effacer. Nothing renders while nothing is chosen.
+ * What is chosen, under the bubbles (ADR-029): the period first (unless it is Tout), then a chip per value with a ✕, however many, and Tout effacer. Nothing renders while nothing is chosen.
  */
 export function FilterChips({
   values,
   names,
+  period,
   onChange,
 }: {
   values: FilterValues
   names: ListFilters | null
+  /** The list's period (ADR-031): a chip first, unless it is Tout. */
+  period?: { choice: PeriodChoice; onChange: (choice: PeriodChoice) => void }
   onChange: (values: FilterValues) => void
 }) {
   const { t } = useTranslation()
+  const periodLabel = usePeriodLabel()
+  const toAll = (choice: PeriodChoice) => ({
+    ...choice,
+    period: 'all' as const,
+  })
   const chips = FILTER_TABS.flatMap((tab) => {
     const key = FILTER_KEYS[tab]
     const picked = pickedOf(tab, names, values)
@@ -114,13 +131,28 @@ export function FilterChips({
       />
     ))
   })
+  if (period && period.choice.period !== 'all')
+    chips.unshift(
+      <Chip
+        key="period"
+        name={periodLabel(period.choice)}
+        capitalize
+        removeLabel={t('transactions.list.remove', {
+          name: periodLabel(period.choice),
+        })}
+        onRemove={() => period.onChange(toAll(period.choice))}
+      />,
+    )
   if (chips.length === 0) return null
   return (
     <div className="flex flex-wrap items-center gap-2">
       {chips}
       <button
         type="button"
-        onClick={() => onChange(NO_FILTERS)}
+        onClick={() => {
+          onChange(NO_FILTERS)
+          if (period) period.onChange(toAll(period.choice))
+        }}
         className={cn(
           'h-8 rounded-full px-2 text-sm font-semibold text-muted-foreground hover:text-foreground',
           focusRing,

@@ -12,6 +12,7 @@ import {
   DateProviders,
   FieldLabelRow,
   roundButton,
+  literalClass,
   segmentClass,
 } from '#/components/forms/calendar-sheet'
 import { Icon } from '#/components/display/icon'
@@ -34,18 +35,28 @@ function RangeInput({
     <Group
       className={cn(
         fieldControl,
-        'flex items-center gap-1 pr-1',
+        'flex items-center gap-0.5 pr-1',
         'has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-ring',
       )}
     >
       <DateInput slot="start" className="flex">
-        {(part) => <DateSegment segment={part} className={segmentClass} />}
+        {(part) => (
+          <DateSegment
+            segment={part}
+            className={part.type === 'literal' ? literalClass : segmentClass}
+          />
+        )}
       </DateInput>
-      <span aria-hidden="true" className="px-1.5 text-muted-foreground">
+      <span aria-hidden="true" className="px-1 text-muted-foreground">
         -
       </span>
       <DateInput slot="end" className="flex flex-1">
-        {(part) => <DateSegment segment={part} className={segmentClass} />}
+        {(part) => (
+          <DateSegment
+            segment={part}
+            className={part.type === 'literal' ? literalClass : segmentClass}
+          />
+        )}
       </DateInput>
       {clearable && (
         <Button

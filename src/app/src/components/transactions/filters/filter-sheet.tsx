@@ -1,14 +1,7 @@
-import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import type { FilterOptions } from '#/components/transactions/filters/filter-lists'
 import { FilterPanel } from '#/components/transactions/filters/filter-panel'
 import { Sheet, SheetContent } from '#/components/ui/sheet'
-import { getCategories } from '#/server/categories'
-import { getEvents } from '#/server/events'
-import { getMerchants } from '#/server/merchants'
-import { getPeople } from '#/server/people'
-import { getFormAccounts } from '#/server/transactions'
-import { useToast } from '#/hooks/app/use-toast'
+import { useFilterOptions } from '#/hooks/transactions/use-filter-options'
 import { FILTER_TABS } from '#/lib/transactions/transaction-filters'
 import type {
   FilterScreen,
@@ -19,36 +12,6 @@ import type {
   ListFilters,
   PeriodChoice,
 } from '#/lib/transactions/transaction-list'
-
-/** Only what the open tabs need is fetched. */
-function useOptions(open: boolean, tabs: ReadonlyArray<FilterTab>) {
-  const { t } = useTranslation()
-  const toast = useToast()
-  const [options, setOptions] = useState<FilterOptions | null>(null)
-  useEffect(() => {
-    if (!open || options) return
-    const has = (tab: FilterTab) => tabs.includes(tab)
-    Promise.all([
-      has('accounts') ? getFormAccounts() : [],
-      has('categories') ? getCategories() : [],
-      has('merchants') ? getMerchants() : [],
-      has('people') ? getPeople() : { people: [], groups: [] },
-      has('events') ? getEvents() : { events: [], types: [] },
-    ])
-      .then(([accounts, categories, merchants, people, events]) =>
-        setOptions({
-          accounts,
-          categories,
-          merchants,
-          ...people,
-          events: events.events,
-          eventTypes: events.types,
-        }),
-      )
-      .catch(() => toast({ text: t('common.genericError') }))
-  }, [open, options, tabs, toast, t])
-  return options
-}
 
 /**
  * The filters' sheet (spec 14, TRX-14), opened on one of `tabs` or the period, or on their list: checkboxes for accounts,
@@ -62,6 +25,7 @@ export function FilterSheet({
   canGoBack = tabs.length > 1,
   names = null,
   period = null,
+  empty = null,
   values,
   total,
   onOpenChange,
@@ -79,6 +43,8 @@ export function FilterSheet({
   names?: ListFilters | null
   /** The period (ADR-030), shown as the list's first row. */
   period?: PeriodChoice | null
+  /** The filters with nothing to choose from; their rows cannot open. */
+  empty?: ReadonlySet<FilterTab> | null
   values: FilterValues
   /** How many rows the list matches; null while the next one loads. */
   total: number | null
@@ -88,7 +54,7 @@ export function FilterSheet({
   onPeriod?: (choice: PeriodChoice) => void
 }) {
   const { t } = useTranslation()
-  const options = useOptions(open, tabs)
+  const options = useFilterOptions(open, tabs)
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
@@ -102,6 +68,7 @@ export function FilterSheet({
           options={options}
           names={names}
           period={period}
+          empty={empty}
           values={values}
           total={total}
           onTab={onTab}

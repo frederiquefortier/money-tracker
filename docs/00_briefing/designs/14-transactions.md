@@ -54,21 +54,18 @@ From `md` up: the same list, centred, at most 48rem wide.
 
 ### Period
 
-- First in the row under the search, a bubble (`chip`) with the calendar icon: the
-  month, the year, "Toutes les dates", or the two days ("1 oct. 2026 – 30 oct. 2026"),
-  "Période: …" as its accessible name. For a month or a year, ‹ and › on either side
-  step one back or forward; › stops at the current one. Tout by default.
-- From `md` up the bubble opens the period in the filters' sheet (ADR-030), on phones the
-  Filtres list opens it; the screen shows the four periods as the shared tabs (`TabList`: Tout,
-  Année, Mois, Personnalisée), over the year grid (twelve years ending with the current
-  one, filled column by column so they follow one another down each, arrows to earlier
-  ones), the month grid (a year with arrows over its twelve months), or the date
-  range field (ADR-027) over its calendar, inline. Each tab is as wide as its label, so
-  Personnalisée fits on a phone. Nothing after the current year, month or day can
-  be picked, and the two days never cross. Tout applies and closes; a year or month
-  applies and closes. Personnalisée shows the typed dates over a range calendar, open in
-  the panel (ADR-029, which replaces the calendar rising from the bottom here); the
-  second day picked applies the range and closes the panel.
+- First in the row under the search, from `md` up, a "Dates" bubble like the filters'
+  (no icon, a chevron), outlined while a period is chosen. Tout, the whole history, is the
+  default and the state Effacer returns to, so it has no chip; two days show as a chip
+  under the row ("1 oct. 2026 – 30 oct. 2026") whose ✕ goes back to Tout.
+- The bubble opens the period in the filters' sheet (ADR-030), on phones the Filtres list
+  does (its first row, "Dates"). There is one way to choose: the date range field
+  (ADR-027), typed as jj/mm/aaaa, over its range calendar, open in the sheet. The range
+  is two days, one day being the same day twice; nothing after today can be picked, and
+  the two days never cross. The range applies as it changes and the sheet stays open, as a
+  filter's ticks do; nothing is selected while the period is Tout. The footer's Effacer
+  returns to Tout and "Voir N résultats" closes (ADR-032). There is no month or year
+  picker and no ‹ › stepping; an old address that carries a month or a year still reads.
 - Every period loads a page at a time: about 150 transactions, always whole days, and
   the next page as the end of the list comes into view. Tout is the whole history this
   way.
@@ -86,22 +83,22 @@ From `md` up: the same list, centred, at most 48rem wide.
   row runs out of room the bubbles wrap onto more lines; the list never scrolls sideways
   (decided 2026-11-05, again 2026-11-10).
 - On phones, one Filtres button with the filter icon, "Filtres · 3" and filled while
-  any filter is in use, opens the sheet on the list. There is no period bubble on phones:
-  the period is the list's first row.
-- From `md` up, the period's bubble with ‹ ›, then a button per filter, Comptes,
+  any filter is in use, opens the sheet on the list. There is no Dates bubble on phones:
+  Dates is the list's first row, and a chosen period shows as a chip.
+- From `md` up, the Dates bubble, then a button per filter, Comptes,
   Catégories, Magasins, Proches, Événements, each with a chevron. A filter's button always
   reads its name, with the number ticked after it ("Catégories · 2"), and is filled while
   in use. Each opens the sheet on its own screen alone.
-- Under the row, while anything is chosen, the chips (ADR-029, ADR-030): one per chosen
-  value however many, in the order Comptes, Catégories, Magasins, Proches, Événements, a
+- Under the row, while anything is chosen, the chips (ADR-029, ADR-030, ADR-031): the
+  period first, then one per chosen value however many, in the order Comptes, Catégories, Magasins, Proches, Événements, a
   category with its icon, each with a ✕ that removes it ("Retirer {name}"). "Tout effacer"
-  ends the line, and the line wraps.
+  ends the line (it clears the period too), and the line wraps.
 
 ### Filters
 
 - The sheet (from the right from `md` up, full screen on a phone), titled Filtres, shows
   one filter at a time, with no tabs. Opened from a phone's Filtres button, it first lists
-  Période, then the five filters, each row with its name, a summary on its right (the
+  Dates, then the five filters, each row with its name, a summary on its right (the
   period, "Tout", or "Épicerie, Transport", cut with an ellipsis) and a chevron. A row opens that screen in the same sheet, with a back arrow
   and the filter's name over its search ("Rechercher une catégorie"). Opened from a
   desktop bubble, it opens on that filter with no arrow. The search stays put while the
@@ -120,6 +117,10 @@ From `md` up: the same list, centred, at most 48rem wide.
     with each "Afficher plus"; the search reaches all of them, however many there are.
   - A search lists the matches flat in one card, accounts with their institution and
     categories by their full path.
+- A filter with nothing to choose from (no events, no merchants…) has its button disabled,
+  and its row in the phone's list too, so its screen never opens; once something is
+  ticked in it, it opens again. A small server function looks for one row in each table
+  (`getEmptyFilters`), so no list is loaded for it.
 - Every row is one tap target, 48px tall, the checkbox at its end.
 - The footer: the main button is always at the right, Effacer (where there is one) at the left. Effacer clears the open filter's ticks; "Voir 128 résultats" closes the
   sheet. The count is every row the period, the filters and the search match, all pages
@@ -232,8 +233,8 @@ From `md` up: the same list, centred, at most 48rem wide.
 
 | Key | Français |
 |---|---|
-| Period | Tabs Tout, Année, Mois, Personnalisée; Toutes les dates; Période: {period}; Du, Au; Mois précédent, Mois suivant |
-| Filters | Filtres, Période, Filtres · {count}, Comptes, Catégories, Magasins, Proches, Événements, {name} · {count}; Retirer {name}, Tout effacer, Retour aux filtres; Rechercher un compte, une catégorie, un magasin; Tout, Aucun, Tout cocher dans “{name}”, Tout décocher dans “{name}”; Effacer, Voir {count} résultat(s), Voir les résultats, Aucun résultat |
+| Period | Dates; Tout; Du, Au |
+| Filters | Filtres, Filtres · {count}, Comptes, Catégories, Magasins, Proches, Événements, {name} · {count}; Retirer {name}, Tout effacer, Retour aux filtres; Rechercher un compte, une catégorie, un magasin; Tout, Aucun, Tout cocher dans “{name}”, Tout décocher dans “{name}”; Effacer, Voir {count} résultat(s), Voir les résultats, Aucun résultat |
 | Converted detail | {original} converti au taux du {date} ({rate}) |
 | Pending | En attente, {count} en attente |
 | Owed | {count} me doit / me doivent; Quelqu'un me doit sa part (screen readers) |
@@ -244,4 +245,3 @@ From `md` up: the same list, centred, at most 48rem wide.
 | Empty | Aucune transaction en {period}. Aucune transaction du {start} au {end}. Aucune transaction pour l'instant. Aucun résultat. |
 | Actions | Importer un historique |
 | Missing rate | Taux manquant |
-| Grids | Année précédente, Année suivante, Années précédentes, Années suivantes |

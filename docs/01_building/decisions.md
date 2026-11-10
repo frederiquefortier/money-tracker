@@ -4,6 +4,60 @@ Document architectural choices with context, alternatives considered, and trade-
 
 <!-- Newest first: a new ADR goes directly below this line. Template at the bottom. -->
 
+### ADR-032: One calendar for the period (2026-11-10)
+
+**Context:**
+- ADR-031 left the period with three tabs: a list of years, a month grid and the range
+  calendar. The author, asking for the year list to be checkboxes and a second click to
+  clear a pick, then suggested keeping the custom range alone: "one calendar only to deal
+  with".
+
+**Decision:**
+- The Dates screen is the range field and its inline calendar, nothing else. No Année or
+  Mois tab, no year list, no month grid, no ‹ › stepping. This supersedes the tabs and the
+  year list of ADR-031; the rest of ADR-031 stands (a pick applies and the sheet stays
+  open, a "Dates" bubble and a chip, Effacer returns to Tout).
+- While the period is Tout the calendar selects nothing, instead of showing the last 30
+  days as if chosen.
+- The model keeps `month` and `year` periods: the address, the server and the empty-state
+  text still read them, so an old link works. Nothing in the interface produces them.
+
+**Alternatives Considered:**
+- Years as check rows, a second click clearing a month or year -> Built, then dropped for
+  this: three pickers for one job.
+- Remove `month` and `year` from the model -> Larger change across the address and
+  `list_transactions`, for no visible gain. Left as an improvement.
+
+**Consequences:**
+- A month now takes two taps on the calendar, and the whole of it is no quicker than
+  before; the author chose the simplicity.
+- The check-list years, the month grid and `TabList` on the period are gone.
+
+### ADR-031: The period is chosen in place, Tout is Effacer (2026-11-10)
+
+**Context:**
+- Trying ADR-030, the author found three things off: a pick in the period closed the
+  sheet or went back, though the sheet has a confirm button; Dates was the only bubble
+  with an icon; and Tout was a tab while Effacer exists everywhere else.
+
+**Decision:**
+- Every period pick (a year, a month, the calendar's second day, the typed dates) applies
+  and the sheet stays open, as a filter's ticks do. The footer's "Voir N résultats" closes.
+- The bubble reads "Dates", like the filter bubbles (a chevron, no icon), and a chosen
+  period shows as a chip under the row; its ✕ and "Tout effacer" return to Tout. Tout is
+  the default and has no chip. The phone's list calls the row "Dates".
+- Tout is no tab. It is the state Effacer returns to, in the period screen and in the
+  list of filters (where Effacer clears the filters and the period).
+- The years are a list from the current year back to 2000, not a grid; the months'
+  previous arrow stops at 2000. This replaces the twelve-year grid.
+
+**Alternatives Considered:**
+- Keep Tout as a tab -> The author wanted one way to empty a filter, Effacer.
+
+**Consequences:**
+- A pick no longer returns to the list on a phone; the back arrow does.
+- The years' paging keys (`previousYears`, `nextYears`) and the "Période: …" label are gone.
+
 ### ADR-030: The period joins the filters' sheet; sheets slide from the right (2026-11-10)
 
 **Context:**

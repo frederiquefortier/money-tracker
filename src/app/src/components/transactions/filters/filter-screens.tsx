@@ -2,19 +2,26 @@ import { useTranslation } from 'react-i18next'
 import { IconButton } from '#/components/display/icon-button'
 import { SearchField } from '#/components/forms/search-field'
 import { FilterList } from '#/components/transactions/filters/filter-lists'
-import type { FilterOptions } from '#/components/transactions/filters/filter-lists'
 import { PeriodPanel } from '#/components/transactions/period/period-panel'
 import { Button } from '#/components/ui/button'
 import { SheetBody, SheetFooter, SheetHead } from '#/components/ui/sheet'
 import { formatCount } from '#/lib/shared/format'
 import { useLocale } from '#/hooks/app/use-locale'
-import { FILTER_KEYS } from '#/lib/transactions/transaction-filters'
+import { FilterRoot } from '#/components/transactions/filters/filter-root'
+import {
+  FILTER_KEYS,
+  FILTER_TABS,
+} from '#/lib/transactions/transaction-filters'
 import type {
+  FilterOptions,
   FilterScreen,
   FilterTab,
   FilterValues,
 } from '#/lib/transactions/transaction-filters'
-import type { PeriodChoice } from '#/lib/transactions/transaction-list'
+import type {
+  ListFilters,
+  PeriodChoice,
+} from '#/lib/transactions/transaction-list'
 
 /** "Voir 128 résultats", or "Voir les résultats" while the count loads. */
 function ResultCount({ total }: { total: number | null }) {
@@ -81,7 +88,7 @@ function BackRow({
   )
 }
 
-/** The period in the sheet (ADR-030): a pick applies, then back to the list or closed. */
+/** The period in the sheet (ADR-032): a pick applies and stays; Effacer goes back to Tout. */
 export function PeriodScreen({
   choice,
   canGoBack,
@@ -104,18 +111,55 @@ export function PeriodScreen({
           <BackRow screen="period" onBack={onBack} />
         </SheetHead>
       )}
-      <SheetBody className="flex flex-col gap-4">
-        <PeriodPanel
-          choice={choice}
-          onChange={onPeriod}
-          onApply={(next) => {
-            onPeriod({ ...choice, ...next })
-            if (canGoBack) onBack()
-            else onClose()
-          }}
-        />
+      <SheetBody>
+        <PeriodPanel choice={choice} onChange={onPeriod} />
       </SheetBody>
-      <FilterFooter total={total} onClose={onClose} />
+      <FilterFooter
+        cleared={choice.period === 'all'}
+        total={total}
+        onClear={() => onPeriod({ ...choice, period: 'all' })}
+        onClose={onClose}
+      />
+    </>
+  )
+}
+
+/** The first level: the period and the filters with what is chosen; Effacer clears them all. */
+export function FilterListScreen({
+  screens,
+  values,
+  names,
+  period,
+  empty,
+  total,
+  onTab,
+  onClear,
+  onClose,
+}: {
+  screens: ReadonlyArray<FilterScreen>
+  values: FilterValues
+  names: ListFilters | null
+  period: PeriodChoice | null
+  empty: ReadonlySet<FilterTab> | null
+  total: number | null
+  onTab: (screen: FilterScreen) => void
+  onClear: () => void
+  onClose: () => void
+}) {
+  return (
+    <>
+      <SheetBody>
+        <FilterRoot {...{ screens, values, names, period, empty, onTab }} />
+      </SheetBody>
+      <FilterFooter
+        cleared={
+          (period?.period ?? 'all') === 'all' &&
+          FILTER_TABS.every((one) => values[FILTER_KEYS[one]].length === 0)
+        }
+        total={total}
+        onClear={onClear}
+        onClose={onClose}
+      />
     </>
   )
 }

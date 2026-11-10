@@ -12,6 +12,7 @@ import {
   DateProviders,
   FieldLabelRow,
   roundButton,
+  literalClass,
   segmentClass,
 } from '#/components/forms/calendar-sheet'
 import { Icon } from '#/components/display/icon'
@@ -75,7 +76,14 @@ export function DatePickerField({
           )}
         >
           <DateInput className="flex flex-1">
-            {(part) => <DateSegment segment={part} className={segmentClass} />}
+            {(part) => (
+              <DateSegment
+                segment={part}
+                className={
+                  part.type === 'literal' ? literalClass : segmentClass
+                }
+              />
+            )}
           </DateInput>
           {clearable && controlled && value && (
             <Button

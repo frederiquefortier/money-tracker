@@ -1,3 +1,9 @@
+import type { Category } from '#/lib/categories/category'
+import type { EventItem, EventType } from '#/lib/events/event'
+import type { Merchant } from '#/lib/merchants/merchant'
+import type { Person, PersonGroup } from '#/lib/people/person'
+import type { FormAccount } from '#/lib/transactions/transaction'
+
 // The filters of the transactions list (spec 14): the tabs and what each one holds.
 
 export type FilterValues = {
@@ -35,3 +41,14 @@ export const FILTER_KEYS = {
   people: 'personIds',
   events: 'eventIds',
 } as const satisfies Record<FilterTab, keyof FilterValues>
+
+/** What each filter can offer. */
+export type FilterOptions = {
+  accounts: Array<FormAccount>
+  categories: Array<Category>
+  merchants: Array<Merchant>
+  people: Array<Person>
+  groups: Array<PersonGroup>
+  events: Array<EventItem>
+  eventTypes: Array<EventType>
+}

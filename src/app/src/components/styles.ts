@@ -14,7 +14,7 @@ export const insetFocus = '[&_:focus-visible]:-outline-offset-2!'
 
 /** A bubble: the transactions list's period and filters, all the same height (spec 14). */
 export const chipSurface = cn(
-  'inline-flex h-8 shrink-0 items-center gap-1.5 rounded-full border border-input bg-transparent px-3 text-sm font-semibold hover:bg-secondary disabled:opacity-50',
+  'inline-flex h-8 shrink-0 items-center gap-1.5 rounded-full border border-input bg-transparent px-3 text-sm font-semibold hover:bg-secondary disabled:pointer-events-none disabled:opacity-50',
   focusRing,
 )
 
@@ -64,3 +64,11 @@ export const iconHover = {
   group:
     'relative isolate before:absolute before:-inset-1.5 before:-z-10 before:rounded-lg group-hover:before:bg-secondary',
 }
+
+// The calendar's header.
+export const pickerHeader = 'flex items-center justify-between'
+export const pickerHeading = 'font-mono font-bold capitalize'
+export const pickerNav = cn(
+  'grid size-9 shrink-0 place-items-center rounded-full text-muted-foreground hover:bg-secondary hover:text-foreground disabled:pointer-events-none disabled:opacity-40',
+  focusRing,
+)

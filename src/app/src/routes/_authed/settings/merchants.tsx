@@ -84,6 +84,7 @@ function CategoryFilter({
       <FilterBubble
         label={labelOf('categories')}
         count={picked.length}
+        disabled={categories.length === 0 && picked.length === 0}
         onOpen={() => setOpen(true)}
       />
       <FilterChips

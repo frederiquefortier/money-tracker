@@ -39,12 +39,15 @@ export function FilterRoot({
   values,
   names,
   period,
+  empty,
   onTab,
 }: {
   screens: ReadonlyArray<FilterScreen>
   values: FilterValues
   names: ListFilters | null
   period: PeriodChoice | null
+  /** Filters with nothing to choose from; they cannot open while nothing is ticked. */
+  empty: ReadonlySet<FilterScreen> | null
   onTab: (screen: FilterScreen) => void
 }) {
   const { t } = useTranslation()
@@ -56,15 +59,18 @@ export function FilterRoot({
           tab === 'period'
             ? period?.period !== 'all'
             : values[FILTER_KEYS[tab]].length > 0
+        const off = !active && (empty?.has(tab) ?? false)
         return (
           <li key={tab} className="border-b last:border-b-0">
             <button
               type="button"
+              disabled={off}
               onClick={() => onTab(tab)}
               className={cn(
                 'flex min-h-12 w-full items-center gap-3 px-4 py-2 text-left',
                 rowHover,
                 focusRing,
+                off && 'pointer-events-none opacity-50',
               )}
             >
               <span className="font-semibold">
@@ -76,9 +82,11 @@ export function FilterRoot({
                   active ? 'text-primary' : 'text-muted-foreground',
                 )}
               >
-                {summaryOf(tab)}
+                {off ? '' : summaryOf(tab)}
               </span>
-              <Icon name="chevron-right" className="text-muted-foreground" />
+              {!off && (
+                <Icon name="chevron-right" className="text-muted-foreground" />
+              )}
             </button>
           </li>
         )

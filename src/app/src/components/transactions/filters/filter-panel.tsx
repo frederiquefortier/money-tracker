@@ -1,18 +1,12 @@
 import { useEffect, useRef, useState } from 'react'
 import {
   FilterDetail,
-  FilterFooter,
+  FilterListScreen,
   PeriodScreen,
 } from '#/components/transactions/filters/filter-screens'
-import type { FilterOptions } from '#/components/transactions/filters/filter-lists'
-import { FilterRoot } from '#/components/transactions/filters/filter-root'
-import { SheetBody } from '#/components/ui/sheet'
-import {
-  FILTER_KEYS,
-  FILTER_TABS,
-  NO_FILTERS,
-} from '#/lib/transactions/transaction-filters'
+import { NO_FILTERS } from '#/lib/transactions/transaction-filters'
 import type {
+  FilterOptions,
   FilterScreen,
   FilterTab,
   FilterValues,
@@ -67,6 +61,7 @@ export function FilterPanel({
   names,
   values,
   period,
+  empty,
   total,
   onTab,
   onChange,
@@ -80,6 +75,7 @@ export function FilterPanel({
   names: ListFilters | null
   values: FilterValues
   period: PeriodChoice | null
+  empty: ReadonlySet<FilterTab> | null
   total: number | null
   onTab: (tab: FilterScreen | null) => void
   onChange: (values: FilterValues) => void
@@ -88,10 +84,11 @@ export function FilterPanel({
 }) {
   const [query, setQuery] = useState('')
   const [local, setLocal] = useLocalValues(values, onChange)
-  const back = () => {
+  const go = (next: FilterScreen | null) => {
     setQuery('')
-    onTab(null)
+    onTab(next)
   }
+  const back = () => go(null)
   if (tab === 'period' && period)
     return (
       <PeriodScreen
@@ -103,28 +100,16 @@ export function FilterPanel({
     )
   if (tab === null || tab === 'period')
     return (
-      <>
-        <SheetBody>
-          <FilterRoot
-            screens={period ? ['period', ...tabs] : tabs}
-            values={local}
-            names={names}
-            period={period}
-            onTab={(next) => {
-              setQuery('')
-              onTab(next)
-            }}
-          />
-        </SheetBody>
-        <FilterFooter
-          cleared={FILTER_TABS.every(
-            (one) => local[FILTER_KEYS[one]].length === 0,
-          )}
-          total={total}
-          onClear={() => setLocal(NO_FILTERS)}
-          onClose={onClose}
-        />
-      </>
+      <FilterListScreen
+        {...{ names, period, empty, total, onClose }}
+        screens={period ? ['period', ...tabs] : tabs}
+        values={local}
+        onTab={go}
+        onClear={() => {
+          setLocal(NO_FILTERS)
+          if (period) onPeriod({ ...period, period: 'all' })
+        }}
+      />
     )
   return (
     <FilterDetail

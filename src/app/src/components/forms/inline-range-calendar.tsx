@@ -17,7 +17,8 @@ export function InlineRangeCalendar({
   onChange,
 }: {
   label: string
-  value: DateRange
+  /** Null selects nothing. */
+  value: DateRange | null
   /** The last day that can be chosen (an ISO date). */
   maxValue?: string
   onChange: (range: DateRange) => void
@@ -26,7 +27,12 @@ export function InlineRangeCalendar({
     <DateProviders>
       <RangeCalendar
         aria-label={label}
-        value={{ start: parseDate(value.start), end: parseDate(value.end) }}
+        value={
+          value && {
+            start: parseDate(value.start),
+            end: parseDate(value.end),
+          }
+        }
         maxValue={maxValue ? parseDate(maxValue) : undefined}
         onChange={(range) =>
           onChange({ start: range.start.toString(), end: range.end.toString() })

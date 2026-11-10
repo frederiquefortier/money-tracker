@@ -17,7 +17,12 @@ import {
 } from 'react-aria-components'
 import { useTranslation } from 'react-i18next'
 import { Icon } from '#/components/display/icon'
-import { focusRing } from '#/components/styles'
+import {
+  focusRing,
+  pickerHeader,
+  pickerHeading,
+  pickerNav,
+} from '#/components/styles'
 import { useOverlayContainer } from '#/components/ui/overlay-container'
 import { DATE_FIELD_LOCALE } from '#/i18n/locales'
 import { useLocale } from '#/hooks/app/use-locale'
@@ -30,6 +35,9 @@ export const roundButton = cn(
   'grid size-8 shrink-0 place-items-center rounded-full text-muted-foreground hover:bg-secondary hover:text-foreground',
   focusRing,
 )
+
+/** The "/" between a date's numbers has no padding, so it reads 12/11/2026. */
+export const literalClass = 'px-0'
 
 export const segmentClass = cn(
   'rounded-xs px-0.5 tabular-nums outline-none',
@@ -151,12 +159,12 @@ function Day({
 export function CalendarMonthGrid({ range }: { range: boolean }) {
   return (
     <>
-      <header className="flex items-center justify-between">
-        <Button slot="previous" className={roundButton}>
+      <header className={pickerHeader}>
+        <Button slot="previous" className={pickerNav}>
           <Icon name="chevron-left" />
         </Button>
-        <Heading className="font-semibold capitalize" />
-        <Button slot="next" className={roundButton}>
+        <Heading className={pickerHeading} />
+        <Button slot="next" className={pickerNav}>
           <Icon name="chevron-right" />
         </Button>
       </header>

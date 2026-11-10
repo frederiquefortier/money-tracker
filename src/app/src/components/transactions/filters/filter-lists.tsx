@@ -8,13 +8,8 @@ import {
   merchantNodes,
 } from '#/components/forms/check-ticks'
 import { Button } from '#/components/ui/button'
-import type { Category } from '#/lib/categories/category'
-import type { EventItem, EventType } from '#/lib/events/event'
-import { NO_EVENT } from '#/lib/transactions/transaction-list'
 import { todayIso } from '#/lib/shared/format'
 import type { Merchant } from '#/lib/merchants/merchant'
-import type { Person, PersonGroup } from '#/lib/people/person'
-import type { FormAccount } from '#/lib/transactions/transaction'
 import { useFormatLocale } from '#/hooks/app/use-locale'
 import {
   useAccountTree,
@@ -23,21 +18,12 @@ import {
   usePeopleTree,
 } from '#/hooks/transactions/use-check-trees'
 import type {
+  FilterOptions,
   FilterTab,
   FilterValues,
 } from '#/lib/transactions/transaction-filters'
 
 // The filter sheet's lists, one per tab (spec 14, spec 20).
-
-export type FilterOptions = {
-  accounts: Array<FormAccount>
-  categories: Array<Category>
-  merchants: Array<Merchant>
-  people: Array<Person>
-  groups: Array<PersonGroup>
-  events: Array<EventItem>
-  eventTypes: Array<EventType>
-}
 
 function NoMatch() {
   const { t } = useTranslation()
@@ -108,7 +94,6 @@ function EventList({
   values: FilterValues
   onChange: (values: FilterValues) => void
 }) {
-  const { t } = useTranslation()
   const events = useEventTree(
     { events: options.events, types: options.eventTypes },
     query,
@@ -117,23 +102,14 @@ function EventList({
   const ticks = groupTicks(values.eventIds)
   const toggle = (node: CheckNode) =>
     onChange({ ...values, eventIds: ticks.toggle(node) })
-  const none = { id: NO_EVENT, label: t('transactions.list.noEvent') }
+  if (events.length === 0) return <NoMatch />
   return (
-    <div className="flex flex-col gap-2">
-      {!query.trim() && (
-        <CheckList nodes={[none]} stateOf={ticks.stateOf} onToggle={toggle} />
-      )}
-      {events.length === 0 && query.trim() ? (
-        <NoMatch />
-      ) : (
-        <CheckList
-          nodes={events}
-          openCount={1}
-          stateOf={ticks.stateOf}
-          onToggle={toggle}
-        />
-      )}
-    </div>
+    <CheckList
+      nodes={events}
+      openCount={1}
+      stateOf={ticks.stateOf}
+      onToggle={toggle}
+    />
   )
 }
 

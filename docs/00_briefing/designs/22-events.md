@@ -137,7 +137,7 @@ surface.
   event's name in its type's colour, with the small sparkle when the link is automatic. The transaction sheet shows the
   same.
 - **Événements** joins the list's filter sheet (`FilterSheet`) as a tab of `CheckList`:
-  "Sans événement" in a card of its own, then two cards, Événements and Événements passés
+  two cards, Événements and Événements passés
   (collapsed), with a search that lists the matches flat. The address carries `event`.
 
 ### Delete
@@ -196,7 +196,7 @@ surface.
 | Add | Ajouter un événement, Ajouter un type |
 | Event form | Nom, Type, Dates, Proches |
 | Type form | Couleur, Nom |
-| Transaction | Événement, Sans événement |
+| Transaction | Événement |
 | Delete | {count} transactions seront détachées de cet événement., Les {count} événements de ce type n'en auront plus. |
 | Empty | Aucun événement pour l'instant., Aucun type pour l'instant. |
 
