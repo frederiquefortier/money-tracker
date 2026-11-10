@@ -1,3 +1,4 @@
+import { EventPicker } from '#/components/events/event-picker'
 import { MerchantPicker } from '#/components/merchants/merchant-picker'
 import { PersonPicker } from '#/components/people/person-picker'
 import { ReimbursesField } from '#/components/transactions/form/reimburses-field'
@@ -105,6 +106,18 @@ export function TransactionDetails({
         date={draft.occurredOn}
         error={error('occurredOn')}
         onChange={(occurredOn) => onChange({ occurredOn })}
+      />
+      <EventPicker
+        events={data.events}
+        types={data.eventTypes}
+        value={draft.eventId}
+        auto={draft.eventChoice === 'auto'}
+        onChange={(eventId) =>
+          onChange({
+            eventId,
+            eventChoice: eventId === null ? 'none' : 'manual',
+          })
+        }
       />
       <NoteField value={draft.note} onChange={(note) => onChange({ note })} />
     </>

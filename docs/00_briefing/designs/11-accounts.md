@@ -73,7 +73,7 @@ ACC-01, 02, 03, 04, 05, 06, 07. ACC-08 (last reconciled, last transaction) is ph
 
 ### Sort (ACC-07)
 
-- "Trier:" menu beside the title (the shared `SortMenu`): Nom, Type, Devise, Solde −, Solde +.
+- "Trier:" menu beside the title (the shared `SortMenu`): Nom, Type, Devise, Solde croissant, Solde décroissant.
   It sorts the rows inside each group; groups stay alphabetical.
 - Balance sorts compare amounts converted to the display currency.
 - The choice is kept per browser.
@@ -171,7 +171,7 @@ The `multi_currency` account type is dropped.
 | Key | Français |
 |---|---|
 | Screen title | Comptes |
-| Sort | Nom, Type, Devise, Solde −, Solde +; Trier: {sort} (accessible name) |
+| Sort | Nom, Type, Devise, Solde croissant, Solde décroissant; Trier: {sort} (accessible name) |
 | Add buttons | Institution, Compte, Ajuster un solde (named Ajouter une institution, Ajouter un compte, Ajuster un solde) |
 | Archived section | Comptes archivés ({count}), Archivé le {date} |
 | Hidden label | Masqué des nouvelles transactions |

@@ -18,6 +18,7 @@ import type {
   TransactionError,
 } from '#/lib/transactions/transaction'
 import { isOneOf } from '#/lib/shared/collections'
+import type { EventSource } from '#/lib/events/event'
 
 type TransactionResult<T = object> = Result<TransactionError, T>
 
@@ -28,6 +29,7 @@ const failure = failureFor<TransactionError>('transactions', {
 const isKind = isOneOf(TRANSACTION_KINDS)
 const isMode = isOneOf(SPLIT_MODES)
 const isRole = isOneOf(PERSON_ROLES)
+const isEventSource = isOneOf<EventSource>(['manual', 'auto'])
 
 /** Every account, so an old transaction still shows its closed or hidden one. */
 export const getFormAccounts = createServerFn({ method: 'GET' }).handler(
@@ -114,7 +116,7 @@ export const getTransaction = createServerFn({ method: 'GET' })
     const { data: row, error } = await getSupabase()
       .from('transactions')
       .select(
-        'id, account_id, kind, occurred_on, amount::text, original_amount::text, original_currency, status, merchant_id, note, transfer_id, transaction_splits(category_id, input_mode, input_value::text, amount::text), transaction_people(id, position, role, person_id, head_count, input_mode, input_value::text, amount_unknown, fills_rest), reimbursements!reimbursements_user_id_income_id_fkey(owed_line_id)',
+        'id, account_id, kind, occurred_on, amount::text, original_amount::text, original_currency, status, merchant_id, note, transfer_id, event_id, event_source, transaction_splits(category_id, input_mode, input_value::text, amount::text), transaction_people(id, position, role, person_id, head_count, input_mode, input_value::text, amount_unknown, fills_rest), reimbursements!reimbursements_user_id_income_id_fkey(owed_line_id)',
       )
       .eq('id', data.id)
       .maybeSingle()
@@ -163,6 +165,8 @@ export const getTransaction = createServerFn({ method: 'GET' })
           : [],
       ),
       reimburses: row.reimbursements.map((r) => r.owed_line_id),
+      eventId: row.event_id,
+      eventSource: isEventSource(row.event_source) ? row.event_source : null,
     }
   })
 
@@ -196,6 +200,9 @@ export const saveTransaction = createServerFn({ method: 'POST' })
         fills_rest: p.fillsRest,
       })),
       reimburses: data.kind === 'income' ? data.reimburses : undefined,
+      event_id:
+        data.eventChoice === 'manual' ? (data.eventId ?? undefined) : undefined,
+      event_choice: data.eventChoice,
     })
     if (error) return failure('save', error)
     return { ok: true, id }

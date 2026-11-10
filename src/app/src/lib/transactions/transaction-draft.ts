@@ -51,6 +51,8 @@ export function emptyDraft(
     people: [],
     peopleMode: 'share',
     reimburses: [],
+    eventId: null,
+    eventChoice: 'auto',
   }
 }
 
@@ -124,6 +126,8 @@ export function draftFromTransaction(
       forInput(value, inAccount ? accountCurrency : null),
     ),
     reimburses: transaction.reimburses,
+    eventId: transaction.eventId,
+    eventChoice: transaction.eventSource === 'manual' ? 'manual' : 'auto',
   }
 }
 
@@ -233,6 +237,8 @@ export function validateDraft(
       peopleMode: draft.peopleMode,
       people: peopleInput(draft, accountCurrency, total),
       reimburses: draft.kind === 'income' ? draft.reimburses : [],
+      eventId: draft.eventId,
+      eventChoice: draft.eventChoice,
     },
   }
 }

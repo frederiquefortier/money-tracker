@@ -221,6 +221,140 @@ export type Database = {
         }
         Relationships: []
       }
+      event_exclusions: {
+        Row: {
+          event_id: string
+          transaction_id: string
+          user_id: string
+        }
+        Insert: {
+          event_id: string
+          transaction_id: string
+          user_id?: string
+        }
+        Update: {
+          event_id?: string
+          transaction_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_exclusions_user_id_event_id_fkey"
+            columns: ["user_id", "event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["user_id", "id"]
+          },
+          {
+            foreignKeyName: "event_exclusions_user_id_transaction_id_fkey"
+            columns: ["user_id", "transaction_id"]
+            isOneToOne: false
+            referencedRelation: "transactions"
+            referencedColumns: ["user_id", "id"]
+          },
+        ]
+      }
+      event_people: {
+        Row: {
+          event_id: string
+          person_id: string
+          user_id: string
+        }
+        Insert: {
+          event_id: string
+          person_id: string
+          user_id?: string
+        }
+        Update: {
+          event_id?: string
+          person_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_people_user_id_event_id_fkey"
+            columns: ["user_id", "event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["user_id", "id"]
+          },
+          {
+            foreignKeyName: "event_people_user_id_person_id_fkey"
+            columns: ["user_id", "person_id"]
+            isOneToOne: false
+            referencedRelation: "people"
+            referencedColumns: ["user_id", "id"]
+          },
+        ]
+      }
+      event_types: {
+        Row: {
+          color: string
+          created_at: string
+          id: string
+          name: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          color: string
+          created_at?: string
+          id?: string
+          name: string
+          updated_at?: string
+          user_id?: string
+        }
+        Update: {
+          color?: string
+          created_at?: string
+          id?: string
+          name?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      events: {
+        Row: {
+          created_at: string
+          ends_on: string | null
+          id: string
+          name: string
+          starts_on: string | null
+          type_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          ends_on?: string | null
+          id?: string
+          name: string
+          starts_on?: string | null
+          type_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Update: {
+          created_at?: string
+          ends_on?: string | null
+          id?: string
+          name?: string
+          starts_on?: string | null
+          type_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "events_user_id_type_id_fkey"
+            columns: ["user_id", "type_id"]
+            isOneToOne: false
+            referencedRelation: "event_types"
+            referencedColumns: ["user_id", "id"]
+          },
+        ]
+      }
       exchange_rates: {
         Row: {
           base: string
@@ -649,6 +783,8 @@ export type Database = {
           amount: number
           created_at: string
           currency: string
+          event_id: string | null
+          event_source: string | null
           id: string
           kind: string
           merchant_id: string | null
@@ -666,6 +802,8 @@ export type Database = {
           amount: number
           created_at?: string
           currency: string
+          event_id?: string | null
+          event_source?: string | null
           id?: string
           kind: string
           merchant_id?: string | null
@@ -683,6 +821,8 @@ export type Database = {
           amount?: number
           created_at?: string
           currency?: string
+          event_id?: string | null
+          event_source?: string | null
           id?: string
           kind?: string
           merchant_id?: string | null
@@ -696,6 +836,13 @@ export type Database = {
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "transactions_event_fk"
+            columns: ["user_id", "event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["user_id", "id"]
+          },
           {
             foreignKeyName: "transactions_user_id_account_id_currency_fkey"
             columns: ["user_id", "account_id", "currency"]
@@ -772,6 +919,13 @@ export type Database = {
           active_from: string | null
           active_to: string | null
           category_id: string | null
+        }
+        Relationships: []
+      }
+      event_usage: {
+        Row: {
+          event_id: string | null
+          transaction_count: number | null
         }
         Relationships: []
       }
@@ -884,8 +1038,17 @@ export type Database = {
         Returns: undefined
       }
       check_transfer: { Args: { transfer: string }; Returns: undefined }
+      delete_event: { Args: { event_id: string }; Returns: undefined }
       delete_transfer: { Args: { transfer_id: string }; Returns: undefined }
       empty_part_room: { Args: { transaction: string }; Returns: number }
+      event_first_day: {
+        Args: { ends: string; starts: string }
+        Returns: string
+      }
+      event_last_day: {
+        Args: { ends: string; starts: string }
+        Returns: string
+      }
       exchange_rate: {
         Args: { from_currency: string; on_date: string; to_currency: string }
         Returns: number
@@ -900,6 +1063,7 @@ export type Database = {
           account_ids?: string[]
           before?: string
           category_ids?: string[]
+          event_ids?: string[]
           from_date?: string
           max_rows?: number
           merchant_ids?: string[]
@@ -908,6 +1072,7 @@ export type Database = {
           person_ids?: string[]
           search?: string
           to_date?: string
+          without_event?: boolean
         }
         Returns: {
           account_name: string
@@ -917,6 +1082,7 @@ export type Database = {
           currency: string
           day_net: string
           display_amount: string
+          event: Json
           fee_amount: string
           fee_category: string
           from_account: string
@@ -943,6 +1109,15 @@ export type Database = {
           transfer_id: string
         }[]
       }
+      matching_event: {
+        Args: {
+          for_transaction?: string
+          ignore_exclusions?: boolean
+          on_date: string
+          tx_kind: string
+        }
+        Returns: string
+      }
       merge_merchants: {
         Args: { source: string; target: string }
         Returns: undefined
@@ -953,6 +1128,10 @@ export type Database = {
       }
       recolor_categories: { Args: { colors: Json }; Returns: undefined }
       recompute_people: { Args: { transaction: string }; Returns: undefined }
+      relink_events: {
+        Args: { from_date: string; to_date: string }
+        Returns: undefined
+      }
       save_adjustment: {
         Args: {
           account_id: string
@@ -961,6 +1140,21 @@ export type Database = {
           occurred_on: string
           real_balance: number
         }
+        Returns: string
+      }
+      save_event: {
+        Args: {
+          ends_on: string
+          event_id: string
+          name: string
+          person_ids: string[]
+          starts_on: string
+          type_id: string
+        }
+        Returns: string
+      }
+      save_event_type: {
+        Args: { color: string; name: string; type_id: string }
         Returns: string
       }
       save_person: {
@@ -980,6 +1174,8 @@ export type Database = {
         Args: {
           account_id: string
           amount: number
+          event_choice?: string
+          event_id?: string
           kind: string
           merchant_id?: string
           note?: string

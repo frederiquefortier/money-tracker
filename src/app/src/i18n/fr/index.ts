@@ -4,6 +4,7 @@ import { authFr } from './auth'
 import { categoriesFr } from './categories'
 import { commonFr } from './common'
 import { currenciesFr } from './currencies'
+import { eventsFr } from './events'
 import { merchantsFr } from './merchants'
 import { peopleFr } from './people'
 import { shellFr } from './shell'
@@ -17,6 +18,7 @@ export const fr = {
   ...currenciesFr,
   ...categoriesFr,
   ...merchantsFr,
+  ...eventsFr,
   ...peopleFr,
   ...transactionsFr,
 }

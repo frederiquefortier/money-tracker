@@ -17,3 +17,7 @@ export function useMerchantsPage() {
 export function usePeoplePage() {
   return useLoaderData({ from: '/_authed/settings/people' })
 }
+
+export function useEventsPage() {
+  return useLoaderData({ from: '/_authed/settings/events' })
+}

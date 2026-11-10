@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { CategoryBadge } from '#/components/categories/category-badge'
+import { EventTag } from '#/components/display/event-tag'
 import { Icon } from '#/components/display/icon'
 import { AvatarStack } from '#/components/people/avatars'
 import type { IconName } from '#/components/display/icon'
@@ -170,7 +171,18 @@ function RowContent({
           )}
         </span>
         <span className="flex min-w-0 flex-1 flex-col">
-          <span className="truncate font-semibold">{title}</span>
+          {/* The event's tag sits beside the name, as a label does (spec 22). */}
+          <span className="flex min-w-0 items-center gap-2">
+            <span className="min-w-0 truncate font-semibold">{title}</span>
+            {row.event && (
+              <EventTag
+                name={row.event.name}
+                color={row.event.color}
+                auto={row.event.source === 'auto'}
+                className="max-w-[45%] shrink-0"
+              />
+            )}
+          </span>
           {(details || row.people.length > 0) && (
             <span className="flex min-w-0 items-center gap-2 text-sm text-muted-foreground">
               <span className="truncate">{details}</span>

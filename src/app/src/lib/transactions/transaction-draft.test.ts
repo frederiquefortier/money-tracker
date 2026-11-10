@@ -176,6 +176,8 @@ describe('draftFromTransaction', () => {
         peopleMode: 'share',
         people: [],
         reimburses: [],
+        eventId: null,
+        eventSource: null,
       },
       'CAD',
       'fr',

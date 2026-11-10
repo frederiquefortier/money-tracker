@@ -141,3 +141,23 @@ export function siblingVariation(parent: string, index: number): string {
   const order = siblingOrder(parent)
   return order[index % order.length] ?? parent
 }
+
+export type TagColors = {
+  light: { background: string; text: string }
+  dark: { background: string; text: string }
+}
+
+/**
+ * A tag's soft pill from any hex, like a Gmail label (spec 22): the hue kept, a pale tint
+ * with dark text, or in dark mode a deep tint with pale text. Both pairs read at 4.5:1
+ * whatever the colour chosen.
+ */
+export function tagColors(hex: string): TagColors {
+  const { c, h } = hexToOklch(hex)
+  const shade = (l: number, max: number) =>
+    oklchToHex({ l, c: Math.min(c, max), h })
+  return {
+    light: { background: shade(0.94, 0.06), text: shade(0.38, 0.12) },
+    dark: { background: shade(0.32, 0.06), text: shade(0.88, 0.09) },
+  }
+}

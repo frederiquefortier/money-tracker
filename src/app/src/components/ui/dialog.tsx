@@ -3,6 +3,10 @@ import { Dialog as DialogPrimitive } from 'radix-ui'
 import { Icon } from '#/components/display/icon'
 import { cn } from '#/lib/utils'
 import { iconAction } from '#/components/styles'
+import {
+  OverlayContainerProvider,
+  inAriaOverlay,
+} from '#/components/ui/overlay-container'
 
 // shadcn's dialog, as a bottom sheet on phones and a centred card from sm up.
 function Dialog(props: React.ComponentProps<typeof DialogPrimitive.Root>) {
@@ -17,6 +21,7 @@ function DialogContent({
 }: React.ComponentProps<typeof DialogPrimitive.Content> & {
   closeLabel: string
 }) {
+  const [panel, setPanel] = React.useState<HTMLElement | null>(null)
   return (
     <DialogPrimitive.Portal>
       <DialogPrimitive.Overlay
@@ -24,6 +29,7 @@ function DialogContent({
         className="fixed inset-0 z-50 bg-black/40 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:animate-in data-[state=open]:fade-in-0"
       />
       <DialogPrimitive.Content
+        ref={setPanel}
         data-slot="dialog-content"
         className={cn(
           'fixed inset-x-0 bottom-0 z-50 flex max-h-[85dvh] flex-col gap-4 rounded-t-2xl border bg-card p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] text-card-foreground outline-none data-[state=closed]:animate-out data-[state=closed]:slide-out-to-bottom data-[state=open]:animate-in data-[state=open]:slide-in-from-bottom',
@@ -31,8 +37,15 @@ function DialogContent({
           className,
         )}
         {...props}
+        onEscapeKeyDown={(event) => {
+          // A calendar closes on its own Escape; the dialog stays.
+          if (inAriaOverlay(event.target)) return event.preventDefault()
+          props.onEscapeKeyDown?.(event)
+        }}
       >
-        {children}
+        <OverlayContainerProvider value={panel}>
+          {children}
+        </OverlayContainerProvider>
         <DialogPrimitive.Close
           className={cn(iconAction(), 'absolute top-3 right-3')}
         >

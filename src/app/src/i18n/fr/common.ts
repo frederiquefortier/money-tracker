@@ -13,6 +13,8 @@ export const commonFr = {
     suggestions: 'Suggestions pour {{label}}',
     loading: 'Chargement…',
     clear: 'Effacer',
+    chooseDates: 'Choisir les dates',
+    done: 'Terminé',
     irreversible: 'Cette action est irréversible.',
     add: 'Ajouter',
     edit: 'Modifier',

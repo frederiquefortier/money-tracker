@@ -125,13 +125,13 @@ English; this file is in English like every other meta-doc.
 
 | ID | Requirement | Source | Phase |
 |---|---|---|---|
-| EVT-01 | User-defined event types. | ai | 2 |
-| EVT-02 | An event has a name, a date (or range), a type and optional people. | v1, ai | 2 |
+| EVT-01 | User-defined event types, each with a name and a colour. | ai, author | 2 |
+| EVT-02 | An event has a name, optional dates (one day or a range), an optional type and optional people. | v1, ai | 2 |
 | EVT-03 | Transactions can be linked to an event, by hand or automatically (EVT-07). The event shows as a tag on the transaction. | v1, ai, author | 2 |
 | EVT-04 | Calendar view of events with the total spent on each. | v1, ai | 2 |
 | EVT-05 | Compare events of the same type. | ai | 2 |
 | EVT-06 | Give an event a budget and follow it live. Moved to phase 4 with the other budgets, built once on the shared `budgets` table (author, 2026-11-08). | ai, author | 4 |
-| EVT-07 | An event can carry categories. In its date range, it attaches itself to every transaction in at least one of those categories. Automatic links are marked as such and can be removed or changed by hand. | ai (was TAG-02), author | 2 |
+| EVT-07 | In its dates, an event attaches itself to every expense and income (no categories: removed 2026-11-09, the author prefers the tag taken off by hand). With no dates, only by hand. Automatic links are marked as such and can be removed or changed by hand; a removed one stays removed. | ai (was TAG-02), author | 2 |
 
 ## 10. Dashboard and reports (`DSH`)
 

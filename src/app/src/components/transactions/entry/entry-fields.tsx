@@ -1,7 +1,8 @@
 import { useId } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Combobox } from '#/components/combobox/combobox'
-import { FieldMessage, FormField } from '#/components/forms/form-field'
+import { DatePickerField } from '#/components/forms/date-picker-field'
+import { FieldMessage } from '#/components/forms/form-field'
 import { FieldLabel, fieldControl } from '#/components/ui/field'
 import { accountLabel } from '#/lib/accounts/account'
 import { compareNames } from '#/lib/shared/collections'
@@ -61,7 +62,7 @@ export function AccountPicker({
   )
 }
 
-/** TRX-01: the date, today by default. */
+/** TRX-01: the date, today by default (the shared calendar, ADR-027). */
 export function DateField({
   date,
   error,
@@ -73,14 +74,13 @@ export function DateField({
 }) {
   const { t } = useTranslation()
   return (
-    <FormField
+    <DatePickerField
       name="occurredOn"
-      type="date"
       required
       label={t('transactions.date')}
       value={date}
       error={error}
-      onChange={(event) => onChange(event.target.value)}
+      onChange={onChange}
     />
   )
 }

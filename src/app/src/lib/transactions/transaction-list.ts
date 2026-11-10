@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import type { LinkedEvent } from '#/lib/events/event'
 
 // The transactions list (spec 14): a period, its days, a page at a time.
 
@@ -60,6 +61,9 @@ export function periodRange(
 
 export type AccountName = { name: string; institution: string | null }
 
+/** In a list's event filter, the choice of transactions with no event. */
+export const NO_EVENT = 'none'
+
 export type ListedCategory = { name: string; icon: string; color: string }
 
 export type ListedPerson = {
@@ -94,6 +98,8 @@ export type ListedTransaction = {
   people: Array<ListedPerson>
   /** On an income, the expenses it pays back: merchant or category, and date. */
   reimburses: Array<{ label: string | null; date: string }>
+  /** The event it carries as a tag (spec 22). */
+  event: LinkedEvent | null
   /** As booked, in the account's currency; a transfer is unsigned in the full list. */
   amount: string
   currency: string
@@ -129,6 +135,8 @@ export type ListQuery = {
   categoryIds?: Array<string>
   merchantIds?: Array<string>
   personIds?: Array<string>
+  /** Event ids, or NO_EVENT for the transactions with none. */
+  eventIds?: Array<string>
   search?: string
   pendingOnly?: boolean
   owedOnly?: boolean
@@ -140,6 +148,7 @@ export type ListFilters = {
   categories: Array<ListedCategory & { id: string }>
   merchants: Array<{ id: string; name: string }>
   people: Array<{ id: string; name: string }>
+  events: Array<{ id: string; name: string }>
 }
 
 export type PageRow = { row: ListedTransaction; dayNet: string | null }

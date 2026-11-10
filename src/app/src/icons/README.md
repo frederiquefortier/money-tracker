@@ -27,3 +27,8 @@ After editing the list, regenerate it:
 ```
 curl -sSf "https://api.iconify.design/coolicons.json?icons=$(node -p "require('./src/icons/categories/keywords.json').map((i) => i.name).join(',')")" -o src/icons/categories/glyphs.json
 ```
+
+`categories/custom.json` holds the icons coolicons does not have, drawn in its style (24px,
+2px round strokes), so regenerating `glyphs.json` never drops them: `ring` (a wedding, an
+engagement). Their names are in `keywords.json` like the others; the curl above reports
+them as not found and the rest is unaffected.

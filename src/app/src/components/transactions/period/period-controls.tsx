@@ -1,7 +1,8 @@
 import { useId, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { FormField } from '#/components/forms/form-field'
+import { DateRangeField } from '#/components/forms/date-range-field'
 import { Icon } from '#/components/display/icon'
+import { inAriaOverlay } from '#/components/ui/overlay-container'
 import { IconButton } from '#/components/display/icon-button'
 import {
   MonthGrid,
@@ -27,8 +28,8 @@ import type {
 import { useLocale } from '#/hooks/app/use-locale'
 
 /**
- * A custom period's two days (ADR-024's native date fields). Neither goes past today,
- * and each keeps the other's side, so the range never turns around.
+ * A custom period's range (ADR-027). It cannot go past today, and the field always holds
+ * two days, so the range never turns around.
  */
 function DateRangeFields({
   choice,
@@ -39,31 +40,14 @@ function DateRangeFields({
 }) {
   const { t } = useTranslation()
   return (
-    <div className="grid grid-cols-2 gap-3">
-      <FormField
-        name="start"
-        label={t('transactions.list.start')}
-        type="date"
-        value={choice.start}
-        max={choice.end}
-        onChange={(event) => {
-          if (event.target.value)
-            onChange({ ...choice, start: event.target.value })
-        }}
-      />
-      <FormField
-        name="end"
-        label={t('transactions.list.end')}
-        type="date"
-        value={choice.end}
-        min={choice.start}
-        max={todayIso()}
-        onChange={(event) => {
-          if (event.target.value)
-            onChange({ ...choice, end: event.target.value })
-        }}
-      />
-    </div>
+    <DateRangeField
+      label={t('transactions.list.dates')}
+      value={{ start: choice.start, end: choice.end }}
+      maxValue={todayIso()}
+      onChange={(range) => {
+        if (range) onChange({ ...choice, ...range })
+      }}
+    />
   )
 }
 
@@ -198,6 +182,14 @@ export function PeriodPicker({
         <PopoverContent
           align="start"
           className="flex w-[min(22rem,calc(100vw-2rem))] flex-col gap-4"
+          // The date range's calendar is portalled outside this panel (ADR-027): a tap or
+          // an Escape in it is not this panel's.
+          onInteractOutside={(event) => {
+            if (inAriaOverlay(event.target)) event.preventDefault()
+          }}
+          onEscapeKeyDown={(event) => {
+            if (inAriaOverlay(document.activeElement)) event.preventDefault()
+          }}
         >
           <PeriodPanel
             choice={choice}

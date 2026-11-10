@@ -14,6 +14,7 @@ import { TransactionDayGroup } from '#/components/transactions/list/transaction-
 import { useTransactionPages } from '#/hooks/transactions/use-transaction-pages'
 import { formatDate, formatMonth, todayIso } from '#/lib/shared/format'
 import {
+  NO_EVENT,
   PERIOD_UNITS,
   lastThirtyDays,
   monthOf,
@@ -38,12 +39,18 @@ const KEPT = [
   'category',
   'merchant',
   'person',
+  'event',
   'q',
   'pending',
   'owed',
 ] as const
 
 const ids = z.array(z.uuid()).max(100).optional().catch(undefined)
+const eventChoices = z
+  .array(z.union([z.uuid(), z.literal(NO_EVENT)]))
+  .max(100)
+  .optional()
+  .catch(undefined)
 
 export const Route = createFileRoute('/_authed/transactions')({
   validateSearch: z.object({
@@ -56,6 +63,7 @@ export const Route = createFileRoute('/_authed/transactions')({
     category: ids,
     merchant: ids,
     person: ids,
+    event: eventChoices,
     q: z.string().max(200).optional().catch(undefined),
     pending: z.boolean().optional().catch(undefined),
     owed: z.boolean().optional().catch(undefined),
@@ -82,6 +90,7 @@ export const Route = createFileRoute('/_authed/transactions')({
       categoryIds: search.category ?? [],
       merchantIds: search.merchant ?? [],
       personIds: search.person ?? [],
+      eventIds: search.event ?? [],
       search: search.q?.trim() || undefined,
       pendingOnly,
       owedOnly,
@@ -110,7 +119,8 @@ function useEmptyText() {
     deps.accountIds.length +
     deps.categoryIds.length +
     deps.merchantIds.length +
-    deps.personIds.length
+    deps.personIds.length +
+    deps.eventIds.length
   if (deps.search || filtered || deps.pendingOnly || deps.owedOnly)
     return t('common.noMatch')
   if (period === 'month')
@@ -172,6 +182,7 @@ function useListNavigation() {
           category: f.categoryIds.length ? f.categoryIds : undefined,
           merchant: f.merchantIds.length ? f.merchantIds : undefined,
           person: f.personIds.length ? f.personIds : undefined,
+          event: f.eventIds.length ? f.eventIds : undefined,
         }),
       }),
     search: (text: string) =>

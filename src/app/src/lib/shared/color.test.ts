@@ -6,6 +6,7 @@ import {
   iconColor,
   oklchToHex,
   siblingVariation,
+  tagColors,
 } from '#/lib/shared/color'
 
 describe('OKLCH and hex', () => {
@@ -64,5 +65,26 @@ describe('siblingVariation', () => {
   it('repeats only after every distinct colour is used', () => {
     const siblings = siblingsOf('#c30839')
     expect(siblingVariation('#c30839', siblings.length)).toBe(siblings[0])
+  })
+})
+
+describe('tagColors', () => {
+  const hexes = [
+    '#e11d48',
+    '#f59e0b',
+    '#16a34a',
+    '#3b82f6',
+    '#a855f7',
+    '#fde047',
+    '#111111',
+    '#ffffff',
+  ]
+
+  it('keeps text readable on its tint in both modes', () => {
+    for (const hex of hexes) {
+      const { light, dark } = tagColors(hex)
+      expect(contrast(light.background, light.text)).toBeGreaterThanOrEqual(4.5)
+      expect(contrast(dark.background, dark.text)).toBeGreaterThanOrEqual(4.5)
+    }
   })
 })

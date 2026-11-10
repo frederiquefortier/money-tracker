@@ -5,6 +5,7 @@ export type FilterValues = {
   categoryIds: Array<string>
   merchantIds: Array<string>
   personIds: Array<string>
+  eventIds: Array<string>
 }
 
 export const FILTER_TABS = [
@@ -12,6 +13,7 @@ export const FILTER_TABS = [
   'categories',
   'merchants',
   'people',
+  'events',
 ] as const
 export type FilterTab = (typeof FILTER_TABS)[number]
 
@@ -20,4 +22,5 @@ export const FILTER_KEYS = {
   categories: 'categoryIds',
   merchants: 'merchantIds',
   people: 'personIds',
+  events: 'eventIds',
 } as const satisfies Record<FilterTab, keyof FilterValues>

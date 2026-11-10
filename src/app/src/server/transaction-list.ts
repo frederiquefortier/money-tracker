@@ -3,7 +3,11 @@ import { z } from 'zod'
 import type { Database } from '#/lib/db/database'
 import { loaded } from '#/lib/server/db.server'
 import { getSupabase } from '#/lib/server/supabase.server'
-import { LISTED_KINDS, groupByDay } from '#/lib/transactions/transaction-list'
+import {
+  LISTED_KINDS,
+  NO_EVENT,
+  groupByDay,
+} from '#/lib/transactions/transaction-list'
 import type {
   ListFilters,
   PageRow,
@@ -20,6 +24,10 @@ const listInput = z.object({
   categoryIds: z.array(z.uuid()).max(100).optional(),
   merchantIds: z.array(z.uuid()).max(100).optional(),
   personIds: z.array(z.uuid()).max(100).optional(),
+  eventIds: z
+    .array(z.union([z.uuid(), z.literal(NO_EVENT)]))
+    .max(100)
+    .optional(),
   search: z.string().trim().max(200).optional(),
   pendingOnly: z.boolean().optional(),
   owedOnly: z.boolean().optional(),
@@ -42,6 +50,15 @@ const peopleSchema = z.array(
 const reimbursesSchema = z.array(
   z.object({ label: z.string().nullable(), date: z.string() }),
 )
+
+const eventSchema = z
+  .object({
+    id: z.uuid(),
+    name: z.string(),
+    color: z.string().nullable(),
+    source: z.enum(['manual', 'auto']),
+  })
+  .nullable()
 
 type ListRow =
   Database['public']['Functions']['list_transactions']['Returns'][number]
@@ -70,6 +87,7 @@ function toPageRow(r: ListRow): Array<PageRow> {
         categories: categories.success ? categories.data : [],
         people: peopleSchema.safeParse(r.people).data ?? [],
         reimburses: reimbursesSchema.safeParse(r.reimburses).data ?? [],
+        event: eventSchema.safeParse(r.event).data ?? null,
         amount: r.amount,
         currency: r.currency,
         displayAmount: r.display_amount,
@@ -118,8 +136,10 @@ async function filterNames(
     categoryIds = [],
     merchantIds = [],
     personIds = [],
+    eventIds = [],
   } = data
-  const [accounts, categories, merchants, people] = loaded(
+  const named = eventIds.filter((id) => id !== NO_EVENT)
+  const [accounts, categories, merchants, people, events] = loaded(
     'Filters',
     ...(await Promise.all([
       accountIds.length
@@ -140,6 +160,9 @@ async function filterNames(
       personIds.length
         ? supabase.from('people').select('id, name').in('id', personIds)
         : none,
+      named.length
+        ? supabase.from('events').select('id, name').in('id', named)
+        : none,
     ])),
   )
   return {
@@ -151,6 +174,7 @@ async function filterNames(
     categories,
     merchants,
     people,
+    events,
   }
 }
 
@@ -180,6 +204,8 @@ export const listTransactions = createServerFn({ method: 'GET' })
           category_ids: data.categoryIds,
           merchant_ids: data.merchantIds,
           person_ids: data.personIds,
+          event_ids: data.eventIds?.filter((id) => id !== NO_EVENT),
+          without_event: data.eventIds?.includes(NO_EVENT),
           search: data.search || undefined,
           pending_only: data.pendingOnly,
           owed_only: data.owedOnly,

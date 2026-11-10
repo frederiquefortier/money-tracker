@@ -3,6 +3,7 @@ import { noteSchema } from '#/lib/shared/validation'
 import type { Category } from '#/lib/categories/category'
 import { currencyCodeSchema } from '#/lib/currencies/currency'
 import type { Merchant } from '#/lib/merchants/merchant'
+import type { EventItem, EventSource, EventType } from '#/lib/events/event'
 import type { Person, PersonGroup } from '#/lib/people/person'
 
 // Shared by the transaction form (spec 15) and its server functions.
@@ -12,6 +13,13 @@ export type PersonRole = (typeof PERSON_ROLES)[number]
 
 export const TRANSACTION_KINDS = ['expense', 'income'] as const
 export type TransactionKind = (typeof TRANSACTION_KINDS)[number]
+
+/**
+ * How the event is set (spec 22): auto follows the rule, manual is the one chosen, none
+ * was cleared by hand, which the rule then remembers.
+ */
+export const EVENT_CHOICES = ['auto', 'manual', 'none'] as const
+export type EventChoice = (typeof EVENT_CHOICES)[number]
 
 export const SPLIT_MODES = ['amount', 'share', 'percent'] as const
 export type SplitMode = (typeof SPLIT_MODES)[number]
@@ -38,6 +46,8 @@ export type TransactionFormData = {
   groups: Array<PersonGroup>
   /** The people most often on transactions lately, most first (spec 20). */
   frequentPeople: Array<string>
+  events: Array<EventItem>
+  eventTypes: Array<EventType>
 }
 
 /** A saved expense or income as the form loads it; amounts signed, as stored. */
@@ -69,6 +79,8 @@ export type Transaction = {
   }>
   /** On an income, the owed lines it pays back, in order (spec 21). */
   reimburses: Array<string>
+  eventId: string | null
+  eventSource: EventSource | null
 }
 
 export const positiveDecimal = z
@@ -108,6 +120,8 @@ export const transactionInputSchema = z
       )
       .max(100),
     reimburses: z.array(z.uuid()).max(50),
+    eventId: z.uuid().nullable(),
+    eventChoice: z.enum(EVENT_CHOICES),
   })
   .refine((t) => (t.originalAmount === null) === (t.originalCurrency === null))
 export type TransactionInput = z.input<typeof transactionInputSchema>

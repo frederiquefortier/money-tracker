@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ConfirmDialog } from '#/components/feedback/confirm-dialog'
-import { FormField } from '#/components/forms/form-field'
+import { DatePickerField } from '#/components/forms/date-picker-field'
 import { useServerAction } from '#/hooks/app/use-server-action'
 import type { ServerActionOptions } from '#/hooks/app/use-server-action'
 import { todayIso } from '#/lib/shared/format'
@@ -37,13 +37,12 @@ export function ArchiveDialog({
         run(() => onArchive(date), { onResult: onClose, failureText })
       }
     >
-      <FormField
+      <DatePickerField
         name="archivedOn"
-        type="date"
         required
         label={dateLabel}
         value={date}
-        onChange={(event) => setDate(event.target.value)}
+        onChange={setDate}
       />
     </ConfirmDialog>
   )

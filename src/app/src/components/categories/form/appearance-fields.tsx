@@ -1,6 +1,9 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { CategoryBadge } from '#/components/categories/category-badge'
+import {
+  CategoryBadge,
+  CategoryIcon,
+} from '#/components/categories/category-badge'
 import { IconPicker } from '#/components/categories/form/icon-picker'
 import { EditHint } from '#/components/forms/edit-hint'
 import type { CategoryDraft } from '#/hooks/categories/use-category-draft'
@@ -10,8 +13,20 @@ import { iconColor } from '#/lib/shared/color'
 import { cn } from '#/lib/utils'
 import { focusRing } from '#/components/styles'
 
+/** What the icon and colour fields need: a category's draft, or an event type's. */
+export type Appearance = Pick<
+  CategoryDraft,
+  | 'icon'
+  | 'color'
+  | 'suggestedIcon'
+  | 'canResetColor'
+  | 'pickIcon'
+  | 'pickColor'
+  | 'resetColor'
+>
+
 /** The icon in its colour circle; tapping it opens the picker (CAT-07). */
-function IconButton({ draft }: { draft: CategoryDraft }) {
+function IconButton({ draft }: { draft: Appearance }) {
   const { t } = useTranslation()
   const [picking, setPicking] = useState(false)
   return (
@@ -41,10 +56,6 @@ function IconButton({ draft }: { draft: CategoryDraft }) {
     </>
   )
 }
-
-// Any colour: a full rainbow until a custom colour is picked, then a ring around it.
-const RAINBOW =
-  'conic-gradient(oklch(0.65 0.2 0), oklch(0.75 0.17 90), oklch(0.65 0.17 150), oklch(0.6 0.15 230), oklch(0.55 0.2 300), oklch(0.65 0.2 360))'
 
 const selected = 'ring-2 ring-foreground ring-offset-2 ring-offset-card'
 
@@ -88,36 +99,40 @@ function Swatch({
   )
 }
 
-/** The browser's own colour picker, as the last circle. */
+/**
+ * The browser's own colour picker, as the last circle: an empty dashed circle with a
+ * paintbrush, and a plus on hover (like the other round add buttons), until a colour of
+ * its own is picked, then that colour, selected like the quick picks and with a pencil on
+ * hover. The real colour input lies invisibly over it.
+ */
 function CustomColor({
   draft,
   isSwatch,
 }: {
-  draft: CategoryDraft
+  draft: Pick<Appearance, 'color' | 'pickColor'>
   isSwatch: boolean
 }) {
   const { t } = useTranslation()
   return (
     <span
       className={cn(
-        'aspect-square rounded-full p-[3px]',
+        'group relative grid aspect-square place-items-center rounded-full transition-colors',
         'has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-ring',
-        !isSwatch && selected,
+        isSwatch
+          ? 'border-2 border-dashed border-primary/40 text-primary/60 hover:border-primary hover:text-primary'
+          : selected,
       )}
-      style={{ background: RAINBOW }}
+      style={isSwatch ? undefined : { backgroundColor: draft.color }}
     >
+      {isSwatch && <CategoryIcon icon="brush" className="size-4" />}
+      <EditHint size="xs" icon={isSwatch ? 'plus' : 'pencil'} />
       <input
         type="color"
         aria-label={t('categories.customColor')}
         title={t('categories.customColor')}
         value={draft.color}
         onChange={(event) => draft.pickColor(event.target.value)}
-        className={cn(
-          'block size-full cursor-pointer appearance-none rounded-full border-0 bg-transparent p-0 outline-none',
-          '[&::-webkit-color-swatch-wrapper]:p-0 [&::-webkit-color-swatch]:rounded-full [&::-webkit-color-swatch]:border-0',
-          '[&::-moz-color-swatch]:rounded-full [&::-moz-color-swatch]:border-0',
-          isSwatch && 'opacity-0',
-        )}
+        className="absolute inset-0 size-full cursor-pointer opacity-0"
       />
     </span>
   )
@@ -128,22 +143,27 @@ function CustomColor({
  * by hand (spec 12). `used` holds the quick picks other top-level categories of the same
  * type already have.
  */
-function ColorGrid({
+export function ColorGrid({
   draft,
   used,
+  swatches,
 }: {
-  draft: CategoryDraft
+  draft: Pick<
+    Appearance,
+    'color' | 'canResetColor' | 'pickColor' | 'resetColor'
+  >
   used: ReadonlySet<string>
+  swatches: ReadonlyArray<{ key: string; hex: string }>
 }) {
   const { t } = useTranslation()
-  const isSwatch = SWATCHES.some((swatch) => swatch.hex === draft.color)
+  const isSwatch = swatches.some((swatch) => swatch.hex === draft.color)
   return (
     <div
       role="group"
       aria-label={t('categories.color')}
       className="grid flex-1 grid-cols-11 gap-1.5"
     >
-      {SWATCHES.map((swatch, i) => (
+      {swatches.map((swatch, i) => (
         <Swatch
           key={swatch.key}
           hex={swatch.hex}
@@ -176,14 +196,17 @@ function ColorGrid({
 export function AppearanceFields({
   draft,
   used,
+  swatches = SWATCHES,
 }: {
-  draft: CategoryDraft
+  draft: Appearance
   used: ReadonlySet<string>
+  /** The quick picks; the categories' own by default. */
+  swatches?: ReadonlyArray<{ key: string; hex: string }>
 }) {
   return (
     <div className="flex items-center gap-4">
       <IconButton draft={draft} />
-      <ColorGrid draft={draft} used={used} />
+      <ColorGrid draft={draft} used={used} swatches={swatches} />
     </div>
   )
 }

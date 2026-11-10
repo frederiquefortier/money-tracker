@@ -15,6 +15,8 @@ export const commonEn: typeof commonFr = {
     suggestions: 'Suggestions for {{label}}',
     loading: 'Loading…',
     clear: 'Clear',
+    chooseDates: 'Choose dates',
+    done: 'Done',
     irreversible: 'This cannot be undone.',
     add: 'Add',
     edit: 'Edit',

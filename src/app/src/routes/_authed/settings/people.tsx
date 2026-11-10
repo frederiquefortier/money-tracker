@@ -4,10 +4,8 @@ import { useTranslation } from 'react-i18next'
 import { FloatingAddButton } from '#/components/layout/floating-add-button'
 import { EmptyState, ListCard } from '#/components/lists/list-card'
 import { ListPage } from '#/components/layout/list-page'
-import {
-  ArchivedOn,
-  ArchivedPeople,
-} from '#/components/people/list/archived-people'
+import { ArchivedOn } from '#/components/people/list/archived-on'
+import { CollapsedSection } from '#/components/lists/collapsed-section'
 import { PeopleRow } from '#/components/people/list/people-row'
 import { SearchField } from '#/components/forms/search-field'
 import { SortMenu } from '#/components/lists/sort-menu'
@@ -148,12 +146,12 @@ function TabPanel<T extends { name: string; archivedOn: string | null }>({
     <>
       {active.length > 0 && <ListCard>{rows(active)}</ListCard>}
       {archived.length > 0 && (
-        <ArchivedPeople
+        <CollapsedSection
           label={archivedLabel(archived.length)}
           storageKey={storageKey}
         >
           {rows(archived)}
-        </ArchivedPeople>
+        </CollapsedSection>
       )}
     </>
   )

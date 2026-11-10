@@ -43,11 +43,13 @@ function onlyPicked(tab: FilterTab, names: ListFilters | null) {
       ),
     }
   }
-  if (tab === 'merchants' && names?.merchants.length === 1)
-    return { name: names.merchants[0].name }
-  if (tab === 'people' && names?.people.length === 1)
-    return { name: names.people[0].name }
-  return null
+  const plain = {
+    merchants: names?.merchants,
+    people: names?.people,
+    events: names?.events,
+  }
+  const list = tab in plain ? plain[tab as keyof typeof plain] : undefined
+  return list?.length === 1 ? { name: list[0].name } : null
 }
 
 /**

@@ -3,6 +3,10 @@ import { Dialog as SheetPrimitive } from 'radix-ui'
 import { Icon } from '#/components/display/icon'
 import { cn } from '#/lib/utils'
 import { iconAction } from '#/components/styles'
+import {
+  OverlayContainerProvider,
+  inAriaOverlay,
+} from '#/components/ui/overlay-container'
 
 // Based on shadcn's sheet: full screen on phones, a panel from the right from md up (from
 // the left with side="left", sliding in from there at every width), its animations in
@@ -32,13 +36,19 @@ function SheetContent({
   onCloseAutoFocus?: (event: Event) => void
   onEscapeKeyDown?: (event: KeyboardEvent) => void
 }) {
+  const [panel, setPanel] = React.useState<HTMLElement | null>(null)
   return (
     <SheetPrimitive.Portal>
       <SheetPrimitive.Overlay className="sheet-overlay fixed inset-0 z-50 bg-black/40" />
       <SheetPrimitive.Content
+        ref={setPanel}
         aria-describedby={undefined}
         onCloseAutoFocus={onCloseAutoFocus}
-        onEscapeKeyDown={onEscapeKeyDown}
+        onEscapeKeyDown={(event) => {
+          // A calendar closes on its own Escape; the sheet stays.
+          if (inAriaOverlay(event.target)) return event.preventDefault()
+          onEscapeKeyDown?.(event)
+        }}
         className={cn(
           'sheet-panel fixed inset-0 z-50 flex flex-col bg-card text-card-foreground outline-none md:w-full md:max-w-md',
           side === 'left'
@@ -57,7 +67,9 @@ function SheetContent({
             <Icon name="close" label={closeLabel} className="size-5" />
           </SheetPrimitive.Close>
         </header>
-        {children}
+        <OverlayContainerProvider value={panel}>
+          {children}
+        </OverlayContainerProvider>
       </SheetPrimitive.Content>
     </SheetPrimitive.Portal>
   )

@@ -15,6 +15,7 @@ import {
   suggestIcon,
 } from '#/lib/categories/category'
 import categoryGlyphs from '#/icons/categories/glyphs.json'
+import customGlyphs from '#/icons/categories/custom.json'
 
 const category = (
   id: string,
@@ -48,7 +49,9 @@ describe('the icon list', () => {
 
   it('has a drawing for every icon', () => {
     for (const icon of CATEGORY_ICONS)
-      expect(categoryGlyphs.icons).toHaveProperty(icon.name)
+      expect({ ...categoryGlyphs.icons, ...customGlyphs.icons }).toHaveProperty(
+        icon.name,
+      )
   })
 })
 

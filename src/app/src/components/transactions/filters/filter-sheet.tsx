@@ -15,6 +15,7 @@ import {
 import { formatCount } from '#/lib/shared/format'
 import { useLocale } from '#/hooks/app/use-locale'
 import { getCategories } from '#/server/categories'
+import { getEvents } from '#/server/events'
 import { getMerchants } from '#/server/merchants'
 import { getPeople } from '#/server/people'
 import { getFormAccounts } from '#/server/transactions'
@@ -40,9 +41,17 @@ function useOptions(open: boolean) {
       getCategories(),
       getMerchants(),
       getPeople(),
+      getEvents(),
     ])
-      .then(([accounts, categories, merchants, people]) =>
-        setOptions({ accounts, categories, merchants, ...people }),
+      .then(([accounts, categories, merchants, people, events]) =>
+        setOptions({
+          accounts,
+          categories,
+          merchants,
+          ...people,
+          events: events.events,
+          eventTypes: events.types,
+        }),
       )
       .catch(() => toast({ text: t('common.genericError') }))
   }, [open, options, toast, t])

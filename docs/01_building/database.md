@@ -232,16 +232,22 @@ went to events (EVT-07). Kept as the draft for when they come back.
 | `person_aliases` | `person_id`, `alias` | PPL-06. Built 2026-11-05. Unique per user on `fold_name(alias)`. Triggers refuse an alias equal to any person's name or another alias, and a name equal to an alias, so an import match points to one person. Written by `save_person`, which replaces the list; deleted with the person. |
 | `person_group_members` | `group_id`, `person_id` | PPL-01. Composite keys with `user_id` to both (ADR-005), deleted with either side. Written with the person or the group by `save_person` and `save_person_group` (ADR-012). |
 | `transaction_people` | `transaction_id`, `position`, `role` (`me`/`invited`/`owes`/`from`), `person_id` (null for Moi and lines without a name), `head_count`, `input_mode`, `input_value`, `amount` (null on an unknown part), `amount_unknown`, `fills_rest` (spec 21) | PPL-03, 04. Built 2026-11-05 (spec 20). A group is never a line, only its members. One Moi per expense; an income only `from`; a person once per transaction; the parts sum to the amount (deferred constraint trigger, also run when the transaction changes). Deleting a person keeps their lines without a name. Written by `save_transaction` with the splits. View `person_usage` counts each person's transactions. The share comes off each split proportionally (Q5); view `my_split_amounts` gives "my share per category", which the dashboard uses by default. |
-| `event_types` | `name`, `icon` | EVT-01 |
-| `events` | `type_id`, `name`, `starts_on`, `ends_on` | EVT-02 |
-| `event_people` | `event_id`, `person_id` | EVT-02 |
-| `event_categories` | `event_id`, `category_id` | EVT-07 |
+| `event_types` | `name`, `color` (hex `#rrggbb`, free choice; the icon was dropped 2026-11-09) | EVT-01. Names unique ignoring case and accents. Deleting one sets `events.type_id` to null. |
+| `events` | `type_id` (nullable), `name`, `starts_on`, `ends_on` (both nullable: no end is one day, no start is open on that side) | EVT-02. No archive: an event is past once its end date has passed (spec 22). |
+| `event_people` | `event_id`, `person_id` | EVT-02. Kept apart from `transaction_people`. |
+| `event_exclusions` | `event_id`, `transaction_id` | EVT-07. An automatic link removed by hand; recomputing never restores it, and choosing the event by hand deletes the row. |
 
 A transaction has one event (`transactions.event_id`) and `event_source`
-(`manual`/`auto`). Automatic links are recomputed when an event's range or categories
-change, and for one transaction when its date or splits change; a manual link is never
-touched. To settle with the spec: two automatic events matching the same transaction, and
-how removing an automatic link by hand keeps it from coming back.
+(`manual`/`auto`). Automatic links are recomputed when an event's dates change, and for one
+transaction when its date or kind changes; a manual link is never
+touched. Only expenses and incomes carry an event. Two automatic events matching the same
+transaction: the narrower range wins, then the earlier created. A link removed by hand is
+kept from coming back by `event_exclusions` (designs/22-events.md). Built 2026-11-09
+(migration `events`, pgTAP `16_events`): view `event_usage`; `matching_event`,
+`event_first_day`, `event_last_day`, `relink_events`, `save_event`, `save_event_type`, `delete_event`;
+`save_transaction` and `list_transactions` carry the event. `event_source` is read only
+while `event_id` is set. The table `event_categories` and the Sauf flag existed for a few hours on
+2026-11-09 and were dropped (migration `events_without_categories`).
 
 ### Budget
 

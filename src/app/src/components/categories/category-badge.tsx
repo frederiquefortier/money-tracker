@@ -2,9 +2,11 @@ import { Icon as Iconify, addCollection } from '@iconify/react/offline'
 import { iconColor } from '#/lib/shared/color'
 import { cn } from '#/lib/utils'
 import categoryGlyphs from '#/icons/categories/glyphs.json'
+import customGlyphs from '#/icons/categories/custom.json'
 
 // The picker's icons load with the category components only (ADR-020).
 addCollection(categoryGlyphs)
+addCollection(customGlyphs)
 
 const SIZES = {
   sm: 'size-7 [&_svg]:size-4',

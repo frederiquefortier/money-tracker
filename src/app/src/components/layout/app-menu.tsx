@@ -15,6 +15,7 @@ const SCREENS = [
   { to: '/settings/categories', label: 'settings.categories', icon: 'tags' },
   { to: '/settings/merchants', label: 'settings.merchants', icon: 'store' },
   { to: '/settings/people', label: 'settings.people', icon: 'users' },
+  { to: '/settings/events', label: 'settings.events', icon: 'calendar' },
   { to: '/settings/currencies', label: 'settings.currencies', icon: 'coins' },
 ] as const satisfies ReadonlyArray<{
   to: string

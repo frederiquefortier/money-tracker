@@ -13,6 +13,13 @@ export const FORMAT_LOCALE: Record<Locale, string> = {
   en: 'en-CA',
 }
 
+// Typed dates read day, month, year with slashes in both languages (jj/mm/aaaa,
+// dd/mm/yyyy), whichever region ADR-019 formats the rest in (decided 2026-11-09).
+export const DATE_FIELD_LOCALE: Record<Locale, string> = {
+  fr: 'fr-FR',
+  en: 'en-GB',
+}
+
 /** Reference rows carry both labels (`_fr` and `_en` columns). */
 export function inLocale<T>(locale: Locale, fr: T, en: T): T {
   return locale === 'fr' ? fr : en

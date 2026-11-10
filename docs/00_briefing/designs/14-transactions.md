@@ -61,8 +61,9 @@ From `md` up: the same list, centred, at most 48rem wide.
 - The bubble opens a popover: the four periods as the shared tabs (`TabList`: Tout,
   Année, Mois, Personnalisée), over the year grid (twelve years ending with the current
   one, filled column by column so they follow one another down each, arrows to earlier
-  ones), the month grid (a year with arrows over its twelve months), or two date
-  fields, Du and Au (native, ADR-024). Each tab is as wide as its label, so
+  ones), the month grid (a year with arrows over its twelve months), or the date
+  range field (ADR-027), whose calendar comes up from the bottom of the page, half its
+  height, over a dim backdrop. Each tab is as wide as its label, so
   Personnalisée fits on a phone. Nothing after the current year, month or day can
   be picked, and the two days never cross. Tout applies and closes; a year or month
   applies and closes; Personnalisée applies at once on the last 30 days, the dates as

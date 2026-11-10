@@ -13,6 +13,7 @@ import type {
   FormAccount,
   TransactionFormData,
 } from '#/lib/transactions/transaction'
+import { useMatchedEvent } from '#/hooks/transactions/use-matched-event'
 import { useMyCurrencies } from '#/hooks/currencies/use-my-currencies'
 import { useRate } from '#/hooks/currencies/use-rate'
 import { saveTransaction } from '#/server/transactions'
@@ -41,7 +42,10 @@ function useDraft(
     markChanged()
     setDraft((d) => ({ ...d, ...changes }))
   }
-  return { draft, update, accountCurrency, rate }
+  // The rule's answer is not an edit: it must not mark the form changed.
+  const setEvent = (eventId: string | null) =>
+    setDraft((d) => (d.eventId === eventId ? d : { ...d, eventId }))
+  return { draft, update, setEvent, accountCurrency, rate }
 }
 
 function useSubmit({
@@ -146,10 +150,11 @@ export function TransactionForm({
   const { currencies } = useMyCurrencies()
   const panelId = useId()
   const [layer, setLayer] = useState<Layer | null>(null)
-  const { draft, update, accountCurrency, rate } = useDraft(
+  const { draft, update, setEvent, accountCurrency, rate } = useDraft(
     initial,
     data.accounts,
   )
+  useMatchedEvent(draft, id, setEvent)
   const check = () =>
     validateDraft(draft, { id, accountCurrency, rate: rate ?? null })
   const [state, submit, pending] = useSubmit({ check, savedText, onSaved })

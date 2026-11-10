@@ -1,0 +1,10 @@
+{
+  "prefix": "coolicons",
+  "width": 24,
+  "height": 24,
+  "icons": {
+    "ring": {
+      "body": "<g fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\"><circle cx=\"12\" cy=\"15.5\" r=\"5.5\"/><path d=\"m9.5 3.5-1.5 3L12 10l4-3.5-1.5-3Z\"/></g>"
+    }
+  }
+}

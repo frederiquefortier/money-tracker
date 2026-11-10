@@ -8,6 +8,8 @@ type SaveTransfer = Public['Functions']['save_transfer']
 type SaveAdjustment = Public['Functions']['save_adjustment']
 type SavePerson = Public['Functions']['save_person']
 type SavePersonGroup = Public['Functions']['save_person_group']
+type SaveEvent = Public['Functions']['save_event']
+type SaveEventType = Public['Functions']['save_event_type']
 
 // The generator types numeric as number. Amounts travel as text (ADR-004).
 type WithTextAmount<T> = Omit<T, 'opening_balance'> & {
@@ -56,6 +58,20 @@ type SavePersonGroupArgs = Omit<SavePersonGroup['Args'], 'group_id'> & {
   group_id: string | null
 }
 
+// A null id creates the event or the type; an event has no type or end date at will.
+type SaveEventArgs = Omit<
+  SaveEvent['Args'],
+  'event_id' | 'type_id' | 'starts_on' | 'ends_on'
+> & {
+  event_id: string | null
+  type_id: string | null
+  starts_on: string | null
+  ends_on: string | null
+}
+type SaveEventTypeArgs = Omit<SaveEventType['Args'], 'type_id'> & {
+  type_id: string | null
+}
+
 // The generator types a SQL function's columns as never null.
 type ListedRow = ListTransactions['Returns'][number]
 type NullableListed =
@@ -76,6 +92,7 @@ type NullableListed =
   | 'received_currency'
   | 'received_value'
   | 'conversion_cost'
+  | 'event'
 type ListTransactionsRow = Omit<ListedRow, NullableListed> & {
   [K in NullableListed]: ListedRow[K] | null
 }
@@ -96,6 +113,8 @@ export type Database = Omit<Generated, 'public'> & {
       | 'save_adjustment'
       | 'save_person'
       | 'save_person_group'
+      | 'save_event'
+      | 'save_event_type'
       | 'list_transactions'
     > & {
       save_transaction: Omit<SaveTransaction, 'Args'> & {
@@ -110,6 +129,10 @@ export type Database = Omit<Generated, 'public'> & {
       save_person: Omit<SavePerson, 'Args'> & { Args: SavePersonArgs }
       save_person_group: Omit<SavePersonGroup, 'Args'> & {
         Args: SavePersonGroupArgs
+      }
+      save_event: Omit<SaveEvent, 'Args'> & { Args: SaveEventArgs }
+      save_event_type: Omit<SaveEventType, 'Args'> & {
+        Args: SaveEventTypeArgs
       }
       list_transactions: Omit<ListTransactions, 'Returns'> & {
         Returns: Array<ListTransactionsRow>

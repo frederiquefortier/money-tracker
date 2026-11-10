@@ -1,5 +1,9 @@
 import type { PersonLine } from '#/lib/transactions/transaction-people'
-import type { SplitMode, TransactionKind } from '#/lib/transactions/transaction'
+import type {
+  EventChoice,
+  SplitMode,
+  TransactionKind,
+} from '#/lib/transactions/transaction'
 
 // What the transaction form holds while it is being filled (spec 15).
 
@@ -31,6 +35,9 @@ export type TransactionDraft = {
   peopleMode: SplitMode
   /** An income's owed lines it pays back, in order (spec 21). */
   reimburses: Array<string>
+  /** The event shown in the field, and how it got there (spec 22). */
+  eventId: string | null
+  eventChoice: EventChoice
 }
 
 /** How a part of the form hands its changes up to the draft. */

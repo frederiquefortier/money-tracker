@@ -4,6 +4,64 @@ Document architectural choices with context, alternatives considered, and trade-
 
 <!-- Newest first: a new ADR goes directly below this line. Template at the bottom. -->
 
+### ADR-028: Every date field uses the shared calendar (2026-11-09)
+
+**Context:**
+- ADR-027 kept single dates native and put only ranges on react-aria's calendar. The
+  author, seeing the range field, asked that all date fields use "our calendar".
+
+**Decision:**
+- One calendar for every date: `DatePickerField` (one date) and `DateRangeField` (a range),
+  both on `calendar-sheet.tsx`: typed segments, and a calendar rising from the bottom of
+  the sheet or dialog the field is in (the page outside both), with a dim backdrop. No
+  `<input type="date">` remains. This supersedes ADR-024 and the single-date exception of
+  ADR-027.
+- Typed dates read day, month, year with slashes in both languages (jj/mm/aaaa,
+  dd/mm/yyyy), through `DATE_FIELD_LOCALE`; the rest of the app keeps ADR-019's Canadian
+  formats. A range's band has no gap between its days.
+- Sheets and dialogs both hand their panel to the calendar (`OverlayContainerProvider`),
+  and ignore the Escape that closes it, so it stays inside Radix's focus and pointer scope.
+
+**Alternatives Considered:**
+- Native for one date, the calendar for ranges (ADR-027) -> Two looks for the same job.
+
+**Consequences:**
+- Forms that read their fields from `FormData` keep working: the field has a hidden input
+  with the ISO date. A field no longer revalidates on blur; it validates on submit.
+- In the small confirmation dialogs the calendar rises above the dialog, at the height
+  the month needs.
+
+### ADR-027: Date ranges use react-aria's range picker (2026-11-09)
+
+**Context:**
+- ADR-024 put dates back to `<input type="date">` after a shadcn calendar could not jump
+  to a month or a year, and said a later date picker needs a direct month and year choice
+  to be worth it.
+- The event form needs optional dates as one range (EVT-02), and the author asked for a
+  calendar that rises from the bottom of the sheet, half its height, over a dim backdrop,
+  as in TravelSpend. The Transactions list's custom period is a range too.
+
+**Decision:**
+- A range is one shared field, `DateRangeField`, built on react-aria-components'
+  `DateRangePicker`: typed month, day and year segments (the direct choice ADR-024 asked
+  for) plus a `RangeCalendar` in a bottom panel. A range closes it; one day is the same
+  day twice. The tooltip beside its label is react-aria's too.
+- Single dates stay native, as ADR-024 says. Only ranges use the library.
+- Dependencies, each with a line in ADR-011: `react-aria-components`, `react-aria`
+  (for `UNSAFE_PortalProvider`, which puts the calendar inside the sheet it opens from)
+  and `@internationalized/date` (the date values it takes), all pinned.
+
+**Alternatives Considered:**
+- react-day-picker, shadcn's Calendar -> What ADR-024 tried: no typed segments, so the
+  month and year problem returns; locales through date-fns, against ADR-008's use of `Intl`.
+- Two native date fields (ADR-024) -> No range at a glance, and no calendar the author wants.
+
+**Consequences:**
+- A new dependency family, about the size of a small design system, for one field.
+- The calendar is portalled into the open sheet, or to the page outside one. In the period
+  popover of the Transactions list that is outside Radix's popover, so the popover ignores
+  taps and Escape inside react-aria's overlays.
+
 ### ADR-026: The code is grouped by role and by feature, with one naming rule per layer (2026-11-08)
 
 **Context:**
@@ -521,6 +579,7 @@ Document architectural choices with context, alternatives considered, and trade-
   | TanStack devtools (dev only) | Router inspector in `npm run dev`; the devtools Vite plugin strips it from the build |
   | i18next, react-i18next | Plurals, interpolation and server-rendered language switching for FR and EN (ADR-008) |
   | Recharts (through shadcn charts) | Line, bar, area and donut charts with tooltips and responsive sizing |
+  | react-aria-components, react-aria, @internationalized/date | The date range field (ADR-027): typed segments, a range calendar, tooltips; ranges only, single dates stay native |
   | @iconify/react (offline build) | coolicons for every icon, from a vendored file (ADR-020) |
   | @fontsource-variable/nunito | Nunito, self-hosted: no request to Google Fonts, no CSP change |
   | @fontsource-variable/inconsolata | Inconsolata, the accent font, self-hosted the same way |

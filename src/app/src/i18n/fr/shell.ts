@@ -27,6 +27,7 @@ export const shellFr = {
     currencies: 'Devises',
     merchants: 'Magasins',
     people: 'Proches',
+    events: 'Événements',
   },
   displayCurrency: {
     label: 'Devise d’affichage: {{code}}',

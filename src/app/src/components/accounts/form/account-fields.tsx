@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import { InstitutionPicker } from '#/components/accounts/institutions/institution-picker'
 import { CheckboxField } from '#/components/forms/checkbox-field'
+import { DatePickerField } from '#/components/forms/date-picker-field'
 import { FormField } from '#/components/forms/form-field'
 import { SelectField } from '#/components/forms/select-field'
 import { LinkedFields } from '#/components/forms/linked-fields'
@@ -51,9 +52,10 @@ function OpeningFields({ field }: { field: Field }) {
   const { t } = useTranslation()
   return (
     <>
-      <FormField
-        {...field('openedOn')}
-        type="date"
+      <DatePickerField
+        name="openedOn"
+        defaultValue={field('openedOn').defaultValue}
+        error={field('openedOn').error}
         required
         label={t('accounts.openedOn')}
       />

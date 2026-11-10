@@ -91,7 +91,9 @@ For transactions spread over several categories.
 ## Later columns
 
 People are named by their name or one of their aliases (PPL-06), ignoring case and
-accents. Features from later phases add optional columns (people, events, reimbursement links,
+accents. An optional `event` column names an event the same way (exact name, ignoring
+case and accents): an unknown name is a warning in the summary and creates nothing, and
+an imported link is manual (spec 22). Features from later phases add optional columns (people, events, reimbursement links,
 `holding` for investment contributions)
 and optional files (net-worth holdings and snapshots, IMP-02). A file in the v1 format stays
 valid.

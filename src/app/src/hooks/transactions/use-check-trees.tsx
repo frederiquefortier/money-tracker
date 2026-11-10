@@ -1,11 +1,14 @@
 import { useTranslation } from 'react-i18next'
 import { CategoryBadge } from '#/components/categories/category-badge'
+import { EventBadge } from '#/components/events/event-badge'
 import type { CheckNode } from '#/components/forms/check-list'
 import { GROUP } from '#/components/forms/check-ticks'
 import { useFormatLocale } from '#/hooks/app/use-locale'
 import { accountLabel } from '#/lib/accounts/account'
 import { KINDS, categoryPath } from '#/lib/categories/category'
 import type { Category } from '#/lib/categories/category'
+import { isPast, sortEvents } from '#/lib/events/event'
+import type { EventItem, EventType } from '#/lib/events/event'
 import type { Person, PersonGroup } from '#/lib/people/person'
 import type { FormAccount } from '#/lib/transactions/transaction'
 import { treeOrder } from '#/lib/shared/tree-layout'
@@ -122,4 +125,51 @@ export function useCategoryTree(
       },
     ]
   })
+}
+
+/**
+ * Events in two cards, the current ones open and the past ones folded (spec 22); a search
+ * lists the matches flat. Past events stay, for old transactions.
+ */
+export function useEventTree(
+  {
+    events,
+    types,
+  }: { events: ReadonlyArray<EventItem>; types: ReadonlyArray<EventType> },
+  query: string,
+  today: string,
+): Array<CheckNode> {
+  const { t } = useTranslation()
+  const locale = useFormatLocale()
+  const matches = matcher(query)
+  const leaf = (e: EventItem): CheckNode => {
+    const type = types.find((x) => x.id === e.typeId)
+    return {
+      id: e.id,
+      label: e.name,
+      icon: <EventBadge color={type?.color ?? null} size="sm" />,
+    }
+  }
+  const sorted = sortEvents(
+    events.filter((e) => matches(e.name)),
+    'dateDesc',
+    locale,
+  )
+  if (query.trim()) return sorted.map(leaf)
+  const card = (id: string, label: string, list: ReadonlyArray<EventItem>) =>
+    list.length
+      ? [{ id: `${GROUP}${id}`, label, children: list.map(leaf) }]
+      : []
+  return [
+    ...card(
+      'current',
+      t('events.tabs.events'),
+      sorted.filter((e) => !isPast(e, today)),
+    ),
+    ...card(
+      'past',
+      t('transactions.list.pastEvents'),
+      sorted.filter((e) => isPast(e, today)),
+    ),
+  ]
 }

@@ -88,6 +88,18 @@
     "words": ["ice-cream", "crème glacée", "dessert", "ice cream"]
   },
   {
+    "name": "ring",
+    "words": [
+      "bague",
+      "ring",
+      "mariage",
+      "wedding",
+      "noces",
+      "fiançailles",
+      "engagement"
+    ]
+  },
+  {
     "name": "cake",
     "words": ["gâteau", "anniversaire", "fête", "cake", "birthday", "party"]
   },
@@ -466,7 +478,19 @@
   },
   {
     "name": "first-aid",
-    "words": ["first-aid", "santé", "soins", "health", "care", "medical"]
+    "words": [
+      "first-aid",
+      "santé",
+      "soins",
+      "health",
+      "care",
+      "medical",
+      "opération",
+      "chirurgie",
+      "traitement",
+      "surgery",
+      "treatment"
+    ]
   },
   {
     "name": "hand",
@@ -589,6 +613,10 @@
     "name": "flower",
     "words": [
       "flower",
+      "funérailles",
+      "deuil",
+      "obsèques",
+      "funeral",
       "beauté",
       "soins personnels",
       "cosmétiques",
@@ -733,7 +761,17 @@
   },
   {
     "name": "gift",
-    "words": ["cadeau", "cadeaux", "gift", "gifts", "presents"]
+    "words": [
+      "cadeau",
+      "cadeaux",
+      "gift",
+      "gifts",
+      "presents",
+      "noël",
+      "christmas",
+      "pâques",
+      "easter"
+    ]
   },
   {
     "name": "film",
@@ -765,7 +803,8 @@
       "guitar",
       "violin",
       "singing",
-      "music lessons"
+      "music lessons",
+      "festival"
     ]
   },
   {
@@ -873,7 +912,7 @@
   },
   {
     "name": "users",
-    "words": ["users", "famille", "family"]
+    "words": ["users", "famille", "family", "réunion", "gathering"]
   },
   {
     "name": "user",
@@ -883,6 +922,8 @@
     "name": "backpack",
     "words": [
       "backpack",
+      "rentrée",
+      "back to school",
       "école",
       "fournitures scolaires",
       "school",
@@ -897,6 +938,8 @@
       "éducation",
       "études",
       "université",
+      "remise de diplôme",
+      "graduation",
       "cours",
       "formation",
       "education",
@@ -951,6 +994,23 @@
       "services",
       "professionnel",
       "professional"
+    ]
+  },
+  {
+    "name": "baby",
+    "words": ["bébé", "baby", "naissance", "birth", "baby shower"]
+  },
+  {
+    "name": "presentation",
+    "words": [
+      "conférence",
+      "conference",
+      "présentation",
+      "presentation",
+      "séminaire",
+      "seminar",
+      "colloque",
+      "webinaire"
     ]
   },
   {

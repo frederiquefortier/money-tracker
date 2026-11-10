@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ConfirmDialog } from '#/components/feedback/confirm-dialog'
 import { DeleteDialog } from '#/components/feedback/delete-dialog'
-import { FormField } from '#/components/forms/form-field'
+import { DatePickerField } from '#/components/forms/date-picker-field'
 import {
   IconActions,
   IconButton,
@@ -123,23 +123,22 @@ function StatusDialog({
         })
       }
     >
-      <FormField
+      <DatePickerField
         name="from"
-        type="date"
         required
         label={t('categories.from')}
         value={from}
-        onChange={(event) => setFrom(event.target.value)}
+        onChange={setFrom}
       />
       {mode !== 'reactivate' && (
-        <FormField
+        <DatePickerField
           name="until"
-          type="date"
           label={t('categories.until')}
           value={until}
-          min={from || undefined}
-          max={today}
-          onChange={(event) => setUntil(event.target.value)}
+          minValue={from || undefined}
+          maxValue={today}
+          clearable
+          onChange={setUntil}
         />
       )}
       <StatusNotes parents={parents} branch={mode === 'archive' ? branch : 0} />

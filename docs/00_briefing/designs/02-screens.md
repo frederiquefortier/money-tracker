@@ -24,6 +24,7 @@ onto them.
 | 19 | [People](19-people.md) | Proches and groups, their forms, aliases, in the Réglages menu | PPL-01, 02, 06 | Built |
 | 20 | [People on a transaction](20-people-on-transactions.md) | The people list, the people's lines and round add on the receipt, an income's Proche field, avatars and a Proches filter on the list | PPL-03, 04 | Built |
 | 21 | [Reimbursements](21-reimbursements.md) | Unknown owed amounts, linking an income to owed lines, what each proche owes | TRX-07, PPL-05 | Built |
+| 22 | [Events](22-events.md) | Événements in the Réglages menu: events and types, the automatic link by dates and categories, the event on a transaction and in the filters | EVT-01..03, 07 | Built |
 
 ## Shared patterns
 
@@ -100,7 +101,7 @@ component to use, so a screen is assembled, not redrawn.
   switching sheets keeps the list's scroll: sheet routes carry `staticData.sheet`, and
   the router skips scroll restoration for them.
 - **Fields:** the shared ones (`FormField`, `SelectField`, `CheckboxField`,
-  `LinkedFields`). Dates are native (`FormField` with `type="date"`, ADR-024). `LinkedFields` wraps only the sub-field, never the field it belongs to. Required fields carry an asterisk, no legend, no "(facultatif)".
+  `LinkedFields`). Every date is `DatePickerField`, and a range `DateRangeField` (ADR-028): typed segments (jj/mm/aaaa), and a calendar up from the bottom of the sheet or dialog, half its height in a sheet, over a dim backdrop; a range is one band with no gap. `LinkedFields` wraps only the sub-field, never the field it belongs to. Required fields carry an asterisk, no legend, no "(facultatif)".
 - **Choosing from the user's own items:** `Combobox`, typed into the field: it filters,
   offers "Créer « … »" when that makes sense (`useInlineCreate`: a failure is a toast,
   the new item is chosen), and a × clears it. Several choices in a form (a person's groups, spec 19)

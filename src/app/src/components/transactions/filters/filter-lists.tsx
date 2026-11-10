@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { CheckList } from '#/components/forms/check-list'
+import type { CheckNode } from '#/components/forms/check-list'
 import {
   groupTicks,
   categoryTicks,
@@ -8,6 +9,9 @@ import {
 } from '#/components/forms/check-ticks'
 import { Button } from '#/components/ui/button'
 import type { Category } from '#/lib/categories/category'
+import type { EventItem, EventType } from '#/lib/events/event'
+import { NO_EVENT } from '#/lib/transactions/transaction-list'
+import { todayIso } from '#/lib/shared/format'
 import type { Merchant } from '#/lib/merchants/merchant'
 import type { Person, PersonGroup } from '#/lib/people/person'
 import type { FormAccount } from '#/lib/transactions/transaction'
@@ -15,6 +19,7 @@ import { useFormatLocale } from '#/hooks/app/use-locale'
 import {
   useAccountTree,
   useCategoryTree,
+  useEventTree,
   usePeopleTree,
 } from '#/hooks/transactions/use-check-trees'
 import type {
@@ -30,6 +35,8 @@ export type FilterOptions = {
   merchants: Array<Merchant>
   people: Array<Person>
   groups: Array<PersonGroup>
+  events: Array<EventItem>
+  eventTypes: Array<EventType>
 }
 
 function NoMatch() {
@@ -84,6 +91,47 @@ function MerchantList({
         </div>
       )}
     </CheckList>
+  )
+}
+
+/** Events in two cards, current open and past folded, after the choice of none (spec 22). */
+function EventList({
+  options,
+  query,
+  values,
+  onChange,
+}: {
+  options: FilterOptions
+  query: string
+  values: FilterValues
+  onChange: (values: FilterValues) => void
+}) {
+  const { t } = useTranslation()
+  const events = useEventTree(
+    { events: options.events, types: options.eventTypes },
+    query,
+    todayIso(),
+  )
+  const ticks = groupTicks(values.eventIds)
+  const toggle = (node: CheckNode) =>
+    onChange({ ...values, eventIds: ticks.toggle(node) })
+  const none = { id: NO_EVENT, label: t('transactions.list.noEvent') }
+  return (
+    <div className="flex flex-col gap-2">
+      {!query.trim() && (
+        <CheckList nodes={[none]} stateOf={ticks.stateOf} onToggle={toggle} />
+      )}
+      {events.length === 0 && query.trim() ? (
+        <NoMatch />
+      ) : (
+        <CheckList
+          nodes={events}
+          openCount={1}
+          stateOf={ticks.stateOf}
+          onToggle={toggle}
+        />
+      )}
+    </div>
   )
 }
 
@@ -149,6 +197,15 @@ export function FilterList({
       />
     )
   }
+  if (tab === 'events')
+    return (
+      <EventList
+        options={options}
+        query={query}
+        values={values}
+        onChange={onChange}
+      />
+    )
   return (
     <MerchantList
       merchants={options.merchants}

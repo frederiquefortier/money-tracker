@@ -4,6 +4,27 @@ Document new concepts, techniques, and knowledge gained. Reference this file to 
 
 <!-- Newest first: a new entry goes directly below this line. Template at the bottom. -->
 
+### 2026-11-09 - A bottom calendar inside a Radix sheet with react-aria
+
+**What Was New:**
+- react-aria's `ModalOverlay` and `Modal` portal to the page by default. To cover only the
+  sheet a field is in, the field wraps its picker in `UNSAFE_PortalProvider` with the
+  sheet's own element (`useSheetContainer`), and the overlay is `absolute` instead of
+  `fixed`. Inside Radix's dialog this also keeps focus and taps inside its content.
+- The same container idea works for a Radix dialog: the content hands its element down
+  (`OverlayContainerProvider`), the overlay is `absolute` inside it, and the dialog's Escape
+  is ignored when it comes from inside a react-aria overlay (`inAriaOverlay`).
+- A range band with no gap: the cell fills its column (`table-fixed`, no border spacing), the
+  band is a gradient from the middle of the first day to the middle of the last, and the
+  round ends are an inner circle.
+- Inside a `DateRangePicker`, every `Button` inherits the trigger's props. A ✕ or a close
+  button must opt out with `slot={null}`.
+- A Gmail-style tag from any hex: keep the hue in OKLCH, a pale tint with dark text for
+  light mode, a deep tint with pale text for dark (`tagColors`).
+
+**Where to Go Deeper:**
+- `components/forms/date-range-field.tsx`, ADR-027, `lib/shared/color.ts`.
+
 ### 2026-11-09 - Passing a typed link to a shared component
 
 **What Was New:**

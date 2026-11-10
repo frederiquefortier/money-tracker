@@ -29,6 +29,7 @@ export const shellEn: typeof shellFr = {
     currencies: 'Currencies',
     merchants: 'Merchants',
     people: 'People',
+    events: 'Events',
   },
   displayCurrency: {
     label: 'Display currency: {{code}}',
