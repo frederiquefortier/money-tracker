@@ -1,12 +1,11 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { CategoryBadge } from '#/components/categories/category-badge'
 import { Icon } from '#/components/display/icon'
 import { SearchField } from '#/components/forms/search-field'
 import { PageTitle } from '#/components/layout/list-page'
+import { FilterChips } from '#/components/transactions/filters/filter-chips'
 import { FilterSheet } from '#/components/transactions/filters/filter-sheet'
 import { PeriodPicker } from '#/components/transactions/period/period-controls'
-import { accountLabel } from '#/lib/accounts/account'
 import type {
   ListFilters,
   PeriodChoice,
@@ -22,66 +21,31 @@ import {
   FILTER_TABS,
 } from '#/lib/transactions/transaction-filters'
 import type {
+  FilterScreen,
   FilterTab,
   FilterValues,
 } from '#/lib/transactions/transaction-filters'
 import { useFilterLabel } from '#/hooks/transactions/use-filter-label'
 
-/** The one ticked in a filter, named on its button; null with none or several. */
-function onlyPicked(tab: FilterTab, names: ListFilters | null) {
-  if (tab === 'accounts' && names?.accounts.length === 1)
-    return { name: accountLabel(names.accounts[0]) }
-  if (tab === 'categories' && names?.categories.length === 1) {
-    const c = names.categories[0]
-    return {
-      name: c.name,
-      icon: (
-        <CategoryBadge
-          icon={c.icon}
-          color={c.color}
-          size="sm"
-          className="size-6 [&_svg]:size-3.5"
-        />
-      ),
-    }
-  }
-  const plain = {
-    merchants: names?.merchants,
-    people: names?.people,
-    events: names?.events,
-  }
-  const list = tab in plain ? plain[tab as keyof typeof plain] : undefined
-  return list?.length === 1 ? { name: list[0].name } : null
-}
-
 /**
- * A filter's button: "Comptes", the one ticked ("Épicerie"), or "Catégories · 2",
- * filled while in use. It opens the sheet on that filter.
+ * A filter's button: "Comptes", or "Catégories · 2" with some ticked, filled while in
+ * use. It opens the sheet on that filter.
  */
 function FilterButton({
   tab,
   values,
-  names,
   onOpen,
 }: {
   tab: FilterTab
   values: FilterValues
-  names: ListFilters | null
   onOpen: () => void
 }) {
   const labelOf = useFilterLabel(values)
   const count = values[FILTER_KEYS[tab]].length
-  return (
-    <FilterBubble
-      label={labelOf(tab)}
-      count={count}
-      only={count === 1 ? onlyPicked(tab, names) : null}
-      onOpen={onOpen}
-    />
-  )
+  return <FilterBubble label={labelOf(tab)} count={count} onOpen={onOpen} />
 }
 
-/** On phones, one button for the three filters, "Filtres · 3", opening on Comptes. */
+/** On phones, one button for the five filters, "Filtres · 3", opening their list. */
 function AllFiltersButton({
   values,
   onOpen,
@@ -162,12 +126,12 @@ type BubblesProps = {
   onPeriod: (choice: PeriodChoice) => void
   onPending: (on: boolean) => void
   onOwed: (on: boolean) => void
-  onOpen: (tab: FilterTab) => void
+  onOpen: (tab: FilterScreen | null) => void
 }
 
 /** Pending, owed, the period and the filters, as bubbles wrapping onto more lines. */
 function Bubbles(props: BubblesProps) {
-  const { choice, filters, names, pending, owed, loading } = props
+  const { choice, filters, pending, owed, loading } = props
   return (
     <div className="flex flex-wrap items-center gap-2">
       <StatusButton
@@ -186,17 +150,14 @@ function Bubbles(props: BubblesProps) {
         choice={choice}
         disabled={loading}
         onChange={props.onPeriod}
+        onOpen={() => props.onOpen('period')}
       />
-      <AllFiltersButton
-        values={filters}
-        onOpen={() => props.onOpen('accounts')}
-      />
+      <AllFiltersButton values={filters} onOpen={() => props.onOpen(null)} />
       {FILTER_TABS.map((tab) => (
         <span key={tab} className="hidden md:contents">
           <FilterButton
             tab={tab}
             values={filters}
-            names={names}
             onOpen={() => props.onOpen(tab)}
           />
         </span>
@@ -240,10 +201,12 @@ export function ListHeader({
   onSearch: (text: string) => void
 }) {
   const { t } = useTranslation()
-  const [sheet, setSheet] = useState<{ open: boolean; tab: FilterTab }>({
-    open: false,
-    tab: 'accounts',
-  })
+  // `list`: the sheet came from a phone's Filtres button, so a filter has a way back to it.
+  const [sheet, setSheet] = useState<{
+    open: boolean
+    tab: FilterScreen | null
+    list: boolean
+  }>({ open: false, tab: null, list: true })
   return (
     <>
       <PageTitle>{t('nav.transactions')}</PageTitle>
@@ -251,16 +214,21 @@ export function ListHeader({
       <Bubbles
         {...{ choice, filters, names, pending, owed, loading }}
         {...{ onPeriod, onPending, onOwed }}
-        onOpen={(tab) => setSheet({ open: true, tab })}
+        onOpen={(tab) => setSheet({ open: true, tab, list: tab === null })}
       />
+      <FilterChips values={filters} names={names} onChange={onFilters} />
       <FilterSheet
         open={sheet.open}
         tab={sheet.tab}
+        canGoBack={sheet.list}
+        names={names}
+        period={choice}
         values={filters}
         total={loading ? null : total}
         onOpenChange={(open) => setSheet({ ...sheet, open })}
         onTab={(tab) => setSheet({ ...sheet, tab })}
         onChange={onFilters}
+        onPeriod={onPeriod}
       />
     </>
   )

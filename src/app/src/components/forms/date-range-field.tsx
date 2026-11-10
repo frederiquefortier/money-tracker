@@ -22,9 +22,11 @@ import { cn } from '#/lib/utils'
 /** The typed segments, a ✕ to empty them and the button that opens the calendar. */
 function RangeInput({
   clearable,
+  calendar,
   onClear,
 }: {
   clearable: boolean
+  calendar: boolean
   onClear: () => void
 }) {
   const { t } = useTranslation()
@@ -55,9 +57,11 @@ function RangeInput({
           <Icon name="close" />
         </Button>
       )}
-      <Button aria-label={t('common.chooseDates')} className={roundButton}>
-        <Icon name="calendar" />
-      </Button>
+      {calendar && (
+        <Button aria-label={t('common.chooseDates')} className={roundButton}>
+          <Icon name="calendar" />
+        </Button>
+      )}
     </Group>
   )
 }
@@ -75,6 +79,7 @@ export function DateRangeField({
   onChange,
   maxValue,
   clearable = false,
+  calendar = true,
   error,
 }: {
   label: string
@@ -85,6 +90,8 @@ export function DateRangeField({
   maxValue?: string
   /** A ✕ empties the field: no dates. */
   clearable?: boolean
+  /** False when a calendar sits beside the field (ADR-029): no button and no sheet. */
+  calendar?: boolean
   error?: string
 }) {
   return (
@@ -111,10 +118,11 @@ export function DateRangeField({
         <FieldLabelRow label={label} addon={labelAddon} />
         <RangeInput
           clearable={clearable && value !== null}
+          calendar={calendar}
           onClear={() => onChange(null)}
         />
         {error && <p className="text-sm text-destructive">{error}</p>}
-        <CalendarSheet label={label} range />
+        {calendar && <CalendarSheet label={label} range />}
       </DateRangePicker>
     </DateProviders>
   )

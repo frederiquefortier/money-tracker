@@ -8,8 +8,8 @@ import {
   inAriaOverlay,
 } from '#/components/ui/overlay-container'
 
-// Based on shadcn's sheet: full screen on phones, a panel from the right from md up (from
-// the left with side="left", sliding in from there at every width), its animations in
+// Based on shadcn's sheet: full screen on phones, a panel from md up, sliding in from the
+// right at every width (from the left with side="left"), its animations in
 // styles.css (.sheet-panel). Built on the Radix dialog, so focus is trapped
 // and returns to the trigger on close. Content is a SheetBody that scrolls and a
 // SheetFooter that stays put; a form can wrap both. `actions` are the item's row actions,

@@ -92,7 +92,7 @@ component to use, so a screen is assembled, not redrawn.
 - **Confirmations:** `ConfirmDialog`, red title and button: "Supprimer “{name}”" and
   "Cette action est irréversible.", or a sentence naming what else is affected.
 - **Forms:** a route sheet over the list (`RouteSheet`, `SheetForm`) with its own URL:
-  full screen on a phone, a panel from the right from `md` up. Its body only edits: no
+  full screen on a phone, a panel from `md` up, sliding in from the right at every width (only the menu comes from the left; ADR-030). Its body only edits: no
   archive or delete buttons among the fields (on phones they are in the header, above).
   Closing with something typed or chosen asks "Abandonner les modifications?" first. Annuler and one "Enregistrer" in the footer; saving closes it
   with a toast. Errors from the server, a lost connection included, show in the sheet

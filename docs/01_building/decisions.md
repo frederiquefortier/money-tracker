@@ -4,6 +4,72 @@ Document architectural choices with context, alternatives considered, and trade-
 
 <!-- Newest first: a new ADR goes directly below this line. Template at the bottom. -->
 
+### ADR-030: The period joins the filters' sheet; sheets slide from the right (2026-11-10)
+
+**Context:**
+- After trying ADR-029, the author asked for four changes: chips that stay individual
+  whatever their number, a filter bubble that always keeps its name, every sheet on a
+  phone opening from the right (the menu apart), and the period inside the Filtres button
+  on a phone, in the same drill-in as the filters, "maybe even on desktop".
+
+**Decision:**
+- Chips are always one per value. This replaces ADR-029's single "Catégories · 5" chip.
+- A filter bubble always reads its name, with the number after it once something is
+  ticked ("Catégories · 2"). It never swaps its name for the one ticked, since the chips
+  now say what is ticked. This replaces the single name on the bubble (spec 14).
+- Every sheet slides in from the right at every width; only the menu (`side="left"`)
+  comes from the left. The bottom animation is gone.
+- The period is a screen of the filters' sheet, `FilterScreen = FilterTab | 'period'`. On a
+  phone the bar has no period bubble: Filtres lists Période first (its value on the
+  right), then the five filters, and Période opens the same tabs, grids and calendar. From
+  `md` up the period bubble keeps its ‹ › and opens the sheet on that screen alone, in
+  place of the popover. A pick applies, then returns to the list when the sheet came from
+  it, or closes when a bubble opened it.
+
+**Alternatives Considered:**
+- Keep the period bubble and its popover on phones -> The author wants one place for
+  everything that narrows the list.
+- Keep the popover on desktop -> Two patterns for one job, which the author did not want.
+
+**Consequences:**
+- On a phone, stepping a month with ‹ › now takes the drill-in: Filtres, Période, Mois.
+- The merchants page's category bubble loses the single name too (same bubble), and has
+  no chips to replace it.
+
+### ADR-029: Transactions filters: one filter per screen, chips for the choices (2026-11-10)
+
+**Context:**
+- The Transactions period and filters had three problems, reported by the author: the
+  custom period opened its calendar in a second overlay (ADR-027), unlike the month and
+  year grids; the chosen filters showed nowhere but as a count; and every filter opened
+  the same sheet with five wrapping tabs, which did not work on a phone.
+
+**Decision:**
+- The custom period shows its range calendar inline in the period panel, under the typed
+  dates, as the year and month grids do. Picking the second day applies the range and
+  closes the panel. This supersedes ADR-027 and ADR-028 for the Transactions period only;
+  every other date field keeps the calendar rising from the bottom.
+- The filter sheet has no tab row. From `md` up, each filter's bubble opens the sheet on
+  that filter alone. On a phone, one Filtres button opens a list of the five filters, each
+  with a summary of what is ticked; a row opens that filter in the same sheet, with a back
+  arrow. Two levels, no sideways scroll.
+- What is chosen shows as chips under the bubbles: one per value (the category with its
+  icon), a ✕ to remove it, and "Tout effacer" at the end. A filter with more than two
+  values becomes one chip, "Catégories · 5".
+
+**Alternatives Considered:**
+- Tabs kept, in a scrolling row -> Rejected by the author: sideways scroll hides tabs.
+- One bubble per filter in a scrolling row on phones (the assistant's first choice) ->
+  Rejected by the author, who preferred the two-level list.
+- A popover per filter on desktop -> The sheet already holds the search, the grouped
+  lists and the result count; a popover would rebuild them. Left as an improvement.
+
+**Consequences:**
+- `FilterSheet` takes a `tab` that may be null (the list of filters) and shows the back
+  arrow only when more than one tab is available. The settings merchants filter, which
+  passes one tab, is unchanged.
+- The period panel on a phone stays a popover; the inline calendar fits its width.
+
 ### ADR-028: Every date field uses the shared calendar (2026-11-09)
 
 **Context:**

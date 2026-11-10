@@ -1,0 +1,133 @@
+import { useTranslation } from 'react-i18next'
+import { CategoryBadge } from '#/components/categories/category-badge'
+import { Icon } from '#/components/display/icon'
+import { focusRing } from '#/components/styles'
+import { accountLabel } from '#/lib/accounts/account'
+import type { ListFilters } from '#/lib/transactions/transaction-list'
+import {
+  FILTER_KEYS,
+  FILTER_TABS,
+  NO_FILTERS,
+} from '#/lib/transactions/transaction-filters'
+import type {
+  FilterTab,
+  FilterValues,
+} from '#/lib/transactions/transaction-filters'
+import { cn } from '#/lib/utils'
+
+type Picked = { id: string; name: string; icon?: React.ReactNode }
+
+function namedIn(tab: FilterTab, names: ListFilters): Array<Picked> {
+  if (tab === 'accounts')
+    return names.accounts.map((a) => ({ id: a.id, name: accountLabel(a) }))
+  if (tab === 'categories')
+    return names.categories.map((c) => ({
+      id: c.id,
+      name: c.name,
+      icon: (
+        <CategoryBadge
+          icon={c.icon}
+          color={c.color}
+          size="sm"
+          className="size-6 [&_svg]:size-3.5"
+        />
+      ),
+    }))
+  return names[tab]
+}
+
+/** What is ticked in a filter, by name, as far as the list has named it. */
+export function pickedOf(
+  tab: FilterTab,
+  names: ListFilters | null,
+  values: FilterValues,
+): Array<Picked> {
+  if (!names) return []
+  const ticked = new Set(values[FILTER_KEYS[tab]])
+  return namedIn(tab, names).filter((one) => ticked.has(one.id))
+}
+
+function Chip({
+  name,
+  icon,
+  removeLabel,
+  onRemove,
+}: {
+  name: string
+  icon?: React.ReactNode
+  removeLabel: string
+  onRemove: () => void
+}) {
+  return (
+    <span
+      className={cn(
+        'inline-flex h-8 max-w-full items-center gap-1.5 rounded-full border border-primary bg-accent pr-1 pl-3 text-sm font-semibold text-accent-foreground',
+        icon && 'pl-1',
+      )}
+    >
+      {icon}
+      <span className="truncate">{name}</span>
+      <button
+        type="button"
+        aria-label={removeLabel}
+        title={removeLabel}
+        onClick={onRemove}
+        className={cn(
+          'grid size-6 shrink-0 place-items-center rounded-full hover:bg-primary/15',
+          focusRing,
+        )}
+      >
+        <Icon name="close" className="size-4" />
+      </button>
+    </span>
+  )
+}
+
+/**
+ * What is chosen, under the bubbles (ADR-029): a chip per value with a ✕, however many, and Tout effacer. Nothing renders while nothing is chosen.
+ */
+export function FilterChips({
+  values,
+  names,
+  onChange,
+}: {
+  values: FilterValues
+  names: ListFilters | null
+  onChange: (values: FilterValues) => void
+}) {
+  const { t } = useTranslation()
+  const chips = FILTER_TABS.flatMap((tab) => {
+    const key = FILTER_KEYS[tab]
+    const picked = pickedOf(tab, names, values)
+    const without = (ids: ReadonlyArray<string>) =>
+      onChange({
+        ...values,
+        [key]: values[key].filter((id) => !ids.includes(id)),
+      })
+    return picked.map((one) => (
+      <Chip
+        key={`${tab}-${one.id}`}
+        name={one.name}
+        icon={one.icon}
+        removeLabel={t('transactions.list.remove', { name: one.name })}
+        onRemove={() => without([one.id])}
+      />
+    ))
+  })
+  if (chips.length === 0) return null
+  return (
+    <div className="flex flex-wrap items-center gap-2">
+      {chips}
+      <button
+        type="button"
+        onClick={() => onChange(NO_FILTERS)}
+        className={cn(
+          'h-8 rounded-full px-2 text-sm font-semibold text-muted-foreground hover:text-foreground',
+          focusRing,
+        )}
+      >
+        {t('transactions.list.clearAll')}
+      </button>
+    </div>
+  )
+}

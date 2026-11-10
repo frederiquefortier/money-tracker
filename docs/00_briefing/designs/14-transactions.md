@@ -1,6 +1,6 @@
 # Transactions
 
-**Status:** reviewed 2026-11-03; aligned with the built screens 2026-11-03; built
+**Status:** filters reworked 2026-11-10 (ADR-029, ADR-030); reviewed 2026-11-03; aligned with the built screens 2026-11-03; built
 2026-11-05, then reworked the same day after the author tried it, and the period and
 filters redone for phones the same day (process.md): a list
 over a chosen period, no tiles. Shared rules:
@@ -58,16 +58,17 @@ From `md` up: the same list, centred, at most 48rem wide.
   month, the year, "Toutes les dates", or the two days ("1 oct. 2026 – 30 oct. 2026"),
   "Période: …" as its accessible name. For a month or a year, ‹ and › on either side
   step one back or forward; › stops at the current one. Tout by default.
-- The bubble opens a popover: the four periods as the shared tabs (`TabList`: Tout,
+- From `md` up the bubble opens the period in the filters' sheet (ADR-030), on phones the
+  Filtres list opens it; the screen shows the four periods as the shared tabs (`TabList`: Tout,
   Année, Mois, Personnalisée), over the year grid (twelve years ending with the current
   one, filled column by column so they follow one another down each, arrows to earlier
   ones), the month grid (a year with arrows over its twelve months), or the date
-  range field (ADR-027), whose calendar comes up from the bottom of the page, half its
-  height, over a dim backdrop. Each tab is as wide as its label, so
+  range field (ADR-027) over its calendar, inline. Each tab is as wide as its label, so
   Personnalisée fits on a phone. Nothing after the current year, month or day can
   be picked, and the two days never cross. Tout applies and closes; a year or month
-  applies and closes; Personnalisée applies at once on the last 30 days, the dates as
-  they change.
+  applies and closes. Personnalisée shows the typed dates over a range calendar, open in
+  the panel (ADR-029, which replaces the calendar rising from the bottom here); the
+  second day picked applies the range and closes the panel.
 - Every period loads a page at a time: about 150 transactions, always whole days, and
   the next page as the end of the list comes into view. Tout is the whole history this
   way.
@@ -81,23 +82,30 @@ From `md` up: the same list, centred, at most 48rem wide.
 
 ### The row under the search
 
-- One row, all bubbles the same height (`chip`): the period, then the filters. On
-  phones, when the row runs out of room it scrolls sideways and fades at the right edge,
-  so the list never moves down; from `md` up the bubbles wrap onto more lines (decided
-  2026-11-05).
+- One row, all bubbles the same height (`chip`): the period, then the filters. When the
+  row runs out of room the bubbles wrap onto more lines; the list never scrolls sideways
+  (decided 2026-11-05, again 2026-11-10).
 - On phones, one Filtres button with the filter icon, "Filtres · 3" and filled while
-  any are in use, opens the sheet on Comptes.
-- From `md` up, a button per filter instead, Comptes, Catégories, Magasins, each with a
-  chevron. A filter's button names the one ticked ("Épicerie", the category's with its icon,
-  "Chèque (Desjardins)"), or how many ("Catégories · 2"), and is filled while in use.
-  It opens the filter sheet on that filter.
+  any filter is in use, opens the sheet on the list. There is no period bubble on phones:
+  the period is the list's first row.
+- From `md` up, the period's bubble with ‹ ›, then a button per filter, Comptes,
+  Catégories, Magasins, Proches, Événements, each with a chevron. A filter's button always
+  reads its name, with the number ticked after it ("Catégories · 2"), and is filled while
+  in use. Each opens the sheet on its own screen alone.
+- Under the row, while anything is chosen, the chips (ADR-029, ADR-030): one per chosen
+  value however many, in the order Comptes, Catégories, Magasins, Proches, Événements, a
+  category with its icon, each with a ✕ that removes it ("Retirer {name}"). "Tout effacer"
+  ends the line, and the line wraps.
 
 ### Filters
 
-- The sheet (from the right from `md` up, full screen on a phone), titled Filtres, has
-  three tabs, Comptes, Catégories, Magasins, each with its count ("Catégories · 2"),
-  and a search under them for the open tab only ("Rechercher une catégorie"). Both stay
-  put while the list scrolls (TRX-14). Only the groups fold, each a card like an
+- The sheet (from the right from `md` up, full screen on a phone), titled Filtres, shows
+  one filter at a time, with no tabs. Opened from a phone's Filtres button, it first lists
+  Période, then the five filters, each row with its name, a summary on its right (the
+  period, "Tout", or "Épicerie, Transport", cut with an ellipsis) and a chevron. A row opens that screen in the same sheet, with a back arrow
+  and the filter's name over its search ("Rechercher une catégorie"). Opened from a
+  desktop bubble, it opens on that filter with no arrow. The search stays put while the
+  list scrolls (TRX-14). Only the groups fold, each a card like an
   institution's on Comptes: its name folds it and shows how many are ticked inside, and
   "Tout" on its right ticks all of it ("Aucun" once it is).
   - **Comptes**: a card per institution with its accounts, closed ones too, all open
@@ -113,7 +121,7 @@ From `md` up: the same list, centred, at most 48rem wide.
   - A search lists the matches flat in one card, accounts with their institution and
     categories by their full path.
 - Every row is one tap target, 48px tall, the checkbox at its end.
-- The footer: Effacer clears the open tab's ticks; "Voir 128 résultats" closes the
+- The footer: the main button is always at the right, Effacer (where there is one) at the left. Effacer clears the open filter's ticks; "Voir 128 résultats" closes the
   sheet. The count is every row the period, the filters and the search match, all pages
   together; "Voir les résultats" while it loads, "Aucun résultat" at none.
 - Each tick applies at once, the list updating behind the sheet. A transaction shows
@@ -225,7 +233,7 @@ From `md` up: the same list, centred, at most 48rem wide.
 | Key | Français |
 |---|---|
 | Period | Tabs Tout, Année, Mois, Personnalisée; Toutes les dates; Période: {period}; Du, Au; Mois précédent, Mois suivant |
-| Filters | Filtres, Filtres · {count}, Comptes, Catégories, Magasins, {name} · {count}; Rechercher un compte, une catégorie, un magasin; Tout, Aucun, Tout cocher dans “{name}”, Tout décocher dans “{name}”; Effacer, Voir {count} résultat(s), Voir les résultats, Aucun résultat |
+| Filters | Filtres, Période, Filtres · {count}, Comptes, Catégories, Magasins, Proches, Événements, {name} · {count}; Retirer {name}, Tout effacer, Retour aux filtres; Rechercher un compte, une catégorie, un magasin; Tout, Aucun, Tout cocher dans “{name}”, Tout décocher dans “{name}”; Effacer, Voir {count} résultat(s), Voir les résultats, Aucun résultat |
 | Converted detail | {original} converti au taux du {date} ({rate}) |
 | Pending | En attente, {count} en attente |
 | Owed | {count} me doit / me doivent; Quelqu'un me doit sa part (screen readers) |

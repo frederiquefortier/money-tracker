@@ -8,6 +8,14 @@ export type FilterValues = {
   eventIds: Array<string>
 }
 
+export const NO_FILTERS: FilterValues = {
+  accountIds: [],
+  categoryIds: [],
+  merchantIds: [],
+  personIds: [],
+  eventIds: [],
+}
+
 export const FILTER_TABS = [
   'accounts',
   'categories',
@@ -16,6 +24,9 @@ export const FILTER_TABS = [
   'events',
 ] as const
 export type FilterTab = (typeof FILTER_TABS)[number]
+
+/** What the filters' sheet can show: a filter, or the period (ADR-030). */
+export type FilterScreen = FilterTab | 'period'
 
 export const FILTER_KEYS = {
   accounts: 'accountIds',

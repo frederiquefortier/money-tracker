@@ -7,7 +7,8 @@ import { MerchantRow } from '#/components/merchants/merchant-row'
 import { SearchField } from '#/components/forms/search-field'
 import { ListPage } from '#/components/layout/list-page'
 import { SortMenu } from '#/components/lists/sort-menu'
-import { CategoryBadge } from '#/components/categories/category-badge'
+import { useFilterLabel } from '#/hooks/transactions/use-filter-label'
+import { FilterChips } from '#/components/transactions/filters/filter-chips'
 import { FilterBubble } from '#/components/transactions/filters/filter-bubble'
 import { FilterSheet } from '#/components/transactions/filters/filter-sheet'
 import { categoryPath } from '#/lib/categories/category'
@@ -18,7 +19,7 @@ import {
   sortMerchants,
 } from '#/lib/merchants/merchant'
 import type { Merchant, MerchantSort } from '#/lib/merchants/merchant'
-import type { FilterValues } from '#/lib/transactions/transaction-filters'
+import { NO_FILTERS } from '#/lib/transactions/transaction-filters'
 import { useFormatLocale } from '#/hooks/app/use-locale'
 import { useStoredState } from '#/hooks/app/use-stored-state'
 import { getCategories } from '#/server/categories'
@@ -38,13 +39,6 @@ export const Route = createFileRoute('/_authed/settings/merchants')({
 })
 
 const parseSort = oneOf(MERCHANT_SORTS)
-const NO_FILTERS: FilterValues = {
-  accountIds: [],
-  categoryIds: [],
-  merchantIds: [],
-  personIds: [],
-  eventIds: [],
-}
 
 function categoryLookup(categories: ReadonlyArray<Category>) {
   const byId = indexById(categories)
@@ -75,40 +69,37 @@ function CategoryFilter({
   total: number
   onChange: (ids: Array<string>) => void
 }) {
-  const { t } = useTranslation()
+  const labelOf = useFilterLabel({ ...NO_FILTERS, categoryIds: [...picked] })
   const [open, setOpen] = useState(false)
-  const only = categories.find((c) => c.id === picked[0])
+  const values = { ...NO_FILTERS, categoryIds: [...picked] }
+  const names = {
+    accounts: [],
+    categories: categories.filter((c) => picked.includes(c.id)),
+    merchants: [],
+    people: [],
+    events: [],
+  }
   return (
-    <div>
+    <div className="flex flex-col items-start gap-3">
       <FilterBubble
-        label={t('transactions.list.categories')}
+        label={labelOf('categories')}
         count={picked.length}
-        only={
-          picked.length === 1 && only
-            ? {
-                name: only.name,
-                icon: (
-                  <CategoryBadge
-                    icon={only.icon}
-                    color={only.color}
-                    size="sm"
-                    className="size-6 [&_svg]:size-3.5"
-                  />
-                ),
-              }
-            : null
-        }
         onOpen={() => setOpen(true)}
+      />
+      <FilterChips
+        values={values}
+        names={names}
+        onChange={(next) => onChange(next.categoryIds)}
       />
       <FilterSheet
         open={open}
         tabs={CATEGORY_TABS}
         tab="categories"
-        values={{ ...NO_FILTERS, categoryIds: [...picked] }}
+        values={values}
         total={total}
         onOpenChange={setOpen}
         onTab={() => {}}
-        onChange={(values) => onChange(values.categoryIds)}
+        onChange={(next) => onChange(next.categoryIds)}
       />
     </div>
   )

@@ -148,7 +148,7 @@ function Day({
 }
 
 /** The month grid with its arrows: Page Up and Down move by month, with Shift by year. */
-function MonthGrid({ range }: { range: boolean }) {
+export function CalendarMonthGrid({ range }: { range: boolean }) {
   return (
     <>
       <header className="flex items-center justify-between">
@@ -205,11 +205,11 @@ function Panel({
       </div>
       {range ? (
         <RangeCalendar aria-label={label} className={body}>
-          <MonthGrid range />
+          <CalendarMonthGrid range />
         </RangeCalendar>
       ) : (
         <Calendar aria-label={label} className={body}>
-          <MonthGrid range={false} />
+          <CalendarMonthGrid range={false} />
         </Calendar>
       )}
     </>
