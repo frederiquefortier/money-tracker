@@ -47,7 +47,7 @@ export function ArchivedCategories({
   const isRoot = (category: Category) => roots.includes(category)
 
   return (
-    <section className="flex flex-col gap-2">
+    <section className="mt-2 flex flex-col gap-2 border-t pt-4">
       <CollapseToggle
         expanded={expanded}
         onToggle={() => setExpanded(!expanded)}

@@ -2,22 +2,12 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { IconButton } from '#/components/display/icon-button'
 import { ConfirmDialog } from '#/components/feedback/confirm-dialog'
-import { EmptyState, ListCard } from '#/components/lists/list-card'
+import { CollapsedSection } from '#/components/lists/collapsed-section'
 import { useServerAction } from '#/hooks/app/use-server-action'
 import { useFormatLocale } from '#/hooks/app/use-locale'
 import type { ImportBatch } from '#/lib/import/import'
 import { cn } from '#/lib/utils'
 import { undoImport } from '#/server/import'
-
-const CREATED_KINDS = [
-  'institutions',
-  'accounts',
-  'categories',
-  'merchants',
-  'people',
-  'events',
-  'aliases',
-] as const
 
 function BatchRow({
   batch,
@@ -33,29 +23,21 @@ function BatchRow({
       new Date(iso),
     )
   const undone = batch.undoneAt !== null
-  const created = CREATED_KINDS.flatMap((kind) => {
-    const count = batch.created[kind] ?? 0
-    return count > 0 ? [t(`import.created.${kind}`, { count })] : []
-  })
-  const second = [
-    t('import.transactions', { count: batch.transactions }),
-    ...created,
-  ].join(', ')
   return (
     <li
       className={cn(
-        'flex items-center gap-2 py-3 pr-2 pl-4',
+        'flex items-center gap-3 py-3 pr-2 pl-4',
         undone && 'text-muted-foreground',
       )}
     >
-      <div className="flex min-w-0 flex-1 flex-col">
-        <span className="font-semibold">
-          {undone && batch.undoneAt
-            ? t('import.history.undone', { date: day(batch.undoneAt) })
-            : day(batch.committedAt)}
-        </span>
-        <span className="text-sm text-muted-foreground">{second}</span>
-      </div>
+      <span className="font-semibold">
+        {undone && batch.undoneAt
+          ? t('import.history.undone', { date: day(batch.undoneAt) })
+          : day(batch.committedAt)}
+      </span>
+      <span className="min-w-0 flex-1 truncate text-right text-sm text-muted-foreground">
+        {t('import.transactions', { count: batch.transactions })}
+      </span>
       {!undone && (
         <IconButton
           icon="undo"
@@ -82,24 +64,21 @@ export function ImportHistory({
         new Date(asking.committedAt),
       )
     : ''
+  if (batches.length === 0) return null
   return (
-    <section className="mt-6 flex flex-col gap-3 border-t pt-8">
-      <h2 className="font-mono text-sm font-bold tracking-wide uppercase">
-        {t('import.history.title')}
-      </h2>
-      {batches.length === 0 ? (
-        <EmptyState>{t('import.history.empty')}</EmptyState>
-      ) : (
-        <ListCard>
-          {batches.map((batch) => (
-            <BatchRow
-              key={batch.id}
-              batch={batch}
-              onUndo={() => setAsking(batch)}
-            />
-          ))}
-        </ListCard>
-      )}
+    <div className="mt-6">
+      <CollapsedSection
+        label={`${t('import.history.title')} (${batches.length})`}
+        storageKey="import-history-open"
+      >
+        {batches.map((batch) => (
+          <BatchRow
+            key={batch.id}
+            batch={batch}
+            onUndo={() => setAsking(batch)}
+          />
+        ))}
+      </CollapsedSection>
       <ConfirmDialog
         open={asking !== null}
         title={t('import.history.undoTitle', { date })}
@@ -127,6 +106,6 @@ export function ImportHistory({
           })
         }}
       />
-    </section>
+    </div>
   )
 }

@@ -5,7 +5,6 @@ import { ImportDone } from '#/components/import/import-done'
 import { ImportErrors } from '#/components/import/import-errors'
 import { ImportFilesCard } from '#/components/import/import-files-card'
 import { ImportHistory } from '#/components/import/import-history'
-import { ResetChoices } from '#/components/import/reset-choices'
 import { ImportSteps } from '#/components/import/import-steps'
 import { ImportSummary } from '#/components/import/import-summary'
 import { ListPage } from '#/components/layout/list-page'
@@ -48,7 +47,7 @@ function Import() {
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' })
-  }, [stage])
+  }, [stage, run.refusal, check])
 
   function upload() {
     if (files.hasTransactions) void run.runCheck()
@@ -60,6 +59,12 @@ function Import() {
       <ImportSteps stage={stage} />
       {stage === 'files' && (
         <section className="flex flex-col gap-4">
+          {files.errors.length > 0 && (
+            <ImportErrors errors={files.errors} count={files.errors.length} />
+          )}
+          {check && !check.ok && (
+            <ImportErrors errors={check.errors} count={check.errorCount} />
+          )}
           <ImportFilesCard
             files={files.files}
             uploading={run.busy === 'checking'}
@@ -71,16 +76,14 @@ function Import() {
             onRemove={files.remove}
             onUpload={upload}
           />
-          {files.errors.length > 0 && (
-            <ImportErrors errors={files.errors} count={files.errors.length} />
-          )}
-          {check && !check.ok && (
-            <ImportErrors errors={check.errors} count={check.errorCount} />
-          )}
-          {check && !check.ok && (
-            <ResetChoices count={decisionCount(decisions)} onReset={reset} />
-          )}
         </section>
+      )}
+      {stage === 'import' && run.refusal && (
+        <ImportErrors
+          errors={run.refusal.errors}
+          count={run.refusal.count}
+          choices={{ count: decisionCount(decisions), onReset: reset }}
+        />
       )}
       {stage === 'import' && check?.ok && (
         <ImportSummary

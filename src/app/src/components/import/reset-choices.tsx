@@ -16,14 +16,9 @@ export function ResetChoices({
 }) {
   const { t } = useTranslation()
   const [asking, setAsking] = useState(false)
-  if (count === 0) return null
   return (
     <>
-      <Button
-        variant="outline"
-        className="self-start"
-        onClick={() => setAsking(true)}
-      >
+      <Button variant="outline" onClick={() => setAsking(true)}>
         {t('import.undoChoices', { count })}
       </Button>
       <ConfirmDialog

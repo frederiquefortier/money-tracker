@@ -4,7 +4,10 @@ import { useStoredState } from '#/hooks/app/use-stored-state'
 
 const parseBoolean = (v: unknown) => (typeof v === 'boolean' ? v : undefined)
 
-/** Archived or past rows, collapsed under a list, flat and muted (PPL-02, EVT-02). */
+/**
+ * Archived or past rows, collapsed under a list, flat and muted (PPL-02, EVT-02), set off by
+ * a line above its title.
+ */
 export function CollapsedSection({
   label,
   storageKey,
@@ -20,7 +23,7 @@ export function CollapsedSection({
     parseBoolean,
   )
   return (
-    <section className="flex flex-col gap-2">
+    <section className="mt-2 flex flex-col gap-2 border-t pt-4">
       <CollapseToggle
         expanded={expanded}
         onToggle={() => setExpanded(!expanded)}

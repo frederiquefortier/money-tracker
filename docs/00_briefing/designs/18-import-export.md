@@ -157,3 +157,26 @@ message per error code.
   another new name (two for a long name) has a "Fusionner avec X ?" link that merges in one
   tap (`similarName`).
 - The last line is one link, "Modifier les {n} fichiers", back to step 1.
+
+## Round 4 notes (import screen)
+
+- Error card: red border, a light red background, extra padding at the bottom, the copy icon
+  by the title. When merges or edits are saved it ends with "Effacer mes N fusions et
+  modifications" at the right, which asks before clearing.
+- Done: a centred card with a green check, "Import terminé", the transactions imported, one
+  row per kind created (label left, count right), then "Importer d'autres fichiers" and
+  "Voir les transactions" at the right.
+- Historique: not a card; a collapsed section "Historique (n)", one line per import (date,
+  number of transactions) and the undo icon.
+
+## Round 5 notes (import screen)
+
+- The error card pairs with the done card: a centred card, a red-tinted circle with a warning
+  icon, "L'import ne peut pas continuer" and the number of faults, each fault as a row (file
+  and line on the left, the message at the right, thin lines between), then at the right the
+  copy icon and, when merges or edits are applied, "Effacer mes N fusions et modifications".
+- Where it shows: a fault found when the files are extracted (the format of a file, or what
+  the check refuses) stays on step 1, under the files. A fault found when importing, which can
+  come from the merges and edits chosen on step 2, shows on step 2 above the summary, so the
+  choices stay in reach and can be changed or cleared; the page scrolls up to it.
+- On step 1 the error card is also above the upload area, as on step 2, so it is the first thing seen; the page scrolls up to it when it appears.

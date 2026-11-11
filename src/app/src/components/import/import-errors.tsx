@@ -1,5 +1,7 @@
-/import { useTranslation } from 'react-i18next'
+import { useTranslation } from 'react-i18next'
 import type { TFunction } from 'i18next'
+import { ResetChoices } from '#/components/import/reset-choices'
+import { Icon } from '#/components/display/icon'
 import { IconButton } from '#/components/display/icon-button'
 import { useToast } from '#/hooks/app/use-toast'
 import { cardSurface } from '#/components/styles'
@@ -26,28 +28,61 @@ function plainText(t: TFunction, errors: ReadonlyArray<ImportErrorItem>) {
     .join('\n')
 }
 
-/** Step 2 when something is wrong (spec 18): by file, the first hundred, all copyable. */
+/**
+ * When the rows are refused (spec 18): a card that pairs with the done one. A red mark, what
+ * happened and how many faults, each fault as a row (file and line, then the message), and
+ * the actions at the right. `choices` is there when merges or edits are applied to the files,
+ * since they can be what is refused.
+ */
 export function ImportErrors({
   errors,
   count,
+  choices,
 }: {
   errors: ReadonlyArray<ImportErrorItem>
   count: number
+  choices?: { count: number; onReset: () => void }
 }) {
   const { t } = useTranslation()
   const toast = useToast()
-  const files = [...new Set(errors.slice(0, SHOWN).map((e) => e.file))]
   return (
     <section
       className={cn(
         cardSurface,
-        'flex flex-col gap-3 border-destructive/40 bg-destructive/10 p-4',
+        'flex flex-col items-center gap-5 px-5 pt-8 pb-5',
       )}
     >
-      <div className="flex items-center justify-between gap-2">
-        <h2 className="font-semibold text-destructive">
+      <span className="grid size-14 place-items-center rounded-full bg-destructive/10 text-destructive [&_svg]:size-8">
+        <Icon name="circle-warning" />
+      </span>
+      <div className="flex flex-col items-center gap-1 text-center">
+        <h2 className="text-lg font-semibold">{t('import.errorsHeading')}</h2>
+        <p className="text-muted-foreground">
           {t('import.errorsTitle', { count })}
-        </h2>
+        </p>
+      </div>
+      <ul className="w-full divide-y border-y">
+        {errors.slice(0, SHOWN).map((e, i) => (
+          <li
+            key={`${e.file}-${e.line}-${e.code}-${i}`}
+            className="flex flex-col gap-2 py-2.5 sm:flex-row sm:items-start sm:gap-4"
+          >
+            <span className="flex shrink-0 flex-col sm:w-44">
+              <span className="font-mono text-sm font-semibold">{e.file}</span>
+              <span className="text-xs text-muted-foreground">
+                {t('import.errorLine', { line: e.line })}
+              </span>
+            </span>
+            <span className="text-sm">{errorText(t, e)}</span>
+          </li>
+        ))}
+      </ul>
+      {count > SHOWN && (
+        <p className="text-sm text-muted-foreground">
+          {t('import.firstErrors', { count: SHOWN })}
+        </p>
+      )}
+      <div className="flex w-full flex-wrap items-center justify-end gap-2">
         <IconButton
           icon="copy"
           label={t('import.copyErrors')}
@@ -57,30 +92,10 @@ export function ImportErrors({
               .then(() => toast({ text: t('import.errorsCopied') }))
           }}
         />
+        {choices && choices.count > 0 && (
+          <ResetChoices count={choices.count} onReset={choices.onReset} />
+        )}
       </div>
-      {files.map((file) => (
-        <div key={file} className="flex flex-col gap-1">
-          <h3 className="font-mono text-sm font-bold">{file}</h3>
-          <ul className="flex flex-col gap-1 text-sm">
-            {errors
-              .slice(0, SHOWN)
-              .filter((e) => e.file === file)
-              .map((e, i) => (
-                <li key={`${e.line}-${e.code}-${i}`} className="flex gap-2">
-                  <span className="w-20 shrink-0 text-muted-foreground">
-                    {t('import.errorLine', { line: e.line })}
-                  </span>
-                  <span>{errorText(t, e)}</span>
-                </li>
-              ))}
-          </ul>
-        </div>
-      ))}
-      {count > SHOWN && (
-        <p className="text-sm text-muted-foreground">
-          {t('import.firstErrors', { count: SHOWN })}
-        </p>
-      )}
     </section>
   )
 }

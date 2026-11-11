@@ -5,10 +5,18 @@ import { useToast } from '#/hooks/app/use-toast'
 import { withDecisions } from '#/lib/import/import-merges'
 import type { Decisions } from '#/lib/import/import-merges'
 import { EMPTY_WILL_CREATE } from '#/lib/import/import'
-import type { ImportCheck, ImportDone, ImportInput } from '#/lib/import/import'
+import type {
+  ImportCheck,
+  ImportDone,
+  ImportErrorItem,
+  ImportInput,
+} from '#/lib/import/import'
 import { checkImport, commitImport } from '#/server/import'
 
 type Checked = { input: ImportInput; check: ImportCheck }
+
+/** What the database refused when importing, with the choices made: shown on the summary. */
+type Refusal = { errors: Array<ImportErrorItem>; count: number }
 
 /**
  * Checking the rows, the merges chosen for what is new (IMP-06), and the import itself.
@@ -21,6 +29,7 @@ export function useImportRun(input: ImportInput, decisions: Decisions) {
   const [checked, setChecked] = useState<Checked | null>(null)
   const [busy, setBusy] = useState<'checking' | 'importing' | null>(null)
   const [done, setDone] = useState<ImportDone | null>(null)
+  const [refusal, setRefusal] = useState<Refusal | null>(null)
   const check = checked?.input === input ? checked.check : null
 
   // Leaving the page while it writes would hide how it ended.
@@ -42,6 +51,7 @@ export function useImportRun(input: ImportInput, decisions: Decisions) {
 
   async function runImport() {
     setBusy('importing')
+    setRefusal(null)
     const will = check?.ok ? check.willCreate : EMPTY_WILL_CREATE
     const result = await commitImport({
       data: withDecisions(input, will, decisions),
@@ -58,8 +68,7 @@ export function useImportRun(input: ImportInput, decisions: Decisions) {
       setDone(result.done)
       await router.invalidate()
     } else if (result?.error === 'invalid') {
-      const { errors, errorCount } = result
-      setChecked({ input, check: { ok: false, errors, errorCount } })
+      setRefusal({ errors: result.errors, count: result.errorCount })
     } else {
       const text = t(
         result?.error === 'timeout' ? 'import.timeout' : 'import.wroteNothing',
@@ -71,12 +80,17 @@ export function useImportRun(input: ImportInput, decisions: Decisions) {
 
   return {
     check,
+    refusal,
     busy,
     done,
     runCheck,
     runImport,
     dismissDone: () => setDone(null),
     /** Back to the files, keeping them and what was decided. */
-    reset: () => setChecked(null),
+    reset: () => {
+      setChecked(null)
+      setRefusal(null)
+    },
+    dismissRefusal: () => setRefusal(null),
   }
 }
