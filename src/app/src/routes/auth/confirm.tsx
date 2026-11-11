@@ -7,6 +7,7 @@ import { FormAlert } from '#/components/forms/form-field'
 import { Button } from '#/components/ui/button'
 import { EMAIL_LINK_TYPES } from '#/lib/auth/auth-schema'
 import { verifyEmailLink } from '#/server/password'
+import { Spinner } from '#/components/feedback/spinner'
 
 // Invitation and reset email links land here.
 export const Route = createFileRoute('/auth/confirm')({
@@ -41,7 +42,8 @@ function Confirm() {
       {token_hash ? (
         <form action={accept}>
           <Button type="submit" className="w-full" disabled={pending}>
-            {pending ? t('emailLink.pending') : t('emailLink.continue')}
+            {pending && <Spinner />}
+            {t('emailLink.continue')}
           </Button>
         </form>
       ) : null}

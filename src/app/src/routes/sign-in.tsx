@@ -17,6 +17,7 @@ import {
   useFocusFirstError,
 } from '#/hooks/forms/use-validation'
 import { signInSchema } from '#/lib/auth/auth-schema'
+import { Spinner } from '#/components/feedback/spinner'
 
 export const Route = createFileRoute('/sign-in')({
   beforeLoad: ({ context }) => {
@@ -90,7 +91,8 @@ function SignIn() {
           </FormAlert>
         )}
         <Button type="submit" disabled={pending}>
-          {pending ? t('signIn.pending') : t('signIn.submit')}
+          {pending && <Spinner />}
+          {t('signIn.submit')}
         </Button>
       </form>
       <Button

@@ -18,6 +18,7 @@ import type { ImportFileName } from '#/lib/import/import'
 import type { ImportFileRead } from '#/lib/import/import-files'
 import { templateHref } from '#/lib/import/import-templates'
 import { cn } from '#/lib/utils'
+import { Spinner } from '#/components/feedback/spinner'
 
 export const FILE_ICON: Record<ImportFileName, IconName> = {
   accounts: 'wallet',
@@ -165,7 +166,8 @@ export function ImportFilesCard({
       <div className="flex flex-wrap items-center justify-end gap-2 border-t p-4">
         <TemplatesMenu />
         <Button disabled={uploading || !canUpload} onClick={onUpload}>
-          {uploading ? t('import.uploading') : t('import.upload')}
+          {uploading && <Spinner />}
+          {t('import.upload')}
         </Button>
       </div>
     </section>

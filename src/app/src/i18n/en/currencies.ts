@@ -13,7 +13,6 @@ export const currenciesEn: typeof currenciesFr = {
     usedByAccount_one: 'The account {{name}} and 1 other are in {{code}}.',
     usedByAccount_other:
       'The account {{name}} and {{count}} others are in {{code}}.',
-    adding: 'Checking…',
     hexaRateDown: 'Rate validation is unavailable. Try again in a moment.',
     unknown: 'The rate service does not know {{code}}.',
     ratesFrom: 'Rates available from {{date}}',

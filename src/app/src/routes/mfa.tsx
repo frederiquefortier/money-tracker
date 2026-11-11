@@ -13,6 +13,7 @@ import {
   useFocusFirstError,
 } from '#/hooks/forms/use-validation'
 import { totpFormSchema } from '#/lib/auth/auth-schema'
+import { Spinner } from '#/components/feedback/spinner'
 
 // An allowlist: `next` cannot become an open redirect.
 const NEXT = ['/', '/set-password'] as const
@@ -110,7 +111,8 @@ function Mfa() {
           />
           {state.rejected && <FormAlert>{t('mfa.invalidCode')}</FormAlert>}
           <Button type="submit" disabled={pending}>
-            {pending ? t('mfa.pending') : t('mfa.verify')}
+            {pending && <Spinner />}
+            {t('mfa.verify')}
           </Button>
         </form>
       )}

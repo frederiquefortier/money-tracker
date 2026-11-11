@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next'
 import { FormAlert } from '#/components/forms/form-field'
 import { Button } from '#/components/ui/button'
 import { SheetBody, SheetClose, SheetFooter } from '#/components/ui/sheet'
+import { Spinner } from '#/components/feedback/spinner'
 
 /**
  * The form of a RouteSheet: fields in the scrolling body, Annuler and the submit button
@@ -13,7 +14,6 @@ export function SheetForm({
   pending,
   canSubmit = true,
   submitLabel,
-  pendingLabel,
   error,
   children,
 }: {
@@ -22,7 +22,6 @@ export function SheetForm({
   pending: boolean
   canSubmit?: boolean
   submitLabel?: string
-  pendingLabel?: string
   error?: React.ReactNode
   children: React.ReactNode
 }) {
@@ -45,9 +44,8 @@ export function SheetForm({
           </Button>
         </SheetClose>
         <Button type="submit" disabled={pending || !canSubmit}>
-          {pending
-            ? (pendingLabel ?? t('common.saving'))
-            : (submitLabel ?? t('common.save'))}
+          {pending && <Spinner />}
+          {submitLabel ?? t('common.save')}
         </Button>
       </SheetFooter>
     </form>

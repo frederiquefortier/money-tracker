@@ -12,6 +12,7 @@ import {
   useFocusFirstError,
 } from '#/hooks/forms/use-validation'
 import { newPasswordSchema } from '#/lib/auth/auth-schema'
+import { Spinner } from '#/components/feedback/spinner'
 
 export const Route = createFileRoute('/set-password')({
   beforeLoad: ({ context }) => {
@@ -98,7 +99,8 @@ function SetPassword() {
           </FormAlert>
         )}
         <Button type="submit" disabled={pending}>
-          {pending ? t('common.saving') : t('common.save')}
+          {pending && <Spinner />}
+          {t('common.save')}
         </Button>
       </form>
     </AuthShell>

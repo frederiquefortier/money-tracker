@@ -55,7 +55,6 @@ export function AddCurrencyForm({
       pending={pending}
       canSubmit={code !== null}
       submitLabel={t('common.add')}
-      pendingLabel={t('currencies.adding')}
       error={
         failure &&
         {

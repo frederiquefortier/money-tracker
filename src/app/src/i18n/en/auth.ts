@@ -6,7 +6,6 @@ export const authEn: typeof authFr = {
     email: 'Email',
     password: 'Password',
     submit: 'Sign in',
-    pending: 'Signing in…',
     invalidCredentials: 'Invalid email or password.',
     tooManyAttempts: 'Too many attempts. Wait a few minutes.',
     forgot: 'Forgot your password?',
@@ -22,12 +21,10 @@ export const authEn: typeof authFr = {
     challengeIntro: 'Enter the six-digit code from your authenticator app.',
     code: 'Code',
     verify: 'Verify',
-    pending: 'Verifying…',
     invalidCode: 'Invalid or expired code.',
   },
   emailLink: {
     continue: 'Continue',
-    pending: 'Checking…',
     invite: {
       title: 'Welcome',
       intro: 'Your invitation is ready. Continue to set your password.',
@@ -44,7 +41,6 @@ export const authEn: typeof authFr = {
   forgotPassword: {
     title: 'Forgot password',
     submit: 'Send the link',
-    pending: 'Sending…',
     sent: 'If an account exists for this email, the link has been sent. It expires in one hour.',
     back: 'Back to sign in',
   },

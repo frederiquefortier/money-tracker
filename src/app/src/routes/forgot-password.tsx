@@ -13,6 +13,7 @@ import {
   useFocusFirstError,
 } from '#/hooks/forms/use-validation'
 import { forgotPasswordSchema } from '#/lib/auth/auth-schema'
+import { Spinner } from '#/components/feedback/spinner'
 
 export const Route = createFileRoute('/forgot-password')({
   beforeLoad: ({ context }) => {
@@ -64,7 +65,8 @@ function ForgotPassword() {
             onChange={fields.onChange}
           />
           <Button type="submit" disabled={pending}>
-            {pending ? t('forgotPassword.pending') : t('forgotPassword.submit')}
+            {pending && <Spinner />}
+            {t('forgotPassword.submit')}
           </Button>
         </form>
       )}

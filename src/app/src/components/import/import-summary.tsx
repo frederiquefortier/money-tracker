@@ -14,6 +14,7 @@ import type {
   MergeKind,
 } from '#/lib/import/import'
 import { cn } from '#/lib/utils'
+import { Spinner } from '#/components/feedback/spinner'
 
 type Checked = Extract<ImportCheck, { ok: true }>
 
@@ -144,9 +145,8 @@ export function ImportSummary({
           disabled={importing}
           onClick={onImport}
         >
-          {importing
-            ? t('import.importing')
-            : t('import.importNow', { count: check.counts.transactions })}
+          {importing && <Spinner />}
+          {t('import.importNow', { count: check.counts.transactions })}
         </Button>
       )}
       <Button

@@ -22,6 +22,7 @@ import type {
   ListFilters,
   PeriodChoice,
 } from '#/lib/transactions/transaction-list'
+import { Spinner } from '#/components/feedback/spinner'
 
 /** "Voir 128 résultats", or "Voir les résultats" while the count loads. */
 function ResultCount({ total }: { total: number | null }) {
@@ -211,7 +212,10 @@ export function FilterDetail({
             onChange={onChange}
           />
         ) : (
-          <p className="text-muted-foreground">{t('common.loading')}</p>
+          <Spinner
+            label={t('common.loading')}
+            className="text-muted-foreground"
+          />
         )}
       </SheetBody>
       <FilterFooter

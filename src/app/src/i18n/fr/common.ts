@@ -9,7 +9,6 @@ export const commonFr = {
     saveFailed: 'La modification n’a pas été enregistrée.',
     cancel: 'Annuler',
     save: 'Enregistrer',
-    saving: 'Enregistrement…',
     suggestions: 'Suggestions pour {{label}}',
     loading: 'Chargement…',
     clear: 'Effacer',

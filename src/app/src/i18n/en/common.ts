@@ -11,7 +11,6 @@ export const commonEn: typeof commonFr = {
     saveFailed: 'The change was not saved.',
     cancel: 'Cancel',
     save: 'Save',
-    saving: 'Saving…',
     suggestions: 'Suggestions for {{label}}',
     loading: 'Loading…',
     clear: 'Clear',

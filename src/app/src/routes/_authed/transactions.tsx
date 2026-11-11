@@ -28,6 +28,7 @@ import { listTransactions } from '#/server/transaction-list'
 import { getFeeCategory } from '#/server/transfers'
 import type { FilterValues } from '#/lib/transactions/transaction-filters'
 import type { PeriodChoice } from '#/lib/transactions/transaction-list'
+import { Spinner } from '#/components/feedback/spinner'
 
 const KEPT = [
   'period',
@@ -241,7 +242,9 @@ function Transactions() {
             ref={sentinel}
             className="py-4 text-center text-muted-foreground"
           >
-            {loading && t('common.loading')}
+            {loading && (
+              <Spinner label={t('common.loading')} className="mx-auto" />
+            )}
           </div>
         )}
       </div>

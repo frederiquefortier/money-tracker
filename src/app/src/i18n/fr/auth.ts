@@ -4,7 +4,6 @@ export const authFr = {
     email: 'Courriel',
     password: 'Mot de passe',
     submit: 'Se connecter',
-    pending: 'Connexion…',
     invalidCredentials: 'Courriel ou mot de passe invalide.',
     tooManyAttempts: 'Trop de tentatives. Patientez quelques minutes.',
     forgot: 'Mot de passe oublié?',
@@ -21,12 +20,10 @@ export const authFr = {
       'Entrez le code à six chiffres de votre application d’authentification.',
     code: 'Code',
     verify: 'Vérifier',
-    pending: 'Vérification…',
     invalidCode: 'Code invalide ou expiré.',
   },
   emailLink: {
     continue: 'Continuer',
-    pending: 'Vérification…',
     invite: {
       title: 'Bienvenue',
       intro:
@@ -44,7 +41,6 @@ export const authFr = {
   forgotPassword: {
     title: 'Mot de passe oublié',
     submit: 'Envoyer le lien',
-    pending: 'Envoi…',
     sent: 'Si un compte existe pour ce courriel, le lien vient d’être envoyé. Il expire dans une heure.',
     back: 'Retour à la connexion',
   },
