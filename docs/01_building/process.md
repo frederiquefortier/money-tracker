@@ -36,6 +36,7 @@ work runs on:
 
 | Risk | Check |
 |---|---|
+| A flow that works in pieces but not together | Playwright on a local stack in CI, non-blocking at first (ADR-044) |
 | A table readable by another user | pgTAP test per table: a second user sees zero rows |
 | A multi-row write half applied | One SQL function, with pgTAP tests of its invariants (ADR-012) |
 | Type drift between form, server and database | One Zod schema per input, generated database types, strict type-check in CI |

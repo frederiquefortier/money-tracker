@@ -4,6 +4,29 @@ Technical and structural choices, with the alternatives that were rejected. Chec
 
 <!-- Newest first: a new ADR goes directly below this line. Template at the bottom. -->
 
+### ADR-044: End-to-end tests with Playwright, on a local stack, in CI (2026-11-11)
+
+**Context:**
+- The unit tests cover the pure logic and pgTAP covers the database. Nothing exercised a request from the browser through a server function to an RPC, nor the sign-in with MFA. The development machine cannot run the local stack (ADR-014), and the hosted project holds the owner's account (ADR-021).
+
+**Decision:**
+- `@playwright/test`, specs in `src/app/e2e/`, run by a CI job on a local Supabase stack (the one the pgTAP job already starts). The job is non-blocking at first (`continue-on-error`): it gates nothing, and the `migrate` job does not wait for it.
+- A setup project creates one test user through the Auth admin API, signs in through the screen, enrols TOTP from the secret the screen shows, and keeps the session. The TOTP code is computed with `node:crypto` (RFC 6238), no library.
+- The specs: sign-in (wrong password, password without code, password with code, a cross-site write is refused), the import of the example files, a new expense. They run in order on one worker, since the import creates the accounts and categories the form needs.
+- `e2e/env.ts` refuses any Supabase URL that is not `localhost` or `127.0.0.1`.
+
+**Alternatives Considered:**
+- Against the hosted project -> Test entries among real data (ADR-021).
+- Seeding the test user's factor directly in SQL -> Skips the enrolment screen, the one most worth testing.
+- A TOTP library (otplib) -> Fifteen lines of `node:crypto` (ADR-011).
+
+**Consequences:**
+- The specs could not be run on the laptop. They were written from the screens and tuned on the first CI runs; expect selector fixes. The job uploads the HTML report and traces.
+- To gate merges, remove `continue-on-error` from the job and add it to the `migrate` job's `needs`.
+- To run locally, someone with Docker sets `E2E_SUPABASE_URL`, `E2E_PUBLISHABLE_KEY` and `E2E_SECRET_KEY` from `supabase status` and runs `npm run e2e` from `src/app`.
+
+---
+
 ### ADR-043: A dev-only design gallery instead of Storybook (2026-11-11)
 
 **Context:**
@@ -456,6 +479,7 @@ Dependencies that stay:
 | i18next, react-i18next | Plurals, interpolation, server-rendered language switch (ADR-008) |
 | Recharts (via shadcn charts) | Line, bar, area, donut charts |
 | react-aria-components, react-aria, @internationalized/date | The date field and its calendar: typed segments, range calendar, tooltips (design-decisions.md) |
+| @playwright/test (dev only) | End-to-end tests in CI (ADR-044). Runs a real browser; no native equivalent |
 | @iconify/react (offline) | coolicons from a vendored file (ADR-020) |
 | @fontsource-variable/nunito, /inconsolata | Self-hosted fonts: no request to Google Fonts, no CSP change |
 

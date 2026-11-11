@@ -25,3 +25,10 @@ export const SECURITY_HEADERS: Record<string, string> = {
     'camera=(), microphone=(), geolocation=(), payment=(), usb=()',
   'Cross-Origin-Opener-Policy': 'same-origin',
 }
+
+// Covers login CSRF, which SameSite=lax does not.
+export function isCrossSiteWrite(request: Request): boolean {
+  if (request.method === 'GET' || request.method === 'HEAD') return false
+  const site = request.headers.get('sec-fetch-site')
+  return site === 'cross-site' || site === 'same-site'
+}

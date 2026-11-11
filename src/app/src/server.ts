@@ -6,6 +6,7 @@ import { createServerEntry } from '@tanstack/react-start/server-entry'
 import {
   SECURITY_HEADERS,
   contentSecurityPolicy,
+  isCrossSiteWrite,
 } from '#/lib/server/security-headers'
 
 const handle = createStartHandler(defaultStreamHandler)
@@ -13,13 +14,6 @@ const handle = createStartHandler(defaultStreamHandler)
 function newNonce(): string {
   const bytes = crypto.getRandomValues(new Uint8Array(16))
   return btoa(String.fromCharCode(...bytes))
-}
-
-// Covers login CSRF, which SameSite=lax does not.
-function isCrossSiteWrite(request: Request): boolean {
-  if (request.method === 'GET' || request.method === 'HEAD') return false
-  const site = request.headers.get('sec-fetch-site')
-  return site === 'cross-site' || site === 'same-site'
 }
 
 // Netlify's static headers do not reach function responses, so the server sets them.

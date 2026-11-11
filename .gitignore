@@ -23,6 +23,11 @@ src/app/.vinxi/
 src/app/.nitro/
 coverage/
 
+# Playwright
+src/app/e2e/.auth/
+src/app/playwright-report/
+src/app/test-results/
+
 # Netlify
 .netlify/
 

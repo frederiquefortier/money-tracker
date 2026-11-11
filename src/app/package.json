@@ -12,6 +12,7 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "test": "vitest run",
+    "e2e": "playwright test",
     "format": "prettier --write . && eslint --fix .",
     "check": "prettier --check .",
     "verify": "npm run typecheck && npm run lint && npm run check && npm test",
@@ -47,6 +48,7 @@
   },
   "devDependencies": {
     "@netlify/vite-plugin-tanstack-start": "^1.2.15",
+    "@playwright/test": "1.65.0",
     "@tanstack/devtools-vite": "0.8.5",
     "@tanstack/eslint-config": "0.4.0",
     "@tanstack/react-devtools": "0.10.13",

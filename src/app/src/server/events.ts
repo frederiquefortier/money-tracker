@@ -27,7 +27,9 @@ export const getEvents = createServerFn({ method: 'GET' }).handler(
     const [events, types, people, usage] = loaded(
       'Events',
       ...(await Promise.all([
-        supabase.from('events').select('id, name, type_id, starts_on, ends_on, auto_link'),
+        supabase
+          .from('events')
+          .select('id, name, type_id, starts_on, ends_on, auto_link'),
         supabase.from('event_types').select('id, name, color'),
         supabase.from('event_people').select('event_id, person_id'),
         supabase.from('event_usage').select('event_id, transaction_count'),
