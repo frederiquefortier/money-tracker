@@ -43,7 +43,12 @@ export default [
   // Every visible string goes through t() (ADR-008).
   {
     files: ['src/**/*.tsx'],
-    ignores: ['src/components/ui/**'],
+    // The design gallery is a dev tool, in English only (ADR-043).
+    ignores: [
+      'src/components/ui/**',
+      'src/components/design/**',
+      'src/routes/_authed/design.tsx',
+    ],
     plugins: { i18next },
     rules: {
       'i18next/no-literal-string': ['error', { mode: 'jsx-text-only' }],

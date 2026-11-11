@@ -4,6 +4,25 @@ Technical and structural choices, with the alternatives that were rejected. Chec
 
 <!-- Newest first: a new ADR goes directly below this line. Template at the bottom. -->
 
+### ADR-043: A dev-only design gallery instead of Storybook (2026-11-11)
+
+**Context:**
+- The author asked whether to build Storybook for a more consistent design system. Shared components already live in role folders (ADR-026), and the inconsistency comes from new screens not reusing them.
+
+**Decision:**
+- `/design`, a route under `_authed` that throws `notFound()` unless `import.meta.env.DEV`. It renders the shared components in their states, with the app's real providers (i18n, router, toaster), and a Dark toggle that puts the `dark` class on the preview.
+- Its code is in `components/design/`, one file per role. It is in English only, outside the i18n lint rule, because it is a developer tool. A new shared component gets a specimen there in the same change.
+
+**Alternatives Considered:**
+- Storybook -> A second build and a new dependency (ADR-011), and every story needs decorators for i18n, the router and Tailwind that drift from the app. Revisit with a second developer or visual regression tests.
+- A components inventory in the docs only -> Goes stale; the gallery cannot.
+
+**Consequences:**
+- The route ships in the bundle but answers 404 outside dev. Popovers and dialogs open in the light theme even with Dark on, since they render at the page root.
+- Not shown: the add button, sheets and the date range calendar, which need the route or the layout around them.
+
+---
+
 ### ADR-042: An event can opt out of the automatic link by date (2026-11-11)
 
 **Context:**

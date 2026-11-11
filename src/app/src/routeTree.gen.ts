@@ -18,6 +18,7 @@ import { Route as AuthedIndexRouteImport } from './routes/_authed/index'
 import { Route as AuthedAccountsRouteImport } from './routes/_authed/accounts'
 import { Route as AuthedBudgetRouteImport } from './routes/_authed/budget'
 import { Route as AuthedDashboardRouteImport } from './routes/_authed/dashboard'
+import { Route as AuthedDesignRouteImport } from './routes/_authed/design'
 import { Route as AuthedTransactionsRouteImport } from './routes/_authed/transactions'
 import { Route as AuthConfirmRouteImport } from './routes/auth/confirm'
 import { Route as AuthedAccountsAccountIdRouteImport } from './routes/_authed/accounts/$accountId'
@@ -92,6 +93,11 @@ const AuthedBudgetRoute = AuthedBudgetRouteImport.update({
 const AuthedDashboardRoute = AuthedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => AuthedRoute,
+} as any)
+const AuthedDesignRoute = AuthedDesignRouteImport.update({
+  id: '/design',
+  path: '/design',
   getParentRoute: () => AuthedRoute,
 } as any)
 const AuthedTransactionsRoute = AuthedTransactionsRouteImport.update({
@@ -277,6 +283,7 @@ export interface FileRoutesByFullPath {
   '/accounts': typeof AuthedAccountsRouteWithChildren
   '/budget': typeof AuthedBudgetRoute
   '/dashboard': typeof AuthedDashboardRoute
+  '/design': typeof AuthedDesignRoute
   '/transactions': typeof AuthedTransactionsRouteWithChildren
   '/auth/confirm': typeof AuthConfirmRoute
   '/accounts/$accountId': typeof AuthedAccountsAccountIdRoute
@@ -316,6 +323,7 @@ export interface FileRoutesByTo {
   '/accounts': typeof AuthedAccountsRouteWithChildren
   '/budget': typeof AuthedBudgetRoute
   '/dashboard': typeof AuthedDashboardRoute
+  '/design': typeof AuthedDesignRoute
   '/transactions': typeof AuthedTransactionsRouteWithChildren
   '/auth/confirm': typeof AuthConfirmRoute
   '/': typeof AuthedIndexRoute
@@ -358,6 +366,7 @@ export interface FileRoutesById {
   '/_authed/accounts': typeof AuthedAccountsRouteWithChildren
   '/_authed/budget': typeof AuthedBudgetRoute
   '/_authed/dashboard': typeof AuthedDashboardRoute
+  '/_authed/design': typeof AuthedDesignRoute
   '/_authed/transactions': typeof AuthedTransactionsRouteWithChildren
   '/auth/confirm': typeof AuthConfirmRoute
   '/_authed/': typeof AuthedIndexRoute
@@ -402,6 +411,7 @@ export interface FileRouteTypes {
     | '/accounts'
     | '/budget'
     | '/dashboard'
+    | '/design'
     | '/transactions'
     | '/auth/confirm'
     | '/accounts/$accountId'
@@ -441,6 +451,7 @@ export interface FileRouteTypes {
     | '/accounts'
     | '/budget'
     | '/dashboard'
+    | '/design'
     | '/transactions'
     | '/auth/confirm'
     | '/'
@@ -482,6 +493,7 @@ export interface FileRouteTypes {
     | '/_authed/accounts'
     | '/_authed/budget'
     | '/_authed/dashboard'
+    | '/_authed/design'
     | '/_authed/transactions'
     | '/auth/confirm'
     | '/_authed/'
@@ -588,6 +600,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof AuthedDashboardRouteImport
+      parentRoute: typeof AuthedRoute
+    }
+    '/_authed/design': {
+      id: '/_authed/design'
+      path: '/design'
+      fullPath: '/design'
+      preLoaderRoute: typeof AuthedDesignRouteImport
       parentRoute: typeof AuthedRoute
     }
     '/_authed/transactions': {
@@ -952,6 +971,7 @@ interface AuthedRouteChildren {
   AuthedAccountsRoute: typeof AuthedAccountsRouteWithChildren
   AuthedBudgetRoute: typeof AuthedBudgetRoute
   AuthedDashboardRoute: typeof AuthedDashboardRoute
+  AuthedDesignRoute: typeof AuthedDesignRoute
   AuthedTransactionsRoute: typeof AuthedTransactionsRouteWithChildren
   AuthedIndexRoute: typeof AuthedIndexRoute
   AuthedSettingsCategoriesRoute: typeof AuthedSettingsCategoriesRouteWithChildren
@@ -966,6 +986,7 @@ const AuthedRouteChildren: AuthedRouteChildren = {
   AuthedAccountsRoute: AuthedAccountsRouteWithChildren,
   AuthedBudgetRoute: AuthedBudgetRoute,
   AuthedDashboardRoute: AuthedDashboardRoute,
+  AuthedDesignRoute: AuthedDesignRoute,
   AuthedTransactionsRoute: AuthedTransactionsRouteWithChildren,
   AuthedIndexRoute: AuthedIndexRoute,
   AuthedSettingsCategoriesRoute: AuthedSettingsCategoriesRouteWithChildren,
