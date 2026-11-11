@@ -23,7 +23,7 @@ import type {
   FilterValues,
 } from '#/lib/transactions/transaction-filters'
 
-// The filter sheet's lists, one per tab (spec 14, spec 20).
+// The filter sheet's lists, one per tab.
 
 function NoMatch() {
   const { t } = useTranslation()
@@ -82,7 +82,7 @@ function MerchantList({
   )
 }
 
-/** Events in two cards, current open and past folded, after the choice of none (spec 22). */
+/** Events in two cards, current open and past folded, after the choice of none. */
 function EventList({
   options,
   query,

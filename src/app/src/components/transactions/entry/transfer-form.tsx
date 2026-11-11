@@ -77,7 +77,7 @@ function useSubmit({
   )
 }
 
-/** Spec 16: with fewer than two accounts, a transfer cannot be made. */
+/** With fewer than two accounts, a transfer cannot be made. */
 function OneAccount() {
   const { t } = useTranslation()
   return (
@@ -187,7 +187,7 @@ function useTransferForm(props: TransferFormProps) {
 }
 
 /**
- * Spec 16: a transfer between two of the owner's accounts (TRX-04, 11), new (`id`
+ * a transfer between two of the owner's accounts (TRX-04, 11), new (`id`
  * undefined) or edited.
  */
 export function TransferForm(props: TransferFormProps) {

@@ -1,4 +1,4 @@
-// Category colours (spec 12): stored as #rrggbb, reasoned about in OKLCH so a variation
+// Category colours: stored as #rrggbb, reasoned about in OKLCH so a variation
 // keeps the hue. Conversions follow Björn Ottosson's OKLab definition.
 
 export type Oklch = { l: number; c: number; h: number }
@@ -148,7 +148,7 @@ export type TagColors = {
 }
 
 /**
- * A tag's soft pill from any hex, like a Gmail label (spec 22): the hue kept, a pale tint
+ * A tag's soft pill from any hex, like a Gmail label: the hue kept, a pale tint
  * with dark text, or in dark mode a deep tint with pale text. Both pairs read at 4.5:1
  * whatever the colour chosen.
  */

@@ -161,7 +161,7 @@ function RowContent({
           )}
         </span>
         <span className="flex min-w-0 flex-1 flex-col">
-          {/* The event's tag sits beside the name, as a label does (spec 22). */}
+          {/* The event's tag sits beside the name, as a label does. */}
           <span className="flex min-w-0 items-center gap-2">
             <span className="min-w-0 truncate font-semibold">{title}</span>
             {row.event && (
@@ -176,7 +176,7 @@ function RowContent({
           {(details || row.people.length > 0) && (
             <span className="flex min-w-0 items-center gap-2 text-sm text-muted-foreground">
               <span className="truncate">{details}</span>
-              {/* Spec 20: who it was with, stacked like a group's avatars. */}
+              {/* who it was with, stacked like a group's avatars. */}
               {row.people.length > 0 && (
                 <>
                   <AvatarStack items={row.people} size="md" />
@@ -216,7 +216,7 @@ const rowLayout = 'flex min-w-0 flex-1 flex-col gap-1 py-3 pl-4 text-left'
 
 /**
  * One transaction. An expense, income or adjustment opens its form, and a transfer or
- * its fee the transfer's (spec 16).
+ * its fee the transfer's.
  */
 export function TransactionRow({
   row,

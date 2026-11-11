@@ -4,7 +4,7 @@ import type { Merchant } from '#/lib/merchants/merchant'
 import type { Person, PersonGroup } from '#/lib/people/person'
 import type { FormAccount } from '#/lib/transactions/transaction'
 
-// The filters of the transactions list (spec 14): the tabs and what each one holds.
+// The filters of the transactions list: the tabs and what each one holds.
 
 export type FilterValues = {
   accountIds: Array<string>

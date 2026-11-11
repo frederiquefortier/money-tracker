@@ -125,9 +125,9 @@ const receiptErrors = (error: (name: string) => string | undefined) => ({
 })
 
 /**
- * Spec 15: an expense or income, new (`id` undefined) or edited. A category's round
+ * an expense or income, new (`id` undefined) or edited. A category's round
  * icon, on the receipt or a split line, opens the category list over the whole sheet;
- * the form stays as it was underneath. `onTransfer` offers the Transfert tab (spec 16),
+ * the form stays as it was underneath. `onTransfer` offers the Transfert tab,
  * handing over what was typed.
  */
 export function TransactionForm({
@@ -187,7 +187,7 @@ export function TransactionForm({
             : update({
                 kind,
                 ...peopleForKind(draft, kind),
-                // An income names who it came from instead of a seller (spec 20).
+                // An income names who it came from instead of a seller.
                 ...(kind === 'income' ? { sellerId: null } : {}),
               })
         }

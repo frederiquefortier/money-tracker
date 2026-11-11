@@ -46,7 +46,7 @@ function LineBadge({ category }: { category: Category | undefined }) {
 }
 
 /**
- * TRX-07 (spec 21), on an income with its Proche, on the line of fields linked to it:
+ * TRX-07, on an income with its Proche, on the line of fields linked to it:
  * the owed lines it pays back, drawn like transaction rows (the category, the merchant,
  * the date, what is left), ticked in the order the money goes to them. The first ticked
  * gives its expense's category, as a refund, unless one was chosen by hand.

@@ -13,7 +13,7 @@ import { saveEventType } from '#/server/events'
 const NO_USED: ReadonlySet<string> = new Set()
 
 /**
- * EVT-01 (spec 22): a type is a colour, then a name. `onSaved` gets the new id, for the
+ * EVT-01: a type is a colour, then a name. `onSaved` gets the new id, for the
  * event form that opened it over itself.
  */
 export function EventTypeForm({

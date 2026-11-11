@@ -45,7 +45,7 @@ export function useAccountTree(
 }
 
 /**
- * People under their groups, as accounts under their institution (spec 20): a person in
+ * People under their groups, as accounts under their institution: a person in
  * several groups is in each, those in none under "Sans groupe". Searching lists the
  * matches flat, by name or alias. Archived people stay, for past transactions.
  */
@@ -128,7 +128,7 @@ export function useCategoryTree(
 }
 
 /**
- * Events in two cards, the current ones open and the past ones folded (spec 22); a search
+ * Events in two cards, the current ones open and the past ones folded; a search
  * lists the matches flat. Past events stay, for old transactions.
  */
 export function useEventTree(

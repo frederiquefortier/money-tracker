@@ -59,7 +59,7 @@ function useDeleteText(summary: TransactionSummary) {
   }
 }
 
-/** Delete, on the transaction's row (spec 14) or in its sheet on phones. */
+/** Delete, on the transaction's row or in its sheet on phones. */
 export function TransactionActions({
   summary,
   placement,

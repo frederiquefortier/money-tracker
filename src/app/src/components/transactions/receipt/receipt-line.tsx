@@ -1,7 +1,7 @@
 import { cn } from '#/lib/utils'
 import { focusRing } from '#/components/styles'
 
-// The receipt slip's parts (spec 15), shared by the amount and its split lines.
+// The receipt slip's parts, shared by the amount and its split lines.
 
 /** The dashed rule between the slip's sections. */
 export const slipRule = <hr className="my-1 border-dashed border-border" />

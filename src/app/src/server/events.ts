@@ -20,7 +20,7 @@ const KNOWN: Partial<Record<string, EventError>> = {
 
 const failure = failureFor('events', KNOWN)
 
-/** Events and types with their people and counts (spec 22). */
+/** Events and types with their people and counts. */
 export const getEvents = createServerFn({ method: 'GET' }).handler(
   async (): Promise<{ events: Array<EventItem>; types: Array<EventType> }> => {
     const supabase = getSupabase()

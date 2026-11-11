@@ -10,7 +10,7 @@ import {
 import { typedMinor } from '#/lib/transactions/transaction-preview'
 import type { Transfer, TransferInput } from '#/lib/transfers/transfer'
 
-// What the transfer form holds while it is being filled (spec 16) and its validation.
+// What the transfer form holds while it is being filled and its validation.
 // The server recomputes and the database checks.
 
 export type TransferDraft = {
@@ -29,7 +29,7 @@ export type TransferDraft = {
 /** The two accounts' currencies, once chosen. */
 export type TransferCurrencies = { from: string | null; to: string | null }
 
-/** A new transfer keeps what the transaction form already had (spec 15). */
+/** A new transfer keeps what the transaction form already had. */
 export function emptyTransfer(carry: {
   amount: string
   accountId: string | null

@@ -71,7 +71,7 @@ export const getFrequentCategories = createServerFn({ method: 'GET' }).handler(
   },
 )
 
-/** The people most often on transactions over the last 90 days, most first (spec 20). */
+/** The people most often on transactions over the last 90 days, most first. */
 export const getFrequentPeople = createServerFn({ method: 'GET' }).handler(
   async (): Promise<Array<string>> => {
     const [data] = loaded(
@@ -210,7 +210,7 @@ export const saveTransaction = createServerFn({ method: 'POST' })
     return { ok: true, id }
   })
 
-/** An expense or income; a transfer's parts are deleted together (spec 16). */
+/** An expense or income; a transfer's parts are deleted together. */
 export const deleteTransaction = createServerFn({ method: 'POST' })
   .validator(idInput)
   .handler(async ({ data }): Promise<TransactionResult> => {

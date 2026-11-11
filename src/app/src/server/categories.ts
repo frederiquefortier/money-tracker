@@ -106,7 +106,7 @@ export const getCategories = createServerFn({ method: 'GET' }).handler(
   },
 )
 
-/** Brings every automatic colour in line with its parent (spec 12). */
+/** Brings every automatic colour in line with its parent. */
 async function recolor() {
   const supabase = getSupabase()
   const { data, error } = await supabase

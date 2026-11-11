@@ -7,7 +7,7 @@ import { useFormatLocale } from '#/hooks/app/use-locale'
 import { saveMerchant } from '#/server/merchants'
 
 /**
- * TRX-05 (spec 13): the most used merchants first, matches by name while typing, and
+ * TRX-05: the most used merchants first, matches by name while typing, and
  * "Créer « … »" for a new one with no default category.
  */
 export function MerchantPicker({

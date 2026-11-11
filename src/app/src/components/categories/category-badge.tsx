@@ -31,7 +31,7 @@ export function CategoryIcon({
   )
 }
 
-/** A category's icon in a filled circle of its colour; the icon stays readable (spec 12). */
+/** A category's icon in a filled circle of its colour; the icon stays readable. */
 export function CategoryBadge({
   icon,
   color,

@@ -1,7 +1,7 @@
 import { compareNames } from '#/lib/shared/collections'
 
 /**
- * The lines before one row of a tree drawn as a flat list (spec 12): `continues[k]` is a
+ * The lines before one row of a tree drawn as a flat list: `continues[k]` is a
  * vertical line through the row at level k + 1, and the last slot is the elbow, cut short
  * when the row is the last of its siblings.
  */

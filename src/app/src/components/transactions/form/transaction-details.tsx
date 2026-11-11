@@ -66,7 +66,7 @@ type Where = (typeof WHERE)[number]
 
 /**
  * A store or a person, one or the other: where an expense was bought (PPL-08) or who an
- * income came from (spec 20). The toggle only decides which field shows; switching clears
+ * income came from. The toggle only decides which field shows; switching clears
  * the other side.
  */
 function StoreOrPerson({
@@ -152,8 +152,8 @@ function StoreOrPerson({
 }
 
 /**
- * Spec 15, under the receipt: the store, full width, which can fill the category
- * (MER-01), and who it was bought from (PPL-08), or on an income who it came from (spec 20); the account, the date, the note.
+ * Under the receipt: the store, full width, which can fill the category
+ * (MER-01), and who it was bought from (PPL-08), or on an income who it came from; the account, the date, the note.
  */
 export function TransactionDetails({
   id,

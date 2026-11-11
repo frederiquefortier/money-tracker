@@ -42,8 +42,8 @@ function useChanging<T>(initial: T) {
 }
 
 /**
- * EVT-02, EVT-07 (spec 22): name, type, dates and people. No date is required; the
- * dates link the transactions in them. What an event cost is spec 23's view.
+ * EVT-02, EVT-07: name, type, dates and people. No date is required; the
+ * dates link the transactions in them. What an event cost is a later view (EVT-04, 05).
  */
 export function EventForm({
   row,

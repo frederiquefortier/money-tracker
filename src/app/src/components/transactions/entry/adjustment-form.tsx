@@ -32,7 +32,7 @@ export type AdjustmentValues = {
   note: string
 }
 
-/** The app's balance on a date, `undefined` while it loads (spec 16). */
+/** The app's balance on a date, `undefined` while it loads. */
 function useAppBalance(
   accountId: string,
   date: string,
@@ -73,7 +73,7 @@ function SlipAmount({
 }
 
 /**
- * Spec 16 on the slip of spec 15: the real balance typed big, then the app's balance on
+ * The real balance typed big, then the app's balance on
  * that date and the gap the adjustment records.
  */
 function AdjustmentReceipt({

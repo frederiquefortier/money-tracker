@@ -8,7 +8,7 @@ import { Sheet, SheetContent } from '#/components/ui/sheet'
 
 /**
  * A form's sheet: closing plays the animation, then runs `onClosed`. Once something was
- * typed or chosen, closing other than by saving asks first (spec 15). `actions` show in
+ * typed or chosen, closing other than by saving asks first. `actions` show in
  * the header on phones (shared patterns). A sheet over a sheet (the category form over a
  * transaction) is one too, with its own changes and Escape layers.
  */
@@ -87,7 +87,7 @@ export function FormSheet({
 }
 
 /**
- * A sheet that is a route (spec 11): it has a URL, so back and reload work. Once closed
+ * A sheet that is a route: it has a URL, so back and reload work. Once closed
  * it navigates to `to` and refreshes its data.
  */
 export function RouteSheet({

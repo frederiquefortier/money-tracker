@@ -1,4 +1,4 @@
-// The Événements screens (spec 22).
+// The Événements screens.
 export const eventsFr = {
   events: {
     title: 'Événements',

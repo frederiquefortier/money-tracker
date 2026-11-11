@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import type { LinkedEvent } from '#/lib/events/event'
 
-// The transactions list (spec 14): a period, its days, a page at a time.
+// The transactions list: a period, its days, a page at a time.
 
 export const LISTED_KINDS = [
   'expense',
@@ -70,11 +70,11 @@ export type ListedPerson = {
   name: string | null
   count: number
   role: 'invited' | 'owes' | 'from'
-  /** An owed part not fully paid back yet, or not known yet (spec 21). */
+  /** An owed part not fully paid back yet, or not known yet. */
   open: boolean
 }
 
-/** Someone on it still owes me their part (spec 20, 21). */
+/** Someone on it still owes me their part. */
 export const isOwed = (row: { people: ReadonlyArray<ListedPerson> }) =>
   row.people.some((p) => p.open)
 
@@ -92,13 +92,13 @@ export type ListedTransaction = {
   /** Every category of the transaction, the largest share first (TRX-06). */
   categories: Array<ListedCategory>
   /**
-   * Everyone on it but Moi, in the order of their lines (spec 20): a line without a name
+   * Everyone on it but Moi, in the order of their lines: a line without a name
    * has no name and a count; `owes` lines colour the row.
    */
   people: Array<ListedPerson>
   /** On an income, the expenses it pays back: merchant or category, and date. */
   reimburses: Array<{ label: string | null; date: string }>
-  /** The event it carries as a tag (spec 22). */
+  /** The event it carries as a tag. */
   event: LinkedEvent | null
   /** As booked, in the account's currency; a transfer is unsigned in the full list. */
   amount: string
@@ -106,7 +106,7 @@ export type ListedTransaction = {
   /** In the display currency; null when the rate is missing. */
   displayAmount: string | null
   rate: string | null
-  /** A transfer's fee, on its departure row (spec 16). */
+  /** A transfer's fee, on its departure row. */
   fee: { amount: string; category: string | null } | null
   /** What arrived in another currency, and its value back in this row's (TRX-11). */
   arrival: { amount: string; currency: string; value: string | null } | null

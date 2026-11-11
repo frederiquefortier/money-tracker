@@ -3,7 +3,7 @@ import { getMatchingEvent } from '#/server/events'
 import type { TransactionDraft } from '#/lib/transactions/transaction-draft-types'
 
 /**
- * Spec 22: until the event is chosen or cleared by hand, the field follows the rule as
+ * until the event is chosen or cleared by hand, the field follows the rule as
  * the date and the kind change. The rule itself stays in SQL, so what shows here is what
  * saving will give. A failed lookup leaves the field as it was.
  */

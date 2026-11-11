@@ -31,7 +31,7 @@ export function useRowText(row: ListedTransaction) {
       title: t('transactions.list.adjustment'),
       details: join([accountLabel(row.account), row.note]),
     }
-  // Spec 21: what an income pays back, first on its line.
+  // what an income pays back, first on its line.
   const reimburses = row.reimburses
     .map((r) =>
       [r.label, formatDate(r.date, locale, 'medium')]

@@ -33,7 +33,7 @@ function useFees(row: ListedTransaction) {
 }
 
 /**
- * Spec 14: each fee as a tight line inside its row, joined to the row's icon by the
+ * each fee as a tight line inside its row, joined to the row's icon by the
  * tree's elbow line, with the fee category's icon at a smaller size and the amount
  * under the row's own.
  */

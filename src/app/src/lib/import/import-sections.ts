@@ -15,7 +15,7 @@ import type {
   MergeKind,
 } from '#/lib/import/import'
 
-// What the summary lists under "new" (spec 18): each kind, its items, and for the four
+// What the summary lists under "new": each kind, its items, and for the four
 // kinds that can be merged (IMP-06) what each is merged into.
 
 export const SECTION_KEYS = [

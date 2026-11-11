@@ -179,7 +179,7 @@ async function filterNames(
 }
 
 /**
- * One page of the list (spec 14): whole days of the period, newest first, narrowed by
+ * One page of the list: whole days of the period, newest first, narrowed by
  * the filters and the search (TRX-12), converted and netted in SQL. The first page also
  * names the filters in use.
  */

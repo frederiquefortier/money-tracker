@@ -249,7 +249,7 @@ function Transactions() {
         )}
       </div>
       <FloatingAddLink to="/transactions/new" label={t('transactions.add')} />
-      {/* The transaction forms open here as sheets (spec 15). */}
+      {/* The transaction forms open here as sheets. */}
       <Outlet />
     </div>
   )

@@ -144,7 +144,7 @@ function Accounts() {
         institutions={page.institutions}
       />
       <AddMenu />
-      {/* The account form opens here as a sheet, over the list (spec 11). */}
+      {/* The account form opens here as a sheet, over the list. */}
       <Outlet />
     </ListPage>
   )

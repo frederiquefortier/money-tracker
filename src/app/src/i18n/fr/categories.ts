@@ -1,4 +1,4 @@
-// The Catégories screens (spec 12).
+// The Catégories screens.
 export const categoriesFr = {
   categories: {
     feeCategory: 'Assignée aux frais',

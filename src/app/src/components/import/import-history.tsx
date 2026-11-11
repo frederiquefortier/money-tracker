@@ -49,7 +49,7 @@ function BatchRow({
   )
 }
 
-/** The imports made, newest first, each one undone in one action (IMP-05, spec 18). */
+/** The imports made, newest first, each one undone in one action (IMP-05). */
 export function ImportHistory({
   batches,
 }: {

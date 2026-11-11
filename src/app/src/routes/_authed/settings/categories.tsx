@@ -203,7 +203,7 @@ function Categories() {
         />
       </div>
       <AddCategoryButton kind={kind} />
-      {/* The category form opens here as a sheet, over the tree (spec 12). */}
+      {/* The category form opens here as a sheet, over the tree. */}
       <Outlet />
     </ListPage>
   )

@@ -9,7 +9,7 @@ import { useToast } from '#/hooks/app/use-toast'
 
 /**
  * The loader's first page, then older ones fetched as the end of the list comes into
- * view (spec 14). A new first page (a save, another period) starts over.
+ * view. A new first page (a save, another period) starts over.
  */
 export function useTransactionPages(first: TransactionPage, query: ListQuery) {
   const { t } = useTranslation()

@@ -4,7 +4,7 @@ import { getSupabase } from '#/lib/server/supabase.server'
 import type { FilterTab } from '#/lib/transactions/transaction-filters'
 
 /**
- * The transaction filters with nothing to choose from (spec 14), one row looked for in
+ * The transaction filters with nothing to choose from, one row looked for in
  * each table, so the bar can disable them without loading their lists.
  */
 export const getEmptyFilters = createServerFn({ method: 'GET' }).handler(

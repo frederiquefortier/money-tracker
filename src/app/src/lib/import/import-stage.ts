@@ -1,6 +1,6 @@
 import type { ImportCheck } from '#/lib/import/import'
 
-/** The steps of the screen (spec 18); `done` is after the last. */
+/** The steps of the screen; `done` is after the last. */
 export const IMPORT_STEPS = ['files', 'import'] as const
 export type ImportStage = (typeof IMPORT_STEPS)[number] | 'done'
 

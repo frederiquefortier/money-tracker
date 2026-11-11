@@ -177,7 +177,7 @@ export const addCurrency = createServerFn({ method: 'POST' })
 
 /**
  * Open accounts block removal and a transaction count asks for confirmation once those
- * tables exist (spec 10, specs 11 and 14). The display currency falls back to the default
+ * tables exist. The display currency falls back to the default
  * in a trigger.
  */
 export const removeCurrency = createServerFn({ method: 'POST' })

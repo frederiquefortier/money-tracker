@@ -8,7 +8,7 @@ export type ListedAccount = Account & { typeLabel: string }
 
 /**
  * One account in a list: name, then `details` and the currency, `aside` on the right.
- * `alignTop` sets `aside` and the actions level with the name (archived rows, spec 11).
+ * `alignTop` sets `aside` and the actions level with the name (archived rows).
  */
 export function AccountRow({
   account,

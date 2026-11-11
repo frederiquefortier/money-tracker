@@ -17,7 +17,7 @@ const TEXT_FIELDS = [
   'openedOn',
 ] as const
 
-/** Spec 11. The institution and the currency are chosen live; the rest is read on submit. */
+/** The institution and the currency are chosen live; the rest is read on submit. */
 export function AccountForm({
   accountId,
   initial,

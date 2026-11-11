@@ -26,7 +26,7 @@ import type {
 } from '#/lib/transactions/transaction'
 import type { TransactionDraft } from '#/lib/transactions/transaction-draft-types'
 
-// What the transaction form holds while it is being filled (spec 15) and its validation.
+// What the transaction form holds while it is being filled and its validation.
 // The server recomputes and the database checks.
 
 export function emptyDraft(

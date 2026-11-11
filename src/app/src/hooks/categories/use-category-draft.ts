@@ -21,7 +21,7 @@ export type CategoryValues = Pick<
 >
 
 /**
- * The form's live values (spec 12). The icon follows the name until one is picked by
+ * The form's live values. The icon follows the name until one is picked by
  * hand; a sub-category's colour follows its parent until one is picked by hand. A
  * sub-category takes its parent's kind.
  */

@@ -49,7 +49,7 @@ export function formatDate(
   }).format(utcDate(isoDate))
 }
 
-/** "lundi 3 novembre 2026", a day header in the list (spec 14); a period can span years. */
+/** "lundi 3 novembre 2026", a day header in the list; a period can span years. */
 export function formatDay(isoDate: string, locale: Locale): string {
   return new Intl.DateTimeFormat(FORMAT_LOCALE[locale], {
     weekday: 'long',

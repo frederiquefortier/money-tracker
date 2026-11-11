@@ -44,7 +44,7 @@ function Tile({
   )
 }
 
-/** The file's figures first (spec 18), then the lines that qualify them. */
+/** The file's figures first, then the lines that qualify them. */
 function Figures({ input, check }: { input: ImportInput; check: Checked }) {
   const { t } = useTranslation()
   const locale = useLocale()
@@ -93,7 +93,7 @@ function Figures({ input, check }: { input: ImportInput; check: Checked }) {
   )
 }
 
-/** Step 2 (spec 18): the figures, what would be created, and the import button. */
+/** Step 2: the figures, what would be created, and the import button. */
 export function ImportSummary({
   check,
   input,

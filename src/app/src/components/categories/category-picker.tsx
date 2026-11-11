@@ -73,7 +73,7 @@ function treeOptions(
 }
 
 /**
- * CAT-04, 06 (spec 15): "Fréquentes" first while nothing is typed, each by its full path,
+ * CAT-04, 06: "Fréquentes" first while nothing is typed, each by its full path,
  * then one group per type with `kind` first, each a tree. Only categories active on `date`
  * are listed; a chosen one that is not stays in the field, tagged "Archivée".
  */

@@ -4,7 +4,7 @@ import type {
   TransactionKind,
 } from '#/lib/transactions/transaction'
 
-// The people on a transaction while the form is filled (PPL-03, 04, spec 20): who an
+// The people on a transaction while the form is filled (PPL-03, 04): who an
 // expense was shared with, or who an income came from, and each one's part. Computed like
 // the splits; the server recomputes and the database checks.
 
@@ -35,7 +35,7 @@ export type PeopleChanges = Partial<
 
 /**
  * In Parts, every line starts at one per person; Montant and % start empty. A Me doit
- * line always starts empty: its part is not known until typed (spec 21).
+ * line always starts empty: its part is not known until typed.
  */
 function startValue(
   line: Pick<PersonLine, 'role' | 'headCount'>,

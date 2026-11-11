@@ -170,7 +170,7 @@ Document new concepts, techniques, and knowledge gained. Reference this file to 
 - CSS Color 4, gamut mapping in `oklch()`
 
 **Applied In:**
-- `src/app/src/lib/color.ts` and its tests; the twenty quick picks in spec 12.
+- `src/app/src/lib/color.ts` and its tests; the quick picks in `lib/categories/category.ts`.
 
 ### 2026-11-03 - Sheet animations and TanStack Router loading
 

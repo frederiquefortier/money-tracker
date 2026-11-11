@@ -14,7 +14,7 @@ import type {
 } from '#/lib/transactions/transaction-list'
 
 /**
- * The filters' sheet (spec 14, TRX-14), opened on one of `tabs` or the period, or on their list: checkboxes for accounts,
+ * The filters' sheet (TRX-14), opened on one of `tabs` or the period, or on their list: checkboxes for accounts,
  * categories (a category keeps its sub-categories) merchants, people or events, several at
  * once. Each tick applies at once. The choices load the first time it opens.
  */

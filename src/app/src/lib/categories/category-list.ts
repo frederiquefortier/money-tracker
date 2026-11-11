@@ -11,7 +11,7 @@ import type {
 import { indexById } from '#/lib/shared/collections'
 import { foldForSearch, matcher } from '#/lib/shared/search'
 
-// The transaction form's category list (spec 15): one type's tree, as on Catégories.
+// The transaction form's category list: one type's tree, as on Catégories.
 
 /**
  * The ids of the categories whose name matches the folded query `q`, with their parents

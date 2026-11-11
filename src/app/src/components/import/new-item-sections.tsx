@@ -151,7 +151,7 @@ function SectionBlock({
 }
 
 /**
- * Everything new, kind by kind (spec 18), and what can be decided about each (IMP-06):
+ * Everything new, kind by kind, and what can be decided about each (IMP-06):
  * merge it into another name, edit it, remove it, or say a merchant is a person. The sheets
  * open from here.
  */

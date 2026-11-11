@@ -1,5 +1,5 @@
 // A range of whole days as the date range field holds it: ISO `YYYY-MM-DD`, both ends
-// included, one day being the same day twice (spec 22, ADR-027).
+// included, one day being the same day twice (ADR-027).
 
 export type DateRange = { start: string; end: string }
 

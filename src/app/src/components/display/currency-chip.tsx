@@ -12,7 +12,7 @@ import { chipSurface, focusRing } from '#/components/styles'
 
 const chip = cn(chipSurface, 'font-mono')
 
-/** A currency the field cannot change, drawn like the chip (a transfer's, spec 16). */
+/** A currency the field cannot change, drawn like the chip (a transfer's). */
 export function FixedCurrency({ value }: { value: string }) {
   return <span className={chip}>{value}</span>
 }

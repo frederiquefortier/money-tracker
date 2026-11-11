@@ -7,7 +7,7 @@ import {
   toMinor,
 } from '#/lib/shared/money'
 
-// Shared by the adjustment form (spec 16) and its server functions.
+// Shared by the adjustment form and its server functions.
 
 /** A saved adjustment as the form loads it: the gap is the stored amount. */
 export type Adjustment = {

@@ -41,7 +41,7 @@ export function LinePart({
   const { t } = useTranslation()
   // Someone with me has no part.
   if (line.role === 'with') return null
-  // An empty field shows what it comes to under it (spec 21).
+  // An empty field shows what it comes to under it.
   const empty = line.value.trim() === ''
   return (
     <LineValue
@@ -111,7 +111,7 @@ export function BackLines({
   )
 }
 
-/** Adds someone: an empty dashed circle with a plus, as for a category (spec 20). */
+/** Adds someone: an empty dashed circle with a plus, as for a category. */
 export function AddPerson({ onOpen }: { onOpen: () => void }) {
   const { t } = useTranslation()
   const label = t('transactions.people.add')

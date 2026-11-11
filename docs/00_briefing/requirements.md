@@ -1,13 +1,12 @@
 # Requirements
 
-The organized feature list. It merges four sources and removes the duplicates between them:
+The organized feature list. It merges its sources and removes the duplicates between them:
 
 | Tag | Source |
 |---|---|
 | `v1` | [01-app-v1.md](notes/01-app-v1.md), the first full list, plus the loose MISC notes |
 | `ai` | [02-app-v-ai.md](notes/02-app-v-ai.md), the revised list. **Baseline when the two disagree.** |
-| `add` | [03-a-ajouter-2026-02.md](notes/03-a-ajouter-2026-02.md), feedback from testing the prototype |
-| `C1`..`C11` | [04-prompts-de-correction.md](notes/04-prompts-de-correction.md), detailed acceptance criteria |
+| `add`, `C1`..`C11` | Feedback from testing the first prototype (built on Lovable, February 2026, see [brief.md](brief.md)) and the detailed correction prompts written from it. The notes were removed once their content was in the rows below. |
 | `sheet` | Something the current spreadsheets do that the notes never mention ([reference-sheets.md](reference-sheets.md)) |
 
 Each requirement has a stable ID (`ACC-03`) so ADRs, issues and commits can point at it.
@@ -107,9 +106,9 @@ English; this file is in English like every other meta-doc.
 
 | ID | Requirement | Source | Phase |
 |---|---|---|---|
-| TAG-01 | Create tags; a transaction can have several. | v1, ai | later |
-| TAG-02 | Automatic linking by date range and categories moved to events (EVT-07) on 2026-11-05. | ai | later |
-| TAG-03 | Per tag: most and least expensive transactions. | misc ("Tag + expensive, less expensive") | later |
+| TAG-01 | Create tags; a transaction can have several. Dropped 2026-11-05: events cover it (see improvements.md). | v1, ai | dropped |
+| TAG-02 | Automatic linking by date range and categories moved to events (EVT-07) on 2026-11-05. | ai | dropped |
+| TAG-03 | Per tag: most and least expensive transactions. | misc ("Tag + expensive, less expensive") | dropped |
 
 ## 8. People and groups (`PPL`)
 

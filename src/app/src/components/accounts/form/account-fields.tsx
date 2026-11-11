@@ -71,7 +71,7 @@ function OpeningFields({ field }: { field: Field }) {
   )
 }
 
-/** The account form's fields (spec 11). Uncontrolled except the institution and currency. */
+/** The account form's fields. Uncontrolled except the institution and currency. */
 export function AccountFields({
   values,
   field,

@@ -9,7 +9,7 @@ import { getOwedLines } from '#/server/owed'
 import type { Balance, OwedLine } from '#/lib/people/owed'
 import { fieldSurface, focusRing, rowHover } from '#/components/styles'
 
-/** PPL-05 (spec 21), on a person's row: "Me doit 45,00 $", "+ inconnu" past a known part. */
+/** PPL-05, on a person's row: "Me doit 45,00 $", "+ inconnu" past a known part. */
 export function OwedTag({ balance }: { balance: Balance | undefined }) {
   const { t } = useTranslation()
   const locale = useLocale()

@@ -1,61 +1,15 @@
 # Visual direction
 
-The look (UI, not UX) the owner chose on 2026-11-02. The layout itself follows
-[00-layout-reference.md](00-layout-reference.md).
-
-**Sources.** Two Pinterest pins: a blurred, grainy sunset gradient
-(https://ca.pinterest.com/pin/610448924533902066/) and flat pink with grainy coral blobs and
-four-point sparkles (https://ca.pinterest.com/pin/313211349108071545/). Copies for local
-viewing are in `references/visual/` (gitignored: third-party images, never committed).
+The look chosen by the owner on 2026-11-02, from two Pinterest pins: a blurred grainy sunset gradient and flat pink with coral blobs and four-point sparkles. Tokens live in `src/app/src/styles.css`.
 
 ## Rules
 
-- **Grain and warm gradients.** Yellow, orange, coral, pink and a touch of violet, with a
-  fractal-noise grain on top. The colors are tokens in `src/app/src/styles.css`
-  (`--sun-*`, `--grain`).
-- **Full sunset on the signed-out screens** (`bg-sunset`), with sparkles in white and in the
-  primary plum. **Signed-in screens stay calm:** plum cream, the same grain, a faint glow at
-  the top, so figures stay easy to read.
-- **Surfaces are flat.** Cream cards with a thin border. No shadows: the shadow scale is
-  removed from the Tailwind theme, so a shadcn component added later gets none either.
-- **Incomes are green** (`--income`), expenses in the text colour; red never marks an
-  amount.
-- **Pending is blue** (`--pending`, a light blue background, dark blue in dark mode), the
-  spreadsheet's colour for it, with no visible label; the "En attente" bubble names it
-  and screen readers hear it (spec 14).
-- **Owed is amber** (`--owed`, a light amber background, dark amber in dark mode): a row
-  where someone owes me their part (spec 20), named by its bubble and heard by screen
-  readers the same way. Pending's blue wins on a row that is both.
-- **Primary is a dusk plum** (`oklch(0.48 0.17 320)`, dark mode `oklch(0.76 0.12 320)`),
-  with its tints (secondary, accent) at the same hue (2026-11-03). Text, muted text,
-  borders, field borders, the focus outline and the backgrounds are plum tints too (hue
-  320): the page is a plum cream (`oklch(0.965 0.014 320)`), cards a near white. Muted
-  text is 5.6:1 on the page. Fields and outline controls (sort, filter, bubbles) share
-  one border, `--input`, set on 2026-11-05 halfway between the cards' border and the
-  old 3:1 field edge, by the author's choice: softer, below 3:1 in the light theme. Only
-  white
-  button text, the error red and the sunset gradients sit off that hue. White text on it is
-  7.2:1 and plum text on cream 6.9:1. It replaced a rose that sat 0.05 from the error red
-  in perceptual distance; plum sits 0.21 away, so red is left to errors and deletes.
-  Yellow was ruled out: yellow text on cream is 1.4:1. The favicon follows (`#853397` on
-  `#f8e8fb`).
-- **Inconsolata as the accent font**, uppercase and spaced: the wordmark and card titles.
-  Button text is set in Inconsolata too, uppercase (2026-11-03).
-- **Focus** is a 2px outline in the text colour (dark plum, or the light text in dark mode)
-  with a 2px gap, on every control. Never a red: red means an error.
-- **Fields** (inputs, selects, pickers, checkboxes) share one control style
-  (`fieldControl` in `ui/field.tsx`) and a 4px radius (`--radius-field`). **Buttons** take
-  the card radius by default (`rounded-xl` in `ui/button.tsx`); pills stay for the header
-  switchers.
-- **Toasts** appear at the top right (top, full width on phones). **No helper text,
-  taglines, legends or secondary labels**: when a screen needs them to make sense, the
-  label or the layout changes instead.
-- **Punctuation:** no space before ":" "?" "!" or ";", French included, so a mark never
-  wraps alone. **Confirmations** read "Supprimer {name}", then "Cette action est
-  irréversible.", a red button and "Annuler" (`ConfirmDialog`).
-- **Icon actions** (`IconButton`, `IconLink`, `IconAnchor`) share one 32px target and a
-  20px icon, in the primary colour. Icons inside text buttons follow the text size.
-  Amounts will use it too (tabular figures line up). Body text stays Nunito.
-- **Every signed-out card title has an icon** in the primary plum: log-in, key, lock, mail,
-  shield-check (`AuthShell`'s `icon` prop).
-- **The sparkle** (`Sparkle` component) is decoration only, always `aria-hidden`.
+- **Grain and warm gradients.** Yellow, orange, coral, pink, a touch of violet, with fractal-noise grain. Full sunset on signed-out screens; signed-in screens stay calm (plum cream, the same grain) so figures read easily.
+- **Flat surfaces.** Cream cards with a thin border, no shadows (the shadow scale is removed from the theme, so added shadcn components get none).
+- **Primary is a dusk plum** (hue 320), with tints for text, borders, focus and backgrounds. It replaced a rose that sat too close to the error red; red is left to errors and deletes. Yellow was ruled out: yellow text on cream is 1.4:1.
+- **Colour carries meaning:** incomes green, expenses the text colour, red never marks an amount, pending blue, owed amber (pending wins on a row that is both).
+- **Inconsolata** is the accent font (uppercase, spaced): wordmark, card titles, buttons, amounts. Body text is Nunito. Both self-hosted.
+- **Focus** is a 2px outline in the text colour with a 2px gap, never red.
+- **Fields** share one control style and a 4px radius; buttons take the card radius; pills stay for the header switchers. Fields and outline controls share one border, set softer than 3:1 by the author's choice (2026-11-05).
+- **Toasts** top right (top, full width on phones).
+- **Icon actions** share a 32px target and a 20px icon in the primary colour. The sparkle is decoration, `aria-hidden`.

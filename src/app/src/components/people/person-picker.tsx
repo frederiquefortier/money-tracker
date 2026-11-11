@@ -9,7 +9,7 @@ import { ANONYMOUS } from '#/lib/transactions/transaction-source'
 import { savePerson } from '#/server/people'
 
 /**
- * One person, typed into the field: who an income came from (spec 20), in place of the
+ * One person, typed into the field: who an income came from, in place of the
  * merchant, or Sans nom; or who an expense was bought from (PPL-08). Names and aliases match; "Créer « … »" adds someone. Archived people are
  * listed only while chosen.
  */
@@ -25,7 +25,7 @@ export function PersonPicker({
   value: string | null
   label?: string
   hideLabel?: boolean
-  /** Offers Sans nom: an income from someone without a name (spec 21). */
+  /** Offers Sans nom: an income from someone without a name. */
   anonymous?: boolean
   onChange: (personId: string | null) => void
 }) {
@@ -49,7 +49,7 @@ export function PersonPicker({
     },
     onCreated: (person) => onChange(person.id),
   })
-  // Sans nom first: an income from someone without a name pays back their lines (spec 21).
+  // Sans nom first: an income from someone without a name pays back their lines.
   const options = [
     ...(anonymous
       ? [

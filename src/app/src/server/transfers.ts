@@ -15,7 +15,7 @@ const failure = failureFor<TransferError>('transfers', {
   P0002: 'notFound',
 })
 
-/** Both legs and the fee of one transfer; null when it is not there (spec 16). */
+/** Both legs and the fee of one transfer; null when it is not there. */
 export const getTransfer = createServerFn({ method: 'GET' })
   .validator(idInput)
   .handler(async ({ data }): Promise<Transfer | null> => {
@@ -84,7 +84,7 @@ export const deleteTransfer = createServerFn({ method: 'POST' })
     return { ok: true }
   })
 
-/** The fee category's name and look, for the fee lines of the list (spec 14). */
+/** The fee category's name and look, for the fee lines of the list. */
 export const getFeeCategory = createServerFn({ method: 'GET' }).handler(
   async (): Promise<ListedCategory | null> => {
     const feeId = await loadFeeCategoryId()

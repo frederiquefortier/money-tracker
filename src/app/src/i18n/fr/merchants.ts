@@ -1,4 +1,4 @@
-// The Magasins screens (spec 13).
+// The Magasins screens.
 export const merchantsFr = {
   merchants: {
     title: 'Magasins',

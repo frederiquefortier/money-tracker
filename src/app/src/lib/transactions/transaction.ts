@@ -6,7 +6,7 @@ import type { Merchant } from '#/lib/merchants/merchant'
 import type { EventItem, EventSource, EventType } from '#/lib/events/event'
 import type { Person, PersonGroup } from '#/lib/people/person'
 
-// Shared by the transaction form (spec 15) and its server functions.
+// Shared by the transaction form and its server functions.
 
 export const PERSON_ROLES = ['me', 'invited', 'owes', 'from', 'with'] as const
 export type PersonRole = (typeof PERSON_ROLES)[number]
@@ -15,7 +15,7 @@ export const TRANSACTION_KINDS = ['expense', 'income'] as const
 export type TransactionKind = (typeof TRANSACTION_KINDS)[number]
 
 /**
- * How the event is set (spec 22): auto follows the rule, manual is the one chosen, none
+ * How the event is set: auto follows the rule, manual is the one chosen, none
  * was cleared by hand, which the rule then remembers.
  */
 export const EVENT_CHOICES = ['auto', 'manual', 'none'] as const
@@ -44,7 +44,7 @@ export type TransactionFormData = {
   frequent: FrequentCategories
   people: Array<Person>
   groups: Array<PersonGroup>
-  /** The people most often on transactions lately, most first (spec 20). */
+  /** The people most often on transactions lately, most first. */
   frequentPeople: Array<string>
   events: Array<EventItem>
   eventTypes: Array<EventType>
@@ -67,7 +67,7 @@ export type Transaction = {
   splitMode: SplitMode
   splits: Array<{ categoryId: string; value: string }>
   peopleMode: SplitMode
-  /** In the order shown, Moi first on an expense (spec 20). */
+  /** In the order shown, Moi first on an expense. */
   people: Array<{
     role: PersonRole
     personId: string | null
@@ -76,10 +76,10 @@ export type Transaction = {
     amountUnknown: boolean
     /** Left empty: takes what the other lines leave (decided 2026-11-08). */
     fillsRest: boolean
-    /** What came back for an owed line (spec 21). */
+    /** What came back for an owed line. */
     back: Array<{ amount: string; date: string }>
   }>
-  /** On an income, the owed lines it pays back, in order (spec 21). */
+  /** On an income, the owed lines it pays back, in order. */
   reimburses: Array<string>
   eventId: string | null
   eventSource: EventSource | null
@@ -117,7 +117,7 @@ export const transactionInputSchema = z
           headCount: z.number().int().min(1).max(999),
           amountUnknown: z.boolean(),
           fillsRest: z.boolean(),
-          // Moi can be zero (spec 20).
+          // Moi can be zero.
           value: z.string().regex(/^\d{1,15}(\.\d{1,4})?$/),
         }),
       )

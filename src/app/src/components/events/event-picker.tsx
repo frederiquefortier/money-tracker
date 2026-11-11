@@ -6,7 +6,7 @@ import { sortEvents } from '#/lib/events/event'
 import type { EventItem, EventType } from '#/lib/events/event'
 
 /**
- * EVT-03 (spec 22): the event of a transaction, newest first, past ones included since
+ * EVT-03: the event of a transaction, newest first, past ones included since
  * transactions are linked after the occasion. While the value comes from the rule, the
  * field says so.
  */

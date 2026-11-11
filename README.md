@@ -12,10 +12,11 @@ work is split, and where I changed the assistant's proposals, is in
 
 ## Status
 
-Live at https://ff-money-tracker.netlify.app (invite-only). Phase 0 is in place: sign-in
-with MFA, invitations, password reset, FR and EN, and the row-level security pattern with
-its tests. v1 is [phases 0 to 4](docs/03_planning/roadmap.md), when the spreadsheet can be
-retired.
+Live at https://ff-money-tracker.netlify.app (invite-only). Built: sign-in with MFA, FR and
+EN, currencies and rates, accounts, categories, merchants, transactions (splits, transfers,
+foreign currency), people, reimbursements, events and the CSV import. Next: export, the
+dashboard and budgets. v1 is [phases 0 to 4](docs/03_planning/roadmap.md), when the
+spreadsheet can be retired.
 
 ## Stack
 
@@ -41,11 +42,15 @@ runs on the app. First-time setup: [setup.md](docs/01_building/setup.md).
 | [requirements.md](docs/00_briefing/requirements.md) | Every feature, with an ID and a phase |
 | [reference-sheets.md](docs/00_briefing/reference-sheets.md) | What the spreadsheets contain |
 | [architecture.md](docs/01_building/architecture.md) | How the pieces fit |
-| [database.md](docs/01_building/database.md) | Schema |
+| [database.md](docs/01_building/database.md) | Schema rules and traps |
+| [domain-rules.md](docs/01_building/domain-rules.md) | Business rules the code does not make obvious |
+| [decisions.md](docs/01_building/decisions.md) | Technical decisions (ADRs) |
+| [design-decisions.md](docs/00_briefing/designs/design-decisions.md) | Screen and interaction decisions |
+| [02-screens.md](docs/00_briefing/designs/02-screens.md) | UI conventions |
 | [security.md](docs/01_building/security.md) | Threat model and rules |
 | [setup.md](docs/01_building/setup.md) | From an empty Supabase project to a deployed app |
 | [roadmap.md](docs/03_planning/roadmap.md) | Phases |
-| [process.md](docs/01_building/process.md) | Working with an AI assistant, and who decided what |
+| [process.md](docs/01_building/process.md) | How this is built with an AI assistant |
 
 ## Layout
 

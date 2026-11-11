@@ -5,7 +5,7 @@ export const ENTRY_KINDS = ['expense', 'income', 'transfer'] as const
 export type EntryKind = (typeof ENTRY_KINDS)[number]
 
 /**
- * The kind first (spec 15): Dépense, Revenu, Transfert. A saved transaction keeps its
+ * The kind first: Dépense, Revenu, Transfert. A saved transaction keeps its
  * kind family, so editing shows only the tabs it can switch to.
  */
 export function EntryTabs({

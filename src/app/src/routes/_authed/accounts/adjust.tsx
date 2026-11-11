@@ -11,7 +11,7 @@ export const Route = createFileRoute('/_authed/accounts/adjust')({
   component: AdjustBalance,
 })
 
-/** TRX-03, from the + of Comptes; the account is chosen in the sheet (spec 16). */
+/** TRX-03, from the + of Comptes; the account is chosen in the sheet. */
 function AdjustBalance() {
   const { t } = useTranslation()
   const { accounts, institutions } = useAccountsPage()

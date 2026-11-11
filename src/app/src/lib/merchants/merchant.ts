@@ -3,7 +3,7 @@ import { compareNames } from '#/lib/shared/collections'
 import { foldForSearch } from '#/lib/shared/search'
 import { nameFormSchema } from '#/lib/shared/validation'
 
-// Shared by the Marchands screens and the server functions (spec 13).
+// Shared by the Marchands screens and the server functions.
 
 export type Merchant = {
   id: string

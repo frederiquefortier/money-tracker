@@ -15,7 +15,7 @@ import type {
 } from '#/lib/transactions/transaction-people'
 import type { Transaction } from '#/lib/transactions/transaction'
 
-// What the people's lines come to (spec 20, 21): an empty field filled, each line's
+// What the people's lines come to: an empty field filled, each line's
 // amount, the errors, and what saveTransaction takes. The server recomputes.
 
 /** A typed part: Moi can be zero, anyone else must be above it. */
@@ -104,7 +104,7 @@ function moneyPreview(
   const filled = filledLines(draft, total, accountCurrency)
   const people = filled.lines
   if (people.some((l) => isUnknown(l))) {
-    // Spec 21: the others share the whole amount until the reimbursement says the rest.
+    // the others share the whole amount until the reimbursement says the rest.
     const known = people.filter((l) => !isUnknown(l))
     const preview = moneyPreview(
       { ...draft, people: known },

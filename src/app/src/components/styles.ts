@@ -12,7 +12,7 @@ export const focusRing =
  */
 export const insetFocus = '[&_:focus-visible]:-outline-offset-2!'
 
-/** A bubble: the transactions list's period and filters, all the same height (spec 14). */
+/** A bubble: the transactions list's period and filters, all the same height. */
 export const chipSurface = cn(
   'inline-flex h-8 shrink-0 items-center gap-1.5 rounded-full border border-input bg-transparent px-3 text-sm font-semibold hover:bg-secondary disabled:pointer-events-none disabled:opacity-50',
   focusRing,
@@ -36,8 +36,8 @@ export const rowHover = cn(
 /** The gap between stacked icons (a split's categories, a group's members): the row's colour. */
 export const stackRing = 'ring-2 ring-[var(--row-bg,var(--card))]'
 
-// Checkboxes in cards, several ticked at once: the transactions filters (spec 14) and a
-// person's groups or a group's members (spec 19). The cards take a form field's radius
+// Checkboxes in cards, several ticked at once: the transactions filters and a
+// person's groups or a group's members. The cards take a form field's radius
 // and border, so they read as fields.
 /** A form field's radius and border, for what stands in for a field (a list, a popover). */
 export const fieldSurface = 'rounded-field border-input'

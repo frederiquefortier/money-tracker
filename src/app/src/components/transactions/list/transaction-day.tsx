@@ -8,7 +8,7 @@ import type {
 } from '#/lib/transactions/transaction-list'
 import { useLocale } from '#/hooks/app/use-locale'
 
-/** A day's header with its net, then its transactions in one card (spec 14). */
+/** A day's header with its net, then its transactions in one card. */
 export function TransactionDayGroup({
   day,
   displayCurrency,

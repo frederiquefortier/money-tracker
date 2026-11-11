@@ -62,7 +62,7 @@ function usePeoplePick(
 }
 
 /**
- * Spec 20: who was there, over the whole sheet like the category list. Fréquents, then
+ * who was there, over the whole sheet like the category list. Fréquents, then
  * the people grouped as in the list's filter (decided 2026-11-05): a card per group
  * with its members, "Sans groupe" for the others, flat while searching, each card's
  * "Tout" ticking its members. A new person and the people without a name follow in a

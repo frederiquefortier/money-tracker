@@ -20,7 +20,7 @@ function Currencies() {
     <ListPage title={t('currencies.title')}>
       <CurrencyManager ratesFrom={ratesFrom} openAccounts={openAccounts} />
       <AddCurrencyButton />
-      {/* Adding a currency opens here as a sheet (spec 10). */}
+      {/* Adding a currency opens here as a sheet. */}
       <Outlet />
     </ListPage>
   )

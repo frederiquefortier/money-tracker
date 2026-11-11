@@ -1,4 +1,4 @@
-// The Proches screens (spec 19).
+// The Proches screens.
 export const peopleFr = {
   people: {
     title: 'Proches',

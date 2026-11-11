@@ -17,7 +17,7 @@ The `IconName` type follows the file, so a name that is not in it fails type-che
 
 ## Category icons
 
-`categories/keywords.json` is the curated list the category picker offers (CAT-07, spec 12):
+`categories/keywords.json` is the curated list the category picker offers (CAT-07):
 each icon with search words in French and English, lowercase. While a category name is
 typed, the first entry with a matching word becomes the suggestion, so specific entries
 come before general ones ("Essence" finds `fuel` before "Transport" finds `car`). Their

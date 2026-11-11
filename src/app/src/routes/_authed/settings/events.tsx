@@ -190,7 +190,7 @@ function Events() {
         )}
       </div>
       <AddMenu />
-      {/* The event and type forms open here as sheets (spec 22). */}
+      {/* The event and type forms open here as sheets. */}
       <Outlet />
     </ListPage>
   )

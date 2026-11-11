@@ -159,7 +159,7 @@ type ReceiptProps = {
 }
 
 /**
- * Spec 16, on the slip of spec 15: the amount that left, in the departure account's
+ * On the receipt slip: the amount that left, in the departure account's
  * currency; what arrived and its cost between two currencies; the fee; then each side's
  * En attente (TRX-09) after a rule.
  */

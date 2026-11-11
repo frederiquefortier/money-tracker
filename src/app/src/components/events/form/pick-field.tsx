@@ -19,7 +19,7 @@ import { cn } from '#/lib/utils'
 
 export type Picked = { id: string; name: string; icon: React.ReactNode }
 
-/** The round add button: an empty dashed circle with its icon and a plus (spec 20). */
+/** The round add button: an empty dashed circle with its icon and a plus. */
 function AddCircle({
   icon,
   label,
@@ -49,7 +49,7 @@ function AddCircle({
 }
 
 /**
- * Several choices in a form (spec 22), drawn as on the receipt: what is chosen listed with
+ * Several choices in a form, drawn as on the receipt: what is chosen listed with
  * its icon and a ✕, then a round add button. The button opens the choices in a sheet over
  * the form, with a search; Terminé gives the form back.
  */

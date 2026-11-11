@@ -111,7 +111,7 @@ export function ScreenHeader({
 }
 
 /**
- * Spec 15: the category list over the whole sheet, its header included: a back arrow and
+ * the category list over the whole sheet, its header included: a back arrow and
  * the title, no ✕. The toolbar and the search, kept across types, then the type tabs
  * and the Catégories tree, branches
  * collapsible as there, ending on "+ Nouvelle catégorie", which opens the category form

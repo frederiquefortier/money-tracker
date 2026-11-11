@@ -123,7 +123,7 @@ export function percentLeft(values: ReadonlyArray<string>): bigint {
 const HUNDRED = 1000000n
 
 /**
- * TRX-06: percentages never total more than 100 (spec 15). A typed value above what the
+ * TRX-06: percentages never total more than 100. A typed value above what the
  * other lines leave is cut to it; anything not yet a number is kept as typed.
  */
 export function capPercent(

@@ -29,7 +29,7 @@ const TEXT_KEYS = {
   null: 'transactions.transfer.deleteMaybeFee',
 } as const
 
-/** Delete, on the transfer's row (spec 14) or in its sheet on phones (TRX-04). */
+/** Delete, on the transfer's row or in its sheet on phones (TRX-04). */
 export function TransferActions({
   summary,
   placement,

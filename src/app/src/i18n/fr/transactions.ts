@@ -1,4 +1,4 @@
-// The transaction form (spec 15).
+// The transaction form.
 export const transactionsFr = {
   transactions: {
     add: 'Ajouter une transaction',

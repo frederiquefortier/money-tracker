@@ -109,7 +109,7 @@ function DropArea({ onChoose }: { onChoose: () => void }) {
 }
 
 /**
- * Step 1 (spec 18): the files, dropped or chosen, then Téléverser, always there and off
+ * Step 1: the files, dropped or chosen, then Téléverser, always there and off
  * until there is something to send. The check runs when it is pressed.
  */
 export function ImportFilesCard({

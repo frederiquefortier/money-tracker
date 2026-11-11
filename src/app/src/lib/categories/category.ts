@@ -7,7 +7,7 @@ import { foldForSearch } from '#/lib/shared/search'
 import { compareNames } from '#/lib/shared/collections'
 import { nameFormSchema } from '#/lib/shared/validation'
 
-// Shared by the category screens, the picker and the server functions (spec 12).
+// Shared by the category screens, the picker and the server functions.
 
 export const KINDS = ['expense', 'income', 'investment'] as const
 export type CategoryKind = (typeof KINDS)[number]
@@ -58,7 +58,7 @@ export function isActiveOn(category: Pick<Category, 'periods'>, date: string) {
 
 // Quick picks: clean, saturated colours around the five the author chose (ruby, yellow,
 // green, royal, purple), deep ones with a white icon and bright ones with a dark icon,
-// each far enough from the others to tell apart, in rainbow order (spec 12).
+// each far enough from the others to tell apart, in rainbow order.
 export const SWATCHES = [
   { key: 'ruby', hex: '#c30839' },
   { key: 'burgundy', hex: '#850e2c' },
@@ -210,7 +210,7 @@ type Colored = Pick<
 
 /**
  * The colour every category ends up with: an automatic one is a variation of its parent's
- * by its place among its siblings, so a branch follows its parent (spec 12).
+ * by its place among its siblings, so a branch follows its parent.
  */
 export function resolveColors(
   categories: ReadonlyArray<Colored>,

@@ -40,7 +40,7 @@ function NewTransaction() {
   const { t } = useTranslation()
   const { feeCategoryId } = Route.useLoaderData()
   const data = useTransactionFormData()
-  // The account last used, remembered per browser (spec 15).
+  // The account last used, remembered per browser.
   const [lastAccount, setLastAccount] = useStoredState(
     'transactions.account',
     '',
@@ -82,7 +82,7 @@ function NewTransaction() {
 }
 
 /**
- * The Transfert tab swaps the form, keeping the amount, account and date (spec 15);
+ * The Transfert tab swaps the form, keeping the amount, account and date;
  * Dépense or Revenu on the transfer form swaps it back with the same three.
  */
 function NewEntry({

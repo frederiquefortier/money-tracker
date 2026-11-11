@@ -5,7 +5,7 @@ import { TransactionActions } from '#/components/transactions/list/transaction-a
 import { TransferActions } from '#/components/transactions/entry/transfer-actions'
 import type { ListedTransaction } from '#/lib/transactions/transaction-list'
 
-// What a list row (spec 14) opens and deletes, by kind.
+// What a list row opens and deletes, by kind.
 
 /**
  * Where a tap goes: the transaction's form, the transfer's for a leg or its fee, or the

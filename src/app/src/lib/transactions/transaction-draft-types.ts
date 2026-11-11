@@ -5,7 +5,7 @@ import type {
   TransactionKind,
 } from '#/lib/transactions/transaction'
 
-// What the transaction form holds while it is being filled (spec 15).
+// What the transaction form holds while it is being filled.
 
 /** One split line as typed; `key` keeps React rows stable while lines come and go. */
 export type SplitLine = {
@@ -31,12 +31,12 @@ export type TransactionDraft = {
   lines: Array<SplitLine>
   note: string
   pending: boolean
-  /** Empty when no one is on the transaction (spec 20). */
+  /** Empty when no one is on the transaction. */
   people: Array<PersonLine>
   peopleMode: SplitMode
-  /** An income's owed lines it pays back, in order (spec 21). */
+  /** An income's owed lines it pays back, in order. */
   reimburses: Array<string>
-  /** The event shown in the field, and how it got there (spec 22). */
+  /** The event shown in the field, and how it got there. */
   eventId: string | null
   eventChoice: EventChoice
 }

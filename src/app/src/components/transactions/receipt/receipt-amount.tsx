@@ -121,9 +121,9 @@ function AmountRow({
 }
 
 /**
- * Spec 15: the transaction as a receipt slip. The category's round icon, the amount and
+ * the transaction as a receipt slip. The category's round icon, the amount and
  * the currency; Répartir, which itemizes the slip; Débité and Frais in another currency
- * than the account's; the people's parts (spec 20); then En attente (TRX-09) after a rule.
+ * than the account's; the people's parts; then En attente (TRX-09) after a rule.
  */
 export function ReceiptAmount(props: ReceiptProps) {
   const { draft, categories, accountCurrency, errors, onChange, onPick } = props

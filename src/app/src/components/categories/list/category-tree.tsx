@@ -125,7 +125,7 @@ function CategoryList({
 /**
  * CAT-01: categories of one kind, each level alphabetical, parents expandable; the archive
  * draws its own (CAT-05). With `onPick` each row chooses its category instead of opening
- * it (spec 15).
+ * it.
  */
 /** `children` close the card, under the tree (a create row). */
 export function CategoryTree({

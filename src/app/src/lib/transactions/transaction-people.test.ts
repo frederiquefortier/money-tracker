@@ -137,7 +137,7 @@ describe('an income', () => {
   })
 })
 
-describe('an empty Me doit part (spec 21)', () => {
+describe('an empty Me doit part', () => {
   it('starts empty when the line becomes Me doit', () => {
     const lines = withPeople(draft(), [SAM]).people ?? []
     const owes = withRoleSwitched(draft(lines), lines[1].key).people ?? []

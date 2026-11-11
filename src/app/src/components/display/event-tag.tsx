@@ -4,7 +4,7 @@ import { tagColors } from '#/lib/shared/color'
 import { cn } from '#/lib/utils'
 
 /**
- * An event as a soft pill (spec 22): its type's colour, tinted like a Gmail label;
+ * An event as a soft pill: its type's colour, tinted like a Gmail label;
  * neutral when it has no type. The sparkle marks a link made by the rule rather than by
  * hand.
  */

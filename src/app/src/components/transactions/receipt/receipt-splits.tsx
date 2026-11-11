@@ -29,7 +29,7 @@ import type {
 } from '#/lib/transactions/transaction-draft-types'
 import type { PickTarget } from '#/components/transactions/receipt/receipt-line'
 
-/** Removing down to one line goes back to the single category (spec 15). */
+/** Removing down to one line goes back to the single category. */
 function withoutSplitLine(
   lines: ReadonlyArray<SplitLine>,
   key: number,
@@ -55,7 +55,7 @@ export function LineValue({
   mode: SplitMode
   computed: bigint | null | undefined
   accountCurrency: string
-  /** Shown while empty: "?" on a part not known yet (spec 21). */
+  /** Shown while empty: "?" on a part not known yet. */
   placeholder?: string
   /** What the line comes to, under it: in Parts and %, or an empty Montant line. */
   showComputed?: boolean

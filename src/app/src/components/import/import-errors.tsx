@@ -29,7 +29,7 @@ function plainText(t: TFunction, errors: ReadonlyArray<ImportErrorItem>) {
 }
 
 /**
- * When the rows are refused (spec 18): a card that pairs with the done one. A red mark, what
+ * When the rows are refused: a card that pairs with the done one. A red mark, what
  * happened and how many faults, each fault as a row (file and line, then the message), and
  * the actions at the right. `choices` is there when merges or edits are applied to the files,
  * since they can be what is refused.

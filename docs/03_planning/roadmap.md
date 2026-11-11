@@ -1,7 +1,6 @@
 # Roadmap
 
-Phases group the requirement IDs from [requirements.md](../00_briefing/requirements.md).
-Each phase ends with something usable on real data. No dates: this is a personal project.
+Phases group the requirement IDs from [requirements.md](../00_briefing/requirements.md). Each phase ends with something usable on real data. No dates: this is a personal project. `[x]` is built, `[ ]` is not.
 
 | Release | Phases | Done when |
 |---|---|---|
@@ -12,153 +11,66 @@ Each phase ends with something usable on real data. No dates: this is a personal
 # v1
 
 ## Phase 0: Foundation
-Nothing financial yet; the walls go up first.
+Deployed; sign-in, MFA, invitations, reset and FR/EN work. Backups run nightly and a restore was tested.
 
-**Status (2026-11-02):** deployed; sign-in, MFA, invitations, reset and FR/EN work.
-Backups run nightly, one restore tested, two authenticators enrolled; the contract
-migration for `profiles.locale` is written (ADR-019).
-
-- Scaffold TanStack Start in `src/app`, shadcn/ui, Tailwind, strict TypeScript, Vitest.
-- `src/supabase`: first migration with `profiles`, the RLS and MFA policy pattern, a
-  pgTAP test proving user B sees none of user A's rows, and guard tests that every table has
-  RLS, the MFA policy and no anon grants. Runs in CI (ADR-014).
-- One Supabase project, `money-tracker` in Canada, free plan, with the owner's account only
-  (ADR-016, ADR-017, ADR-021). Migrations applied by CI after a backup.
-- Auth: sign-in, TOTP enrolment and challenge, sign-up disabled. SEC-01..03.
-- react-i18next with French and English resources, locale on the profile and in a cookie, the
-  language switcher, `Intl` formatting helpers. SET-04, 05 (ADR-008).
-- Netlify: production site, security headers, deploy previews off (ADR-017).
-- CI: lint, type-check, unit tests, `supabase db lint`, pgTAP, and a docs check: relative
-  links resolve (lychee, offline mode) and every requirement ID cited in roadmap, ADRs and
-  process.md exists in requirements.md (a short script).
-- Nightly encrypted backup as a scheduled GitHub Action; one restore tested.
-- Two authenticators enrolled for the owner account (no TOTP recovery codes).
+- [x] TanStack Start app, shadcn/ui, Tailwind, strict TypeScript, Vitest.
+- [x] Supabase project with RLS and MFA policy pattern, pgTAP isolation tests, guard tests that every table has RLS and no anon grants (ADR-014).
+- [x] Auth: sign-in, TOTP enrolment and challenge, sign-up disabled. SEC-01..03.
+- [x] react-i18next, locale on the profile and in a cookie, `Intl` helpers. SET-04, 05 (ADR-008).
+- [x] Netlify production site, security headers, deploy previews off (ADR-017).
+- [x] CI: lint, type-check, tests, `supabase db lint`, pgTAP, a docs check (links resolve, cited requirement IDs exist).
+- [x] Nightly encrypted backup, one restore tested, two authenticators enrolled.
 
 ## Phase 1: The ledger
-Replace daily use of the spreadsheet.
-
-**Status (2026-11-05):** currencies, the rates job and the Réglages and Devises screens
-(spec 10), institutions and accounts (spec 11), and categories (spec 12) are built and
-tried in local dev. Merchants (spec 13) are built with the category picker of spec 15.
-The transactions migration is pushed to dev: transactions, splits, transfers with fee,
-adjustments and real balances, with 39 pgTAP tests; a merge now moves transactions. The
-transaction form (spec 15) is built: amount, foreign currency with its fee, splits,
-merchant and category pickers with "Fréquentes". Currency favourites are dropped (CUR-03)
-and every screen adds through one round + bottom right. Expense categories take a need
-or want mark (CAT-10). The list (spec 14) is built: a chosen period (TRX-13: everything as
-you scroll, a year, a month, custom days), search (TRX-12) and filters by account,
-category and merchant (TRX-14), day groups with their net in SQL, splits as stacked
-icons. Transfers (spec 16) are built: the Transfert tab of the form, the received amount
-and conversion cost between currencies, the fee and its category, a pending box per
-side, and editing or deleting every part together. Balance adjustments (TRX-03) are
-built: tapping an account's balance on Comptes opens them, and the list opens a saved
-one. Phase 1 is complete once the author has tried them. Phase 2 started: Proches (spec 19,
-PPL-01, 02, 06) are built, in the Réglages menu, and people on transactions (spec 20,
-PPL-03, 04), with a Proches filter on the list, and reimbursements with what each
-proche owes (spec 21, TRX-07, PPL-05), all 2026-11-05. Merging two people (PPL-07) followed on 2026-11-11, after the first import showed an alias created as a person. Next: events (EVT-01..07). The import moved after people,
-tags and events (2026-11-05).
-
-- Currencies, HexaRate validation, the Frankfurter rates job with a backfill to 2018,
-  converted-amount markers. CUR-01..09 (ADR-009).
-- Bilingual reference labels. SET-06.
-- Screen specs in `docs/00_briefing/designs/` before each screen is built (map and order in
-  [02-screens.md](../00_briefing/designs/02-screens.md)): what it shows,
-  why, and which requirement IDs it covers. Mobile layout follows
-  [00-layout-reference.md](../00_briefing/designs/00-layout-reference.md) (TravelSpend patterns); the look
-  follows [01-visual-direction.md](../00_briefing/designs/01-visual-direction.md).
-- Institutions and accounts. ACC-01..07.
-- Categories with archive history, coolicons icons, sort, search and expand all. CAT-01..05, 07, 09; CAT-06 (Fréquentes) comes with the transaction form.
-- Need or want on expense categories, inherited down the branch (built 2026-11-05).
-  CAT-10. Before the import, so the new tree is marked as it is settled.
-- Merchants with default category, and merging. MER-01, 05.
-- Transactions: expense, income, adjustment, transfer with fee (including between
-  currencies), splits, status, notes. TRX-01..06, 09..11. Multi-row writes as SQL functions
-  with pgTAP tests (ADR-012).
-- The transactions list over a chosen period, loaded as you scroll, with search and
-  filters by account, category and merchant. TRX-12 (moved from phase 2), 13, 14.
-- Category icon picker over a curated, vendored subset of coolicons. CAT-07 (ADR-020).
-- **Gate before the spreadsheet is retired** (met 2026-11-02): backup workflow enabled, one
-  restore tested, the first monthly copy on the offline drive, and the private key in the
-  password manager and on paper (security.md, Backups).
+- [x] Currencies, HexaRate validation, rates job with backfill to 2018, converted-amount markers. CUR-01..09 (ADR-009).
+- [x] Institutions and accounts. ACC-01..07.
+- [x] Categories with archive history, icons, sort, search. CAT-01..07, 09, 10.
+- [x] Merchants with default category and merging. MER-01, 05.
+- [x] Transactions: expense, income, adjustment, transfer with fee across currencies, splits, status, notes. TRX-01..06, 09..11.
+- [x] The list over a chosen period with search and filters. TRX-12..14.
+- [x] Gate before retiring the spreadsheet: backup workflow, tested restore, offline copy, private key in the password manager and on paper (met 2026-11-02, security.md).
+- [ ] First run (SET-01, [spec](../00_briefing/designs/17-first-run.md)).
 
 ## Phase 2: What a transaction carries
-Everything the owner's current use can set on a transaction exists before the import, so
-the eight years of history are prepared in one pass, not one per feature (decided
-2026-11-05). In this order (author, 2026-11-05): proches, then events. Tags moved to
-later; events took their automatic linking (2026-11-05).
+Everything the owner can set on a transaction exists before the import, so eight years of history are prepared in one pass (author, 2026-11-05).
 
-- People and groups, roles on transactions, anonymous treat/reimbursement, aliases for
-  the import. PPL-01..06.
-- Reimbursement links. TRX-07.
-- Events, linked by hand or automatically by date range, shown as a tag
-  on the transaction; calendar and comparison. EVT-01..05, 07. Next: spec 22 (types,
-  events, linking, EVT-01..03, 07; built 2026-11-09), then spec 23 (calendar, comparison, EVT-04, 05).
-- Holdings, and transactions linked to the holding they pay into (the `holding` column
-  of the import), on the Comptes tab with the accounts. NW-01, and the my-money part of
-  NW-03.
+- [x] People and groups, roles, aliases, merging. PPL-01..09.
+- [x] Reimbursement links. TRX-07, PPL-05.
+- [x] Events with types and automatic linking by date. EVT-01..03, 07.
+- [ ] Holdings, and transactions linked to the holding they pay into. NW-01, and the my-money part of NW-03.
 
 ## Phase 3: The import
-**CSV import and export in the fixed format** (IMP-01, 04, 05, 06, SEC-04 export, ADR-010).
-This is the milestone: eight years of history in the app. It comes before the dashboard
-so the dashboard and budgets are built and tried on real history.
+The milestone: eight years of history in the app. It comes before the dashboard so the dashboard and budgets are built and tried on real history.
 
-1. Settle the new category tree (worked out together from the old Aspire names).
-2. Convert the Aspire export to the format, outside the app, tags, people, events,
-   reimbursement links and holdings included.
-3. Import, read the summary, undo and re-import until it is right.
-
-Progress (2026-11-10): the converted files for the author's history are ready (outside the
-repo). The database side is built (`import_batch` with its dry run, `import_undo`, tested
-in `17_import`) and so is the import screen (Réglages, Importer): files, check, summary
-with merges, commit, imports and undo, the server functions behind it, and the strings in
-both languages, with merges and edits of new items, aliases (MER-02) and a stepper
-layout. The real files, read by the screen's own code, import in 5 to 6 s. Still to build:
-the export (IMP-04), a screen for merchant aliases, and the first real import by the
-author, then a read of the result.
+- [x] Fixed-format CSV import with check, summary, merges, commit and undo. IMP-01, 05, 06 (ADR-010, ADR-033 to ADR-037).
+- [ ] Export in the same format. IMP-04, SEC-04 ([spec](../00_briefing/designs/18-export.md)).
+- [x] The first real import, done by the author.
 
 ## Phase 4: Seeing it
-- Dashboard: range picker, filters, per-category stats, tiles, ranking, needs, wants and
-  savings, expenses waiting for a reimbursement. DSH-01..09.
-- Budgets and the emergency fund, event budgets included. BUD-01..04, 06, CAT-08, EVT-06
-  (moved from phase 2, 2026-11-08).
-- Recurring transactions. TRX-08.
-- Merchant price evolution. MER-04.
-- Last reconciled and last transaction per account. ACC-08.
-- Delete my account and all its data. SEC-04.
+- [ ] Dashboard: range, filters, per-category stats, tiles, ranking, needs/wants/savings, expenses waiting for reimbursement. DSH-01..09.
+- [ ] Budgets and the emergency fund, event budgets included. BUD-01..04, 06, CAT-08, EVT-06.
+- [ ] Recurring transactions. TRX-08.
+- [ ] Event calendar and comparison. EVT-04, 05.
+- [ ] Merchant price evolution. MER-04.
+- [ ] Last reconciled and last transaction per account. ACC-08.
+- [ ] Delete my account and all its data. SEC-04.
 
 # v2
 
 ## Phase 5: Patrimoine (net worth)
-- Snapshots, contributions with employer money and profit, employers and salaries.
-  NW-02..05, 09 (holdings come in phase 2).
-- Net-worth files in the import format. IMP-02.
+- [ ] Snapshots, contributions, employers and salaries. NW-02..05, 09.
+- [ ] Net-worth files in the import format. IMP-02.
 
 # v3
 
 ## Phase 6: The year
-- Yearly review, money and social views, export. YR-01..05, 07. It may merge with the
-  dashboard; to be decided when phase 4 is built (author, 2026-11-05).
+- [ ] Yearly review, money and social views, export. YR-01..05, 07. May merge with the dashboard; decide when phase 4 is built.
 
 ## Before a second real user
-Not tied to a phase: the app works for its owner without these, and nobody else can use it
-safely until both exist.
+The app works for its owner without these; nobody else can use it safely until both exist.
 
-- **Custom SMTP.** Supabase's built-in sender only emails members of the Supabase
-  organization, a few times an hour. A transactional provider with a free tier (Resend,
-  Brevo or Amazon SES) and a domain we own (the one real cost, about 10 to 15 dollars a
-  year), configured in `[auth.email.smtp]` with the password as an environment variable.
-- **Sign-in throttle.** Supabase rate-limits by IP, but every auth call comes from our
-  server, so it sees Netlify's IP (security.md, Auth). A per-IP and per-email throttle in
-  Postgres.
+- **Custom SMTP.** Supabase's built-in sender only emails organization members, a few times an hour. A transactional provider with a free tier (Resend, Brevo, Amazon SES) and a domain we own (about 10 to 15 dollars a year), set in `[auth.email.smtp]`.
+- **Sign-in throttle.** Supabase rate-limits by IP, but every auth call comes from our server, so it sees Netlify's IP (security.md, Auth). A per-IP and per-email throttle in Postgres.
 
-## Later (not v1)
-Tracked in [improvements.md](improvements.md).
-
-- Import wizard: source profiles, mapping screens, merchant aliases. IMP-03, MER-02.
-- Projections: net-worth growth scenarios, the goal solver, "if this continues", and
-  scenario budgets by place. NW-06..08, BUD-07.
-- Demo-data generator and public demo, only if another user joins. DEM-01, 02.
-- Tags, several per transaction. TAG-01, 03 (moved out of the plan, 2026-11-05).
-- Region packs, birth date and country, merchant countries, local-purchase share, and the
-  goal-reached celebration. LOC-01, 02, SET-02, 03, MER-03, YR-06, BUD-05 (moved out of
-  the plan, 2026-11-05).
+## Later
+Ideas not scheduled are in [improvements.md](improvements.md).

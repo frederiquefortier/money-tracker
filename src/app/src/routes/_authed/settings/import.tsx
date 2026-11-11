@@ -27,7 +27,7 @@ export const Route = createFileRoute('/_authed/settings/import')({
   component: Import,
 })
 
-/** IMP-01, 05, 06 (spec 18): upload the files, see what is new and decide, import, undo. */
+/** IMP-01, 05, 06: upload the files, see what is new and decide, import, undo. */
 function Import() {
   const { t } = useTranslation()
   const toast = useToast()

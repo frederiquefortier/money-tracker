@@ -1,1318 +1,612 @@
 # Architectural Decision Records
 
-Document architectural choices with context, alternatives considered, and trade-offs. Check this file before proposing changes that might conflict with past decisions.
+Technical and structural choices, with the alternatives that were rejected. Check this file before proposing a change that might conflict. Screen and interaction choices live in [design-decisions.md](../00_briefing/designs/design-decisions.md). Superseded ADRs stay as one line so the numbers keep their meaning.
 
 <!-- Newest first: a new ADR goes directly below this line. Template at the bottom. -->
 
 ### ADR-042: An event can opt out of the automatic link by date (2026-11-11)
 
 **Context:**
-- EVT-07 links every expense and income in an event's dates. The author wants an event for
-  the Swiss youth professional visa (2026-2027) to hold only the fees and procedures linked
-  by hand, without taking a year of transactions or a real trip to Switzerland.
+- EVT-07 links every expense and income inside an event's dates. The author wants an event (a visa year) that holds only what is linked by hand.
 
 **Decision:**
-- `events.auto_link` (boolean, default true). `matching_event` skips an event with it off,
-  so the form, `save_transaction`, the import and `relink_events` all agree.
-- `save_event` takes `auto_link` and recomputes the event's old and new dates as before.
-  Turning it off hands its automatic links to the next matching event, or to none, and keeps
-  the manual ones. No `event_exclusions` row is written for them, so turning it back on
-  links the dates again.
-- The event form has a checkbox, "Lier automatiquement les transactions selon la date".
+- `events.auto_link` (default true). `matching_event` skips an event with it off, so the form, `save_transaction`, the import and `relink_events` agree.
+- Turning it off hands its automatic links to the next matching event, or to none, and keeps the manual ones. No `event_exclusions` row is written, so turning it back on links the dates again.
 
 **Alternatives Considered:**
-- Tags again -> A second way to group, loose names, no dates or total.
-- An event with no dates -> Already links by hand only, but then it has no place on the
-  calendar (EVT-04).
+- Tags -> A second way to group, loose names, no dates or total.
+- An event with no dates -> Links by hand only, but has no place on the calendar (EVT-04).
 
 **Consequences:**
 - An event with the link off is never offered for a date on a transaction.
-- A later idea: hide or collapse a hand-linked event's transactions in the list.
 
 ---
 
-### ADR-041: The transaction form's data is one layout route, and closing a sheet leaves sheets out of the refresh (2026-11-11)
+### ADR-041: The transaction form's data is one layout route (2026-11-11)
 
 **Context:**
-- Every transaction sheet (new, edit, transfer) loaded the data of all the form's pickers on
-  its own, about 15 queries, and a hovered row preloaded the same load again. Closing any
-  sheet then called `router.invalidate()`, which reloaded every active route, the sheet's
-  own loaders included, before the navigation back. The author found the app slow and a
-  sheet sometimes not opening.
+- Each transaction sheet loaded the data of all the form's pickers (about 15 queries), a hovered row preloaded it again, and closing a sheet ran `router.invalidate()`, which reloaded every active route including the sheets' own loaders. The app felt slow and a sheet sometimes did not open.
 
 **Decision:**
-- A layout route with no path, `/_authed/transactions/_form`, loads `loadTransactionForm()`
-  once for the three sheets, kept for a minute (`staleTime`), read with
-  `useTransactionFormData()`. The sheets keep only their own data (the transaction, the
-  transfer, the fee category).
-- The layout and the sheets carry `staticData.sheet`, and `RouteSheet` invalidates on close
-  with `filter: match => match.staticData.sheet !== true`: the list and the other data
-  refresh, the sheets' loaders do not. Any other `router.invalidate()` still marks the form
-  data stale.
-- Transaction rows no longer preload on hover.
+- A pathless layout route, `/_authed/transactions/_form`, runs `loadTransactionForm()` once for the three sheets (`staleTime` one minute), read with `useTransactionFormData()`. Sheets keep only their own data.
+- Layout and sheets carry `staticData.sheet`; `RouteSheet` invalidates on close with `filter: match => match.staticData.sheet !== true`. Rows no longer preload on hover.
 
 **Alternatives Considered:**
-- A memo of the form data in the browser -> It has to be cleared by hand on every write, and
-  on the server it would be shared between users.
+- A browser memo -> Cleared by hand on every write.
 - Loading the form data in the list route -> Slows the list for sheets not opened.
 
 **Consequences:**
-- The form's usage ranks (most used merchants, frequent people) can be up to a minute old
-  after a save. A merchant, person or category created inline invalidates, so it shows at
-  once.
-- Three route files moved under `routes/_authed/transactions/_form/`; their URLs are the
-  same.
+- Usage ranks (merchants, frequent people) can be up to a minute old after a save; a merchant, person or category created inline invalidates at once.
 
 ---
 
 ### ADR-040: "With me" is a role and "bought from" is a field on the transaction (2026-11-11)
 
 **Context:**
-- After the first import the author found "Cette personne est le magasin" (ADR-038) made no
-  sense, and reviewed what a person can be on a transaction: someone was with me (no effect
-  on the transaction), I paid for someone (invited or owes), or I bought from someone. Only
-  the second was modelled.
+- After the first import, the author found that making a merchant "be" a person (ADR-038) made no sense. A person on a transaction is one of: with me (no money effect), paid for by me (invited, owes), or sold to me.
 
 **Decision:**
-- `transaction_people.role` gains `with` (PPL-08): a line like the others (it shows in the
-  list, the Proches filter and the person's page) with `amount = 0`, a person required, head
-  count 1, on expenses only. `absorbs` leaves it out, so no recompute gives it a part, and
-  `check_transaction_people` ignores it when counting input modes. `save_transaction` sets
-  these lines aside, computes the parts of the others as before (a Moi line is implied when
-  only `with` lines are given), then writes them last.
-- `transactions.seller_person_id` (PPL-09): a composite FK with `user_id`, set null when the
-  person is deleted, expenses only (a check). `save_transaction` takes `seller_id`. The list
-  names the merchant as `Shop · Person` when both are set, or the person alone, and its
-  Proches filter and search match the seller.
-- `merchants.person_id` is dropped. The migration moves each such merchant's expenses to the
-  seller field and deletes the merchants left with no transaction and no alias; any other
-  stays. `merge_people` moves sellers too.
-- The import: a merchant text that is a person's name or alias on an expense sets the seller
-  and creates no merchant; on an income it still becomes a merchant named for the person,
-  with no link. `people.csv` accepts the role `with`. The summary section reads "Bought from
-  people".
-- The role bubble on a person's line goes round invited, owes me, with me; a line without a
-  name skips with me.
+- `transaction_people.role` gains `with` (PPL-08): `amount = 0`, a person, head count 1, expenses only. `save_transaction` sets these lines aside, computes the others' parts as before, then writes them last.
+- `transactions.seller_person_id` (PPL-09): composite FK, set null on person delete, expenses only. `save_transaction` takes `seller_id`.
+- `merchants.person_id` is dropped; the migration moves those expenses to the seller field and deletes merchants left unused. `merge_people` moves sellers.
+- Import: on an expense, a merchant text equal to a person's name or alias sets the seller and creates no merchant. `people.csv` accepts `with`.
 
 **Alternatives Considered:**
-- Keep the link on the merchant and fix its wording -> Still two steps (make a shop, then say
-  it is a person) for what is one fact about a purchase.
-- A separate table for people with me -> No risk to the parts, but a second place to filter,
-  list, import and merge people from.
-- Seller on incomes too -> An income already names who it came from (a `from` line).
+- Keep the merchant link and reword it -> Still two steps for one fact about a purchase.
+- A separate table for people "with me" -> A second place to filter, list, import and merge.
+- Seller on incomes -> An income already names its source (`from`).
 
 **Consequences:**
-- A transaction can have a seller and a shop; the list joins the two names in one string.
-- Supersedes ADR-038. Its alias and merge rules (ADR-037) are unchanged. ADR-039's rule for
-  a merchant linked to a merged person goes with the link: `merge_people` moves sellers.
+- Supersedes ADR-038. ADR-037's alias and merge rules stand.
 
 ---
 
 ### ADR-039: Merging people is one SQL function that refuses a shared transaction (2026-11-11)
 
 **Context:**
-- The first real import created Claire, an alias of Nina. Merchants can be merged
-  (MER-05) but people could only be merged at import time, for people not yet created
-  (ADR-037). Nothing merged two existing people.
+- The first import created a duplicate person (an alias of another). Merchants could be merged (MER-05); existing people could not.
 
 **Decision:**
-- `merge_people(source, target)` (`security invoker`, PPL-07) re-points the source's
-  transaction lines, group memberships and event links to the target, moves the merchant
-  linked to the source (ADR-038) when the target has none, deletes the source, and keeps
-  its name and aliases as aliases of the target (PPL-06), as `merge_merchants` does.
-- It refuses with `people_merge_shared_transaction` when both are on one transaction: two
-  lines for one person would each carry a part, and choosing which to keep is the author's
-  call on that transaction.
-- `authenticated` gets `update (person_id)` on `transaction_people` for it. The RLS update
-  policy already exists (own rows only).
-- The icon sits on a person's row and sheet, not on a group's.
+- `merge_people(source, target)` (`security invoker`, PPL-07) re-points lines, group memberships and event links to the target, keeps the source's name and aliases as aliases of the target, and deletes the source.
+- It raises `people_merge_shared_transaction` when both people are on one transaction: two lines for one person would each carry a part, and choosing is the author's call.
+- `authenticated` gets `update (person_id)` on `transaction_people` for it.
 
 **Alternatives Considered:**
-- Delete and insert the lines instead of an update -> No new grant, but the line ids
-  change and reimbursements name them.
+- Delete and re-insert lines -> Line ids change and reimbursements name them.
 - Summing the parts of a shared transaction -> Silently rewrites a split the author set.
 
 **Consequences:**
-- A person's merchant link is lost when both have one; the two merchants can be merged
-  on their own.
-- No undo, like a merchant merge; the source's name is kept as an alias only.
+- No undo, like a merchant merge.
 
 ---
 
 ### ADR-038: A merchant can be a person (2026-11-10)
 
-**Context:**
-- Buying something from a proche ("Maman - Amazon", "Juju") has no place in the
-  model: an expense has Moi, invited and owes lines, and only an income has a `from` person.
-  The author wanted this before running the first import.
-
-**Decision:**
-- `merchants.person_id` (nullable, composite FK with `user_id`, set null when the person is
-  deleted, unique per person) says the merchant is that person. The merchant keeps working
-  as a merchant everywhere (list, filters, search, merge), so no transaction code changes.
-- The import links them by itself: a merchant text equal to a person's name or alias (an
-  existing person, one from `people.csv`, or an alias from `aliases.csv` of kind `person`)
-  is that person's merchant, created named for them. The summary lists them under "Proches
-  comme magasins". A merchant that already has the name is used as it is.
-- The merchant form has a person field to set or clear it.
-
-**Alternatives Considered:**
-- A person column on the transaction -> Touches the list, form, filters, search and
-  dashboard; the merchant already carries all of those.
-- A new `from` role on expenses -> Mixes who shares the cost with who was paid.
-
-**Consequences:**
-- A person's page does not yet list what was bought from them.
-- Merging a linked merchant into another loses the link.
-
-### ADR-037: Merges leave aliases, and new items can be edited before they are created (2026-11-10)
-
-**Context:**
-- An import merge only renamed rows, so a re-import showed the same spelling as new again,
-  and the existing merchant merge deleted the source's name. The author also wanted to
-  change a new merchant before it exists, send part of it to the note, or drop a false
-  positive ("?", "Train de Paris"), and said the import being built is the wizard (IMP-03).
-
-**Decision:**
-- Merchants get `merchant_aliases` (MER-02), with people's rules: a name or an alias points
-  to one merchant. A merge of a merchant (MER-05) or a person keeps the old spelling as an
-  alias, and the import finds a merchant or person by name or alias. The import takes an
-  optional `aliases` file (kind, name, alias), which also carries the converter's spellings.
-- Before it is created, a new merchant, person or event can be edited: a new name (empty:
-  not created) and text sent to the note of its transactions. Removing is an edit with
-  nothing kept. This is applied in the browser to the rows, so the database sees only
-  names. Merge and edit exclude each other for an item.
-- IMP-03 is narrowed to reading other sources (column mapping, profiles); the rest of its
-  wizard is IMP-06 and MER-02.
-
-**Alternatives Considered:**
-- Merges as a plain rename for one import (as planned) -> No trace; the same question on
-  every import.
-- Dropping a person -> Allowed; its lines go, and a reimbursement by it goes too.
-- Flagging items for review in the app afterwards -> Not decided; see the session record.
-
-**Consequences:**
-- No screen lists merchant aliases yet.
-- A renamed item's new name is counted as created only once the import runs.
+Superseded by ADR-040 (the link moved from the merchant to a seller field on the transaction).
 
 ---
 
-### ADR-036: import_batch is set-based, checks first, and creates events with dates (2026-11-10)
+### ADR-037: Merges leave aliases, and new items can be edited before import (2026-11-10)
 
 **Context:**
-- The API role gives a statement 8 seconds (`authenticated`: `statement_timeout = 8s`), and
-  the first import is about 4,800 rows. Calling `save_transaction` per row would take far
-  longer, but it holds the rules for people parts and reimbursements.
+- An import merge only renamed rows, so a re-import showed the same spelling as new again, and a merchant merge deleted the source's name. The author also wanted to edit or drop a new item before it exists.
 
 **Decision:**
-- `import_batch(payload jsonb, dry_run boolean)` is one `security invoker` function: it
-  parses the rows into temporary tables, checks everything (every error with its file and
-  line), and writes nothing unless there is none. `dry_run` returns the same checks plus
-  what would be created, which is the summary screen. The server applies the merge choices
-  (IMP-06) by renaming in the rows before the call.
-- Plain expenses, incomes, transfers, fees and adjustments are written in bulk. Rows with
-  people go through `save_transaction`, one call each, so the parts, the empty `Moi` and
-  `Invité` lines and the reimbursements follow the app's own rules; expenses first, then
-  the incomes that repay them.
-- Imported events are created by name with no dates (dates are optional, and an event
-  with none links nothing by itself), and the rows that name them are linked by hand
-  (`event_source = 'manual'`). The author sets dates in the app if wanted. Existing events
-  link the imported rows by their own dates, as everywhere in the app.
-- Parts on an expense are not set by the import (an amount there is an error): empty
-  lines take what is left, and an `owes` line is set by its reimbursement. Only a `from`
-  line carries an amount, the income's.
-- `import_undo(batch)` deletes the batch's transactions, then what it created if nothing
-  else uses it, and puts back the opening balance and date it changed.
+- `merchant_aliases` (MER-02) with people's rules: a name or an alias points to one merchant. Merging a merchant or person keeps the old spelling as an alias, and the import matches by name or alias. An optional `aliases` file (kind, name, alias) carries the converter's spellings.
+- Before creation, a new merchant, person or event can be renamed, partly moved to the note of its transactions, or dropped. Applied in the browser to the rows, so the database sees only names.
+- IMP-03 is narrowed to reading other sources; the rest is IMP-06 and MER-02.
 
 **Alternatives Considered:**
-- `save_transaction` for every row -> Too slow under 8 seconds.
-- Several calls in chunks -> Not all or nothing.
-- A staging table filled by several calls, then one commit call -> More tables and states
-  for a file that fits in one call.
+- A plain rename per import -> No trace; the same question every time.
 
 **Consequences:**
-- Two new columns on `transactions` (`import_ref`, `import_batch_id`) and a batch id on
-  everything the import can create. A re-import skips a `ref` already imported.
-- import.md changes: amounts on an expense's people lines are not used.
-- Correction, same day: this ADR first said an event needs a start date. It does not (made
-  optional in migration `events_without_categories`); the first events migration was read
-  instead of the latest.
+- No screen lists merchant aliases yet (the merchant form edits them).
 
 ---
 
-### ADR-035: The import accepts an archived category before its archive date (2026-11-10)
+### ADR-036: import_batch is set-based, checks first (2026-11-10)
 
 **Context:**
-- The author's old Animaux categories were archived in the app on 2026-05-27, but their
-  history (2019 to 2026) has to import under them.
+- The API role gives a statement 8 seconds (`statement_timeout`), and the first import is about 4,800 rows. `save_transaction` per row is far too slow but holds the rules for people parts and reimbursements.
 
 **Decision:**
-- A transaction may use an archived category when its date is up to and including the day
-  the category was archived (decided by the author: the archive day still counts as
-  inside). A later date is refused in the check, listed by line. Nothing is reactivated.
-- This differs from the stored periods, which are `[active_from, active_to)` and leave the
-  archive day out (CAT-04), so the import's check allows one more day than the pickers do.
+- `import_batch(payload jsonb, dry_run boolean)`, one `security invoker` function: parse rows into temporary tables, check everything (each error with file and line), write nothing unless there is none. `dry_run` returns the checks plus what would be created (the summary screen). Merge choices (IMP-06) are applied by renaming rows before the call.
+- Plain expenses, incomes, transfers, fees and adjustments are written in bulk. Rows with people go through `save_transaction`, one call each, expenses before the incomes that repay them.
+- Imported events are created by name only, and rows naming them are linked by hand.
+- Amounts on an expense's people lines are an error: empty lines take the rest, an `owes` line is set by its reimbursement.
+- `import_undo(batch)` deletes the batch's transactions, then what it created if unused, and restores the opening balance and date it changed.
 
 **Alternatives Considered:**
-- Refuse archived categories -> The author would have to reactivate and re-archive them.
-- Ignore the archive date -> A later transaction could land on a category hidden from pickers.
+- `save_transaction` per row -> Too slow. Chunked calls -> Not all or nothing. A staging table -> More tables and states for a file that fits in one call.
 
 **Consequences:**
-- The import checks the category's periods against each split's transaction date.
+- `import_ref` and `import_batch_id` on `transactions`, and a batch id on everything the import can create.
 
 ---
 
-### ADR-034: The import sets the opening balance of an account that has no transactions (2026-11-10)
+### ADR-035: The import accepts an archived category up to its archive day (2026-11-10)
 
 **Context:**
-- ADR-033 said nothing in the app is overwritten by an import. The accounts exist in the
-  app with an opening balance of 0, and the history's real starting balances (the Aspire
-  "Starting Balance" rows, dated 2022-12-31) have to land somewhere.
+- Old categories were archived in the app, but their history has to import under them.
 
 **Decision:**
-- An account matched by name and institution that has no transactions takes the file's
-  `opening_balance` and `opened_on`; the summary lists each change. Every other field, and
-  every account that already has transactions, is left alone.
-- Rows from before the accounts were tracked go to a placeholder account whose opening
-  balance is set so that it ends at zero, so it adds nothing to net worth.
+- A transaction may use an archived category up to and including the archive day; later dates are refused in the check. Nothing is reactivated.
+- The stored periods are `[active_from, active_to)` and leave the archive day out (CAT-04), so the import allows one more day than the pickers.
 
 **Alternatives Considered:**
-- Starting balances as adjustment transactions -> An adjustment stores a gap against a
-  computed balance, which is not an opening balance.
-- Leave the balances at 0 for the author to edit -> Eight accounts by hand, and the
-  balances stay wrong until it is done.
-
-**Consequences:**
-- `import_batch` needs a rule to update `opening_balance` and `opened_on` for accounts
-  without transactions; undo restores the previous values.
+- Refuse archived categories -> Reactivate and re-archive by hand. Ignore the date -> A later transaction could land on a hidden category.
 
 ---
 
-### ADR-033: The import format, rewritten with people, events and everything created on demand (2026-11-10)
+### ADR-034: The import sets the opening balance of an account with no transactions (2026-11-10)
 
 **Context:**
-- import.md was written before accounts, merchants, people and events were built, and was
-  notes rather than a decision. The author asked to start it again from scratch.
-- Currencies and categories are already set by the author; the import must still add a
-  missing one, and the same for people, events and merchants.
+- Accounts exist with an opening balance of 0, and the history's real starting balances have to land somewhere.
 
 **Decision:**
-- Four files: accounts.csv, transactions.csv, splits.csv, people.csv (optional). No
-  events file: an event named on a transaction is created with a name only.
-- The category lives only in splits.csv, one row for a plain category and several for a
-  split, since every expense and income has at least one split.
-- People are lines in people.csv with the form's roles (`me`, `invited`, `owes`, `from`),
-  head count and amount; a `from` line can name the expense it repays.
-- Every named thing is matched ignoring case and accents and created when missing: currency,
-  account, institution, category, merchant, person, event. The summary lists them by kind,
-  each kept as written or merged into an existing one (IMP-06, widened from categories).
-- No time of day, following the schema.
+- An account matched by name and institution with no transactions takes the file's `opening_balance` and `opened_on`; every other field, and every account with transactions, is left alone. Undo restores the old values.
+- Rows from before the accounts were tracked go to a placeholder account whose opening balance makes it end at zero.
 
 **Alternatives Considered:**
-- A `people` cell on transactions (`Alex; Marie`, shared equally) -> Cannot say who owes
-  what or who reimbursed.
-- An events.csv with dates, types and people -> Not wanted now; events are edited in the
-  app afterwards.
-- Refusing unknown currencies -> The author wants the import to add them.
-
-**Consequences:**
-- The author prepares four sheets instead of one; the converter script writes them.
-- `import_batch` writes through the same rules as `save_transaction`, `save_transfer` and
-  `save_person`, so it must create the people lines and reimbursements in one transaction.
-- Supersedes the earlier import.md notes, not an ADR.
+- Starting balances as adjustments -> An adjustment is a gap against a computed balance, not an opening balance.
 
 ---
 
-### ADR-032: One calendar for the period (2026-11-10)
+### ADR-033: The import format, with people, events and everything created on demand (2026-11-10)
 
 **Context:**
-- ADR-031 left the period with three tabs: a list of years, a month grid and the range
-  calendar. The author, asking for the year list to be checkboxes and a second click to
-  clear a pick, then suggested keeping the custom range alone: "one calendar only to deal
-  with".
+- The earlier import notes predated accounts, merchants, people and events. The author asked to start again.
 
 **Decision:**
-- The Dates screen is the range field and its inline calendar, nothing else. No Année or
-  Mois tab, no year list, no month grid, no ‹ › stepping. This supersedes the tabs and the
-  year list of ADR-031; the rest of ADR-031 stands (a pick applies and the sheet stays
-  open, a "Dates" bubble and a chip, Effacer returns to Tout).
-- While the period is Tout the calendar selects nothing, instead of showing the last 30
-  days as if chosen.
-- The model keeps `month` and `year` periods: the address, the server and the empty-state
-  text still read them, so an old link works. Nothing in the interface produces them.
+- Files: accounts.csv, transactions.csv, splits.csv, people.csv (optional). No events file. The category lives only in splits.csv. People are lines with the form's roles. Format in [import.md](import.md).
+- Every named thing is matched ignoring case and accents and created when missing (currency, account, institution, category, merchant, person, event). The summary lists them, each kept or merged into an existing one (IMP-06).
+- No time of day.
 
 **Alternatives Considered:**
-- Years as check rows, a second click clearing a month or year -> Built, then dropped for
-  this: three pickers for one job.
-- Remove `month` and `year` from the model -> Larger change across the address and
-  `list_transactions`, for no visible gain. Left as an improvement.
+- A `people` cell (`Alex; Marie`) -> Cannot say who owes or who repaid. An events.csv -> Events are edited in the app afterwards. Refusing unknown currencies -> The author wants them added.
 
-**Consequences:**
-- A month now takes two taps on the calendar, and the whole of it is no quicker than
-  before; the author chose the simplicity.
-- The check-list years, the month grid and `TabList` on the period are gone.
+---
 
-### ADR-031: The period is chosen in place, Tout is Effacer (2026-11-10)
+### ADR-032 to ADR-027: Calendar, period and filters
+
+Moved to [design-decisions.md](../00_briefing/designs/design-decisions.md). The dependency they added (react-aria) is in ADR-011.
+
+---
+
+### ADR-026: The code is grouped by role and by feature (2026-11-08)
 
 **Context:**
-- Trying ADR-030, the author found three things off: a pick in the period closed the
-  sheet or went back, though the sheet has a confirm button; Dates was the only bubble
-  with an icon; and Tout was a tab while Effacer exists everywhere else.
+- `components/` had 45 loose files, `lib/` 58, hooks lived in five places, nine file names existed in both `lib/` and `server/`, and 35 files imported types from the server layer.
 
 **Decision:**
-- Every period pick (a year, a month, the calendar's second day, the typed dates) applies
-  and the sheet stays open, as a filter's ticks do. The footer's "Voir N résultats" closes.
-- The bubble reads "Dates", like the filter bubbles (a chevron, no icon), and a chosen
-  period shows as a chip under the row; its ✕ and "Tout effacer" return to Tout. Tout is
-  the default and has no chip. The phone's list calls the row "Dates".
-- Tout is no tab. It is the state Effacer returns to, in the period screen and in the
-  list of filters (where Effacer clears the filters and the period).
-- The years are a list from the current year back to 2000, not a grid; the months'
-  previous arrow stops at 2000. This replaces the twelve-year grid.
+- The layout and naming rules are in CLAUDE.md (Layout). In short: role folders in `components/`, every hook in `hooks/`, `lib/<feature>/` holds `<entity>.ts`, `<entity>-draft.ts` and `<entity>-list.ts`, `server/` holds server functions only, and an export is named for what it is, with no name exported by two files.
+- `i18n/fr/` and `i18n/en/` hold the same files; English is typed against French.
 
 **Alternatives Considered:**
-- Keep Tout as a tab -> The author wanted one way to empty a filter, Effacer.
+- `lib/` by layer only -> A feature's files stay in one flat list.
+- A barrel `index.ts` per folder -> Hides where code lives and slows the dev server.
 
 **Consequences:**
-- A pick no longer returns to the list on a phone; the back arrow does.
-- The years' paging keys (`previousYears`, `nextYears`) and the "Période: …" label are gone.
+- Journal entries before this date point to the old layout; they are left as written.
 
-### ADR-030: The period joins the filters' sheet; sheets slide from the right (2026-11-10)
-
-**Context:**
-- After trying ADR-029, the author asked for four changes: chips that stay individual
-  whatever their number, a filter bubble that always keeps its name, every sheet on a
-  phone opening from the right (the menu apart), and the period inside the Filtres button
-  on a phone, in the same drill-in as the filters, "maybe even on desktop".
-
-**Decision:**
-- Chips are always one per value. This replaces ADR-029's single "Catégories · 5" chip.
-- A filter bubble always reads its name, with the number after it once something is
-  ticked ("Catégories · 2"). It never swaps its name for the one ticked, since the chips
-  now say what is ticked. This replaces the single name on the bubble (spec 14).
-- Every sheet slides in from the right at every width; only the menu (`side="left"`)
-  comes from the left. The bottom animation is gone.
-- The period is a screen of the filters' sheet, `FilterScreen = FilterTab | 'period'`. On a
-  phone the bar has no period bubble: Filtres lists Période first (its value on the
-  right), then the five filters, and Période opens the same tabs, grids and calendar. From
-  `md` up the period bubble keeps its ‹ › and opens the sheet on that screen alone, in
-  place of the popover. A pick applies, then returns to the list when the sheet came from
-  it, or closes when a bubble opened it.
-
-**Alternatives Considered:**
-- Keep the period bubble and its popover on phones -> The author wants one place for
-  everything that narrows the list.
-- Keep the popover on desktop -> Two patterns for one job, which the author did not want.
-
-**Consequences:**
-- On a phone, stepping a month with ‹ › now takes the drill-in: Filtres, Période, Mois.
-- The merchants page's category bubble loses the single name too (same bubble), and has
-  no chips to replace it.
-
-### ADR-029: Transactions filters: one filter per screen, chips for the choices (2026-11-10)
-
-**Context:**
-- The Transactions period and filters had three problems, reported by the author: the
-  custom period opened its calendar in a second overlay (ADR-027), unlike the month and
-  year grids; the chosen filters showed nowhere but as a count; and every filter opened
-  the same sheet with five wrapping tabs, which did not work on a phone.
-
-**Decision:**
-- The custom period shows its range calendar inline in the period panel, under the typed
-  dates, as the year and month grids do. Picking the second day applies the range and
-  closes the panel. This supersedes ADR-027 and ADR-028 for the Transactions period only;
-  every other date field keeps the calendar rising from the bottom.
-- The filter sheet has no tab row. From `md` up, each filter's bubble opens the sheet on
-  that filter alone. On a phone, one Filtres button opens a list of the five filters, each
-  with a summary of what is ticked; a row opens that filter in the same sheet, with a back
-  arrow. Two levels, no sideways scroll.
-- What is chosen shows as chips under the bubbles: one per value (the category with its
-  icon), a ✕ to remove it, and "Tout effacer" at the end. A filter with more than two
-  values becomes one chip, "Catégories · 5".
-
-**Alternatives Considered:**
-- Tabs kept, in a scrolling row -> Rejected by the author: sideways scroll hides tabs.
-- One bubble per filter in a scrolling row on phones (the assistant's first choice) ->
-  Rejected by the author, who preferred the two-level list.
-- A popover per filter on desktop -> The sheet already holds the search, the grouped
-  lists and the result count; a popover would rebuild them. Left as an improvement.
-
-**Consequences:**
-- `FilterSheet` takes a `tab` that may be null (the list of filters) and shows the back
-  arrow only when more than one tab is available. The settings merchants filter, which
-  passes one tab, is unchanged.
-- The period panel on a phone stays a popover; the inline calendar fits its width.
-
-### ADR-028: Every date field uses the shared calendar (2026-11-09)
-
-**Context:**
-- ADR-027 kept single dates native and put only ranges on react-aria's calendar. The
-  author, seeing the range field, asked that all date fields use "our calendar".
-
-**Decision:**
-- One calendar for every date: `DatePickerField` (one date) and `DateRangeField` (a range),
-  both on `calendar-sheet.tsx`: typed segments, and a calendar rising from the bottom of
-  the sheet or dialog the field is in (the page outside both), with a dim backdrop. No
-  `<input type="date">` remains. This supersedes ADR-024 and the single-date exception of
-  ADR-027.
-- Typed dates read day, month, year with slashes in both languages (jj/mm/aaaa,
-  dd/mm/yyyy), through `DATE_FIELD_LOCALE`; the rest of the app keeps ADR-019's Canadian
-  formats. A range's band has no gap between its days.
-- Sheets and dialogs both hand their panel to the calendar (`OverlayContainerProvider`),
-  and ignore the Escape that closes it, so it stays inside Radix's focus and pointer scope.
-
-**Alternatives Considered:**
-- Native for one date, the calendar for ranges (ADR-027) -> Two looks for the same job.
-
-**Consequences:**
-- Forms that read their fields from `FormData` keep working: the field has a hidden input
-  with the ISO date. A field no longer revalidates on blur; it validates on submit.
-- In the small confirmation dialogs the calendar rises above the dialog, at the height
-  the month needs.
-
-### ADR-027: Date ranges use react-aria's range picker (2026-11-09)
-
-**Context:**
-- ADR-024 put dates back to `<input type="date">` after a shadcn calendar could not jump
-  to a month or a year, and said a later date picker needs a direct month and year choice
-  to be worth it.
-- The event form needs optional dates as one range (EVT-02), and the author asked for a
-  calendar that rises from the bottom of the sheet, half its height, over a dim backdrop,
-  as in TravelSpend. The Transactions list's custom period is a range too.
-
-**Decision:**
-- A range is one shared field, `DateRangeField`, built on react-aria-components'
-  `DateRangePicker`: typed month, day and year segments (the direct choice ADR-024 asked
-  for) plus a `RangeCalendar` in a bottom panel. A range closes it; one day is the same
-  day twice. The tooltip beside its label is react-aria's too.
-- Single dates stay native, as ADR-024 says. Only ranges use the library.
-- Dependencies, each with a line in ADR-011: `react-aria-components`, `react-aria`
-  (for `UNSAFE_PortalProvider`, which puts the calendar inside the sheet it opens from)
-  and `@internationalized/date` (the date values it takes), all pinned.
-
-**Alternatives Considered:**
-- react-day-picker, shadcn's Calendar -> What ADR-024 tried: no typed segments, so the
-  month and year problem returns; locales through date-fns, against ADR-008's use of `Intl`.
-- Two native date fields (ADR-024) -> No range at a glance, and no calendar the author wants.
-
-**Consequences:**
-- A new dependency family, about the size of a small design system, for one field.
-- The calendar is portalled into the open sheet, or to the page outside one. In the period
-  popover of the Transactions list that is outside Radix's popover, so the popover ignores
-  taps and Escape inside react-aria's overlays.
-
-### ADR-026: The code is grouped by role and by feature, with one naming rule per layer (2026-11-08)
-
-**Context:**
-- `components/` had 45 loose files, `lib/` 58, and hooks lived in five places. Nine file
-  names existed in both `lib/` and `server/`. Shared types were exported from
-  `server/*.ts`, so 35 files imported types from the server layer. `utils.ts`,
-  `schemas.ts` and `form.ts` each held three unrelated things, and two unrelated types
-  were both called `Period`. The three icon files did not say which held drawings and
-  which held search words.
-
-**Decision:**
-- `components/`: no file at the root. `ui/` is shadcn. Shared pieces are grouped by role
-  in `layout/`, `forms/`, `sheet/`, `combobox/`, `lists/`, `feedback/` and `display/`.
-  `styles.ts` holds the class strings several components share. A feature gets its own
-  folder, split into `list/`, `form/` and similar once it passes about eight files.
-- `hooks/`: every hook, with the shared ones in `app/`, `forms/` and per-feature folders.
-  A context lives in the file of its hook.
-- `lib/`: `shared/` (money, format, color, collections, search, validation), then one
-  folder per feature, plus `auth/`, `forms/`, `db/` and `server/` (the `*.server.ts`
-  files keep that suffix). In a feature folder, `<entity>.ts` is the model (types,
-  constants, zod schemas), `<entity>-draft.ts` the form state and `<entity>-list.ts` the
-  list logic. `lib/utils.ts` keeps only `cn`, which shadcn expects there.
-- `server/<feature>.ts` holds server functions only. Types and constants a component
-  needs are imported from `lib/`, never from `server/`.
-- `i18n/fr/` and `i18n/en/`: the same files in each, one per area. French is the source;
-  the English files are typed against it.
-- `icons/`: `ui-icons.json` (drawings), `categories/keywords.json` (search words) and
-  `categories/glyphs.json` (drawings).
-- An export is named for what it is (`TransactionDetails`, not `Details`), and no name is
-  exported by two files.
-
-**Alternatives Considered:**
-- Group `lib/` by layer only (`domain/`, `server/`, `db/`) -> a feature's files would
-  still sit in one flat list, and `components/` is already grouped by feature.
-- Keep feature hooks next to their components -> the author asked for every hook in one
-  place.
-- A barrel `index.ts` per folder -> hides where code lives and slows the dev server.
-
-**Consequences:**
-- Imports are longer (`#/lib/transactions/transaction-draft`) and every path in the
-  journal before this date points to the old layout. Old entries are left as written.
-- A new file has one obvious home, and a new name can be checked against the rules above.
-- No import cycle exists between modules (checked with a script, types included).
+---
 
 ### ADR-025: Each repeated form, picker and server pattern lives in one place (2026-11-05)
 
 **Context:**
-- A review found the same code written three to six times: the submit of every sheet
-  form, "Créer « … »" in three pickers, and in the server functions the error mapping,
-  the insert-or-update and the load errors. The copies had drifted: four forms crashed
-  on a network error where the transaction form did not, and one picker skipped the
-  toast on a lost connection.
+- The same code existed three to six times (sheet-form submit, "Créer « … »" in pickers, server error mapping and insert-or-update) and the copies had drifted: four forms crashed on a network error.
 
 **Decision:**
-- `useSheetForm` (components) runs every RouteSheet form: validate, save, toast, close,
-  keep the values on failure, focus the first error. A form gives its schema, initial
-  values, `save` and `savedText`, and spreads `form.field(name)` on each `FormField`.
-- `useInlineCreate` (components) runs "Créer « … »" in a picker.
-- `lib/db.server.ts`: `loaded` (rows or a thrown load error), `saveRow`
-  (insert or update by id) and `updateProfile`. `failureFor(scope, known)` in
-  `lib/result.ts` maps SQLSTATEs and raised messages to the screen's error ids.
-- Money helpers (`parseAmount`, `compareDecimal`, `amountForInput`) live in
-  `lib/money.ts`; `amountForInput` takes the decimal separator from Intl.
-- `lib/` never imports from `components/`.
+- `useSheetForm` runs every RouteSheet form (validate, save, toast, close, keep values on failure, focus the first error). `useInlineCreate` runs "Créer « … »".
+- `lib/db.server.ts`: `loaded`, `saveRow`, `updateProfile`. `failureFor(scope, known)` in `lib/result.ts` maps SQLSTATEs to error ids. Money helpers live in `lib/money.ts`. `lib/` never imports from `components/`.
 
 **Alternatives Considered:**
-- A form library (React Hook Form, TanStack Form) -> React 19's `useActionState` and
-  zod already do the work (ADR-011); the repetition was wiring, not missing features.
-- A generic data layer over supabase-js -> More than three helpers would hide the
-  queries; `saveRow` narrows the builder with one cast, documented where it is.
+- React Hook Form or TanStack Form -> React 19 actions and Zod already do the work (ADR-011).
+- A generic data layer over supabase-js -> Hides the queries.
 
-**Consequences:**
-- A new form or picker gets network errors, toasts and focus right without thinking
-  about them, and a fix to that behaviour is made once.
-- Forms take `savedText` instead of `onSaved`; the transaction form keeps an optional
-  `onSaved` for the last account used.
+---
 
 ### ADR-024: Dates stay native, after a calendar was tried (2026-11-05)
 
-**Context:**
-- The author found the native date popup "not cute" on desktop and asked whether shadcn
-  had one that fits. A shared `DateField` was built the same day: a typed input with
-  shadcn's Calendar (react-day-picker 10) in the field's popover, on phones too.
-- Trying it, the author found the month and the year could not be chosen directly. The
-  options were month and year views inside the popover (more custom code) or
-  react-day-picker's month and year dropdowns (native selects again).
+Superseded by ADR-028 (design-decisions.md). Kept for the reason it was tried and dropped: shadcn's Calendar (react-day-picker) cannot jump to a month or year directly, so a later picker must offer that.
 
-**Decision:**
-- Back to `<input type="date">` everywhere, as ADR-011 says. The calendar, the shared
-  field and react-day-picker were removed before being committed.
-
-**Alternatives Considered:**
-- shadcn's Calendar in a shared field -> No direct jump to a month or a year; fixing that
-  meant either custom month and year views or native dropdowns inside a custom picker.
-- shadcn's Date Picker as is (a button opening the calendar) -> No typing, and the same
-  month and year problem.
-
-**Consequences:**
-- No date dependency; the OS picker on phones, the browser's on desktop, unthemed.
-- A later proposal for a custom date picker should start from this ADR: it needs a
-  direct month and year choice to be worth it.
+---
 
 ### ADR-023: Generated database types, amounts kept as text (2026-11-03)
 
 **Context:**
-- Server functions read Supabase rows untyped and cast them (`as string`,
-  `as unknown as CurrencyRow`). A renamed column compiled fine and failed at runtime.
-- `supabase gen types` types every `numeric` column as `number`, which would invite a float
-  into money code (ADR-004).
+- Server functions read rows untyped and cast them, so a renamed column compiled and failed at runtime. `supabase gen types` types `numeric` as `number`, which invites a float into money code (ADR-004).
 
 **Decision:**
-- `npm run db:types` (from `src/app`) writes `src/lib/database.gen.ts` from the linked
-  project. It is committed, and regenerated with every migration.
-- `src/lib/database.ts` wraps it and turns the amount columns that are written
-  (`accounts.opening_balance`) into strings. `getSupabase()` is typed with that wrapper.
-- Reads keep casting amounts to text in the select (`balance::text`), which the client
-  types as `string`.
+- `npm run db:types` writes the committed `src/lib/database.gen.ts`. `src/lib/database.ts` wraps it and overrides written amount columns as strings. Reads cast amounts to text in the select (`balance::text`).
 
 **Alternatives Considered:**
-- Hand-written row types -> Drift from the schema with no warning.
-- `MergeDeep` from type-fest, as the Supabase docs suggest -> A dependency for one
-  override (ADR-011).
+- Hand-written row types -> Drift without warning. type-fest `MergeDeep` -> A dependency for one override.
 
 **Consequences:**
-- Column names, nullability and joins are checked by `tsc`; the casts are gone.
-- A new numeric column that the app writes needs a line in `database.ts`.
-- Forgetting `db:types` after a migration leaves the types one migration behind.
+- A new numeric column the app writes needs a line in `database.ts`; forgetting `db:types` leaves types a migration behind.
+
+---
 
 ### ADR-022: Until real data exists, the project is the dev database (2026-11-03)
 
 **Context:**
-- ADR-017 made CI on `main` the only way to migrate, after a backup, because the project
-  would hold real data. It holds none yet: the import is still ahead (phase 1).
-- Local dev points at that project, so a new screen could not run locally until its
-  migration reached `main`, which meant pushing untested work to `main`.
+- ADR-017 made CI on `main` the only way to migrate, after a backup. The project held no real data yet, so a new screen could not run locally until its migration reached `main`.
 
 **Decision:**
-- Until the first real import, the Supabase project is the development database.
-  `npm run db:push` (from `src/app`) applies pending migrations from the laptop, with no
-  backup step: there is nothing to back up.
-- Work is tried in local dev before it reaches `main`. CI still runs the checks and
-  pgTAP, and its migrate job finds laptop-pushed migrations up to date.
-- Before the first real import, this is revisited: a separate dev project, or the backup
-  gate back in front of every push.
+- Until the first real import, `npm run db:push` (from `src/app`) applies migrations from the laptop with no backup step. Work is tried locally before `main`. CI still runs checks and pgTAP.
+- Before the first real import, revisit: a separate dev project, or the backup gate back in front of every push.
 
 **Alternatives Considered:**
-- CI as the only path (ADR-017) -> Nothing can be tried locally before `main`.
-- Laptop push gated on the GitHub backup workflow -> Ceremony for an empty database, and
-  it needed the GitHub CLI.
-- A second free project now -> The right shape once data exists; until then it is a
-  second sign-in and TOTP setup for no gain.
+- CI as the only path -> Nothing can be tried before `main`. Push gated on the backup workflow -> Ceremony for an empty database. A second project now -> A second sign-in and TOTP setup for no gain yet.
 
 **Consequences:**
 - Supersedes "migrations only from CI" in ADR-017 until real data exists.
-- A migration can be pushed, tried, and fixed with a follow-up migration the same day.
-- The import milestone gains a step: decide the dev setup before importing.
+
+---
 
 ### ADR-021: One account; unfinished work is tried in it (2026-11-02)
 
 **Context:**
-- ADR-017 planned a demo account with generated data (DEM-02) for trying features. The
-  account was never created, and the demo work is deferred: the app stays private.
+- ADR-017 planned a demo account for trying features. It was never created and the demo work is deferred.
 
 **Decision:**
-- The owner's account is the only one. Unfinished screens are tried there.
-- Migrations still run only from CI, after a backup (ADR-017).
-
-**Alternatives Considered:**
-- A demo account typed in by hand -> A second sign-in and second MFA setup to maintain
-  for no gain while the owner is the only user.
+- The owner's account is the only one. Unfinished screens are tried there. Isolation between users is proven by pgTAP only.
 
 **Consequences:**
-- Supersedes the demo account in ADR-017; the rest of ADR-017 stands.
-- Test entries land among real data. Delete them after trying a feature, or undo the
-  import batch (IMP-05).
-- The other-user isolation is proven by pgTAP only, not by a second live account.
+- Supersedes the demo account in ADR-017. Test entries land among real data: delete them or undo the import batch (IMP-05).
+
+---
 
 ### ADR-020: coolicons for every icon, categories included; no emoji (2026-11-02)
 
 **Context:**
-- The logo is coolicons' `pig-fill`. The author wants every icon from the same set, and
-  category icons too, instead of emoji (CAT-07, ADR-013).
-- coolicons now holds 18,870 icons (MIT). Its npm data package appeared three days ago, and
-  the all-sets package `@iconify/json` is 640 MB.
-- The CSP allows no third-party requests, and security.md forbids
-  `dangerouslySetInnerHTML`.
+- The logo is a coolicons icon and the author wants one icon set, categories included (CAT-07). The CSP allows no third-party requests and security.md forbids `dangerouslySetInnerHTML`.
 
 **Decision:**
-- `@iconify/react` (Iconify's own React component, about 630,000 downloads a week), used
-  through its **offline** build: no fetching code, icons come only from data we register.
-- The data is vendored: `src/app/src/icons/coolicons.json` holds only the icons the app
-  uses, generated by one request to the Iconify API (command in that folder's README). The
-  `IconName` type is derived from the file, so an unknown name fails type-checking.
-- `lucide-react` (shadcn's default icon set) is removed. A shadcn component that imports it
-  gets its icon swapped for a coolicons one.
-- **Categories store a coolicons icon name**, not an emoji. The picker (CAT-07, phase 1)
-  offers a curated subset of the set, vendored the same way and loaded only by the picker.
-- `emoji-picker-react` and the Noto Color Emoji font (ADR-013) are dropped.
+- `@iconify/react` through its **offline** build: no fetching, icons only from registered data. `src/app/src/icons/coolicons.json` holds only the icons used, generated by one Iconify API request (command in that folder's README). `IconName` is derived from the file, so an unknown name fails type-checking.
+- Categories store a coolicons icon name. `lucide-react`, `emoji-picker-react` and the Noto Color Emoji font are dropped (supersedes ADR-013).
 
 **Alternatives Considered:**
-- `unplugin-icons` -> Compiles icons at build time, but for React it also needs `@svgr/core`
-  and `@svgr/plugin-jsx`: three build dependencies for eight icons.
-- `@iconify-json/coolicons` or `@iconify/json` -> Three days old, or 640 MB.
-- Copying SVG paths into components by hand -> Works for one logo, does not scale to a
-  category picker.
-- Keep emoji for categories -> Two visual languages in one interface, plus a picker library
-  and a font to carry.
+- `unplugin-icons` -> Needs `@svgr` packages too. `@iconify/json` -> 640 MB. SVG paths by hand -> Does not scale to a picker. Emoji for categories -> Two visual languages and a picker library.
 
 **Consequences:**
-- Supersedes ADR-013.
-- One runtime dependency (`@iconify/react`) replaces three planned ones (emoji picker, emoji
-  font, lucide).
-- Adding an icon means re-running the curl command; forgetting it is a type error.
+- Adding an icon means re-running the request; forgetting it is a type error.
+
+---
 
 ### ADR-019: French and English, without regional variants (2026-11-02)
 
 **Context:**
-- ADR-008 offered six locales (`fr-CA`, `fr-CH`, `fr-FR`, `en-CA`, `en-US`, `en-GB`) so
-  numbers could follow each region. The author wants a choice of two languages.
+- ADR-008 offered six locales so numbers followed each region. The author wants two languages.
 
 **Decision:**
-- `profiles.locale` is `fr` or `en`; the switcher is a FR / EN toggle.
-- Formatting still needs a region: `fr` formats as `fr-CA`, `en` as `en-CA`, matching the
-  home currency (`FORMAT_LOCALE` in `src/app/src/i18n/locales.ts`). A per-user format region
-  can come later as a separate setting if it is ever wanted.
-- The database change follows ADR-017's expand and contract: migration
-  `20261102120000_locale_language_only` accepts both the new and the old values and
-  normalises existing rows; a later migration drops the old values. The app reads old
-  regional values (`toLocale`) in the meantime.
-
-**Alternatives Considered:**
-- Keep six locales -> Choices nobody asked for, mostly differing in thousands separators.
-- Format with bare `fr` / `en` -> ICU then picks France and the United States: euro-style
-  spacing and US dates for a Canadian-dollar ledger.
+- `profiles.locale` is `fr` or `en`. Formatting still needs a region: `fr` formats as `fr-CA` and `en` as `en-CA` (`FORMAT_LOCALE` in `i18n/locales.ts`). Bare `fr`/`en` would pick France and the US: euro spacing and US dates for a Canadian-dollar ledger.
+- The database change follows ADR-017's expand and contract: a migration accepts both new and old values and normalises rows; a later one drops the old.
 
 **Consequences:**
-- Supersedes the locale list in ADR-008; its i18n library and approach stand.
-- Swiss formatting (`1'234.50`) is gone, by choice.
+- Supersedes the locale list in ADR-008. Swiss formatting is gone, by choice.
+
+---
 
 ### ADR-018: The session check verifies the token locally (2026-10-27)
 
 **Context:**
-- Every navigation runs `getSession` (root route). It called `getUser`, the MFA level and
-  `listFactors`: two to three Auth requests per page, from the Ohio functions region.
-- supabase-js `getClaims()` verifies the access token against the project's public
-  signing key (JWKS, cached) with no Auth request, when the project signs with an
-  asymmetric key. With the legacy shared secret it silently falls back to a request.
+- Every navigation ran `getUser`, the MFA level and `listFactors`: two to three Auth requests per page.
 
 **Decision:**
-- `getSession` and `setLocale` use `getClaims()`. An `aal2` token proves a verified factor
-  (TOTP is the only factor enabled), so only an `aal1` session, on the MFA and set-password
-  pages, still asks Auth for its factors.
-- Password change and TOTP enrolment keep `getUser()`: rare, sensitive, worth the request.
-- Access tokens last 15 minutes instead of 60 (`jwt_expiry = 900`).
-- The project must sign with an asymmetric key (Dashboard, JWT Keys). If it still uses the
-  legacy secret, rotate to an ECC key before relying on this.
+- `getSession` and `setLocale` use `getClaims()`, which verifies the access token against the project's cached public signing key. An `aal2` token proves a verified factor, so only an `aal1` session on the MFA pages asks Auth for factors. Password change and TOTP enrolment keep `getUser()`.
+- Access tokens last 15 minutes (`jwt_expiry = 900`). The project must sign with an asymmetric key; with the legacy secret `getClaims()` silently falls back to a request.
 
 **Alternatives Considered:**
-- Keep `getUser()` on every page -> Notices a revoked session at once, at the cost of an
-  Auth round trip on every navigation.
-- Cache the session check in the app -> Our own invalidation logic for something Supabase
-  already signs.
+- `getUser()` on every page -> Catches revocation at once, costs a round trip per navigation. An app-side cache -> Our own invalidation for something Supabase already signs.
 
 **Consequences:**
-- A signed-in page load makes no Auth request; the JWKS is fetched once per function
-  instance.
-- A session revoked elsewhere (signed out on another device, user deleted) keeps passing
-  the page check until its token expires, at most 15 minutes. RLS trusts the same token
-  the same way, so the data is guarded exactly as before.
-- Tokens refresh four times as often while the app is open; each refresh is one request.
+- A session revoked elsewhere keeps passing the page check for up to 15 minutes. RLS trusts the same token, so data is guarded as before.
+
+---
 
 ### ADR-017: One Supabase project for development and real use (2026-10-27)
 
-*The demo account is superseded by ADR-021 (one account); migrations only from CI by ADR-022.*
+Partly superseded: the demo account by ADR-021, migrations-only-from-CI by ADR-022.
 
 **Context:**
-- The owner is the only user, the project is in Canada (`ca-central-1`, close to the Ohio
-  functions region Netlify's free plan uses), and the free plan allows two projects.
-- ADR-014 and ADR-016 planned a demo-only dev project plus a production project. For one
-  person whose main goal is retiring a spreadsheet, that is a second database to keep in
-  step for no user benefit.
-- Without Docker on the laptop, migrations could not be tested locally anyway; CI already
-  runs them on a fresh database.
+- One user, a Canadian project, two free slots. A demo-only dev project plus production (ADR-014, ADR-016) is a second database to keep in step. Migrations cannot be tested locally without Docker.
 
 **Decision:**
 - One project, `money-tracker`, holds real data.
-- **Two accounts in it:** the owner's, and a demo account with invented data (DEM-02) for
-  developing and trying features. RLS keeps them apart; this is the multi-user isolation
-  the app needs anyway, used every day.
-- **Migrations are applied only by CI**, on `main`, after docs, app and database checks
-  pass, and right after an encrypted backup (`ci.yml`: `backup` then `migrate`). There is
-  no `db:push` from the laptop.
-- **Migrations are additive** (expand, then contract in a later change): Netlify deploys
-  the app and CI migrates the database independently, so either may land first.
-- **Netlify deploy previews are off.** A preview runs unreviewed code against real data.
-- The second free slot stays empty, for the public demo (DEM-01), which relaxes MFA and so
-  must never share a database with real data.
+- Migrations are additive (expand, then contract in a later change): Netlify deploys the app and CI migrates the database independently, so either may land first.
+- Netlify deploy previews are off: a preview runs unreviewed code against real data.
+- The second free slot stays empty for the public demo (DEM-01), which relaxes MFA and must never share a database with real data.
 
 **Alternatives Considered:**
-- Separate dev and production projects (ADR-014, ADR-016) -> Safer for experiments, but
-  a second schema to keep in step, and it uses the slot the public demo needs.
-- Push migrations from the laptop -> Needs Docker for the dump that should precede it, and
-  skips the CI checks.
+- Separate dev and production projects -> Safer for experiments, but a second schema to keep in step, and it uses the demo's slot.
 
 **Consequences:**
-- Supersedes the dev project in ADR-014 and the two-project layout in ADR-016.
-- `.env.local` on the laptop points at the real project. The publishable key grants nothing
-  without a session, and a session sees nothing without MFA.
-- A bad migration reaches real data directly; the defences are pgTAP on a fresh database,
-  the additive rule, and the backup taken minutes before.
-- Work in progress is tried in the demo account, never in the owner's.
+- A bad migration reaches real data directly. Defences: pgTAP on a fresh database, the additive rule, a backup taken minutes before.
+
+---
 
 ### ADR-016: Free plans until a real limit is hit (2026-10-27)
 
-*The two-project layout is superseded by ADR-017 (one project).*
-
-**Context:**
-- ADR-001 assumed Supabase Pro (about US$25 a month) for backups and no pausing. The owner
-  will stay on free plans, Supabase and Netlify, until something concrete forces a change.
-- What the free Supabase plan does not give: backups you can download, and protection from
-  pausing (a project with a week of inactivity is paused until restored by hand in the
-  dashboard). It allows two active projects.
-- What the free Netlify plan does not give: choosing the functions region. Functions run in
-  US East (Ohio).
+Partly superseded: the two-project layout by ADR-017.
 
 **Decision:**
-- Two free Supabase projects: dev (demo data, ADR-014) and production. That uses both
-  free slots.
-- **Our nightly encrypted dump is the only backup**, so it is a blocker: the backup
-  workflow is enabled and one restore is tested before any real data enters production
-  (before the Aspire import, IMP-01).
-- A pause is accepted as an annoyance: restore it from the dashboard. Nothing is built to
-  keep the project awake artificially.
-- Upgrade triggers, each one a new ADR when it happens: the database nears 500 MB, pauses
-  become a real problem, page latency from the Ohio functions region is noticeable in use,
-  or invitations need more email than the built-in sender allows (that last one is solved
-  with a free custom SMTP sender, not a plan change).
+- Stay on free Supabase and Netlify plans. The free Supabase plan has no downloadable backups and pauses after a week of inactivity; Netlify functions run in US East (Ohio).
+- **The nightly encrypted dump is the only backup**, so the backup workflow and one tested restore gate the first real import.
+- A pause is accepted: restore it from the dashboard.
+- Upgrade triggers, each a new ADR: the database nears 500 MB, pauses become a real problem, Ohio latency is noticeable, or invitations need more email than the built-in sender (solved with a free custom SMTP, not a plan).
 
 **Alternatives Considered:**
-- Supabase Pro from the start -> Daily backups and no pausing, for a cost the project does
-  not need to carry yet.
-- Production on dev's project -> One slot freed, but demo data and real data would share a
-  database and keys.
+- Supabase Pro from the start -> Daily backups and no pausing, for a cost the project does not yet need.
 
 **Consequences:**
-- Supersedes the plan choice in ADR-001 and the Pro production project in ADR-014.
-- The backup workflow moves from "nice to have in phase 0" to a gate on the first import.
-- Data loss risk rests on one GitHub Action and one offline key. The restore test is what
-  makes it real.
+- Data loss risk rests on one GitHub Action and one offline key; the restore test makes it real.
+
+---
 
 ### ADR-015: A per-request CSP nonce, set by the server entry (2026-10-27)
 
 **Context:**
-- TanStack Start renders inline hydration scripts. A CSP of `script-src 'self'` blocks
-  them; `'unsafe-inline'` would let any injected script run, which is the case a CSP exists
-  to stop.
-- Netlify's `netlify.toml` headers apply to static files, not to responses from the
-  server function that renders every page, and they cannot vary per request anyway.
-- The router accepts `ssr.nonce` and stamps it on every script and preload it renders.
+- TanStack Start renders inline hydration scripts. `script-src 'self'` blocks them and `'unsafe-inline'` defeats the CSP. `netlify.toml` headers cover static files only and cannot vary per request. The router accepts `ssr.nonce`.
 
 **Decision:**
-- A custom server entry (`src/app/src/server.ts`) generates 16 random bytes per request,
-  passes them to the Start handler as request context, and sets the CSP header on the HTML
-  response: `script-src 'nonce-…' 'strict-dynamic'`, `connect-src 'self'`,
-  `frame-ancestors 'none'`, `object-src 'none'`, `base-uri 'none'`.
-- The router reads the nonce with `getGlobalStartContext()`.
-- The same entry sets HSTS, nosniff, referrer and permissions policies on every response.
-  `netlify.toml` repeats them for static assets.
-- In the Vite dev server the CSP is off, since Vite injects un-nonced scripts there.
+- `src/app/src/server.ts` generates 16 random bytes per request, passes them as request context, and sets the CSP on HTML responses: `script-src 'nonce-…' 'strict-dynamic'`, `connect-src 'self'`, `frame-ancestors 'none'`, `object-src 'none'`, `base-uri 'none'`. The router reads the nonce with `getGlobalStartContext()`.
+- The same entry sets HSTS, nosniff, referrer and permissions policies; `netlify.toml` repeats them for static assets. The CSP is off in the Vite dev server.
 
 **Alternatives Considered:**
-- `'unsafe-inline'` for scripts -> Defeats the CSP's main purpose.
-- Hashes of the inline scripts -> The hydration payload changes per page and per user.
-- Carrying the nonce as a request header -> Rebuilding the runtime's `Request` fails on
-  its private fields; the request context is the supported channel.
+- `'unsafe-inline'`, or hashes (the payload changes per page and user), or the nonce as a request header (rebuilding the runtime's `Request` fails on private fields).
 
 **Consequences:**
-- Verified on a production build: every script and modulepreload carries that request's
-  nonce, and a new nonce is generated per request.
-- `style-src` keeps `'unsafe-inline'` for the inline `style` attributes Radix sets.
-- A third-party script would need an explicit CSP change, which is the point.
+- `style-src` keeps `'unsafe-inline'` for inline `style` attributes Radix sets. A third-party script needs an explicit CSP change, which is the point.
 
-### ADR-014: Develop against a hosted dev project; database tests run in CI (2026-10-27)
+---
 
-*Production on the Pro plan is superseded by ADR-016; the separate dev project by ADR-017.*
+### ADR-014: Develop against a hosted project; database tests run in CI (2026-10-27)
+
+Partly superseded: the production-on-Pro part by ADR-016, the separate dev project by ADR-017.
 
 **Context:**
-- The development machine runs macOS 12 on Intel. Current Docker Desktop no longer supports
-  it, and the local Supabase stack (`supabase start`, `supabase test db`) needs Docker.
-- Installing an unsupported Docker build on a machine that will hold financial exports is
-  the wrong trade.
+- The development machine (macOS 12, Intel) cannot run current Docker Desktop, so the local Supabase stack is out.
 
 **Decision:**
-- One hosted Supabase project, **dev**, on a free organization, holding demo data only. It
-  serves local development and Netlify deploy previews. Migrations reach it with
-  `supabase db push` from `src/`.
-- GitHub Actions runs the database checks on every push: `supabase db start` (Docker is
-  available there), `supabase db lint`, `supabase test db`.
-- **production** is a separate project on the Pro plan. Nothing but `main` deploys to it,
-  and no migration is pushed there before CI is green.
+- Migrations reach the hosted project with the Supabase CLI. GitHub Actions runs `supabase db start`, `db lint` and `test db` (pgTAP) on every push.
 
 **Alternatives Considered:**
-- An older Docker Desktop or Colima on macOS 12 -> Unsupported software, and a local
-  database stack competing for an older machine's memory.
-- Separate dev and preview projects -> A free organization allows two projects; one demo
-  project covers both while there is one developer.
+- An older Docker or Colima -> Unsupported software on a machine holding financial exports.
 
 **Consequences:**
-- pgTAP results come back from CI, not instantly. A migration is written, pushed to a branch,
-  and checked there before `db push` to dev.
-- The dev project's keys are low-stakes (demo data), which makes it safe to use from
-  `.env.local` and from previews.
-- If the machine changes, `supabase start` works again and this ADR is superseded.
+- pgTAP results come back from CI, not instantly.
+
+---
 
 ### ADR-013: Google-style emoji from a self-hosted font (2026-10-27)
 
-*Superseded by ADR-020 (coolicons instead of emoji).*
+Superseded by ADR-020 (icons instead of emoji).
 
-**Context:**
-- CAT-07 asks for emoji-picker-react in the Google style. In that mode the library loads
-  every emoji as an image from the jsDelivr CDN, which the Content-Security-Policy blocks
-  (security.md), and which tells a third party when the app is in use.
-- The emoji is stored as text, so outside the picker it renders in the device's own style
-  anyway: Google look in the picker, Apple or Microsoft look everywhere else.
-
-**Decision:**
-- Keep emoji-picker-react (asked for by name, maintained), with `emojiStyle="native"`: it
-  draws characters, not images.
-- Serve Google's emoji font, Noto Color Emoji, from our own origin through
-  `@fontsource/noto-color-emoji`, and put it first in the emoji font stack. Fontsource ships
-  it split by `unicode-range`, so the browser downloads only the slices that are used.
-- The picker and every place an icon is shown use that stack, so the Google style is the
-  same everywhere, on every device.
-
-**Alternatives Considered:**
-- Picker in Google image mode with `getEmojiUrl` pointing at self-hosted images -> Works
-  inside the picker only, and means hosting thousands of PNGs.
-- Allow jsDelivr in the CSP -> A third-party request on a financial app, for decoration.
-- emoji-mart -> Popular, but releases have been sparse; no advantage here.
-
-**Consequences:**
-- CSP stays `self` plus Supabase.
-- Windows, which renders flags as letters, shows real flags.
-- One more small dependency (the font package), listed in ADR-011.
+---
 
 ### ADR-012: Writes that touch several rows are Postgres functions (2026-10-27)
 
 **Context:**
-- supabase-js talks to PostgREST, one HTTP request per call, with no transaction spanning
-  calls.
-- Several writes must be atomic: a transfer (two legs and a fee), a transaction with its
-  splits (the sum check is a deferred constraint, so both must land in one transaction), an
-  import batch, an undo.
-- Netlify Functions time out after about 10 seconds by default and accept request bodies up
-  to about 6 MB.
+- supabase-js sends one HTTP request per call, with no transaction across calls. A transfer, a transaction with its splits (a deferred sum check), an import and an undo must be atomic. Netlify functions time out after about 10 s and accept about 6 MB bodies.
 
 **Decision:**
-- Any write touching more than one row is a PL/pgSQL function called with `.rpc()`:
-  `save_transaction`, `save_transfer`, `delete_transfer`, `import_batch`, `undo_import_batch`.
-- These functions are `security invoker`, so RLS applies exactly as for a direct query, and
-  set `search_path = ''`.
-- The server function still validates input with Zod first (ADR-006); the SQL function
-  re-checks the invariants it owns (sums, transfer shape, currencies).
-- The import sends all rows in one request (about 10,000 rows is 1 to 2 MB of JSON) to one
-  `import_batch(jsonb)` call, which commits or rolls back as a whole inside Postgres.
+- Any write touching more than one row is a PL/pgSQL function called with `.rpc()` (`save_transaction`, `save_transfer`, `delete_transfer`, `import_batch`, `import_undo`, and so on).
+- They are `security invoker` so RLS applies as for a direct query, with `search_path = ''`. The server function validates with Zod first (ADR-006); the SQL function re-checks the invariants it owns.
+- The import sends all rows in one request to one `import_batch` call.
 
 **Alternatives Considered:**
-- A direct Postgres connection from the server with real transactions -> RLS would only
-  apply if every query set the role and JWT claims by hand (ADR-006).
-- Several calls and a compensating delete on failure -> Not atomic; a crash between calls
-  leaves half a transfer.
-- Chunked upload into a staging table -> Needed only past the body limit, far beyond one
-  person's history.
+- A direct Postgres connection -> RLS applies only if every query sets role and JWT claims by hand. Several calls and a compensating delete -> Not atomic. A staging table -> Needed only past the body limit.
 
 **Consequences:**
-- Business rules for money movement live in SQL, versioned in migrations and tested with
-  pgTAP.
-- Single-row reads and writes stay plain supabase-js calls.
-- A history larger than the body limit would need staging; not expected.
+- Money rules live in SQL, versioned in migrations and tested with pgTAP. Single-row reads and writes stay plain supabase-js calls.
+
+---
 
 ### ADR-011: The platform first, a dependency only when it earns its place (2026-10-27)
 
 **Context:**
-- The stack had grown a library per concern (forms, i18n, decimals, data cache, dates,
-  spreadsheets). Each one is code to update, audit and trust with financial data.
-- React 19, TanStack Start, Postgres and modern browsers now cover much of that natively.
+- The stack had a library per concern. Each is code to update, audit and trust with financial data. React 19, TanStack Start, Postgres and modern browsers cover much natively.
 
 **Decision:**
-- Reach for, in order: the browser or Node platform, React 19, TanStack Start, Postgres.
-  Add a dependency only when the native version would be a real chunk of code to own, and
-  then pick the mainstream, maintained option.
-- What that gives, concern by concern:
+- Reach for, in order: the browser or Node platform, React 19, TanStack Start, Postgres. Add a dependency only when the native version is a real chunk of code to own, then pick the mainstream, maintained option.
 
-  | Concern | Native answer | Instead of |
-  |---|---|---|
-  | Forms | `<form action>` with React 19 actions (`useActionState`, `useFormStatus`), HTML validation attributes, `FormData` | react-hook-form |
-  | Optimistic updates | React 19 `useOptimistic` | TanStack Query mutations |
-  | Data loading and cache | TanStack Router loaders, `router.invalidate()` after a write | TanStack Query (added later only if a screen needs it) |
-  | Global display currency | Profile in router context plus a cookie | Zustand |
-  | Number, currency, date, relative-time formatting | `Intl` | date-fns, numeral |
-  | Money arithmetic | In Postgres (`numeric`); in TypeScript, integer minor units with `BigInt` | decimal.js |
-  | Dates | ISO `YYYY-MM-DD` strings, `<input type="date">`, preset buttons for ranges | a date-picker library |
-  | Collapsible groups | `<details>` / `<summary>` | an accordion component |
-  | UI preferences (sort order) | `localStorage` | a state library |
-  | CSV import | `File.text()` and a small RFC 4180 parser | Papa Parse, SheetJS |
+| Concern | Native answer | Instead of |
+|---|---|---|
+| Forms | `<form action>`, `useActionState`, `FormData` | react-hook-form |
+| Optimistic updates | `useOptimistic` | TanStack Query mutations |
+| Data loading and cache | Router loaders, `router.invalidate()` | TanStack Query |
+| Display currency | Profile in router context plus a cookie | Zustand |
+| Number, currency, date formatting | `Intl` | date-fns, numeral |
+| Money arithmetic | Postgres `numeric`; TypeScript integer minor units with `BigInt` | decimal.js |
+| Collapsible groups | `<details>` | an accordion |
+| UI preferences | `localStorage` | a state library |
+| CSV import | `File.text()` and a small RFC 4180 parser | Papa Parse, SheetJS |
 
-- Dependencies that stay, because the native version is not realistic:
+Dependencies that stay:
 
-  | Dependency | Why |
-  |---|---|
-  | `@supabase/supabase-js`, `@supabase/ssr` | Auth sessions, MFA, and the database client |
-  | Zod | Server input validation and the shared schema (ADR-003); hand-written validators for every server function would be the larger, riskier code |
-  | shadcn/ui (Radix underneath) and Tailwind | Accessible combobox, dialog, popover, menu: focus management and keyboard handling that are hard to get right by hand. Components are added one at a time, only when a screen uses them. |
-  | class-variance-authority, clsx, tailwind-merge, tw-animate-css | What shadcn components are written with: variants, class merging (`cn` in `src/lib/utils.ts`), enter and exit animations |
-  | TanStack devtools (dev only) | Router inspector in `npm run dev`; the devtools Vite plugin strips it from the build |
-  | i18next, react-i18next | Plurals, interpolation and server-rendered language switching for FR and EN (ADR-008) |
-  | Recharts (through shadcn charts) | Line, bar, area and donut charts with tooltips and responsive sizing |
-  | react-aria-components, react-aria, @internationalized/date | The date range field (ADR-027): typed segments, a range calendar, tooltips; ranges only, single dates stay native |
-  | @iconify/react (offline build) | coolicons for every icon, from a vendored file (ADR-020) |
-  | @fontsource-variable/nunito | Nunito, self-hosted: no request to Google Fonts, no CSP change |
-  | @fontsource-variable/inconsolata | Inconsolata, the accent font, self-hosted the same way |
+| Dependency | Why |
+|---|---|
+| `@supabase/supabase-js`, `@supabase/ssr` | Auth sessions, MFA, database client |
+| Zod | Server input validation and the shared schema |
+| shadcn/ui (Radix) and Tailwind | Accessible combobox, dialog, popover, menu; added one component at a time |
+| class-variance-authority, clsx, tailwind-merge, tw-animate-css | What shadcn components are written with (`cn` in `src/lib/utils.ts`) |
+| TanStack devtools (dev only) | Router inspector, stripped from the build |
+| i18next, react-i18next | Plurals, interpolation, server-rendered language switch (ADR-008) |
+| Recharts (via shadcn charts) | Line, bar, area, donut charts |
+| react-aria-components, react-aria, @internationalized/date | The date field and its calendar: typed segments, range calendar, tooltips (design-decisions.md) |
+| @iconify/react (offline) | coolicons from a vendored file (ADR-020) |
+| @fontsource-variable/nunito, /inconsolata | Self-hosted fonts: no request to Google Fonts, no CSP change |
 
 **Alternatives Considered:**
-- The full set from the correction prompts (TanStack Query, Zustand, react-hook-form,
-  a decimal library) -> Each is reasonable alone; together they are a lot of
-  surface for an app this size.
-- No UI kit, native `<dialog>` and the Popover API -> Good primitives, but the searchable
-  grouped combobox (CAT-06, CUR-03) still needs custom keyboard and ARIA work.
+- The full set from the first prototype (TanStack Query, Zustand, react-hook-form, a decimal library) -> A lot of surface for this size.
+- No UI kit, native `<dialog>` and Popover -> The searchable grouped combobox still needs custom keyboard and ARIA work.
 
 **Consequences:**
-- About nine runtime dependencies instead of fifteen.
-- shadcn 4 imports `cn` from its own new package (`cn`, 0.x). Not adopted: the components
-  use `src/lib/utils.ts` (clsx + tailwind-merge), and a lint rule rejects `import ... from
-  'cn'`. After each `shadcn add`, point the import back and uninstall `cn`.
-- shadcn components depend on `radix-ui`, the single Radix package.
-- A new dependency needs a line in this ADR's tables or its own ADR.
-- Trade-off: some things the libraries gave for free (form dirty state, query
-  deduplication) are written by hand when needed.
+- shadcn 4 imports `cn` from its own `cn` package. Not adopted: after each `shadcn add`, point the import back to `src/lib/utils.ts` and uninstall `cn` (a lint rule rejects the import).
+- A new dependency needs a line in the tables above or its own ADR.
+
+---
 
 ### ADR-010: A fixed CSV format for import, no user seed (2026-10-27)
 
 **Context:**
-- The real history (Aspire 2018 to now, the net-worth tracker) already exists. A generic
-  starter seed would be thrown away on day one.
-- The category tree is being redesigned in the app, so every historical transaction needs
-  re-categorising on the way in.
-- The app is multi-user: whatever brings this history in should work for the next user's
-  history too, not only this spreadsheet.
-- v1 should get real data in quickly, without a large import UI.
+- The real history already exists and the category tree is being redesigned, so each transaction needs re-categorising on the way in. The app is multi-user, so the import should work for the next user too, without a large import UI in v1.
 
 **Decision:**
-- No seed of user data. `src/data/reference/` keeps only lookup data every user needs
-  (currencies, account and holding types) and the import templates.
-- v1 imports one fixed, documented CSV format ([import.md](import.md)). The user prepares
-  their data in it beforehand, categories already organised. The app validates, summarises
-  what it will create, and commits all or nothing as one undoable batch.
-- Files are parsed in the browser and never stored; the server validates every row again.
-- Converting a specific source (the Aspire sheet) into the format happens outside the app.
+- No seed of user data. `src/data/reference/` keeps lookup data and import templates.
+- v1 imports one fixed, documented CSV format ([import.md](import.md)); the user prepares data beforehand. The app validates, summarises what it will create, and commits all or nothing as one undoable batch. Files are parsed in the browser, never stored, and the server validates every row again. Converting a source (the Aspire sheet) happens outside the app.
 
 **Alternatives Considered:**
-- An import wizard with source profiles and mapping screens -> The right feature for
-  other users eventually, and a lot of UI to build before the first real data is in. Logged
-  in improvements.md (IMP-03).
-- A one-off script that writes straight to the database -> Useless to anyone else, and
-  skips the app's validation.
-- Import as-is and re-categorise in the app -> Thousands of edits by hand.
+- An import wizard with source profiles -> Right eventually, too much UI first (improvements.md, IMP-03). A one-off script -> Useless to others and skips validation. Import as-is and re-categorise -> Thousands of manual edits.
 
 **Consequences:**
-- Any user can import, provided they shape their data first. The format is the contract,
-  and the wizard later becomes a front end that produces it.
 - The same format is the export format, so the round trip is the test.
-- Local and preview environments still need invented demo data (`src/supabase/seed.sql`)
-  so they never touch real figures. That is test data, not a seed.
+
+---
 
 ### ADR-009: HexaRate validates, Frankfurter converts (2026-10-27)
 
 **Context:**
-- CUR-02 asks that every added currency be validated against HexaRate.
-- CUR-07 converts at the rate on the transaction date, and the import starts in 2018, so
-  the app needs daily historical rates.
+- CUR-02 asks that added currencies be validated against HexaRate. CUR-07 converts at the rate of the transaction date, and the history starts in 2018.
 
 **Decision:**
-- HexaRate is called once, server-side, when a user adds a currency (CUR-02).
-- Frankfurter (ECB reference rates, daily from 1999, no key) fills `exchange_rates`:
-  a backfill to 2018, then a daily scheduled job. Weekends and holidays use the last
-  published rate.
-- A currency HexaRate accepts but the ECB does not publish gets its rates from HexaRate's
-  daily rate, starting the day it is added. Before that date it has no rate.
-- `exchange_rates.source` records which provider each rate came from.
+- HexaRate is called once, server-side, when a currency is added.
+- Frankfurter (ECB reference rates, daily from 1999, no key) fills `exchange_rates`: a backfill to 2018, then a daily scheduled job. Weekends and holidays use the last published rate.
+- A currency HexaRate accepts but the ECB does not publish gets HexaRate's daily rate from the day it is added, and none before. `exchange_rates.source` records the provider.
 
 **Alternatives Considered:**
-- HexaRate for everything -> Its historical coverage is unconfirmed, and conversion
-  correctness depends on history.
-- A paid provider (Open Exchange Rates, Fixer) -> Broader coverage, but a key, a bill, and a
-  third party seeing which currencies we ask for. Not needed for the currencies in use.
+- HexaRate for everything -> Unconfirmed history. A paid provider -> A key, a bill, and a third party seeing which currencies we ask for.
 
 **Consequences:**
-- CAD, CHF, EUR, GBP and USD are covered for the whole history.
-- A missing rate is shown as an error on the amount (ADR-004), never as zero. For a card
-  payment where both the original and paid amounts are known, their ratio is a usable
-  fallback rate between those two currencies.
+- A missing rate is an error on the amount (ADR-004), never zero.
+
+---
 
 ### ADR-008: French and English from the first screen (2026-10-27)
 
-*The six regional locales are superseded by ADR-019 (FR and EN only).*
+Locales partly superseded by ADR-019 (FR and EN only).
 
 **Context:**
-- The interface must ship in both languages (SET-04..06). Retrofitting i18n means finding
-  every hard-coded string later.
-- The app is private and behind a login, so there is no SEO reason for `/fr/` and `/en/`
-  URLs.
-- Two languages, one team: no translators, no translation platform.
+- The interface ships in both languages (SET-04..06) and retrofitting i18n means finding every string later. The app is behind a login, so no `/fr/` URLs.
 
 **Decision:**
-- react-i18next (i18next) for UI messages: the mainstream React i18n library, actively
-  maintained. Interpolation, plurals (backed by `Intl.PluralRules`), context and
-  formatting come built in, and it grows to more languages or translators without a rewrite.
-- `fr` is the source language. Keys are typed through i18next's `CustomTypeOptions` from the
-  French resources, so an unknown key fails type-checking, and the English resources are
-  declared `satisfies` the same type, so a missing translation fails it too.
-- Both languages are bundled (two small files); no lazy-loading backend.
-- The locale lives on the profile (`profiles.locale`, BCP 47 such as `fr-CA`, `fr-CH`,
-  `en-CA`), mirrored in a cookie so the server renders the right language before the
-  session loads. No locale in the URL.
-- All number, currency and date formatting goes through `Intl` with the full locale, not
-  just the language, since `fr-CA` writes `1 234,50 $` and `fr-CH` writes `1’234.50`.
-- Reference labels carry `_fr` and `_en` columns. User-typed content is stored as typed.
+- react-i18next. `fr` is the source: keys are typed from the French resources and English is declared `satisfies` the same type, so an unknown key or a missing translation fails type-checking. Both languages are bundled.
+- The locale lives on the profile, mirrored in a cookie so the server renders the right language before the session loads.
+- All number, currency and date formatting goes through `Intl` with the full locale. Reference labels carry `_fr` and `_en` columns; user-typed content is stored as typed.
 
 **Alternatives Considered:**
-- Hand-written typed dictionaries with a small `t()` -> No dependency, but plurals,
-  interpolation and SSR language handling become our code to maintain.
-- react-intl (FormatJS) -> Also mature, ICU syntax built in; smaller ecosystem of
-  examples with TanStack.
-- Paraglide JS -> Compiled and typed, but younger and less widely used.
-- French only, English later -> Every string would have to be found again.
+- A hand-written typed `t()` -> Plurals, interpolation and SSR become our code. react-intl, Paraglide -> Smaller ecosystem or younger. French only first -> Every string found again later.
 
 **Consequences:**
-- No string literal in a component: every visible text goes through `t()`, enforced in
-  review and by `eslint-plugin-i18next`.
-- Every feature is written twice (FR and EN). Small cost, paid as it goes.
+- No string literal in a component, enforced by `eslint-plugin-i18next`. Every feature is written twice.
 
-### ADR-007: Repository layout mirrors Lifebook (2026-10-27)
+---
 
-**Context:**
-- The repo starts from Lifebook's structure: a short root, `docs/` as a dev journal, one
-  folder per sub-project under `src/`.
-- There is one language here (TypeScript) but two tools that each want a folder of their
-  own: the TanStack Start app and the Supabase CLI.
+### ADR-007: Repository layout (2026-10-27)
 
 **Decision:**
-```
-repo/  README.md  CLAUDE.md  .gitignore  .github/  .claude/  docs/
-       src/app/        TanStack Start app: package.json, routes, server functions, tests
-       src/supabase/   Supabase CLI project: config.toml, migrations/, tests/ (pgTAP), seed.sql (demo data)
-       src/data/       reference/ (Git: lookup CSVs) + local/ (gitignored: real data)
-```
-- **Every command runs from `src/app/`.** The Supabase CLI is a dev dependency there, and
-  it runs as `npx supabase --workdir .. <command>` so it finds `src/supabase/`.
+- Short root (`README.md`, `CLAUDE.md`, `.github/`, `.claude/`, `docs/`), then `src/app/` (TanStack Start), `src/supabase/` (CLI project, pgTAP tests) and `src/data/` (`reference/` in Git, `local/` ignored).
+- **Every command runs from `src/app/`.** The Supabase CLI is a dev dependency there: `npx supabase --workdir .. <command>`.
 
 **Alternatives Considered:**
-- `supabase/` at the repo root -> The CLI default, but it puts a sub-project at the root,
-  which is what Lifebook's ADR-029 moved away from.
-- A monorepo with workspaces (`packages/db`, `packages/ui`) -> Machinery for a second app
-  that does not exist.
+- `supabase/` at the root -> Puts a sub-project at the root. A workspaces monorepo -> Machinery for a second app that does not exist.
 
 **Consequences:**
 - Netlify's base directory is `src/app`.
-- Forgetting where to run a command gives "no package.json" or "no supabase project"
-  rather than anything subtle.
+
+---
 
 ### ADR-006: The browser never queries the database (2026-10-27)
 
 **Context:**
-- Supabase's default is a browser client talking straight to the auto-generated API, with
-  RLS as the only guard.
-- This app holds financial data, and a project requirement was a Node backend.
+- Supabase's default is a browser client on the auto-generated API with RLS as the only guard. This app holds financial data and the brief asks for a Node backend.
 
 **Decision:**
-- All data access goes through TanStack Start server functions. They call Supabase with the
-  user's session, so RLS still applies.
-- Sign-in, MFA enrolment and the MFA challenge are server functions too. The browser bundle
-  contains no Supabase client and no key at all; CI fails if one appears in `dist/client`.
-- With no client-side reader, the session cookies are `httpOnly`, `secure` and
-  `SameSite=Lax`.
+- All data access goes through server functions that call Supabase with the user's session, so RLS still applies. Sign-in and MFA are server functions too. The browser bundle contains no Supabase client and no key; CI fails if one appears in `dist/client`.
+- Session cookies are `httpOnly`, `secure`, `SameSite=Lax`.
 
 **Alternatives Considered:**
-- Browser to Supabase directly -> Less code, but every validation rule must also live in
-  SQL, and any table that slips through RLS is exposed to every signed-in user.
-- Server connects to Postgres directly (Drizzle + a pooled connection) -> Type-safe SQL,
-  but RLS only applies if every query sets the role and JWT claims by hand; easy to forget
-  once.
+- Browser to Supabase directly -> Every rule must also live in SQL, and a table that slips through RLS is exposed. Server to Postgres directly (Drizzle) -> RLS applies only if every query sets role and claims by hand.
 
 **Consequences:**
-- Two walls: Zod validation in the server function, RLS in the database. Multi-row writes
-  go through `security invoker` SQL functions, which keep RLS in force (ADR-012).
-- Every query costs one extra hop through a Netlify Function. Fine at this scale.
-- Realtime subscriptions are off the table without opening a browser channel. Not needed.
+- Two walls: Zod in the server function, RLS in the database. One extra hop per query. No realtime subscriptions.
+
+---
 
 ### ADR-005: Composite foreign keys carry `user_id` (2026-10-27)
 
 **Context:**
-- RLS checks the row being written, not the rows it points at. A user who guesses another
-  user's category UUID can attach their own transaction to it, and joins would then leak
-  that category's name.
+- RLS checks the row being written, not the rows it points at. A user who guesses another's category UUID could attach a transaction to it, and joins would leak its name.
 
 **Decision:**
-- Every user table has `unique (user_id, id)`. Every FK between user tables is composite:
-  `(user_id, category_id) references categories (user_id, id)`.
+- Every user table has `unique (user_id, id)`, and every FK between user tables is composite: `(user_id, category_id) references categories (user_id, id)`.
 
 **Alternatives Considered:**
-- Check ownership in a trigger -> Works, but is one more thing to remember per table.
-- Rely on UUIDs being unguessable -> They are, until one appears in a URL or a log.
+- An ownership trigger -> One more thing to remember per table. Trusting unguessable UUIDs -> Until one appears in a URL or log.
 
 **Consequences:**
-- Cross-user references are impossible at the database level, not merely unlikely.
-- Slightly wider indexes and FK declarations.
+- Cross-user references are impossible at the database level. Slightly wider indexes.
+
+---
 
 ### ADR-004: Money as `numeric`, conversion at read time (2026-10-27)
 
 **Context:**
-- Amounts appear in at least CAD, CHF, EUR. The spreadsheet history stores converted
-  amounts as floats with six decimals.
-- The display currency can change at any moment (CUR-06), and conversion must use the rate
-  on the transaction date (CUR-07).
+- Amounts appear in several currencies, the display currency can change at any time (CUR-06), and conversion uses the rate of the transaction date (CUR-07).
 
 **Decision:**
-- `numeric(19,4)` for amounts, `numeric(24,12)` for rates, ISO 4217 codes for currencies.
-- A transaction stores what was paid and, when different, the receipt price. Display amounts
-  are computed by joining `exchange_rates` on the transaction date. Nothing stores a
-  display-currency amount.
-- Arithmetic happens in Postgres. The little done in TypeScript (form previews of a split
-  or a fee) uses integer minor units with `BigInt`, never JS floats (ADR-011).
+- `numeric(19,4)` amounts, `numeric(24,12)` rates, ISO 4217 codes. A transaction stores what was paid and, when different, the receipt price. Display amounts are computed by joining `exchange_rates` on the date; nothing stores a display-currency amount.
+- Arithmetic happens in Postgres. The little done in TypeScript (previews) uses integer minor units with `BigInt`, never floats.
 
 **Alternatives Considered:**
-- Integer minor units (cents) -> Simple and exact, but rates and splits by percent produce
-  fractions of a cent that need a rounding policy at every step.
-- Store the converted amount at write time -> Fast reads, but wrong as soon as the display
-  currency changes, and stale if a rate is corrected.
+- Integer cents -> Rates and percent splits produce fractions needing a rounding policy at every step. Converted amount stored at write time -> Wrong when the display currency changes or a rate is corrected.
 
 **Consequences:**
-- Reports need the rates table to be complete for every date that has a transaction. The
-  rates job backfills, and a missing rate is an error shown to the user, not a silent zero.
+- Reports need complete rates for every transaction date. A missing rate is shown as an error, not zero.
+
+---
 
 ### ADR-003: shadcn/ui as the component base (2026-10-27)
 
-**Context:**
-- The interface needs comboboxes with grouped options (favourites first), dialogs, popovers,
-  data tables, date-range pickers, and charts.
-
 **Decision:**
-- shadcn/ui (Radix primitives, Tailwind), components copied into `src/app` and owned there.
-  Charts through shadcn's chart wrapper around Recharts. Forms are native React 19 form
-  actions (ADR-011), with shadcn's form field styling and Zod on the server.
-- Zod is the one validation layer: TypeScript types disappear at runtime, so anything
-  arriving at a server function is checked by a Zod schema. The same schema validates the
-  form in the browser and gives the TypeScript type, so the three never drift.
+- shadcn/ui (Radix, Tailwind), components copied into `src/app` and owned there. Charts through shadcn's wrapper around Recharts. Forms are native React 19 actions (ADR-011).
+- Zod is the one validation layer: the same schema validates the browser form, the server input and gives the TypeScript type.
 
 **Alternatives Considered:**
-- MUI or Mantine -> Faster start, but styled through the library's theme system; deep
-  customisation fights it.
+- MUI or Mantine -> Faster start, but deep customisation fights the theme system.
 
 **Consequences:**
-- Accessible primitives by default (keyboard, ARIA), which the correction prompts ask for
-  repeatedly.
-- Component updates are manual: shadcn copies code in rather than versioning it.
+- Accessible primitives by default. Component updates are manual.
+
+---
 
 ### ADR-002: TanStack Start server functions are the Node backend, on Netlify (2026-10-27)
 
-**Context:**
-- The brief asks for a Node backend, a React UI (TanStack Start), and Netlify hosting.
-- Netlify runs functions, not long-lived servers.
-
 **Decision:**
-- One TanStack Start app. Its server functions are the backend: they run on Node inside
-  Netlify Functions. Scheduled work (exchange rates, recurring transactions) uses Netlify
-  scheduled functions.
+- One TanStack Start app. Its server functions are the backend, running on Node inside Netlify Functions. Scheduled work (exchange rates, recurring transactions) uses Netlify scheduled functions.
 
 **Alternatives Considered:**
-- A separate Express/Fastify API -> A second deployable, a second host (Netlify cannot
-  keep it running), and a CORS and auth story between them. Only worth it if a second client
-  (a mobile app) appears.
-- Supabase Edge Functions as the backend -> Deno rather than Node, and logic split
-  between two platforms.
+- A separate Express/Fastify API -> A second deployable and host, plus CORS and auth between them; worth it only if a mobile client appears. Supabase Edge Functions -> Deno, and logic split across two platforms.
 
 **Consequences:**
-- Frontend and backend share types and Zod schemas with no build step between them.
-- If a native app arrives later, the server functions become the seed of a real API, which
-  is an ADR then.
+- Frontend and backend share types and Zod schemas.
+
+---
 
 ### ADR-001: Supabase Postgres is the source of truth (2026-10-27)
 
-*The Pro plan is superseded by ADR-016 (free plans).*
-
-**Context:**
-- Multiple users from day one, financial data, a hosted web app.
-- Lifebook chose a single SQLite file, which fits one person on one machine and does not fit
-  here.
+The Pro plan is superseded by ADR-016.
 
 **Decision:**
-- Supabase (Postgres, Auth with TOTP MFA) on the Pro plan, in a European region.
-- All schema changes are SQL migrations in Git, so the database can be rebuilt on any
-  Postgres.
+- Supabase (Postgres, Auth with TOTP MFA). All schema changes are SQL migrations in Git, so the database can be rebuilt on any Postgres.
 
 **Alternatives Considered:**
-- Neon or self-hosted Postgres plus a separate auth service -> More pieces to secure
-  ourselves.
-- Firebase -> Document model is a poor fit for splits, budgets and aggregations.
+- Neon or self-hosted Postgres plus an auth service -> More to secure ourselves. Firebase -> A document model fits splits, budgets and aggregations poorly.
 
 **Consequences:**
-- RLS discipline is mandatory (security.md, ADR-005, ADR-006).
-- A recurring cost (about US$25 a month for Pro) in exchange for backups and no pausing.
-- Lock-in is limited to Auth; the data is plain Postgres and dumps restore anywhere.
+- RLS discipline is mandatory (security.md, ADR-005, ADR-006). Lock-in is limited to Auth; dumps restore anywhere.
 
 ---
 
@@ -1322,15 +616,12 @@ repo/  README.md  CLAUDE.md  .gitignore  .github/  .claude/  docs/
 
 **Context:**
 - Why this decision was needed
-- What problem it solves
 
 **Decision:**
 - What was chosen
 
 **Alternatives Considered:**
-- Option 1 -> Why rejected
-- Option 2 -> Why rejected
+- Option -> Why rejected
 
 **Consequences:**
-- Benefits
-- Trade-offs
+- Benefits and trade-offs

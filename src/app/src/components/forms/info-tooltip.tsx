@@ -6,7 +6,7 @@ import { cn } from '#/lib/utils'
 
 /**
  * A small (i) beside a label that explains it on hover and on focus, which is also what a
- * tap does on a phone (spec 22). `label` names the button for screen readers; the tooltip
+ * tap does on a phone. `label` names the button for screen readers; the tooltip
  * text is its description.
  */
 export function InfoTooltip({

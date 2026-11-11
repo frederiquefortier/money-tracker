@@ -18,7 +18,7 @@ export type MyCurrencies = {
 }
 
 // The first business day of the rates backfill (ADR-009). A currency whose rates start
-// later shows when they start (spec 10).
+// later shows when they start.
 export const RATES_HISTORY_START = '2018-01-02'
 
 export function currencyName(currency: Currency, locale: Locale) {

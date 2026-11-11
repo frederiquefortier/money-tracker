@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-// Shared by the Importer screen and the server functions (spec 18, import.md, ADR-036).
+// Shared by the Importer screen and the server functions (import.md, ADR-036).
 
 export const IMPORT_FILES = [
   'accounts',

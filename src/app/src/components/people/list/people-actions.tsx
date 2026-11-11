@@ -101,7 +101,7 @@ export function PeopleActions({
       <DeleteDialog
         open={dialog === 'delete'}
         title={deleteLabel}
-        // Spec 20: their lines stay without a name, so no amount changes.
+        // Their lines stay without a name, so no amount changes.
         description={
           (row.transactionCount ?? 0) > 0
             ? t('people.deleteKeeps', { count: row.transactionCount })

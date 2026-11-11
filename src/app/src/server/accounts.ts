@@ -179,7 +179,7 @@ export const reopenAccount = createServerFn({ method: 'POST' })
     return error ? failure('reopen', error) : { ok: true }
   })
 
-/** Accounts with transactions will refuse (spec 11); none exist yet. */
+/** Accounts with transactions will refuse; none exist yet. */
 export const deleteAccount = createServerFn({ method: 'POST' })
   .validator(idInput)
   .handler(async ({ data }): Promise<AccountResult> => {

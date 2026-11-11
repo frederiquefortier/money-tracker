@@ -3,7 +3,7 @@ import { byName } from '#/lib/shared/collections'
 import { foldForSearch } from '#/lib/shared/search'
 import { nameFormSchema } from '#/lib/shared/validation'
 
-// Shared by the Proches screens and the server functions (spec 19).
+// Shared by the Proches screens and the server functions.
 
 export type Person = {
   id: string
@@ -12,7 +12,7 @@ export type Person = {
   groupIds: Array<string>
   /** Other spellings, for the import (PPL-06). */
   aliases: Array<string>
-  /** How many transactions name them (spec 20). */
+  /** How many transactions name them. */
   transactionCount: number
 }
 
@@ -41,7 +41,7 @@ export const groupInputSchema = nameFormSchema.extend({
   memberIds: z.array(z.uuid()),
 })
 
-/** A person's avatar for now: the first letter of the name (spec 19). */
+/** A person's avatar for now: the first letter of the name. */
 export function initialOf(name: string, locale: string) {
   return ([...name.trim()][0] ?? '').toLocaleUpperCase(locale)
 }

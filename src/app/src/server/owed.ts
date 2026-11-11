@@ -6,7 +6,7 @@ import { ANONYMOUS } from '#/lib/transactions/transaction-source'
 import { getSupabase } from '#/lib/server/supabase.server'
 import type { OwedLine, Balance } from '#/lib/people/owed'
 
-// What people owe me (spec 21): the owed lines an income can pay back, and balances.
+// What people owe me: the owed lines an income can pay back, and balances.
 
 // Amounts as stored, to four places, so nothing goes through a float (ADR-004).
 const minor4 = (value: string | null | undefined) =>
@@ -25,7 +25,7 @@ function ownedBy<
 }
 
 /**
- * Spec 21: a person's owed lines an income can pay back, newest first: the open ones,
+ * a person's owed lines an income can pay back, newest first: the open ones,
  * and those this income already pays back, with what it took counted as still owed.
  */
 export const getOwedLines = createServerFn({ method: 'GET' })

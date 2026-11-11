@@ -15,6 +15,9 @@ It works, but it cannot answer the questions that matter now:
   and the sheet only has a memo column for that.
 - Net worth, investment contributions and salary history live in a separate document.
 
+## History
+A first prototype was built on Lovable in early 2026 as a proof of concept. Testing it produced the correction list that shaped the requirements (institutions as records, archived categories out of pickers, a history popup that showed nothing). This repo is the rewrite on a stack the owner controls, with security as the first constraint.
+
 ## Goals
 - Every transaction, in its real currency, converted at that day's rate.
 - Budgets and an emergency-fund view that read real averages.
@@ -51,7 +54,7 @@ It works, but it cannot answer the questions that matter now:
 
 ## Where things are
 - What it must do: [requirements.md](requirements.md)
-- Raw notes, verbatim: [notes/](notes/)
+- Raw notes, verbatim: [notes/](notes/) (the prototype feedback notes were folded into the requirements and removed)
 - How it is built: [architecture.md](../01_building/architecture.md),
   [database.md](../01_building/database.md), [decisions.md](../01_building/decisions.md)
 - In what order: [roadmap.md](../03_planning/roadmap.md)

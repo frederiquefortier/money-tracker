@@ -78,7 +78,7 @@ function RangeInput({
 }
 
 /**
- * Spec 22, ADR-027: dates as one range, typed in segments (the month and the year are
+ * ADR-027: dates as one range, typed in segments (the month and the year are
  * entered directly) or picked in a calendar (CalendarSheet). A range closes it. One day is
  * the same day twice. `labelAddon` sits at the far end of the label row (the explanation
  * of the automatic link).

@@ -98,7 +98,7 @@ function LinkedList({
 }
 
 /**
- * Spec 19: a person with their groups and aliases (PPL-06), or a group with its members.
+ * a person with their groups and aliases (PPL-06), or a group with its members.
  * `taken` is what an alias cannot repeat.
  */
 export function PeopleForm({
@@ -118,7 +118,7 @@ export function PeopleForm({
   aliases?: ReadonlyArray<string>
   taken?: ReadonlySet<string>
   savedText: string
-  /** Read-only content after the fields: what the person owes (spec 21). */
+  /** Read-only content after the fields: what the person owes. */
   children?: React.ReactNode
 }) {
   const { t } = useTranslation()

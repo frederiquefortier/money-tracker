@@ -119,7 +119,7 @@ function ItemRow({ item, actions }: { item: SectionItem; actions: Actions }) {
 }
 
 /**
- * What the import would create of one kind (spec 18), as an institution's card on Comptes:
+ * What the import would create of one kind, as an institution's card on Comptes:
  * the group's name folds it, its count at the end, its items as rows. Where a kind can be
  * merged or edited (IMP-06), each row has the icons for it.
  */

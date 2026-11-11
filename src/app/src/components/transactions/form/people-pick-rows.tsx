@@ -14,7 +14,7 @@ import type {
   TransactionDraft,
 } from '#/lib/transactions/transaction-draft-types'
 
-// The people list's own rows (spec 20): Fréquents, and the count of people without a name.
+// The people list's own rows: Fréquents, and the count of people without a name.
 
 /** The most frequent people as a row of avatars; a tap ticks or unticks one. */
 export function FrequentPeople({

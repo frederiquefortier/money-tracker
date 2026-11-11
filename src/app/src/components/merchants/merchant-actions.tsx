@@ -67,7 +67,7 @@ function MergeDialog({
   )
 }
 
-/** Merge and delete, as icons on the merchant's row or its sheet (spec 13). */
+/** Merge and delete, as icons on the merchant's row or its sheet. */
 export function MerchantActions({
   merchant,
   merchants,

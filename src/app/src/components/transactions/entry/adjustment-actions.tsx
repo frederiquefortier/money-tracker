@@ -16,7 +16,7 @@ export type AdjustmentSummary = {
   account: { name: string; institution: string | null }
 }
 
-/** Delete, on the adjustment's row (spec 14) or in its sheet on phones (TRX-03). */
+/** Delete, on the adjustment's row or in its sheet on phones (TRX-03). */
 export function AdjustmentActions({
   summary,
   placement,

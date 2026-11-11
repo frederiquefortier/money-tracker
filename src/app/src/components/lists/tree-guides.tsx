@@ -4,7 +4,7 @@ import { cn } from '#/lib/utils'
 const line = 'pointer-events-none absolute border-primary/30'
 
 /**
- * The tree's elbow connectors (spec 12) in a list row: one slot per level, stretched over
+ * The tree's elbow connectors in a list row: one slot per level, stretched over
  * the row's vertical padding (`className`, e.g. -my-2) so lines join between rows.
  */
 export function TreeGuides({

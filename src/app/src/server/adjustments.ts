@@ -14,7 +14,7 @@ const failure = failureFor<AdjustmentError>('adjustments', {
   balance_already_matches: 'balanceMatches',
 })
 
-/** One adjustment; null when it is not there (spec 16). */
+/** One adjustment; null when it is not there. */
 export const getAdjustment = createServerFn({ method: 'GET' })
   .validator(idInput)
   .handler(async ({ data }): Promise<Adjustment | null> => {

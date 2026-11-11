@@ -5,7 +5,7 @@ import type { Merchant } from '#/lib/merchants/merchant'
 import { indexById } from '#/lib/shared/collections'
 import { matcher } from '#/lib/shared/search'
 
-// How a tick spreads in the check lists: filters (spec 14, TRX-14) and the people on a
+// How a tick spreads in the check lists: filters (TRX-14) and the people on a
 // transaction.
 
 /** A node whose ticks are its children's: an institution, a category type. */

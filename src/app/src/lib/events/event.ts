@@ -3,8 +3,7 @@ import { HEX_COLOR } from '#/lib/categories/category'
 import { byName } from '#/lib/shared/collections'
 import { nameFormSchema } from '#/lib/shared/validation'
 
-// Shared by the Événements screens, the transaction form and the server functions
-// (spec 22).
+// Shared by the Événements screens, the transaction form and the server functions.
 
 export type EventType = {
   id: string
@@ -54,7 +53,7 @@ export const TYPE_SORTS = ['nameAsc', 'nameDesc'] as const
 export type TypeSort = (typeof TYPE_SORTS)[number]
 
 /**
- * Soft colours for the types' quick picks (spec 22), in rainbow order: pale enough that
+ * Soft colours for the types' quick picks, in rainbow order: pale enough that
  * the tag and the badge read as labels. Any other colour stays
  * available through the colour picker.
  */

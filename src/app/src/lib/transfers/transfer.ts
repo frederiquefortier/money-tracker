@@ -2,7 +2,7 @@ import { z } from 'zod'
 import { noteSchema } from '#/lib/shared/validation'
 import { positiveDecimal } from '#/lib/transactions/transaction'
 
-// Shared by the transfer form (spec 16) and its server functions.
+// Shared by the transfer form and its server functions.
 
 /** A saved transfer as the form loads it: both legs and the fee, amounts unsigned. */
 export type Transfer = {

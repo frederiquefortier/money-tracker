@@ -18,7 +18,7 @@ export function AddCurrencyButton() {
   )
 }
 
-/** The Devises list (spec 10), reused by first run (spec 17). */
+/** The Devises list, reused by first run (spec 17). */
 export function CurrencyManager({
   ratesFrom,
   openAccounts,

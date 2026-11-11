@@ -36,7 +36,7 @@ function Marker({ state, icon }: { state: StepState; icon: IconName }) {
   )
 }
 
-/** Where the import stands (spec 18): the files, then the summary and the import. */
+/** Where the import stands: the files, then the summary and the import. */
 export function ImportSteps({ stage }: { stage: ImportStage }) {
   const { t } = useTranslation()
   return (

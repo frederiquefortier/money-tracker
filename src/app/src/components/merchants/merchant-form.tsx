@@ -11,7 +11,7 @@ import type { Merchant } from '#/lib/merchants/merchant'
 import { nameFormSchema } from '#/lib/shared/validation'
 import { saveMerchant } from '#/server/merchants'
 
-/** Spec 13. A new default category applies to new transactions only (MER-01). */
+/** A new default category applies to new transactions only (MER-01). */
 export function MerchantForm({
   merchant,
   merchants,

@@ -69,8 +69,8 @@ flags a session that touched `src/` without touching `docs/`.
 | adds a dependency | its line in ADR-011 |
 | changes the import format | [import.md](docs/01_building/import.md) and the templates |
 | changes a security rule | [security.md](docs/01_building/security.md) |
-| changes direction on a proposal | a row in [process.md](docs/01_building/process.md#who-decided-what) saying what was proposed and what was decided |
-| ends a working session | the session's entry in [sessions.md](docs/01_building/sessions.md): one per session, kept up to date as the work goes, and an entry from the same day may be edited; every author request or correction in it, saying who asked what |
+| changes direction on a proposal | the session's entry in sessions.md, saying what was proposed and what the author decided |
+| ends a working session | the session's entry in [sessions.md](docs/01_building/sessions.md): one per session, short, kept up to date as the work goes; the big lines of what the author asked or corrected, and why |
 | changes what the project is or how to run it | [README.md](README.md) |
 
 Commit messages start with a plain type, `feat:`, `fix:`, `docs:`, `chore:`, `ci:`, `refactor:`,

@@ -1,6 +1,6 @@
 import type { ImportRow } from '#/lib/import/import'
 
-/** What the rows hold, to open the summary with (spec 18). */
+/** What the rows hold, to open the summary with. */
 export type RowsSummary = {
   expenses: number
   incomes: number

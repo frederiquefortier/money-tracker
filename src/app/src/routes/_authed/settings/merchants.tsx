@@ -187,7 +187,7 @@ function Merchants() {
         </>
       )}
       <AddMerchantButton />
-      {/* The merchant form opens here as a sheet (spec 13). */}
+      {/* The merchant form opens here as a sheet. */}
       <Outlet />
     </ListPage>
   )

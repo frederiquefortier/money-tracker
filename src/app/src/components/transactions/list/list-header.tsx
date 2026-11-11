@@ -87,7 +87,7 @@ function AllFiltersButton({
 
 /**
  * A status's bubble in its rows' colour, at any date, while some exist; pressed, the list
- * keeps only those. TRX-09: "3 en attente" in the spreadsheet's blue; spec 20: "2 me
+ * keeps only those. TRX-09: "3 en attente" in the spreadsheet's blue; "2 me
  * doivent" in amber.
  */
 function StatusButton({
@@ -183,7 +183,7 @@ function Bubbles(props: BubblesProps) {
 
 /**
  * The title, the search, then the bubbles: what is pending or owed, the period with its
- * arrows and a button per filter (spec 14), or on phones a single Filtres button.
+ * arrows and a button per filter, or on phones a single Filtres button.
  */
 export function ListHeader({
   choice,

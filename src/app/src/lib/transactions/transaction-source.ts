@@ -5,11 +5,11 @@ import type {
 } from '#/lib/transactions/transaction-people'
 import type { TransactionKind } from '#/lib/transactions/transaction'
 
-// An income's one source (spec 20, 21), and the people kept when the kind changes.
+// An income's one source, and the people kept when the kind changes.
 
 /**
  * An income's source when it came from someone without a name, so it can pay back the
- * owed lines without a name (spec 21).
+ * owed lines without a name.
  */
 export const ANONYMOUS = 'anonymous'
 

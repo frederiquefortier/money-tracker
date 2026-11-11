@@ -10,7 +10,7 @@ const SIZES = {
   lg: 'size-11 text-lg',
 } as const
 
-/** For now a person's icon is the first letter of their name (spec 19). */
+/** For now a person's icon is the first letter of their name. */
 export function PersonAvatar({
   name,
   size = 'lg',
@@ -90,7 +90,7 @@ export function GroupAvatars({
 }
 
 /**
- * Avatars overlapping, as a group's icon or the people on a transaction's row (spec 20),
+ * Avatars overlapping, as a group's icon or the people on a transaction's row,
  * a line without a name as its icon.
  */
 export function AvatarStack({

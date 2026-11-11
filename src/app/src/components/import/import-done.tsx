@@ -18,7 +18,7 @@ const CREATED = [
   'aliases',
 ] as const
 
-/** How it ended (spec 18): what was written, line by line, and where to look. */
+/** How it ended: what was written, line by line, and where to look. */
 export function ImportDone({
   done,
   onAnother,

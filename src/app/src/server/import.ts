@@ -16,7 +16,7 @@ import { failureFor } from '#/lib/shared/result'
 import type { Result } from '#/lib/shared/result'
 import { idInput } from '#/lib/shared/validation'
 
-// IMP-01, 05, 06 (spec 18): the files are read in the browser and arrive here as rows;
+// IMP-01, 05, 06: the files are read in the browser and arrive here as rows;
 // `import_batch` checks them and writes them in one transaction (ADR-036).
 
 const KNOWN: Partial<Record<string, ImportError>> = {

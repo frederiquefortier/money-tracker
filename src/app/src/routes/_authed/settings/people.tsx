@@ -225,7 +225,7 @@ function People() {
         )}
       </div>
       <AddMenu />
-      {/* The person and group forms open here as sheets (spec 19). */}
+      {/* The person and group forms open here as sheets. */}
       <Outlet />
     </ListPage>
   )

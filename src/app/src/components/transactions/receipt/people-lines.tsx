@@ -36,7 +36,7 @@ import type {
 const avatarBox =
   'grid size-8 shrink-0 place-items-center rounded-full bg-secondary text-primary'
 
-/** Moi is the person icon (spec 20); a line without a name, the person or group icon. */
+/** Moi is the person icon; a line without a name, the person or group icon. */
 function LineAvatar({ line, name }: { line: PersonLine; name: string }) {
   if (line.role === 'me')
     return (
@@ -175,7 +175,7 @@ function PeopleLine({
 }
 
 /**
- * PPL-03, 04 (spec 20): the people's parts on the slip after a rule, like the splits.
+ * PPL-03, 04: the people's parts on the slip after a rule, like the splits.
  * Moi first on an expense; each person with their role; a line without a name with its
  * count. The round add button is always last, alone while no one is on it.
  */

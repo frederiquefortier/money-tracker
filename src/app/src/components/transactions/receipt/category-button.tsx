@@ -9,7 +9,7 @@ import { indexById } from '#/lib/shared/collections'
 import { focusRing } from '#/components/styles'
 
 /**
- * Spec 15: the category as a round button, on the receipt beside the amount or on a split
+ * the category as a round button, on the receipt beside the amount or on a split
  * line. Empty, a dashed circle with a plus. Tapping it opens the category list. With
  * `label`, the circle and its name are one button, the gap between them included. The
  * name, and "Remboursement" for an income on an expense category, is its tooltip and

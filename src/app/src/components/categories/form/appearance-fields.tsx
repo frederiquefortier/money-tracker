@@ -140,7 +140,7 @@ function CustomColor({
 
 /**
  * Nineteen quick picks, any colour, and a reset when a sub-category's colour was picked
- * by hand (spec 12). `used` holds the quick picks other top-level categories of the same
+ * by hand. `used` holds the quick picks other top-level categories of the same
  * type already have.
  */
 export function ColorGrid({
