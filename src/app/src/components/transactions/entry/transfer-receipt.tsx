@@ -1,3 +1,4 @@
+import { CurrencyCode } from '#/components/display/currency-code'
 import { useId } from 'react'
 import { Link } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
@@ -12,10 +13,10 @@ import {
   slipTyped,
 } from '#/components/transactions/receipt/receipt-line'
 import { Checkbox } from '#/components/ui/checkbox'
-import { FORMAT_LOCALE } from '#/i18n/locales'
 import { amountForInput } from '#/lib/shared/money'
 import { transferPreview } from '#/lib/transfers/transfer-draft'
 import type { TransferDraft } from '#/lib/transfers/transfer-draft'
+import { formatRate } from '#/lib/shared/format'
 import { useLocale } from '#/hooks/app/use-locale'
 import { cn } from '#/lib/utils'
 
@@ -72,9 +73,7 @@ function ReceivedLines({
             {t('transactions.rate', {
               from: currencies.from,
               to: currencies.to,
-              rate: new Intl.NumberFormat(FORMAT_LOCALE[locale], {
-                maximumFractionDigits: 4,
-              }).format(rate as Intl.StringNumericLiteral),
+              rate: formatRate(rate, locale),
             })}
           </ReceiptLine>
         )}
@@ -122,7 +121,7 @@ function FeeLine({
           onChange={(event) => onChange({ fee: event.target.value })}
           className={cn(slipTyped, 'w-24')}
         />
-        {currency}
+        {currency && <CurrencyCode code={currency} />}
       </ReceiptLine>
       {error && (
         <FieldMessage>

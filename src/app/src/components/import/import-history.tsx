@@ -4,8 +4,9 @@ import { IconButton } from '#/components/display/icon-button'
 import { ConfirmDialog } from '#/components/feedback/confirm-dialog'
 import { CollapsedSection } from '#/components/lists/collapsed-section'
 import { useServerAction } from '#/hooks/app/use-server-action'
-import { useFormatLocale } from '#/hooks/app/use-locale'
+import { useLocale } from '#/hooks/app/use-locale'
 import type { ImportBatch } from '#/lib/import/import'
+import { formatInstant } from '#/lib/shared/format'
 import { cn } from '#/lib/utils'
 import { undoImport } from '#/server/import'
 
@@ -17,11 +18,8 @@ function BatchRow({
   onUndo: () => void
 }) {
   const { t } = useTranslation()
-  const locale = useFormatLocale()
-  const day = (iso: string) =>
-    new Intl.DateTimeFormat(locale, { dateStyle: 'medium' }).format(
-      new Date(iso),
-    )
+  const locale = useLocale()
+  const day = (iso: string) => formatInstant(iso, locale)
   const undone = batch.undoneAt !== null
   return (
     <li
@@ -56,14 +54,10 @@ export function ImportHistory({
   batches: ReadonlyArray<ImportBatch>
 }) {
   const { t } = useTranslation()
-  const locale = useFormatLocale()
+  const locale = useLocale()
   const { run, busy } = useServerAction()
   const [asking, setAsking] = useState<ImportBatch | null>(null)
-  const date = asking
-    ? new Intl.DateTimeFormat(locale, { dateStyle: 'medium' }).format(
-        new Date(asking.committedAt),
-      )
-    : ''
+  const date = asking ? formatInstant(asking.committedAt, locale) : ''
   if (batches.length === 0) return null
   return (
     <div className="mt-6">

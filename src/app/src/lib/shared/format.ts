@@ -24,6 +24,27 @@ export function formatMoney(
   )
 }
 
+export function percentFormat(locale: Locale, maximumFractionDigits: number) {
+  return new Intl.NumberFormat(FORMAT_LOCALE[locale], {
+    style: 'percent',
+    maximumFractionDigits,
+  })
+}
+
+/** An exchange rate, a decimal string, to four decimals. */
+export function formatRate(rate: string, locale: Locale): string {
+  return new Intl.NumberFormat(FORMAT_LOCALE[locale], {
+    maximumFractionDigits: 4,
+  }).format(rate as Intl.StringNumericLiteral)
+}
+
+/** A moment (a timestamp), shown as the date it fell on in the browser's time zone. */
+export function formatInstant(timestamp: string, locale: Locale): string {
+  return new Intl.DateTimeFormat(FORMAT_LOCALE[locale], {
+    dateStyle: 'medium',
+  }).format(new Date(timestamp))
+}
+
 /** Today in the browser's time zone; toISOString() would give the UTC date. */
 export function todayIso(now = new Date()): string {
   const month = String(now.getMonth() + 1).padStart(2, '0')

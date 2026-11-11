@@ -1,8 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import { Icon } from '#/components/display/icon'
 import { slipSmall } from '#/components/transactions/receipt/receipt-line'
-import { FORMAT_LOCALE } from '#/i18n/locales'
-import { formatMoney } from '#/lib/shared/format'
+import { formatMoney, percentFormat } from '#/lib/shared/format'
 import { fromMinor, minorDigits } from '#/lib/shared/money'
 import type { SplitMode } from '#/lib/transactions/transaction'
 import { percentLeft } from '#/lib/transactions/transaction-preview'
@@ -60,10 +59,7 @@ export function SplitRemaining({
   accountCurrency: string
 }) {
   const locale = useLocale()
-  const percent = new Intl.NumberFormat(FORMAT_LOCALE[locale], {
-    style: 'percent',
-    maximumFractionDigits: 2,
-  })
+  const percent = percentFormat(locale, 2)
   const inPercent = mode === 'percent'
   return (
     <RemainingLine

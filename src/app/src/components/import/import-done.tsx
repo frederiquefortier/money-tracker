@@ -1,6 +1,6 @@
 import { Link } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
-import { Icon } from '#/components/display/icon'
+import { IconBubble } from '#/components/display/icon-bubble'
 import { Button } from '#/components/ui/button'
 import { cardSurface } from '#/components/styles'
 import { useLocale } from '#/hooks/app/use-locale'
@@ -39,9 +39,7 @@ export function ImportDone({
         'flex flex-col items-center gap-5 px-5 pt-8 pb-5',
       )}
     >
-      <span className="grid size-14 place-items-center rounded-full bg-income/10 text-income [&_svg]:size-8">
-        <Icon name="check" />
-      </span>
+      <IconBubble icon="check" tone="income" size="lg" />
       <div className="flex flex-col items-center gap-1 text-center">
         <h2 className="text-lg font-semibold">{t('import.doneTitle')}</h2>
         <p className="text-muted-foreground">

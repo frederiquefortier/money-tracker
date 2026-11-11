@@ -11,7 +11,7 @@ export const slipSmall = 'text-[0.8125rem]'
 
 /** A value typed on the slip: underlined, dashed, right-aligned. */
 export const slipTyped = cn(
-  'min-w-0 border-b-2 border-dashed border-input bg-transparent text-right tabular-nums aria-invalid:border-destructive',
+  'min-w-0 border-b-2 border-dashed border-input bg-transparent text-right font-mono tabular-nums aria-invalid:border-destructive',
   focusRing,
 )
 

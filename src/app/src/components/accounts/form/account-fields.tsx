@@ -64,6 +64,7 @@ function OpeningFields({ field }: { field: Field }) {
           {...field('openingBalance')}
           inputMode="decimal"
           autoComplete="off"
+          className="font-mono"
           label={t('accounts.openingBalance')}
         />
       </LinkedFields>

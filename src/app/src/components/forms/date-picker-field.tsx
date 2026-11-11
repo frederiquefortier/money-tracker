@@ -16,6 +16,7 @@ import {
   segmentClass,
 } from '#/components/forms/calendar-sheet'
 import { Icon } from '#/components/display/icon'
+import { FieldMessage } from '#/components/forms/form-field'
 import { fieldControl } from '#/components/ui/field'
 import { cn } from '#/lib/utils'
 
@@ -99,7 +100,7 @@ export function DatePickerField({
             <Icon name="calendar" />
           </Button>
         </Group>
-        {error && <p className="text-sm text-destructive">{error}</p>}
+        {error && <FieldMessage>{error}</FieldMessage>}
         <CalendarSheet label={label} range={false} />
       </DatePicker>
     </DateProviders>

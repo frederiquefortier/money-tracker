@@ -19,6 +19,7 @@ Technical and structural choices, with the alternatives that were rejected. Chec
 
 **Consequences:**
 - The route ships in the bundle but answers 404 outside dev. Popovers and dialogs open in the light theme even with Dark on, since they render at the page root.
+- Review of the gallery's components (2026-11-11) led to shared pieces: `IconBubble` with tones and sizes, `CurrencyCode`, `pageColumn` and `errorTint` in `styles.ts`, and `formatRate`, `percentFormat` and `formatInstant` in `lib/shared/format.ts`.
 - Not shown: the add button, sheets and the date range calendar, which need the route or the layout around them.
 
 ---

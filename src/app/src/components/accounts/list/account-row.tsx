@@ -1,3 +1,4 @@
+import { CurrencyCode } from '#/components/display/currency-code'
 import { useTranslation } from 'react-i18next'
 import { AccountActions } from '#/components/accounts/list/account-actions'
 import { Icon } from '#/components/display/icon'
@@ -48,7 +49,7 @@ export function AccountRow({
         </span>
         <span className="block truncate text-sm text-muted-foreground">
           {details}{' '}
-          <span className="font-mono font-semibold">{account.currency}</span>
+          <CurrencyCode code={account.currency} className="font-semibold" />
         </span>
       </span>
       <span className="text-right md:pr-4">{aside}</span>

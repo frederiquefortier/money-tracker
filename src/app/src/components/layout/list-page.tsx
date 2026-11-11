@@ -1,3 +1,5 @@
+import { pageColumn } from '#/components/styles'
+
 export function PageTitle({ children }: { children: React.ReactNode }) {
   return (
     <h1 className="font-mono text-xl font-bold tracking-wide uppercase">
@@ -17,7 +19,7 @@ export function ListPage({
   children: React.ReactNode
 }) {
   return (
-    <div className="mx-auto flex w-full max-w-[40rem] flex-col gap-4 pb-20">
+    <div className={pageColumn}>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <PageTitle>{title}</PageTitle>
         {actions && (

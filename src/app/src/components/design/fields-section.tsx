@@ -4,6 +4,7 @@ import { GallerySection, Specimen } from '#/components/design/gallery-section'
 import { CheckboxField } from '#/components/forms/checkbox-field'
 import { DatePickerField } from '#/components/forms/date-picker-field'
 import { FormField } from '#/components/forms/form-field'
+import { LinkedFields } from '#/components/forms/linked-fields'
 import { InfoTooltip } from '#/components/forms/info-tooltip'
 import { RadioGroupField } from '#/components/forms/radio-group-field'
 import { SearchField } from '#/components/forms/search-field'
@@ -24,6 +25,24 @@ const OPTIONS: Array<ComboboxOption> = [
   { value: 'salary', label: 'Salary', group: 'Income' },
 ]
 const KINDS = ['need', 'want'] as const
+
+function LinkedFieldsSpecimen() {
+  return (
+    <Specimen name="LinkedFields" source="forms/linked-fields.tsx">
+      <div className="flex w-full flex-col gap-4">
+        <DatePickerField label="Opened on" defaultValue="2026-11-11" />
+        <LinkedFields>
+          <FormField
+            name="balance"
+            label="Balance on that date"
+            inputMode="decimal"
+            className="font-mono"
+          />
+        </LinkedFields>
+      </div>
+    </Specimen>
+  )
+}
 
 function TextFieldSpecimen() {
   return (
@@ -107,6 +126,7 @@ export function FieldsSection() {
             />
           </div>
         </Specimen>
+        <LinkedFieldsSpecimen />
         <Specimen name="InfoTooltip" source="forms/info-tooltip.tsx">
           <span className="text-sm font-semibold">Label</span>
           <InfoTooltip label="More">What the label means.</InfoTooltip>

@@ -38,7 +38,7 @@ export function SplitToggle({
         )
       }
       className={cn(
-        'self-start rounded-sm font-semibold tracking-wide text-primary uppercase underline decoration-transparent transition-colors hover:decoration-current',
+        'self-start rounded-field font-semibold tracking-wide text-primary uppercase underline decoration-transparent transition-colors hover:decoration-current',
         slipSmall,
         focusRing,
       )}

@@ -2,6 +2,19 @@ import { cn } from '#/lib/utils'
 
 // The class strings shared by several components: one place to change how they look.
 
+/** The one width of a screen's column: the lists, the transactions, the calendar sheet. */
+export const pageWidth = 'max-w-[48rem]'
+export const pageColumn = cn(
+  'mx-auto flex w-full flex-col gap-4 pb-20',
+  pageWidth,
+)
+
+/** The red tint of an error message, a badge or a destructive row hover. */
+export const errorTint = 'bg-destructive/10 text-destructive'
+
+// Layers: 10 inside a screen, 20 header and tab bar, 30 add button, 50 overlays (sheet,
+// dialog, menu, calendar), 60 toast, 70 tooltip.
+
 // One focus style everywhere: an outline in the text colour, never the error red.
 export const focusRing =
   'outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-solid focus-visible:outline-ring'

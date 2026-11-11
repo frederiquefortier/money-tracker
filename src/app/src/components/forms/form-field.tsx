@@ -4,7 +4,7 @@ import { Icon } from '#/components/display/icon'
 import { Input } from '#/components/ui/input'
 import { FieldLabel } from '#/components/ui/field'
 import { cn } from '#/lib/utils'
-import { focusRing } from '#/components/styles'
+import { errorTint, focusRing } from '#/components/styles'
 
 type FormFieldProps = Omit<React.ComponentProps<typeof Input>, 'id'> & {
   name: string
@@ -112,9 +112,7 @@ export function FormAlert({
       role={error ? 'alert' : 'status'}
       className={cn(
         'flex items-start gap-2 rounded-lg px-3 py-2 text-sm',
-        error
-          ? 'bg-destructive/10 text-destructive'
-          : 'bg-secondary text-secondary-foreground',
+        error ? errorTint : 'bg-secondary text-secondary-foreground',
       )}
     >
       <Icon

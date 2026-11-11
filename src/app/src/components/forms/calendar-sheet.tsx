@@ -22,6 +22,7 @@ import {
   pickerHeader,
   pickerHeading,
   pickerNav,
+  pageWidth,
 } from '#/components/styles'
 import { useOverlayContainer } from '#/components/ui/overlay-container'
 import { DATE_FIELD_LOCALE } from '#/i18n/locales'
@@ -40,7 +41,7 @@ export const roundButton = cn(
 export const literalClass = 'px-0'
 
 export const segmentClass = cn(
-  'rounded-xs px-0.5 tabular-nums outline-none',
+  'rounded-field px-0.5 tabular-nums outline-none',
   'data-[focused]:bg-primary data-[focused]:text-primary-foreground data-[placeholder]:text-muted-foreground',
 )
 
@@ -251,7 +252,7 @@ export function CalendarSheet({
         className={cn(
           'flex w-full flex-col rounded-t-2xl border-t bg-card text-card-foreground shadow-lg',
           inDialog ? 'h-96' : 'h-1/2 min-h-96',
-          !container && 'max-w-[48rem]',
+          !container && pageWidth,
           'data-[entering]:animate-in data-[entering]:slide-in-from-bottom data-[exiting]:animate-out data-[exiting]:slide-out-to-bottom',
         )}
       >

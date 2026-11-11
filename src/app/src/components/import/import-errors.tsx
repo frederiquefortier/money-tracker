@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import type { TFunction } from 'i18next'
 import { ResetChoices } from '#/components/import/reset-choices'
-import { Icon } from '#/components/display/icon'
+import { IconBubble } from '#/components/display/icon-bubble'
 import { IconButton } from '#/components/display/icon-button'
 import { useToast } from '#/hooks/app/use-toast'
 import { cardSurface } from '#/components/styles'
@@ -52,9 +52,7 @@ export function ImportErrors({
         'flex flex-col items-center gap-5 px-5 pt-8 pb-5',
       )}
     >
-      <span className="grid size-14 place-items-center rounded-full bg-destructive/10 text-destructive [&_svg]:size-8">
-        <Icon name="circle-warning" />
-      </span>
+      <IconBubble icon="circle-warning" tone="error" size="lg" />
       <div className="flex flex-col items-center gap-1 text-center">
         <h2 className="text-lg font-semibold">{t('import.errorsHeading')}</h2>
         <p className="text-muted-foreground">

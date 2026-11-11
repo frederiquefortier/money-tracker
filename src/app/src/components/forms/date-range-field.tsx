@@ -16,6 +16,7 @@ import {
   segmentClass,
 } from '#/components/forms/calendar-sheet'
 import { Icon } from '#/components/display/icon'
+import { FieldMessage } from '#/components/forms/form-field'
 import { fieldControl } from '#/components/ui/field'
 import type { DateRange } from '#/lib/shared/date-range'
 import { cn } from '#/lib/utils'
@@ -132,7 +133,7 @@ export function DateRangeField({
           calendar={calendar}
           onClear={() => onChange(null)}
         />
-        {error && <p className="text-sm text-destructive">{error}</p>}
+        {error && <FieldMessage>{error}</FieldMessage>}
         {calendar && <CalendarSheet label={label} range />}
       </DateRangePicker>
     </DateProviders>

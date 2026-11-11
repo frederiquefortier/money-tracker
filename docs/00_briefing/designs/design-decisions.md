@@ -11,6 +11,9 @@ Newest first inside each section.
 - **No summary tiles on the transactions list** (2026-11-05). Spent-this-period belongs to the dashboard.
 - **Amounts at one size** (2026-11-05). TravelSpend sets cents smaller; not kept.
 - **No helper text, legends or "(facultatif)"** (author's standing rule). If a field needs explaining, fix its label or layout. A reason something is unavailable goes in a toast on tap.
+- **One column width, 48rem** (2026-11-11), for the lists and the transactions list alike (`pageColumn` in `styles.ts`). The lists were 40rem.
+- **Amounts and currency codes are in Inconsolata** (2026-11-11), wherever they show: `Money`, `CurrencyCode`, the typed amounts on the receipt slip and the opening balance field. Amounts inside a translated sentence (a toast, a dialog) stay in the body face.
+- **Status pills are round** (2026-11-11): `Tag` follows `EventTag`. Small inline highlights (combobox options, date segments) take the field radius.
 - **Sort and expand-all on pages only**, never inside a sheet or a list over a form (2026-11-05).
 
 ## Dates, period and filters

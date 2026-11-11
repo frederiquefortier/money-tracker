@@ -11,7 +11,7 @@ export function Tag({
   return (
     <span
       className={cn(
-        'shrink-0 rounded-md bg-secondary px-1.5 py-0.5 text-xs font-semibold text-primary',
+        'shrink-0 rounded-full bg-secondary px-1.5 py-0.5 text-xs font-semibold text-primary',
         className,
       )}
     >

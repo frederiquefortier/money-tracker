@@ -20,7 +20,7 @@ import { fieldSurface, focusRing } from '#/components/styles'
 // are grey so the two never look alike.
 function optionClass(row: ComboboxRow, selected: boolean, active: boolean) {
   return cn(
-    'flex cursor-pointer items-center gap-2 rounded-xs px-2 py-2',
+    'flex cursor-pointer items-center gap-2 rounded-field px-2 py-2',
     selected && 'bg-accent font-semibold text-accent-foreground',
     'hover:bg-muted',
     active && 'bg-muted',
@@ -155,7 +155,7 @@ function ComboboxInput({
           aria-label={clearLabel}
           title={clearLabel}
           className={cn(
-            'absolute top-1/2 right-8 -translate-y-1/2 rounded-sm p-1 text-muted-foreground hover:text-foreground',
+            'absolute top-1/2 right-8 -translate-y-1/2 rounded-field p-1 text-muted-foreground hover:text-foreground',
             focusRing,
           )}
         >

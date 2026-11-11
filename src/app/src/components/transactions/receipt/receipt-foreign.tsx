@@ -1,3 +1,4 @@
+import { CurrencyCode } from '#/components/display/currency-code'
 import { useId } from 'react'
 import { useTranslation } from 'react-i18next'
 import { FieldMessage } from '#/components/forms/form-field'
@@ -6,9 +7,9 @@ import {
   ReceiptLine,
   slipTyped,
 } from '#/components/transactions/receipt/receipt-line'
-import { FORMAT_LOCALE } from '#/i18n/locales'
 import { absDecimal, amountForInput } from '#/lib/shared/money'
 import { foreignPreview } from '#/lib/transactions/transaction-preview'
+import { percentFormat, formatRate } from '#/lib/shared/format'
 import { useLocale } from '#/hooks/app/use-locale'
 import { cn } from '#/lib/utils'
 import type {
@@ -36,16 +37,12 @@ export function ForeignLines({
   const { t } = useTranslation()
   const locale = useLocale()
   const id = useId()
-  const format = FORMAT_LOCALE[locale]
   const preview = foreignPreview(draft, accountCurrency, rate ?? null)
   const paid = draft.paidByHand
     ? draft.paid
     : preview.prefill &&
       amountForInput(absDecimal(preview.prefill), accountCurrency, locale)
-  const percent = new Intl.NumberFormat(format, {
-    style: 'percent',
-    maximumFractionDigits: 1,
-  })
+  const percent = percentFormat(locale, 1)
   return (
     <>
       <div className="flex flex-col gap-0.5">
@@ -61,16 +58,14 @@ export function ForeignLines({
             }
             className={cn(slipTyped, 'w-24')}
           />
-          {accountCurrency}
+          <CurrencyCode code={accountCurrency} />
         </ReceiptLine>
         {rate && (
           <ReceiptLine label={t('transactions.rateLabel')} muted>
             {t('transactions.rate', {
               from: draft.currency,
               to: accountCurrency,
-              rate: new Intl.NumberFormat(format, {
-                maximumFractionDigits: 4,
-              }).format(rate as Intl.StringNumericLiteral),
+              rate: formatRate(rate, locale),
             })}
           </ReceiptLine>
         )}

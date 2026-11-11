@@ -12,7 +12,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '#/components/ui/dropdown-menu'
-import { cardSurface, focusRing } from '#/components/styles'
+import { cardSurface, errorTint, focusRing } from '#/components/styles'
 import { IMPORT_FILES } from '#/lib/import/import'
 import type { ImportFileName } from '#/lib/import/import'
 import type { ImportFileRead } from '#/lib/import/import-files'
@@ -39,7 +39,7 @@ function FileRow({
   const name = `${file.name}.csv`
   return (
     <li className="flex items-center gap-3 py-2.5 pr-2 pl-3">
-      <IconBubble icon={FILE_ICON[file.name]} className="size-10" />
+      <IconBubble icon={FILE_ICON[file.name]} />
       <div className="flex min-w-0 flex-1 flex-col">
         <span className="truncate font-semibold">{name}</span>
         <span className="text-sm text-muted-foreground">
@@ -47,7 +47,7 @@ function FileRow({
         </span>
       </div>
       {file.errors.length > 0 && (
-        <Tag className="bg-destructive/10 text-destructive">
+        <Tag className={errorTint}>
           {t('import.errorsTitle', { count: file.errors.length })}
         </Tag>
       )}
@@ -95,9 +95,7 @@ function DropArea({ onChoose }: { onChoose: () => void }) {
         focusRing,
       )}
     >
-      <span className="grid size-14 place-items-center rounded-2xl bg-secondary text-secondary-foreground">
-        <Icon name="import" className="size-6" />
-      </span>
+      <IconBubble icon="import" size="lg" />
       <span className="text-center text-muted-foreground">
         {t('import.drop')}{' '}
         <span className="underline underline-offset-4">

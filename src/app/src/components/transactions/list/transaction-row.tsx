@@ -11,8 +11,7 @@ import {
   hasFees,
 } from '#/components/transactions/list/fee-lines'
 import { useRowText } from '#/hooks/transactions/use-row-text'
-import { FORMAT_LOCALE } from '#/i18n/locales'
-import { formatDate, formatMoney } from '#/lib/shared/format'
+import { formatDate, formatMoney, formatRate } from '#/lib/shared/format'
 import { absDecimal } from '#/lib/shared/money'
 import { isOwed } from '#/lib/transactions/transaction-list'
 import type {
@@ -89,9 +88,7 @@ function RowAmount({
           rate: t('transactions.rate', {
             from: row.currency,
             to: displayCurrency,
-            rate: new Intl.NumberFormat(FORMAT_LOCALE[locale], {
-              maximumFractionDigits: 4,
-            }).format(row.rate as Intl.StringNumericLiteral),
+            rate: formatRate(row.rate, locale),
           }),
         })
       : undefined

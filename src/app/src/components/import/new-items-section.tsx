@@ -18,7 +18,7 @@ import type { Actions } from '#/components/import/row-buttons'
 import { cn } from '#/lib/utils'
 
 // What the import writes for a category: its parent's colour, or this grey (import.sql).
-const NEW_CATEGORY_COLOR = '#6b7280'
+const NEW_CATEGORY_COLOR = '#6b7280' // Tailwind's gray-500, the import's default grey
 
 function stateTag(item: SectionItem, t: TFunction, renamed: boolean) {
   const edit = item.edit

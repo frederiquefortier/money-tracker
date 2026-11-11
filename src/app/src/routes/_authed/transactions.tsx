@@ -9,6 +9,7 @@ import { useTranslation } from 'react-i18next'
 import { z } from 'zod'
 import { FloatingAddLink } from '#/components/layout/floating-add-button'
 import { EmptyState } from '#/components/lists/list-card'
+import { pageColumn } from '#/components/styles'
 import { ListHeader } from '#/components/transactions/list/list-header'
 import { TransactionDayGroup } from '#/components/transactions/list/transaction-day'
 import { useTransactionPages } from '#/hooks/transactions/use-transaction-pages'
@@ -207,7 +208,7 @@ function Transactions() {
   const empty = useEmptyText()
 
   return (
-    <div className="mx-auto flex w-full max-w-[48rem] flex-col gap-4 pb-20">
+    <div className={pageColumn}>
       <ListHeader
         choice={deps}
         filters={deps}

@@ -37,7 +37,7 @@ export function Money({
 
   return (
     <span
-      className={cn('whitespace-nowrap tabular-nums', className)}
+      className={cn('font-mono whitespace-nowrap tabular-nums', className)}
       title={detail ?? (converted ? label : undefined)}
       aria-label={label}
     >

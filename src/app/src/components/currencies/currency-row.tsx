@@ -1,3 +1,4 @@
+import { CurrencyCode } from '#/components/display/currency-code'
 import { useTranslation } from 'react-i18next'
 import { IconActions, IconButton } from '#/components/display/icon-button'
 import { Tag } from '#/components/display/tag'
@@ -18,7 +19,7 @@ function CurrencyLabel({
   const locale = useLocale()
   return (
     <>
-      <span className="w-9 shrink-0 font-mono font-bold">{currency.code}</span>
+      <CurrencyCode code={currency.code} className="w-9 shrink-0 font-bold" />
       <span className="flex min-w-0 flex-1 items-center gap-2">
         <span className="flex min-w-0 gap-1">
           <span className="truncate">{currencyName(currency, locale)}</span>

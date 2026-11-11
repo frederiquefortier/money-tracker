@@ -34,7 +34,7 @@ export function InfoTooltip({
           placement="top end"
           offset={6}
           containerPadding={16}
-          className="z-[70] w-max max-w-[min(16rem,calc(100vw-2rem))] rounded-md bg-foreground px-3 py-2 text-xs leading-snug font-medium text-background shadow-md"
+          className="z-[70] w-max max-w-[min(16rem,calc(100vw-2rem))] rounded-lg bg-foreground px-3 py-2 text-xs leading-snug font-medium text-background shadow-md"
         >
           {children}
         </Tooltip>

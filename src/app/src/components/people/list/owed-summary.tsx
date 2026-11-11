@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { ListCard } from '#/components/lists/list-card'
+import { Money } from '#/components/display/money'
 import { formatDate, formatMoney } from '#/lib/shared/format'
 import { useLocale } from '#/hooks/app/use-locale'
 import { cn } from '#/lib/utils'
@@ -65,9 +66,11 @@ export function OwedLines({ personId }: { personId: string }) {
                 {formatDate(line.occurredOn, locale, 'medium')} · {line.label}
               </span>
               <span className="shrink-0 font-semibold">
-                {line.left === null
-                  ? t('transactions.people.unknownShort')
-                  : formatMoney(line.left, line.currency, locale)}
+                {line.left === null ? (
+                  t('transactions.people.unknownShort')
+                ) : (
+                  <Money amount={line.left} currency={line.currency} />
+                )}
               </span>
             </Link>
           </li>
