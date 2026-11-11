@@ -1,7 +1,7 @@
 begin;
 create extension if not exists pgtap with schema extensions;
 
-select plan(16);
+select plan(20);
 
 insert into auth.users (id, email) values
   ('11111111-1111-1111-1111-111111111111', 'alice@example.test'),
@@ -125,6 +125,26 @@ select public.save_event(null, 'Vide', null, null, null, '{}');
 select is(
   public.matching_event('2031-01-01', 'expense'),
   null, 'an event with no dates links nothing by itself'
+);
+
+-- With the automatic link off, an event keeps its manual links and gives back the others.
+select public.save_event((select id from public.events where name = 'Lisbonne'), 'Lisbonne',
+  null, '2026-05-10', '2026-05-20', '{}', false);
+select is(
+  (select event_id from public.transactions where occurred_on = '2026-05-12' and amount = -30),
+  null, 'turning the link off takes back its automatic links'
+);
+select is(
+  (select e.name from public.transactions t join public.events e on e.id = t.event_id
+   where t.occurred_on = '2026-06-01'),
+  'Lisbonne', 'and keeps the manual ones'
+);
+select is(
+  public.matching_event('2026-05-12', 'expense'),
+  null, 'an event with the link off is not offered for a date'
+);
+select is(
+  (select count(*)::int from public.event_exclusions), 1, 'no exclusion is written for the links taken back'
 );
 
 -- Bruno sees none of it

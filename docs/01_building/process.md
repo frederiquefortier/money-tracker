@@ -61,6 +61,7 @@ without touching `docs/`.
 
 | Date | Topic | Assistant proposed | Author decided | Where |
 |---|---|---|---|---|
+| 2026-11-11 | Events and the visa | Use an event for the visa, not a tag; a hide option for its transactions as a possible later idea | Chosen by the author: events stay, with a checkbox per event that turns the automatic link by date off, and turning it off removes the automatic links and keeps the manual ones | ADR-042, EVT-07 |
 | 2026-11-10 | The wizard | Keep a later "import wizard" (IMP-03) for mapping, profiles, alias matching and suggested pairs | Said by the author: the import being built is the wizard; narrowed to reading other sources, the rest is IMP-06 and MER-02 | ADR-037, requirements |
 | 2026-11-10 | New merchants before import | Merge or create as written | Asked by the author: also edit (rename, part to the note) or drop a false positive, for merchants, people and events | ADR-037, spec 18 |
 | 2026-11-11 | Repayments above the expense | Refuse them in the import check and unlink them in the data | Rejected by the author: it is fine, and the extra is not a gift: the income keeps its category, whose total can go below zero (a roommate paying two months at once). Fixed in `save_transaction` so several repayments are cut together, like a single one | designs/21-reimbursements.md, database.md |

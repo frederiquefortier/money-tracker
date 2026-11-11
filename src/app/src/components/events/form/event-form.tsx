@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { z } from 'zod'
 import { PeoplePick, TypeField } from '#/components/events/form/event-fields'
 import type { Ids } from '#/components/events/form/event-fields'
+import { CheckboxField } from '#/components/forms/checkbox-field'
 import { DateRangeField } from '#/components/forms/date-range-field'
 import { FormField } from '#/components/forms/form-field'
 import { InfoTooltip } from '#/components/forms/info-tooltip'
@@ -23,6 +24,7 @@ function startValues(row: EventItem | null) {
     range: toRange(row?.startsOn ?? null, row?.endsOn ?? null),
     typeId: row?.typeId ?? null,
     personIds: row?.personIds ?? ([] as Ids),
+    autoLink: row?.autoLink ?? true,
   }
 }
 
@@ -61,6 +63,7 @@ export function EventForm({
   const [typeId, setTypeId] = useChanging(start.typeId)
   const [range, setRange] = useChanging(start.range)
   const [personIds, setPersonIds] = useChanging(start.personIds)
+  const [autoLink, setAutoLink] = useChanging(start.autoLink)
   const form = useSheetForm({
     schema,
     initial: { name: start.name },
@@ -72,6 +75,7 @@ export function EventForm({
           typeId,
           ...fromRange(range),
           personIds,
+          autoLink,
         },
       }),
     savedText,
@@ -90,6 +94,12 @@ export function EventForm({
         value={range}
         onChange={setRange}
         clearable
+      />
+      <CheckboxField
+        name="autoLink"
+        label={t('events.autoLink')}
+        checked={autoLink}
+        onCheckedChange={setAutoLink}
       />
       <PeoplePick
         people={people}

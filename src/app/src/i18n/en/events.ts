@@ -26,6 +26,7 @@ export const eventsEn: typeof eventsFr = {
     name: 'Name',
     type: 'Type',
     dates: 'Dates',
+    autoLink: 'Link transactions automatically by date',
     datesInfo:
       'Expenses and incomes on these dates are linked to the event automatically; remove the link from the transaction. With no dates, links are made by hand.',
     datesInfoLabel: 'About the dates',

@@ -336,6 +336,7 @@ export type Database = {
       }
       events: {
         Row: {
+          auto_link: boolean
           created_at: string
           ends_on: string | null
           id: string
@@ -347,6 +348,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          auto_link?: boolean
           created_at?: string
           ends_on?: string | null
           id?: string
@@ -358,6 +360,7 @@ export type Database = {
           user_id?: string
         }
         Update: {
+          auto_link?: boolean
           created_at?: string
           ends_on?: string | null
           id?: string
@@ -1328,6 +1331,7 @@ export type Database = {
       }
       save_event: {
         Args: {
+          auto_link?: boolean
           ends_on: string
           event_id: string
           name: string

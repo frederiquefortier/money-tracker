@@ -4,6 +4,33 @@ Document architectural choices with context, alternatives considered, and trade-
 
 <!-- Newest first: a new ADR goes directly below this line. Template at the bottom. -->
 
+### ADR-042: An event can opt out of the automatic link by date (2026-11-11)
+
+**Context:**
+- EVT-07 links every expense and income in an event's dates. The author wants an event for
+  the Swiss youth professional visa (2026-2027) to hold only the fees and procedures linked
+  by hand, without taking a year of transactions or a real trip to Switzerland.
+
+**Decision:**
+- `events.auto_link` (boolean, default true). `matching_event` skips an event with it off,
+  so the form, `save_transaction`, the import and `relink_events` all agree.
+- `save_event` takes `auto_link` and recomputes the event's old and new dates as before.
+  Turning it off hands its automatic links to the next matching event, or to none, and keeps
+  the manual ones. No `event_exclusions` row is written for them, so turning it back on
+  links the dates again.
+- The event form has a checkbox, "Lier automatiquement les transactions selon la date".
+
+**Alternatives Considered:**
+- Tags again -> A second way to group, loose names, no dates or total.
+- An event with no dates -> Already links by hand only, but then it has no place on the
+  calendar (EVT-04).
+
+**Consequences:**
+- An event with the link off is never offered for a date on a transaction.
+- A later idea: hide or collapse a hand-linked event's transactions in the list.
+
+---
+
 ### ADR-041: The transaction form's data is one layout route, and closing a sheet leaves sheets out of the refresh (2026-11-11)
 
 **Context:**

@@ -23,6 +23,8 @@ export type EventItem = {
   /** Null makes it one day with a start, open at the end without. */
   endsOn: string | null
   personIds: Array<string>
+  /** False keeps the event out of the link by date (EVT-07): only links made by hand. */
+  autoLink: boolean
   transactionCount: number
 }
 
@@ -93,6 +95,7 @@ export const eventInputSchema = nameFormSchema
     startsOn: z.iso.date().nullable(),
     endsOn: z.iso.date().nullable(),
     personIds: z.array(z.uuid()).max(200),
+    autoLink: z.boolean(),
   })
   .refine(
     (e) => e.startsOn === null || e.endsOn === null || e.endsOn >= e.startsOn,

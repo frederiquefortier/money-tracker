@@ -135,7 +135,7 @@ English; this file is in English like every other meta-doc.
 | EVT-04 | Calendar view of events with the total spent on each. | v1, ai | 2 |
 | EVT-05 | Compare events of the same type. | ai | 2 |
 | EVT-06 | Give an event a budget and follow it live. Moved to phase 4 with the other budgets, built once on the shared `budgets` table (author, 2026-11-08). | ai, author | 4 |
-| EVT-07 | In its dates, an event attaches itself to every expense and income (no categories: removed 2026-11-09, the author prefers the tag taken off by hand). With no dates, only by hand. Automatic links are marked as such and can be removed or changed by hand; a removed one stays removed. | ai (was TAG-02), author | 2 |
+| EVT-07 | In its dates, an event attaches itself to every expense and income (no categories: removed 2026-11-09, the author prefers the tag taken off by hand). With no dates, only by hand. Automatic links are marked as such and can be removed or changed by hand; a removed one stays removed. An event can turn the automatic link off (2026-11-11, ADR-042): it then holds only the transactions linked by hand, and its automatic links are removed. | ai (was TAG-02), author | 2 |
 
 ## 10. Dashboard and reports (`DSH`)
 

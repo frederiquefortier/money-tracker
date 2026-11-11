@@ -27,7 +27,7 @@ export const getEvents = createServerFn({ method: 'GET' }).handler(
     const [events, types, people, usage] = loaded(
       'Events',
       ...(await Promise.all([
-        supabase.from('events').select('id, name, type_id, starts_on, ends_on'),
+        supabase.from('events').select('id, name, type_id, starts_on, ends_on, auto_link'),
         supabase.from('event_types').select('id, name, color'),
         supabase.from('event_people').select('event_id, person_id'),
         supabase.from('event_usage').select('event_id, transaction_count'),
@@ -40,6 +40,7 @@ export const getEvents = createServerFn({ method: 'GET' }).handler(
         typeId: e.type_id,
         startsOn: e.starts_on,
         endsOn: e.ends_on,
+        autoLink: e.auto_link,
         personIds: people
           .filter((p) => p.event_id === e.id)
           .map((p) => p.person_id),
@@ -65,6 +66,7 @@ export const saveEvent = createServerFn({ method: 'POST' })
       starts_on: data.startsOn,
       ends_on: data.endsOn,
       person_ids: data.personIds,
+      auto_link: data.autoLink,
     })
     return error ? failure('save event', error) : { ok: true, id }
   })

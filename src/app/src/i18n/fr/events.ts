@@ -25,6 +25,7 @@ export const eventsFr = {
     name: 'Nom',
     type: 'Type',
     dates: 'Dates',
+    autoLink: 'Lier automatiquement les transactions selon la date',
     datesInfo:
       'Les dépenses et revenus de ces dates sont liés automatiquement à l’événement; le lien se retire depuis la transaction. Sans dates, les liens se font à la main.',
     datesInfoLabel: 'À propos des dates',
