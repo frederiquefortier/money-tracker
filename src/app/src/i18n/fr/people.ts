@@ -36,6 +36,14 @@ export const peopleFr = {
     owes: 'Me doit {{amount}}',
     plusUnknown: '+ inconnu',
     owesUnknown: 'Me doit, montant inconnu',
+    merge: 'Fusionner',
+    mergeName: 'Fusionner “{{name}}”',
+    mergeInto: 'Fusionner avec',
+    mergeEffect:
+      'Les transactions, groupes et événements de “{{source}}” passeront à “{{target}}”. “{{source}}” sera supprimé et gardé comme autre orthographe de “{{target}}”.',
+    mergeAlone: 'Il faut au moins un autre proche.',
+    mergeShared:
+      'Ils sont tous les deux sur la même transaction. Retirez-en un d’abord.',
     owedTitle: 'Me doit',
   },
 }

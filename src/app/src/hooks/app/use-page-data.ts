@@ -21,3 +21,8 @@ export function usePeoplePage() {
 export function useEventsPage() {
   return useLoaderData({ from: '/_authed/settings/events' })
 }
+
+/** What the transaction form's pickers need, loaded once for all its sheets. */
+export function useTransactionFormData() {
+  return useLoaderData({ from: '/_authed/transactions/_form' })
+}

@@ -101,10 +101,11 @@ export function RouteSheet({
     <FormSheet
       {...sheet}
       // Refresh first, while the sheet's route leaves the scroll alone: every load after
-      // the navigation would scroll the list back to the top.
+      // the navigation would scroll the list back to the top. The sheets' own routes are
+      // left out: they are about to go, and the form's pickers would load again for nothing.
       onClosed={() =>
         void router
-          .invalidate()
+          .invalidate({ filter: (match) => match.staticData.sheet !== true })
           .then(() => router.navigate({ to, resetScroll: false }))
       }
     />

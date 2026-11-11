@@ -178,6 +178,7 @@ export function Combobox({
   value,
   onChange,
   required = false,
+  hideLabel = false,
   clearLabel,
   createLabel,
   onCreate,
@@ -189,6 +190,8 @@ export function Combobox({
   value: string | null
   onChange: (value: string | null) => void
   required?: boolean
+  /** The label stays for screen readers, when something above already names the field. */
+  hideLabel?: boolean
   clearLabel: string
   createLabel?: (text: string) => string
   onCreate?: (text: string) => void
@@ -205,7 +208,11 @@ export function Combobox({
 
   return (
     <div className="flex flex-col gap-2">
-      <FieldLabel htmlFor={inputId} required={required}>
+      <FieldLabel
+        htmlFor={inputId}
+        required={required}
+        className={hideLabel ? 'sr-only' : undefined}
+      >
         {label}
       </FieldLabel>
       <Popover open={state.expanded} onOpenChange={state.setOpen}>

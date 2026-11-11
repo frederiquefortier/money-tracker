@@ -87,7 +87,7 @@ function filledLines(
  * rounding. Percentages leave something only when they do not reach 100. Empty lines
  * count as `filledLines` says.
  */
-export function peoplePreview(
+function moneyPreview(
   draft: Pick<TransactionPeople, 'people' | 'peopleMode'>,
   total: bigint | null,
   accountCurrency: string,
@@ -106,7 +106,7 @@ export function peoplePreview(
   if (people.some((l) => isUnknown(l))) {
     // Spec 21: the others share the whole amount until the reimbursement says the rest.
     const known = people.filter((l) => !isUnknown(l))
-    const preview = peoplePreview(
+    const preview = moneyPreview(
       { ...draft, people: known },
       total,
       accountCurrency,
@@ -158,6 +158,32 @@ export function peoplePreview(
   }
 }
 
+/** The people with me have no part: the calculations leave them out. */
+const moneyOf = <T extends Pick<TransactionPeople, 'people'>>(draft: T): T => ({
+  ...draft,
+  people: draft.people.filter((l) => l.role !== 'with'),
+})
+
+/** The typed values of the lines that have a part. */
+export const moneyValues = (draft: Pick<TransactionPeople, 'people'>) =>
+  moneyOf(draft).people.map((l) => l.value)
+
+/** `moneyPreview` for the whole list: a line with me has no amount. */
+export function peoplePreview(
+  draft: Pick<TransactionPeople, 'people' | 'peopleMode'>,
+  total: bigint | null,
+  accountCurrency: string,
+): ReturnType<typeof moneyPreview> {
+  const preview = moneyPreview(moneyOf(draft), total, accountCurrency)
+  let i = 0
+  return {
+    ...preview,
+    amounts: draft.people.map((l) =>
+      l.role === 'with' ? undefined : preview.amounts[i++],
+    ),
+  }
+}
+
 /**
  * What the typed lines leave of the amount, empty lines counting nothing: the people's
  * remaining line in Montant, as the splits' and as % counts from the typed values.
@@ -169,7 +195,7 @@ export function typedLeft(
 ): bigint | null {
   if (total === null) return null
   const digits = minorDigits(accountCurrency)
-  return draft.people.reduce((left, l) => {
+  return moneyOf(draft).people.reduce((left, l) => {
     const part = l.value.trim() === '' ? null : typedPart(l.value, l)
     return left - (part === null ? 0n : (toMinor(part, digits) ?? 0n))
   }, total)
@@ -183,8 +209,8 @@ export function peopleErrors(
 ): FieldErrors {
   if (draft.people.length === 0 || accountCurrency === null || total === null)
     return {}
-  const { amounts, remaining, over } = peoplePreview(
-    draft,
+  const { amounts, remaining, over } = moneyPreview(
+    moneyOf(draft),
     total,
     accountCurrency,
   )
@@ -210,11 +236,22 @@ export function peopleInput(
   total: bigint,
 ) {
   const digits = minorDigits(accountCurrency)
-  const { amounts } = peoplePreview(draft, total, accountCurrency)
-  const { lines } = filledLines(draft, total, accountCurrency)
-  return lines.map((l, i) => {
+  const money = moneyOf(draft)
+  const { amounts } = moneyPreview(money, total, accountCurrency)
+  const { lines } = filledLines(money, total, accountCurrency)
+  const withMe = draft.people
+    .filter((l) => l.role === 'with')
+    .map((l) => ({
+      role: l.role,
+      personId: l.personId,
+      headCount: 1,
+      amountUnknown: false,
+      fillsRest: false,
+      value: '0',
+    }))
+  const paid = lines.map((l, i) => {
     // Left empty: recomputed by the database when a reimbursement comes (Montant).
-    const fillsRest = draft.people[i].value.trim() === '' && !isUnknown(l)
+    const fillsRest = money.people[i].value.trim() === '' && !isUnknown(l)
     const unknown = isUnknown(l)
     const value = () => {
       if (unknown) return '0'
@@ -231,6 +268,7 @@ export function peopleInput(
       value: value(),
     }
   })
+  return [...paid, ...withMe]
 }
 
 /** A saved transaction's lines for the form; Montant parts are in the account's currency. */

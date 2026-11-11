@@ -59,8 +59,8 @@ describe('todayIso', () => {
 
 describe('formatDay and formatMonth', () => {
   it('names the weekday of a day header', () => {
-    expect(formatDay('2026-11-02', 'fr')).toBe('lundi 2 novembre')
-    expect(formatDay('2026-11-02', 'en')).toBe('Monday, November 2')
+    expect(formatDay('2026-11-02', 'fr')).toBe('lundi 2 novembre 2026')
+    expect(formatDay('2026-11-02', 'en')).toBe('Monday, November 2, 2026')
   })
 
   it('names a month with its year, or alone', () => {

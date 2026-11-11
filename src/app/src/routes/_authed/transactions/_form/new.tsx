@@ -7,24 +7,20 @@ import { TransferForm } from '#/components/transactions/entry/transfer-form'
 import { SheetBody } from '#/components/ui/sheet'
 import { todayIso } from '#/lib/shared/format'
 import { emptyDraft } from '#/lib/transactions/transaction-draft'
-import { loadTransactionForm } from '#/server/transaction-form'
 import { emptyTransfer } from '#/lib/transfers/transfer-draft'
 import type { TransferDraft } from '#/lib/transfers/transfer-draft'
 import type {
   FormAccount,
   TransactionFormData,
 } from '#/lib/transactions/transaction'
+import { useTransactionFormData } from '#/hooks/app/use-page-data'
 import { useStoredState } from '#/hooks/app/use-stored-state'
 import { getTransferFeeCategory } from '#/server/transfers'
 import type { TransactionDraft } from '#/lib/transactions/transaction-draft-types'
 
-export const Route = createFileRoute('/_authed/transactions/new')({
+export const Route = createFileRoute('/_authed/transactions/_form/new')({
   loader: async () => {
-    const [data, feeCategoryId] = await Promise.all([
-      loadTransactionForm(),
-      getTransferFeeCategory(),
-    ])
-    return { data, feeCategoryId }
+    return { feeCategoryId: await getTransferFeeCategory() }
   },
   staticData: { sheet: true },
   component: NewTransaction,
@@ -42,7 +38,8 @@ type Entry =
 
 function NewTransaction() {
   const { t } = useTranslation()
-  const { data, feeCategoryId } = Route.useLoaderData()
+  const { feeCategoryId } = Route.useLoaderData()
+  const data = useTransactionFormData()
   // The account last used, remembered per browser (spec 15).
   const [lastAccount, setLastAccount] = useStoredState(
     'transactions.account',

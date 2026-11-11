@@ -84,39 +84,39 @@ select is(
 insert into res select 'run', public.import_batch((select p from pay where name = 'file'));
 select is((select (r ->> 'ok')::boolean from res where name = 'run'), true, 'the file imports');
 select is(
-  (select array_agg(m.name order by m.name) from public.merchants m where m.person_id is not null),
-  array['Claire', 'Julie', 'Maman'], 'each person gets a merchant, named for them'
+  (select array_agg(distinct p.name order by p.name) from public.transactions t
+   join public.people p on p.id = t.seller_person_id),
+  array['Claire', 'Julie', 'Maman'], 'an expense from a person''s name has them as its seller'
 );
 select is(
-  (select count(distinct t.merchant_id)::int from public.transactions t
-   join public.merchants m on m.id = t.merchant_id where m.name = 'Maman'),
-  1, 'whatever the case, one merchant'
+  (select count(*)::int from public.merchants where name in ('Maman', 'Julie', 'Claire')),
+  0, 'and no merchant is made for them'
 );
 select is(
-  (select m.name from public.transactions t join public.merchants m on m.id = t.merchant_id where t.import_ref = 'p3'),
-  'Julie', 'a person''s alias finds their merchant'
+  (select count(distinct t.seller_person_id)::int from public.transactions t where t.import_ref in ('p1', 'p2')),
+  1, 'whatever the case, one seller'
 );
 select is(
-  (select m.person_id from public.merchants m where m.name = 'Sam Cha'), null, 'a shop is linked to no one'
+  (select p.name from public.transactions t join public.people p on p.id = t.seller_person_id where t.import_ref = 'p3'),
+  'Julie', 'a person''s alias finds the person'
 );
-
--- One merchant per person, and deleting the person keeps the merchant.
+select is(
+  (select m.name from public.transactions t join public.merchants m on m.id = t.merchant_id where t.import_ref = 'p4'),
+  'Sam Cha', 'a shop stays a merchant'
+);
+select is(
+  (select t.seller_person_id from public.transactions t where t.import_ref = 'p4'), null, 'with no seller'
+);
 select is(
   (select count(*)::int from public.people where name in ('Claire', 'Nobody')), 1,
   'a person the author named is created, only when a row uses the text'
 );
-select is(
-  (select p.name from public.merchants m join public.people p on p.id = m.person_id where m.name = 'Claire'),
-  'Claire', 'and has their merchant'
-);
-select throws_ok(
-  $$ insert into public.merchants (name, person_id) values ('Maman bis', 'a4000000-0000-0000-0000-000000000001') $$,
-  '23505', null, 'a person has one merchant'
-);
+
+-- Deleting the person keeps the transaction, without a seller.
 delete from public.people where id = 'a4000000-0000-0000-0000-000000000001';
 select is(
-  (select m.person_id from public.merchants m where m.name = 'Maman'), null,
-  'a deleted person leaves the merchant, unlinked'
+  (select t.seller_person_id from public.transactions t where t.import_ref = 'p1'), null,
+  'a deleted person leaves the transaction, without a seller'
 );
 
 -- A text that is a person with many people lines is still one merchant, and counts once.

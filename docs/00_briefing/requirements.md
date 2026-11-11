@@ -96,8 +96,8 @@ English; this file is in English like every other meta-doc.
 | ID | Requirement | Source | Phase |
 |---|---|---|---|
 | MER-01 | A merchant can have a default category, prefilled on new transactions. | v1, ai | 1 |
-| MER-02 | A merchant has aliases, other spellings of its name, so an import finds it by name or alias. A merge (MER-05) and an import merge keep the source's name and aliases as aliases of the target. Built 2026-11-10 (no screen shows them yet). | v1, ai | 3 |
-| MER-07 | A merchant can be a person ("bought something from Maman"): the merchant is linked to the person, and the import links a merchant text that is a person's name or alias. Built 2026-11-10 (ADR-038). | author | 3 |
+| MER-02 | A merchant has aliases, other spellings of its name, so an import finds it by name or alias. A merge (MER-05) and an import merge keep the source's name and aliases as aliases of the target. Built 2026-11-10; the merchant form edits them (2026-11-11). The list does not show them. | v1, ai | 3 |
+| MER-07 | ~~A merchant can be a person.~~ Replaced on 2026-11-11 by PPL-09: the seller is a person field on the transaction, and the merchant has no person (ADR-040, which supersedes ADR-038). | author | 3 |
 | MER-03 | A merchant has a country of origin. | v1 | later |
 | MER-04 | For one merchant, see how the bill has changed over time, in percent. | v1, ai | 4 |
 | MER-06 | The merchant list sorts by name (A–Z, Z–A) or by category, kept per browser, and filters by default category (a parent keeps its branch) or none. | author | 1 |
@@ -121,6 +121,9 @@ English; this file is in English like every other meta-doc.
 | PPL-04 | Without naming anyone: tick "I treated someone" with an amount and a head count, or "I expect a reimbursement" with an amount. | v1 | 2 |
 | PPL-05 | What each person owes me, at a glance: on their row and in their sheet, and the owed bubble on Transactions. Money I owe others is out of scope. | misc, author | 2 |
 | PPL-06 | A person can have aliases, other spellings of their name, so the import finds them by name or alias, ignoring case and accents. A name or an alias points to one person only. | author | 2 |
+| PPL-07 | Merge two people: the source's transaction lines, group memberships and event links move to the other, which keeps its name; the source's name and aliases become aliases of it (PPL-06). Refused when both are on one transaction. Built 2026-11-11. | author | 2 |
+| PPL-08 | A person can be with me on an expense without sharing its cost: a third role, "With me" (Avec moi), beside invited and owes. It has no part and no amount, never changes the others' parts, shows on the transaction, in the Proches filter and on the person's page. Not on an income, and not on a line without a name. Built 2026-11-11 (ADR-040). | author | 2 |
+| PPL-09 | An expense can name who it was bought from, a person field beside the merchant ("Acheté chez"), alone or together with a shop ("Maman, via Amazon"). Expenses only. Searched and filtered like the people on it. The import sets it from a merchant text that is a person's name or alias. Built 2026-11-11 (ADR-040). | author | 2 |
 
 ## 9. Events (`EVT`)
 

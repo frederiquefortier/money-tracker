@@ -13,10 +13,12 @@ import { saveMerchant } from '#/server/merchants'
 export function MerchantPicker({
   merchants: loaded,
   value,
+  hideLabel = false,
   onChange,
 }: {
   merchants: ReadonlyArray<Merchant>
   value: string | null
+  hideLabel?: boolean
   onChange: (merchant: Merchant | null) => void
 }) {
   const { t } = useTranslation()
@@ -24,14 +26,14 @@ export function MerchantPicker({
   const { items: merchants, create } = useInlineCreate(loaded, {
     save: async (name) => {
       const result = await saveMerchant({
-        data: { name, defaultCategoryId: null, personId: null },
+        data: { name, defaultCategoryId: null, aliases: [] },
       })
       return result.ok
         ? {
             id: result.id,
             name,
             defaultCategoryId: null,
-            personId: null,
+            aliases: [],
             transactionCount: 0,
           }
         : null
@@ -45,6 +47,7 @@ export function MerchantPicker({
   return (
     <Combobox
       label={t('transactions.merchant')}
+      hideLabel={hideLabel}
       options={options}
       value={value}
       onChange={(id) => onChange(merchants.find((m) => m.id === id) ?? null)}

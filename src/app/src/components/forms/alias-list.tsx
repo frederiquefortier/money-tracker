@@ -9,15 +9,19 @@ import { foldForSearch } from '#/lib/shared/search'
 import { fieldCard } from '#/components/styles'
 
 /**
- * PPL-06: a person's other spellings, for the import, in a card like the groups' list:
- * one per row with a × to remove it, and a last row adding one. A spelling already used
- * by another person, or twice here, is refused with a toast.
+ * PPL-06, MER-02: another spelling of a person's or merchant's name, for the import, in a
+ * card like the groups' list: one per row with a × to remove it, and a last row adding
+ * one. A spelling already used by another one, or twice here, is refused with a toast.
  */
 export function AliasList({
+  label,
+  newLabel,
   aliases,
   taken,
   onChange,
 }: {
+  label: string
+  newLabel: string
   aliases: ReadonlyArray<string>
   taken: ReadonlySet<string>
   onChange: (aliases: Array<string>) => void
@@ -39,7 +43,7 @@ export function AliasList({
 
   return (
     <div role="group" aria-labelledby={labelId} className="flex flex-col gap-2">
-      <FieldLabel id={labelId}>{t('people.aliases')}</FieldLabel>
+      <FieldLabel id={labelId}>{label}</FieldLabel>
       <div className={fieldCard}>
         {aliases.length > 0 && (
           <ul className="divide-y">
@@ -63,7 +67,7 @@ export function AliasList({
             ))}
           </ul>
         )}
-        <CreateRow label={t('people.newAlias')} onCreate={add} />
+        <CreateRow label={newLabel} onCreate={add} />
       </div>
     </div>
   )

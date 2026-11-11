@@ -19,6 +19,8 @@ const KNOWN: Partial<Record<string, PeopleError>> = {
   // Raised by the alias triggers (PPL-06).
   alias_taken: 'aliasTaken',
   name_is_alias: 'nameTaken',
+  // merge_people refuses two people on one transaction (PPL-07).
+  people_merge_shared_transaction: 'sharedTransaction',
 }
 
 const failure = failureFor('people', KNOWN)
@@ -108,4 +110,12 @@ export const deletePeopleRow = createServerFn({ method: 'POST' })
   .handler(async ({ data }): Promise<PeopleResult> => {
     const error = await deleteRow(TABLES[data.kind], data.id)
     return error ? failure('delete', error) : { ok: true }
+  })
+
+/** PPL-07: one SQL function, so a merge is never half done (ADR-012). */
+export const mergePeople = createServerFn({ method: 'POST' })
+  .validator(z.object({ source: z.uuid(), target: z.uuid() }))
+  .handler(async ({ data }): Promise<PeopleResult> => {
+    const { error } = await getSupabase().rpc('merge_people', data)
+    return error ? failure('merge', error) : { ok: true }
   })

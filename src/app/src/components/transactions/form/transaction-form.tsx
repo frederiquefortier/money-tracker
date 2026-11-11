@@ -187,8 +187,8 @@ export function TransactionForm({
             : update({
                 kind,
                 ...peopleForKind(draft, kind),
-                // An income names who it came from instead of a merchant (spec 20).
-                ...(kind === 'income' ? { merchantId: null } : {}),
+                // An income names who it came from instead of a seller (spec 20).
+                ...(kind === 'income' ? { sellerId: null } : {}),
               })
         }
       />

@@ -1,14 +1,14 @@
 import { useTranslation } from 'react-i18next'
 import type { TFunction } from 'i18next'
-import { chipSurface, focusRing } from '#/components/styles'
 import { FieldMessage } from '#/components/forms/form-field'
 import { Icon } from '#/components/display/icon'
-import { EditHint } from '#/components/forms/edit-hint'
+import { ChoiceMenu } from '#/components/display/choice-menu'
 import { IconButton } from '#/components/display/icon-button'
 import { AnonymousAvatar, PersonAvatar } from '#/components/people/avatars'
 import { SplitRemaining } from '#/components/transactions/receipt/receipt-remaining'
 import { ModeLine } from '#/components/transactions/receipt/receipt-splits'
 import {
+  AddPerson,
   BackLines,
   LinePart,
 } from '#/components/transactions/receipt/people-line-parts'
@@ -17,16 +17,17 @@ import type { Person } from '#/lib/people/person'
 import {
   withHeadCount,
   withPeopleMode,
-  withRoleSwitched,
+  withRole,
+  GUEST_ROLES,
   withoutPersonLine,
   isUnknown,
 } from '#/lib/transactions/transaction-people'
 import {
+  moneyValues,
   peoplePreview,
   typedLeft,
 } from '#/lib/transactions/transaction-people-draft'
 import type { PersonLine } from '#/lib/transactions/transaction-people'
-import { cn } from '#/lib/utils'
 import type {
   DraftUpdate,
   TransactionDraft,
@@ -83,18 +84,17 @@ function LineControls({
     </span>
   )
   const role = t(`transactions.people.roles.${line.role}`)
-  // The count first, so its − and + read as people, not as the amount.
   return (
     <span className="flex shrink-0 items-center gap-1">
       {count}
-      <button
-        type="button"
-        aria-label={t('transactions.people.roleLabel', { name, role })}
-        onClick={() => onChange(withRoleSwitched(draft, line.key))}
-        className={cn(chipSurface, 'h-7 px-2.5 font-sans text-xs')}
-      >
-        {role}
-      </button>
+      <ChoiceMenu
+        label={t('transactions.people.roleLabel', { name, role })}
+        className="h-7 px-2.5 font-sans text-xs"
+        value={line.role}
+        options={line.personId === null ? GUEST_ROLES.slice(0, 2) : GUEST_ROLES}
+        labelOf={(r) => t(`transactions.people.roles.${r}`)}
+        onChange={(next) => onChange(withRole(draft, line.key, next))}
+      />
     </span>
   )
 }
@@ -174,28 +174,6 @@ function PeopleLine({
   )
 }
 
-/** Adds someone: an empty dashed circle with a plus, as for a category (spec 20). */
-function AddPerson({ onOpen }: { onOpen: () => void }) {
-  const { t } = useTranslation()
-  const label = t('transactions.people.add')
-  return (
-    <button
-      type="button"
-      onClick={onOpen}
-      aria-label={label}
-      title={label}
-      className={cn('group self-start rounded-full', focusRing)}
-    >
-      <span className="relative block">
-        <span className="grid size-8 place-items-center rounded-full border-2 border-dashed border-primary/40 text-primary/60 transition-colors group-hover:border-primary group-focus-visible:border-primary">
-          <Icon name="user" className="size-4" />
-        </span>
-        <EditHint size="xs" icon="plus" />
-      </span>
-    </button>
-  )
-}
-
 /**
  * PPL-03, 04 (spec 20): the people's parts on the slip after a rule, like the splits.
  * Moi first on an expense; each person with their role; a line without a name with its
@@ -255,7 +233,7 @@ export function PeopleLines({
         draft.peopleMode !== 'share' && (
           <SplitRemaining
             mode={draft.peopleMode}
-            values={draft.people.map((l) => l.value)}
+            values={moneyValues(draft)}
             remaining={typedLeft(draft, total, accountCurrency)}
             accountCurrency={accountCurrency}
           />

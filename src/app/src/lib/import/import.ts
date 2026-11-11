@@ -104,6 +104,7 @@ export const IMPORT_ERROR_CODES = [
   'people_kind',
   'role_invalid',
   'role_kind',
+  'with_needs_person',
   'people_me_twice',
   'people_income_one',
   'person_twice',

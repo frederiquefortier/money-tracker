@@ -54,7 +54,7 @@ export const importFr = {
       accounts: 'Nouveaux comptes',
       accountChanges: 'Soldes d’ouverture modifiés',
       categories: 'Nouvelles catégories',
-      counterparties: 'Proches comme magasins',
+      counterparties: 'Achats chez des proches',
       merchants: 'Nouveaux magasins',
       people: 'Nouveaux proches',
       events: 'Nouveaux événements',
@@ -212,6 +212,8 @@ export const importFr = {
         'Des proches ne vont que sur une dépense ou un revenu: {{detail}}',
       role_invalid: 'Rôle inconnu: {{detail}}',
       role_kind: 'Ce rôle ne va pas avec ce type de transaction: {{detail}}',
+      with_needs_person:
+        'Une ligne « with » a besoin d’une personne: {{detail}}',
       people_me_twice: 'Une seule ligne « me » par dépense: {{detail}}',
       people_income_one: 'Un revenu vient d’une seule personne: {{detail}}',
       person_twice: 'Une personne une seule fois par transaction: {{detail}}',

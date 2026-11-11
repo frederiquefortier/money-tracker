@@ -11,14 +11,14 @@ export const Route = createFileRoute('/_authed/settings/merchants/new')({
 
 function NewMerchant() {
   const { t } = useTranslation()
-  const { categories, people } = useMerchantsPage()
+  const { merchants, categories } = useMerchantsPage()
 
   return (
     <RouteSheet to="/settings/merchants" title={t('merchants.newTitle')}>
       <MerchantForm
         merchant={null}
+        merchants={merchants}
         categories={categories}
-        people={people}
         savedText={t('merchants.created')}
       />
     </RouteSheet>

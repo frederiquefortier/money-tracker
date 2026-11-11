@@ -4,12 +4,43 @@ import { ArchiveDialog } from '#/components/feedback/archive-dialog'
 import { DeleteDialog } from '#/components/feedback/delete-dialog'
 import { IconActions, IconButton } from '#/components/display/icon-button'
 import type { ActionPlacement } from '#/components/display/icon-button'
+import { PeopleMergeDialog } from '#/components/people/list/people-merge-dialog'
 import { useServerAction } from '#/hooks/app/use-server-action'
+import { usePeoplePage } from '#/hooks/app/use-page-data'
+import { useToast } from '#/hooks/app/use-toast'
 import { archivePeopleRow, deletePeopleRow } from '#/server/people'
 
 export type PeopleKind = 'person' | 'group'
 
-/** Archive or reactivate (PPL-02) and delete, on a person's or a group's row or sheet. */
+function MergeAction({ person }: { person: { id: string; name: string } }) {
+  const { t } = useTranslation()
+  const toast = useToast()
+  const { people } = usePeoplePage()
+  const [open, setOpen] = useState(false)
+  const alone = people.length < 2
+
+  return (
+    <>
+      <IconButton
+        icon="merge"
+        label={t('people.mergeName', { name: person.name })}
+        muted={alone}
+        onClick={() =>
+          alone ? toast({ text: t('people.mergeAlone') }) : setOpen(true)
+        }
+      />
+      {open && (
+        <PeopleMergeDialog
+          person={person}
+          people={people}
+          onClose={() => setOpen(false)}
+        />
+      )}
+    </>
+  )
+}
+
+/** Archive or reactivate (PPL-02), merge (PPL-07, people only) and delete, on a person's or a group's row or sheet. */
 export function PeopleActions({
   kind,
   row,
@@ -33,7 +64,7 @@ export function PeopleActions({
   const deleteLabel = t('common.deleteName', { name })
 
   return (
-    <IconActions slots={2} placement={placement}>
+    <IconActions slots={kind === 'person' ? 3 : 2} placement={placement}>
       {row.archivedOn ? (
         <IconButton
           icon="undo"
@@ -51,6 +82,7 @@ export function PeopleActions({
           onClick={() => setDialog('archive')}
         />
       )}
+      {kind === 'person' && <MergeAction person={row} />}
       <IconButton
         icon="trash-full"
         label={deleteLabel}

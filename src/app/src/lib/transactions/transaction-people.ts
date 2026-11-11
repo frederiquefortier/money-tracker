@@ -41,7 +41,8 @@ function startValue(
   line: Pick<PersonLine, 'role' | 'headCount'>,
   mode: SplitMode,
 ) {
-  if (mode !== 'share' || line.role === 'owes') return ''
+  if (mode !== 'share' || line.role === 'owes' || line.role === 'with')
+    return ''
   return String(line.role === 'me' ? 1 : line.headCount)
 }
 
@@ -129,25 +130,41 @@ export function withPeopleMode(
   }
 }
 
-/** Invité and Me doit switch on a tap. */
+function nextRole(line: PersonLine): PersonRole {
+  if (line.role === 'invited') return 'owes'
+  return line.role === 'owes' && line.personId !== null ? 'with' : 'invited'
+}
+
+/** The roles of a line that is not Moi nor a source, in the order of the menu. */
+export const GUEST_ROLES = ['invited', 'owes', 'with'] as const
+
+/** A line takes another role. A line without a name cannot be with me: it counts people. */
+export function withRole(
+  draft: TransactionPeople,
+  key: number,
+  role: PersonRole,
+): PeopleChanges {
+  return {
+    people: draft.people.map((l) => {
+      if (l.key !== key || l.role === 'me' || l.role === 'from') return l
+      if (role === 'with' && l.personId === null) return l
+      return {
+        ...l,
+        role,
+        headCount: role === 'with' ? 1 : l.headCount,
+        value: startValue({ ...l, role }, draft.peopleMode),
+      }
+    }),
+  }
+}
+
+/** Invité, Me doit and Avec moi go round, as in the tests. */
 export function withRoleSwitched(
   draft: TransactionPeople,
   key: number,
 ): PeopleChanges {
-  return {
-    people: draft.people.map((l) =>
-      l.key === key && (l.role === 'invited' || l.role === 'owes')
-        ? (() => {
-            const role = l.role === 'invited' ? 'owes' : 'invited'
-            return {
-              ...l,
-              role,
-              value: startValue({ ...l, role }, draft.peopleMode),
-            }
-          })()
-        : l,
-    ),
-  }
+  const line = draft.people.find((l) => l.key === key)
+  return line ? withRole(draft, key, nextRole(line)) : { people: draft.people }
 }
 
 /** In Parts, a line still at one part per person follows its count. */

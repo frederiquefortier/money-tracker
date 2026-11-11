@@ -20,7 +20,7 @@ const merchant = (
   id: name,
   name,
   defaultCategoryId,
-  personId: null,
+  aliases: [],
   transactionCount: 0,
 })
 const merchants = [

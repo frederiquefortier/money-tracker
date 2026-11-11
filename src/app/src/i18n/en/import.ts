@@ -56,7 +56,7 @@ export const importEn: typeof importFr = {
       accounts: 'New accounts',
       accountChanges: 'Opening balances changed',
       categories: 'New categories',
-      counterparties: 'People as merchants',
+      counterparties: 'Bought from people',
       merchants: 'New merchants',
       people: 'New people',
       events: 'New events',
@@ -209,6 +209,7 @@ export const importEn: typeof importFr = {
       role_invalid: 'Unknown role: {{detail}}',
       role_kind:
         'This role does not go with this type of transaction: {{detail}}',
+      with_needs_person: 'A “with” line needs a person: {{detail}}',
       people_me_twice: 'One “me” line per expense: {{detail}}',
       people_income_one: 'An income comes from one person: {{detail}}',
       person_twice: 'A person once per transaction: {{detail}}',

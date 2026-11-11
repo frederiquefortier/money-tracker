@@ -57,10 +57,11 @@ On a Revenu, the receipt has no people; the Magasin field becomes **Proche**.
   lines. It opens the people list. There is no Proches field under the receipt and no
   label on the slip.
 - **On an income**, one person at most, who it came from (a gift from Maman): the
-  **Proche** field replaces Magasin (the shared `Combobox`, names and aliases matching,
-  "Créer « … »", the avatar beside each). Their line takes the whole amount; an income
-  has no merchant. Switching an expense to an income keeps its first named person and
-  clears the merchant; back to an expense, Moi returns and that person is invited.
+  **Proche** field (the shared `Combobox`, names and aliases matching,
+  "Créer « … »", the avatar beside each) sits under Magasin. Their line takes the whole
+  amount. An income can have a merchant too (a returned item, decided 2026-11-11).
+  Switching an expense to an income keeps its first named person and merchant; back to
+  an expense, Moi returns and that person is invited.
 - Transfers and adjustments have no people.
 
 ### The people list

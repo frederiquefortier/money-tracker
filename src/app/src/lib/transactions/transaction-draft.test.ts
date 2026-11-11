@@ -167,6 +167,7 @@ describe('draftFromTransaction', () => {
         originalCurrency: 'EUR',
         pending: false,
         merchantId: null,
+        sellerId: null,
         note: null,
         splitMode: 'share',
         splits: [

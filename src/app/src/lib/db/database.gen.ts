@@ -538,7 +538,6 @@ export type Database = {
           id: string
           import_batch_id: string | null
           name: string
-          person_id: string | null
           updated_at: string
           user_id: string
         }
@@ -548,7 +547,6 @@ export type Database = {
           id?: string
           import_batch_id?: string | null
           name: string
-          person_id?: string | null
           updated_at?: string
           user_id?: string
         }
@@ -558,7 +556,6 @@ export type Database = {
           id?: string
           import_batch_id?: string | null
           name?: string
-          person_id?: string | null
           updated_at?: string
           user_id?: string
         }
@@ -575,13 +572,6 @@ export type Database = {
             columns: ["user_id", "import_batch_id"]
             isOneToOne: false
             referencedRelation: "import_batches"
-            referencedColumns: ["user_id", "id"]
-          },
-          {
-            foreignKeyName: "merchants_user_id_person_id_fkey"
-            columns: ["user_id", "person_id"]
-            isOneToOne: false
-            referencedRelation: "people"
             referencedColumns: ["user_id", "id"]
           },
         ]
@@ -945,6 +935,7 @@ export type Database = {
           occurred_on: string
           original_amount: number | null
           original_currency: string | null
+          seller_person_id: string | null
           status: string
           transfer_id: string | null
           updated_at: string
@@ -966,6 +957,7 @@ export type Database = {
           occurred_on: string
           original_amount?: number | null
           original_currency?: string | null
+          seller_person_id?: string | null
           status?: string
           transfer_id?: string | null
           updated_at?: string
@@ -987,6 +979,7 @@ export type Database = {
           occurred_on?: string
           original_amount?: number | null
           original_currency?: string | null
+          seller_person_id?: string | null
           status?: string
           transfer_id?: string | null
           updated_at?: string
@@ -1027,6 +1020,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "user_currencies"
             referencedColumns: ["user_id", "code"]
+          },
+          {
+            foreignKeyName: "transactions_user_id_seller_person_id_fkey"
+            columns: ["user_id", "seller_person_id"]
+            isOneToOne: false
+            referencedRelation: "people"
+            referencedColumns: ["user_id", "id"]
           },
         ]
       }
@@ -1302,6 +1302,10 @@ export type Database = {
         Args: { source: string; target: string }
         Returns: undefined
       }
+      merge_people: {
+        Args: { source: string; target: string }
+        Returns: undefined
+      }
       reactivate_category: {
         Args: { active_from: string; category: string }
         Returns: number
@@ -1337,6 +1341,15 @@ export type Database = {
         Args: { color: string; name: string; type_id: string }
         Returns: string
       }
+      save_merchant: {
+        Args: {
+          aliases?: string[]
+          default_category_id: string
+          merchant_id: string
+          name: string
+        }
+        Returns: string
+      }
       save_person: {
         Args: {
           aliases?: string[]
@@ -1364,6 +1377,7 @@ export type Database = {
           original_currency?: string
           people?: Json
           reimburses?: string[]
+          seller_id?: string
           splits: Json
           status?: string
           transaction_id: string

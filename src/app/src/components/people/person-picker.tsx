@@ -10,16 +10,23 @@ import { savePerson } from '#/server/people'
 
 /**
  * One person, typed into the field: who an income came from (spec 20), in place of the
- * merchant, or Sans nom. Names and aliases match; "Créer « … »" adds someone. Archived people are
+ * merchant, or Sans nom; or who an expense was bought from (PPL-08). Names and aliases match; "Créer « … »" adds someone. Archived people are
  * listed only while chosen.
  */
 export function PersonPicker({
   people: loaded,
   value,
+  label,
+  hideLabel = false,
+  anonymous = true,
   onChange,
 }: {
   people: ReadonlyArray<Person>
   value: string | null
+  label?: string
+  hideLabel?: boolean
+  /** Offers Sans nom: an income from someone without a name (spec 21). */
+  anonymous?: boolean
   onChange: (personId: string | null) => void
 }) {
   const { t } = useTranslation()
@@ -44,11 +51,15 @@ export function PersonPicker({
   })
   // Sans nom first: an income from someone without a name pays back their lines (spec 21).
   const options = [
-    {
-      value: ANONYMOUS,
-      label: t('transactions.people.anonymous'),
-      icon: <AnonymousAvatar count={1} size="sm" />,
-    },
+    ...(anonymous
+      ? [
+          {
+            value: ANONYMOUS,
+            label: t('transactions.people.anonymous'),
+            icon: <AnonymousAvatar count={1} size="sm" />,
+          },
+        ]
+      : []),
     ...byName(
       people.filter((p) => !p.archivedOn || p.id === value),
       locale,
@@ -61,7 +72,8 @@ export function PersonPicker({
   ]
   return (
     <Combobox
-      label={t('transactions.people.source')}
+      label={label ?? t('transactions.people.source')}
+      hideLabel={hideLabel}
       options={options}
       value={value}
       onChange={onChange}

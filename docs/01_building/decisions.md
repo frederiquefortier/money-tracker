@@ -4,6 +4,114 @@ Document architectural choices with context, alternatives considered, and trade-
 
 <!-- Newest first: a new ADR goes directly below this line. Template at the bottom. -->
 
+### ADR-041: The transaction form's data is one layout route, and closing a sheet leaves sheets out of the refresh (2026-11-11)
+
+**Context:**
+- Every transaction sheet (new, edit, transfer) loaded the data of all the form's pickers on
+  its own, about 15 queries, and a hovered row preloaded the same load again. Closing any
+  sheet then called `router.invalidate()`, which reloaded every active route, the sheet's
+  own loaders included, before the navigation back. The author found the app slow and a
+  sheet sometimes not opening.
+
+**Decision:**
+- A layout route with no path, `/_authed/transactions/_form`, loads `loadTransactionForm()`
+  once for the three sheets, kept for a minute (`staleTime`), read with
+  `useTransactionFormData()`. The sheets keep only their own data (the transaction, the
+  transfer, the fee category).
+- The layout and the sheets carry `staticData.sheet`, and `RouteSheet` invalidates on close
+  with `filter: match => match.staticData.sheet !== true`: the list and the other data
+  refresh, the sheets' loaders do not. Any other `router.invalidate()` still marks the form
+  data stale.
+- Transaction rows no longer preload on hover.
+
+**Alternatives Considered:**
+- A memo of the form data in the browser -> It has to be cleared by hand on every write, and
+  on the server it would be shared between users.
+- Loading the form data in the list route -> Slows the list for sheets not opened.
+
+**Consequences:**
+- The form's usage ranks (most used merchants, frequent people) can be up to a minute old
+  after a save. A merchant, person or category created inline invalidates, so it shows at
+  once.
+- Three route files moved under `routes/_authed/transactions/_form/`; their URLs are the
+  same.
+
+---
+
+### ADR-040: "With me" is a role and "bought from" is a field on the transaction (2026-11-11)
+
+**Context:**
+- After the first import the author found "Cette personne est le magasin" (ADR-038) made no
+  sense, and reviewed what a person can be on a transaction: someone was with me (no effect
+  on the transaction), I paid for someone (invited or owes), or I bought from someone. Only
+  the second was modelled.
+
+**Decision:**
+- `transaction_people.role` gains `with` (PPL-08): a line like the others (it shows in the
+  list, the Proches filter and the person's page) with `amount = 0`, a person required, head
+  count 1, on expenses only. `absorbs` leaves it out, so no recompute gives it a part, and
+  `check_transaction_people` ignores it when counting input modes. `save_transaction` sets
+  these lines aside, computes the parts of the others as before (a Moi line is implied when
+  only `with` lines are given), then writes them last.
+- `transactions.seller_person_id` (PPL-09): a composite FK with `user_id`, set null when the
+  person is deleted, expenses only (a check). `save_transaction` takes `seller_id`. The list
+  names the merchant as `Shop · Person` when both are set, or the person alone, and its
+  Proches filter and search match the seller.
+- `merchants.person_id` is dropped. The migration moves each such merchant's expenses to the
+  seller field and deletes the merchants left with no transaction and no alias; any other
+  stays. `merge_people` moves sellers too.
+- The import: a merchant text that is a person's name or alias on an expense sets the seller
+  and creates no merchant; on an income it still becomes a merchant named for the person,
+  with no link. `people.csv` accepts the role `with`. The summary section reads "Bought from
+  people".
+- The role bubble on a person's line goes round invited, owes me, with me; a line without a
+  name skips with me.
+
+**Alternatives Considered:**
+- Keep the link on the merchant and fix its wording -> Still two steps (make a shop, then say
+  it is a person) for what is one fact about a purchase.
+- A separate table for people with me -> No risk to the parts, but a second place to filter,
+  list, import and merge people from.
+- Seller on incomes too -> An income already names who it came from (a `from` line).
+
+**Consequences:**
+- A transaction can have a seller and a shop; the list joins the two names in one string.
+- Supersedes ADR-038. Its alias and merge rules (ADR-037) are unchanged. ADR-039's rule for
+  a merchant linked to a merged person goes with the link: `merge_people` moves sellers.
+
+---
+
+### ADR-039: Merging people is one SQL function that refuses a shared transaction (2026-11-11)
+
+**Context:**
+- The first real import created Claire, an alias of Nina. Merchants can be merged
+  (MER-05) but people could only be merged at import time, for people not yet created
+  (ADR-037). Nothing merged two existing people.
+
+**Decision:**
+- `merge_people(source, target)` (`security invoker`, PPL-07) re-points the source's
+  transaction lines, group memberships and event links to the target, moves the merchant
+  linked to the source (ADR-038) when the target has none, deletes the source, and keeps
+  its name and aliases as aliases of the target (PPL-06), as `merge_merchants` does.
+- It refuses with `people_merge_shared_transaction` when both are on one transaction: two
+  lines for one person would each carry a part, and choosing which to keep is the author's
+  call on that transaction.
+- `authenticated` gets `update (person_id)` on `transaction_people` for it. The RLS update
+  policy already exists (own rows only).
+- The icon sits on a person's row and sheet, not on a group's.
+
+**Alternatives Considered:**
+- Delete and insert the lines instead of an update -> No new grant, but the line ids
+  change and reimbursements name them.
+- Summing the parts of a shared transaction -> Silently rewrites a split the author set.
+
+**Consequences:**
+- A person's merchant link is lost when both have one; the two merchants can be merged
+  on their own.
+- No undo, like a merchant merge; the source's name is kept as an alias only.
+
+---
+
 ### ADR-038: A merchant can be a person (2026-11-10)
 
 **Context:**

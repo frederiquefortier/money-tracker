@@ -55,7 +55,7 @@ built: tapping an account's balance on Comptes opens them, and the list opens a 
 one. Phase 1 is complete once the author has tried them. Phase 2 started: Proches (spec 19,
 PPL-01, 02, 06) are built, in the Réglages menu, and people on transactions (spec 20,
 PPL-03, 04), with a Proches filter on the list, and reimbursements with what each
-proche owes (spec 21, TRX-07, PPL-05), all 2026-11-05. Next: events (EVT-01..07). The import moved after people,
+proche owes (spec 21, TRX-07, PPL-05), all 2026-11-05. Merging two people (PPL-07) followed on 2026-11-11, after the first import showed an alias created as a person. Next: events (EVT-01..07). The import moved after people,
 tags and events (2026-11-05).
 
 - Currencies, HexaRate validation, the Frankfurter rates job with a backfill to 2018,

@@ -1,4 +1,6 @@
 import { useTranslation } from 'react-i18next'
+import { Icon } from '#/components/display/icon'
+import { EditHint } from '#/components/forms/edit-hint'
 import { Money } from '#/components/display/money'
 import { slipSmall } from '#/components/transactions/receipt/receipt-line'
 import { LineValue } from '#/components/transactions/receipt/receipt-splits'
@@ -8,6 +10,7 @@ import { isUnknown } from '#/lib/transactions/transaction-people'
 import type { PersonLine } from '#/lib/transactions/transaction-people'
 import { useLocale } from '#/hooks/app/use-locale'
 import { cn } from '#/lib/utils'
+import { focusRing } from '#/components/styles'
 import type {
   DraftUpdate,
   TransactionDraft,
@@ -36,6 +39,8 @@ export function LinePart({
   onChange: DraftUpdate
 }) {
   const { t } = useTranslation()
+  // Someone with me has no part.
+  if (line.role === 'with') return null
   // An empty field shows what it comes to under it (spec 21).
   const empty = line.value.trim() === ''
   return (
@@ -103,5 +108,27 @@ export function BackLines({
         </li>
       )}
     </ul>
+  )
+}
+
+/** Adds someone: an empty dashed circle with a plus, as for a category (spec 20). */
+export function AddPerson({ onOpen }: { onOpen: () => void }) {
+  const { t } = useTranslation()
+  const label = t('transactions.people.add')
+  return (
+    <button
+      type="button"
+      onClick={onOpen}
+      aria-label={label}
+      title={label}
+      className={cn('group self-start rounded-full', focusRing)}
+    >
+      <span className="relative block">
+        <span className="grid size-8 place-items-center rounded-full border-2 border-dashed border-primary/40 text-primary/60 transition-colors group-hover:border-primary group-focus-visible:border-primary">
+          <Icon name="user" className="size-4" />
+        </span>
+        <EditHint size="xs" icon="plus" />
+      </span>
+    </button>
   )
 }

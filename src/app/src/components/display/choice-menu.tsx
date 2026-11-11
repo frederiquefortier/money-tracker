@@ -1,6 +1,7 @@
 import { Icon } from '#/components/display/icon'
 import type { IconName } from '#/components/display/icon'
 import { chipSurface } from '#/components/styles'
+import { cn } from '#/lib/utils'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,6 +16,7 @@ import {
  */
 export function ChoiceMenu<TValue extends string>({
   icon,
+  className,
   label,
   value,
   options,
@@ -22,7 +24,8 @@ export function ChoiceMenu<TValue extends string>({
   renderOption,
   onChange,
 }: {
-  icon: IconName
+  icon?: IconName
+  className?: string
   label: string
   value: TValue
   options: ReadonlyArray<TValue>
@@ -36,11 +39,11 @@ export function ChoiceMenu<TValue extends string>({
       <DropdownMenuTrigger asChild>
         <button
           type="button"
-          className={chipSurface}
+          className={cn(chipSurface, className)}
           aria-label={label}
           title={label}
         >
-          <Icon name={icon} className="size-4" />
+          {icon && <Icon name={icon} className="size-4" />}
           {labelOf(value)}
           <Icon name="chevron-down" className="size-4" />
         </button>

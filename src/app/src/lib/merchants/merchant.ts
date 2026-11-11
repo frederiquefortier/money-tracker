@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { compareNames } from '#/lib/shared/collections'
+import { foldForSearch } from '#/lib/shared/search'
 import { nameFormSchema } from '#/lib/shared/validation'
 
 // Shared by the Marchands screens and the server functions (spec 13).
@@ -8,15 +9,14 @@ export type Merchant = {
   id: string
   name: string
   defaultCategoryId: string | null
-  /** The person this merchant is: "bought from Maman". */
-  personId: string | null
+  aliases: Array<string>
   transactionCount: number
 }
 
 export const merchantInputSchema = nameFormSchema.extend({
   id: z.uuid().optional(),
   defaultCategoryId: z.uuid().nullable(),
-  personId: z.uuid().nullable(),
+  aliases: z.array(z.string().trim().min(1).max(100)).default([]),
 })
 export type MerchantInput = z.input<typeof merchantInputSchema>
 
@@ -92,4 +92,20 @@ export function compareByUse(locale: string) {
     b.transactionCount - a.transactionCount || byName(a, b)
 }
 
-export type MerchantError = 'nameTaken' | 'notFound' | 'failed'
+/**
+ * The names and aliases a merchant's alias cannot take, folded: every other merchant's
+ * (an import match must point to one merchant only, MER-02).
+ */
+export function takenMerchantNames(
+  merchants: ReadonlyArray<Merchant>,
+  merchantId: string | undefined,
+) {
+  return new Set(
+    merchants
+      .filter((m) => m.id !== merchantId)
+      .flatMap((m) => [m.name, ...m.aliases])
+      .map(foldForSearch),
+  )
+}
+
+export type MerchantError = 'nameTaken' | 'aliasTaken' | 'notFound' | 'failed'

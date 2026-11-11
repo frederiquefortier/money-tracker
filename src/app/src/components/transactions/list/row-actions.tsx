@@ -7,7 +7,11 @@ import type { ListedTransaction } from '#/lib/transactions/transaction-list'
 
 // What a list row (spec 14) opens and deletes, by kind.
 
-/** Where a tap goes: the transaction's form, the transfer's for a leg or its fee, or the adjustment's. */
+/**
+ * Where a tap goes: the transaction's form, the transfer's for a leg or its fee, or the
+ * adjustment's. Not preloaded on hover: each sheet loads the data of every picker, and
+ * sweeping the mouse down a list started one such load per row.
+ */
 export function RowLink({
   row,
   className,
@@ -20,6 +24,7 @@ export function RowLink({
   if (row.transferId)
     return (
       <Link
+        preload={false}
         to="/transactions/transfers/$transferId"
         params={{ transferId: row.transferId }}
         className={className}
@@ -30,6 +35,7 @@ export function RowLink({
   if (row.kind === 'adjustment')
     return (
       <Link
+        preload={false}
         to="/transactions/adjustments/$adjustmentId"
         params={{ adjustmentId: row.id }}
         className={className}
@@ -39,6 +45,7 @@ export function RowLink({
     )
   return (
     <Link
+      preload={false}
       to="/transactions/$transactionId"
       params={{ transactionId: row.id }}
       className={className}

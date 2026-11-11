@@ -37,6 +37,14 @@ export const peopleEn: typeof peopleFr = {
     owes: 'Owes me {{amount}}',
     plusUnknown: '+ unknown',
     owesUnknown: 'Owes me, amount unknown',
+    merge: 'Merge',
+    mergeName: 'Merge “{{name}}”',
+    mergeInto: 'Merge into',
+    mergeEffect:
+      'The transactions, groups and events of “{{source}}” will move to “{{target}}”. “{{source}}” will be deleted and kept as another spelling of “{{target}}”.',
+    mergeAlone: 'You need at least one other person.',
+    mergeShared:
+      'They are both on the same transaction. Remove one of them there first.',
     owedTitle: 'Owes me',
   },
 }

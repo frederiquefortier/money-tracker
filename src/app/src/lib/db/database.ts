@@ -6,6 +6,7 @@ type SaveTransaction = Public['Functions']['save_transaction']
 type ListTransactions = Public['Functions']['list_transactions']
 type SaveTransfer = Public['Functions']['save_transfer']
 type SaveAdjustment = Public['Functions']['save_adjustment']
+type SaveMerchant = Public['Functions']['save_merchant']
 type SavePerson = Public['Functions']['save_person']
 type SavePersonGroup = Public['Functions']['save_person_group']
 type SaveEvent = Public['Functions']['save_event']
@@ -24,12 +25,23 @@ type SaveTransactionArgs = Omit<
   | 'original_amount'
   | 'original_currency'
   | 'merchant_id'
+  | 'seller_id'
 > & {
   transaction_id: string | null
   amount: string
   original_amount: string | null
   original_currency: string | null
   merchant_id: string | null
+  seller_id: string | null
+}
+
+// A null id creates the merchant; it may have no default category.
+type SaveMerchantArgs = Omit<
+  SaveMerchant['Args'],
+  'merchant_id' | 'default_category_id'
+> & {
+  merchant_id: string | null
+  default_category_id: string | null
 }
 
 type SaveTransferArgs = Omit<
@@ -111,6 +123,7 @@ export type Database = Omit<Generated, 'public'> & {
       | 'save_transaction'
       | 'save_transfer'
       | 'save_adjustment'
+      | 'save_merchant'
       | 'save_person'
       | 'save_person_group'
       | 'save_event'
@@ -126,6 +139,7 @@ export type Database = Omit<Generated, 'public'> & {
       save_adjustment: Omit<SaveAdjustment, 'Args'> & {
         Args: SaveAdjustmentArgs
       }
+      save_merchant: Omit<SaveMerchant, 'Args'> & { Args: SaveMerchantArgs }
       save_person: Omit<SavePerson, 'Args'> & { Args: SavePersonArgs }
       save_person_group: Omit<SavePersonGroup, 'Args'> & {
         Args: SavePersonGroupArgs

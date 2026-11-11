@@ -1,3 +1,8 @@
+import { useId, useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import { FieldLabel } from '#/components/ui/field'
+import { ToggleGroup, ToggleGroupItem } from '#/components/ui/toggle-group'
+import { LinkedFields } from '#/components/forms/linked-fields'
 import { EventPicker } from '#/components/events/event-picker'
 import { MerchantPicker } from '#/components/merchants/merchant-picker'
 import { PersonPicker } from '#/components/people/person-picker'
@@ -40,7 +45,11 @@ function merchantChanges(
   if (!merchant) return { merchantId: null }
   if (draft.categoryByHand || draft.splitMode !== null)
     return { merchantId: merchant.id }
-  return withMerchant(merchant, categories)
+  // An expense's default category never fills an income, such as a returned item.
+  return withMerchant(
+    merchant,
+    categories.filter((c) => c.kind === draft.kind),
+  )
 }
 
 type DetailsProps = {
@@ -52,9 +61,99 @@ type DetailsProps = {
   onChange: (changes: Partial<TransactionDraft>) => void
 }
 
+const WHERE = ['store', 'person'] as const
+type Where = (typeof WHERE)[number]
+
+/**
+ * A store or a person, one or the other: where an expense was bought (PPL-08) or who an
+ * income came from (spec 20). The toggle only decides which field shows; switching clears
+ * the other side.
+ */
+function StoreOrPerson({
+  id,
+  draft,
+  data,
+  onChange,
+}: Pick<DetailsProps, 'id' | 'draft' | 'data' | 'onChange'>) {
+  const { t } = useTranslation()
+  const labelId = useId()
+  const income = draft.kind === 'income'
+  const label = t(
+    income ? 'transactions.receivedFrom' : 'transactions.boughtFrom',
+  )
+  const person = income ? sourceOf(draft) : draft.sellerId
+  const [where, setWhere] = useState<Where>(person ? 'person' : 'store')
+  const select = (next: Where) => {
+    setWhere(next)
+    if (next === 'person') onChange({ merchantId: null })
+    else
+      onChange(
+        income ? { ...withSource(null), reimburses: [] } : { sellerId: null },
+      )
+  }
+  return (
+    <>
+      <div className="flex flex-col gap-2">
+        <FieldLabel id={labelId}>{label}</FieldLabel>
+        <ToggleGroup
+          type="single"
+          aria-labelledby={labelId}
+          value={where}
+          // Pressing the chosen item again would clear it: one side is always chosen.
+          onValueChange={(next) => next && select(next as Where)}
+        >
+          {WHERE.map((tab) => (
+            <ToggleGroupItem key={tab} value={tab}>
+              {tab === 'store'
+                ? t('transactions.merchant')
+                : t('transactions.people.source')}
+            </ToggleGroupItem>
+          ))}
+        </ToggleGroup>
+      </div>
+      <LinkedFields>
+        <div className="contents">
+          {where === 'store' ? (
+            <MerchantPicker
+              hideLabel
+              merchants={data.merchants}
+              value={draft.merchantId}
+              onChange={(merchant) =>
+                onChange(merchantChanges(draft, merchant, data.categories))
+              }
+            />
+          ) : (
+            <PersonPicker
+              hideLabel
+              people={data.people}
+              value={person}
+              anonymous={income}
+              onChange={(personId) =>
+                onChange(
+                  income
+                    ? { ...withSource(personId), reimburses: [] }
+                    : { sellerId: personId },
+                )
+              }
+            />
+          )}
+        </div>
+      </LinkedFields>
+      {income && where === 'person' && (
+        <ReimbursesField
+          id={id}
+          draft={draft}
+          categories={data.categories}
+          onChange={onChange}
+        />
+      )}
+    </>
+  )
+}
+
 /**
  * Spec 15, under the receipt: the store, full width, which can fill the category
- * (MER-01), or on an income who it came from (spec 20); the account, the date, the note.
+ * (MER-01), and who it was bought from (PPL-08), or on an income who it came from (spec 20); the account, the date, the note.
  */
 export function TransactionDetails({
   id,
@@ -69,31 +168,7 @@ export function TransactionDetails({
 
   return (
     <>
-      {draft.kind === 'income' ? (
-        <>
-          <PersonPicker
-            people={data.people}
-            value={sourceOf(draft)}
-            onChange={(personId) =>
-              onChange({ ...withSource(personId), reimburses: [] })
-            }
-          />
-          <ReimbursesField
-            id={id}
-            draft={draft}
-            categories={data.categories}
-            onChange={onChange}
-          />
-        </>
-      ) : (
-        <MerchantPicker
-          merchants={data.merchants}
-          value={draft.merchantId}
-          onChange={(merchant) =>
-            onChange(merchantChanges(draft, merchant, data.categories))
-          }
-        />
-      )}
+      <StoreOrPerson {...{ id, draft, data, onChange }} />
       <AccountPicker
         accounts={data.accounts}
         value={draft.accountId}

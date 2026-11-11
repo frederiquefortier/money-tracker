@@ -91,4 +91,5 @@ export function namesOf(
     .join(', ')
 }
 
-export type PeopleError = 'nameTaken' | 'aliasTaken' | 'notFound' | 'failed'
+export type PeopleError =
+  'nameTaken' | 'aliasTaken' | 'notFound' | 'sharedTransaction' | 'failed'

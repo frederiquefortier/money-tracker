@@ -4,17 +4,17 @@ import { RouteSheet } from '#/components/sheet/route-sheet'
 import { TransactionActions } from '#/components/transactions/list/transaction-actions'
 import { TransactionForm } from '#/components/transactions/form/transaction-form'
 import { draftFromTransaction } from '#/lib/transactions/transaction-draft'
-import { loadTransactionForm } from '#/server/transaction-form'
+import { useTransactionFormData } from '#/hooks/app/use-page-data'
 import { useLocale } from '#/hooks/app/use-locale'
 import { getTransaction } from '#/server/transactions'
 
-export const Route = createFileRoute('/_authed/transactions/$transactionId')({
+export const Route = createFileRoute(
+  '/_authed/transactions/_form/$transactionId',
+)({
   loader: async ({ params }) => {
-    const [data, transaction] = await Promise.all([
-      loadTransactionForm(),
-      getTransaction({ data: { id: params.transactionId } }),
-    ])
-    return { data, transaction }
+    return {
+      transaction: await getTransaction({ data: { id: params.transactionId } }),
+    }
   },
   staticData: { sheet: true },
   component: EditTransaction,
@@ -23,7 +23,8 @@ export const Route = createFileRoute('/_authed/transactions/$transactionId')({
 function EditTransaction() {
   const { t } = useTranslation()
   const locale = useLocale()
-  const { data, transaction } = Route.useLoaderData()
+  const { transaction } = Route.useLoaderData()
+  const data = useTransactionFormData()
   const account = data.accounts.find((a) => a.id === transaction?.accountId)
   if (!transaction || !account)
     return <Navigate to="/transactions" resetScroll={false} />

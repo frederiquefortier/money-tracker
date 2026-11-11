@@ -8,7 +8,7 @@ import type { Person, PersonGroup } from '#/lib/people/person'
 
 // Shared by the transaction form (spec 15) and its server functions.
 
-export const PERSON_ROLES = ['me', 'invited', 'owes', 'from'] as const
+export const PERSON_ROLES = ['me', 'invited', 'owes', 'from', 'with'] as const
 export type PersonRole = (typeof PERSON_ROLES)[number]
 
 export const TRANSACTION_KINDS = ['expense', 'income'] as const
@@ -61,6 +61,8 @@ export type Transaction = {
   originalCurrency: string | null
   pending: boolean
   merchantId: string | null
+  /** Who the expense was bought from (PPL-08). */
+  sellerId: string | null
   note: string | null
   splitMode: SplitMode
   splits: Array<{ categoryId: string; value: string }>
@@ -99,6 +101,7 @@ export const transactionInputSchema = z
     originalCurrency: currencyCodeSchema.nullable(),
     pending: z.boolean(),
     merchantId: z.uuid().nullable(),
+    sellerId: z.uuid().nullable(),
     note: noteSchema,
     splitMode: z.enum(SPLIT_MODES),
     splits: z

@@ -2,7 +2,7 @@ import { useId, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { CheckList } from '#/components/forms/check-list'
 import { FormField } from '#/components/forms/form-field'
-import { AliasList } from '#/components/people/form/alias-list'
+import { AliasList } from '#/components/forms/alias-list'
 import { GroupAvatars, PersonAvatar } from '#/components/people/avatars'
 import { CreateRow } from '#/components/forms/create-row'
 import type { PeopleKind } from '#/components/people/list/people-actions'
@@ -139,7 +139,13 @@ export function PeopleForm({
       <FormField {...form.field('name')} label={t('people.name')} required />
       <LinkedList kind={kind} ids={ids} others={others} onChange={setIds} />
       {kind === 'person' && (
-        <AliasList aliases={aliases} taken={taken} onChange={setAliases} />
+        <AliasList
+          label={t('people.aliases')}
+          newLabel={t('people.newAlias')}
+          aliases={aliases}
+          taken={taken}
+          onChange={setAliases}
+        />
       )}
       {children}
     </SheetForm>

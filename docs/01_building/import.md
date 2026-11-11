@@ -106,7 +106,7 @@ transactions, is kept as it is.
 | `amount` | yes | What the account moved |
 | `currency` | yes | The account's currency |
 | `original_amount`, `original_currency` | together | The receipt price, when paid in another currency. Expenses and incomes only. |
-| `merchant` | no | Expenses and incomes only (the screen can also mark a merchant text as a person: the payload then carries a `counterparties` list of names, which creates the person when missing). A text equal to a person's name or alias (people file, or an `aliases` line of kind `person`) is that person's merchant, created named for them and linked to them (ADR-038) |
+| `merchant` | no | Expenses and incomes only (the screen can also mark a merchant text as a person: the payload then carries a `counterparties` list of names, which creates the person when missing). On an expense, a text equal to a person's name or alias (people file, or an `aliases` line of kind `person`) is that person as its seller (PPL-09, ADR-040): no merchant is made for them. On an income it stays a merchant, named for the person |
 | `event` | no | Expenses and incomes only. Sets a manual link. A trip is one event per place and run of days (`Paris 2023`), made by the converter. |
 | `status` | no | `cleared` (default) or `pending` |
 | `transfer_group` | transfers | Same value on both legs and on the fee row. Exactly two `transfer` rows per group, on two accounts; same currency, the amounts mirror; different currencies, each leg holds what really moved. The fee is an `expense` row with the group's value on the departure account, booked in the profile's transfer-fee category. |
@@ -136,7 +136,7 @@ The people on a transaction, one row per person, the same lines as the transacti
 | Column | Required | Meaning |
 |---|---|---|
 | `ref` | yes | The transaction's `ref` |
-| `role` | yes | `me`, `invited`, `owes` or `from` |
+| `role` | yes | `me`, `invited`, `owes`, `from` or `with` (someone with me, with no part; a person is required; expenses only, PPL-08) |
 | `person` | no | A name or alias. Empty on an `invited`, `owes` or `from` line means a guest with no name (PPL-04); `me` has none. |
 | `head_count` | no | Default 1. On an unnamed line, how many people it stands for (a `DUO` meal with nobody named is one unnamed guest). |
 | `amount` | no | Only on a `from` line, where it is the income's amount (default). On an expense the parts are not set by the import: leave it empty, and a line takes its share of what is left (by head count) or, for `owes`, what its reimbursement pays. |

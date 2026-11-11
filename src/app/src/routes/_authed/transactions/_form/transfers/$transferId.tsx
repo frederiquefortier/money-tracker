@@ -4,20 +4,19 @@ import { RouteSheet } from '#/components/sheet/route-sheet'
 import { TransferActions } from '#/components/transactions/entry/transfer-actions'
 import { TransferForm } from '#/components/transactions/entry/transfer-form'
 import { draftFromTransfer } from '#/lib/transfers/transfer-draft'
-import { loadTransactionForm } from '#/server/transaction-form'
+import { useTransactionFormData } from '#/hooks/app/use-page-data'
 import { useLocale } from '#/hooks/app/use-locale'
 import { getTransfer, getTransferFeeCategory } from '#/server/transfers'
 
 export const Route = createFileRoute(
-  '/_authed/transactions/transfers/$transferId',
+  '/_authed/transactions/_form/transfers/$transferId',
 )({
   loader: async ({ params }) => {
-    const [data, transfer, feeCategoryId] = await Promise.all([
-      loadTransactionForm(),
+    const [transfer, feeCategoryId] = await Promise.all([
       getTransfer({ data: { id: params.transferId } }),
       getTransferFeeCategory(),
     ])
-    return { data, transfer, feeCategoryId }
+    return { transfer, feeCategoryId }
   },
   staticData: { sheet: true },
   component: EditTransfer,
@@ -26,7 +25,8 @@ export const Route = createFileRoute(
 function EditTransfer() {
   const { t } = useTranslation()
   const locale = useLocale()
-  const { data, transfer, feeCategoryId } = Route.useLoaderData()
+  const { transfer, feeCategoryId } = Route.useLoaderData()
+  const data = useTransactionFormData()
   const from = data.accounts.find((a) => a.id === transfer?.fromAccountId)
   const to = data.accounts.find((a) => a.id === transfer?.toAccountId)
   if (!transfer || !from || !to)
