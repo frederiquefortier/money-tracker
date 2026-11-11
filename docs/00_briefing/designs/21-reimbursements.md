@@ -33,7 +33,7 @@ someone who paid for me stays out of scope (spec 20).
   - In **Montant**, typed lines keep their amounts; the empty ones absorb what a
     reimbursement changes. With nothing else empty, Moi absorbs it, typed or not, since
     Moi is what I really paid; a reimbursement never takes more than those lines can
-    give up (the rest of it is a gift).
+    give up. What an income has over is not a gift: it stays an income in the expense's category, so that category's total can go below zero (decided 2026-11-11, a late roommate paying two months at once).
   - When the typed lines already take everything, "Répartissez tout le montant." or
     "Les pourcentages doivent totaliser 100." says so.
 - Example, Parts: 90 $, Moi and Alex (invité) at 1 part each, Sam's part empty. Before
@@ -54,7 +54,7 @@ someone who paid for me stays out of scope (spec 20).
   end. Ticking one links it.
 - The income's amount is spread over the ticked lines in order: each takes what it is
   still owed, the last takes the rest; an unknown line takes all that is left. A line
-  never takes more than it is owed: what the income has over is a gift, kept as income.
+  never takes more than it is owed: what the income has over stays an income in its category (not a gift).
 - The first line ticked gives the income its expense's category (its largest), as a
   refund (decided 2026-11-05; spec 15: an expense category on an income lowers that
   category's spending), unless a category was chosen by hand. It stays editable.

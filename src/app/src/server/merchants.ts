@@ -24,7 +24,9 @@ export const getMerchants = createServerFn({ method: 'GET' }).handler(
     const [merchants, usage] = loaded(
       'Merchants',
       ...(await Promise.all([
-        supabase.from('merchants').select('id, name, default_category_id'),
+        supabase
+          .from('merchants')
+          .select('id, name, default_category_id, person_id'),
         supabase
           .from('merchant_usage')
           .select('merchant_id, transaction_count'),
@@ -37,6 +39,7 @@ export const getMerchants = createServerFn({ method: 'GET' }).handler(
       id: m.id,
       name: m.name,
       defaultCategoryId: m.default_category_id,
+      personId: m.person_id,
       transactionCount: counts.get(m.id) ?? 0,
     }))
   },
@@ -48,6 +51,7 @@ export const saveMerchant = createServerFn({ method: 'POST' })
     const { saved, error } = await saveRow('merchants', data.id, {
       name: data.name,
       default_category_id: data.defaultCategoryId,
+      person_id: data.personId,
     })
     if (error) return failure('save', error)
     if (!saved) return { ok: false, error: 'notFound' }

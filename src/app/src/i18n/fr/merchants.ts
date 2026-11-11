@@ -9,6 +9,7 @@ export const merchantsFr = {
       nameDesc: 'Nom (Z à A)',
       category: 'Catégorie',
     },
+    person: 'Cette personne est le magasin',
     newTitle: 'Nouveau magasin',
     editTitle: 'Modifier le magasin',
     name: 'Nom',

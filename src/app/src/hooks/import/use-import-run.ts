@@ -1,0 +1,82 @@
+import { useEffect, useState } from 'react'
+import { useRouter } from '@tanstack/react-router'
+import { useTranslation } from 'react-i18next'
+import { useToast } from '#/hooks/app/use-toast'
+import { withDecisions } from '#/lib/import/import-merges'
+import type { Decisions } from '#/lib/import/import-merges'
+import { EMPTY_WILL_CREATE } from '#/lib/import/import'
+import type { ImportCheck, ImportDone, ImportInput } from '#/lib/import/import'
+import { checkImport, commitImport } from '#/server/import'
+
+type Checked = { input: ImportInput; check: ImportCheck }
+
+/**
+ * Checking the rows, the merges chosen for what is new (IMP-06), and the import itself.
+ * A check belongs to the rows it was made on: other files, no check.
+ */
+export function useImportRun(input: ImportInput, decisions: Decisions) {
+  const { t } = useTranslation()
+  const toast = useToast()
+  const router = useRouter()
+  const [checked, setChecked] = useState<Checked | null>(null)
+  const [busy, setBusy] = useState<'checking' | 'importing' | null>(null)
+  const [done, setDone] = useState<ImportDone | null>(null)
+  const check = checked?.input === input ? checked.check : null
+
+  // Leaving the page while it writes would hide how it ended.
+  useEffect(() => {
+    if (busy !== 'importing') return
+    const stop = (e: BeforeUnloadEvent) => e.preventDefault()
+    window.addEventListener('beforeunload', stop)
+    return () => window.removeEventListener('beforeunload', stop)
+  }, [busy])
+
+  async function runCheck() {
+    setBusy('checking')
+    setDone(null)
+    const result = await checkImport({ data: input }).catch(() => null)
+    setBusy(null)
+    if (result?.ok) setChecked({ input, check: result.check })
+    else toast({ text: t('import.checkFailed') })
+  }
+
+  async function runImport() {
+    setBusy('importing')
+    const will = check?.ok ? check.willCreate : EMPTY_WILL_CREATE
+    const result = await commitImport({
+      data: withDecisions(input, will, decisions),
+    }).catch((error: unknown) => {
+      // Only the kind of error, never what was in the files.
+      console.error(
+        '[import] commit request failed:',
+        error instanceof Error ? error.name : 'unknown',
+      )
+      return null
+    })
+    setBusy(null)
+    if (result?.ok) {
+      setDone(result.done)
+      await router.invalidate()
+    } else if (result?.error === 'invalid') {
+      const { errors, errorCount } = result
+      setChecked({ input, check: { ok: false, errors, errorCount } })
+    } else {
+      const text = t(
+        result?.error === 'timeout' ? 'import.timeout' : 'import.wroteNothing',
+      )
+      const code = result && 'code' in result ? result.code : 'request'
+      toast({ text: code ? `${text} (${code})` : text })
+    }
+  }
+
+  return {
+    check,
+    busy,
+    done,
+    runCheck,
+    runImport,
+    dismissDone: () => setDone(null),
+    /** Back to the files, keeping them and what was decided. */
+    reset: () => setChecked(null),
+  }
+}

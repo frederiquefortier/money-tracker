@@ -112,8 +112,8 @@ branch, in one statement; a colour picked by hand is never touched (ADR-012).
 
 | Table | Columns | Req |
 |---|---|---|
-| `merchants` | `name`, `default_category_id` (nullable, composite FK with `user_id`, cleared when the category is deleted) | MER-01. Names unique per user ignoring case and accents: a unique index on `fold_name(name)`. `country` comes with MER-03 (later). |
-| `merchant_aliases` | `merchant_id`, `pattern` | MER-02, **later** (with the import wizard). Not created in v1. `merge_merchants` then moves the source's aliases to the target and adds the source's name as one. |
+| `merchants` | `name`, `default_category_id` (nullable, composite FK with `user_id`, cleared when the category is deleted), `person_id` (nullable, composite FK to `people`, set null on delete, unique per person: the merchant is that person, MER-07, ADR-038; pgTAP `19_merchant_person`) | MER-01. Names unique per user ignoring case and accents: a unique index on `fold_name(name)`. `country` comes with MER-03 (later). |
+| `merchant_aliases` | `merchant_id`, `alias`, `import_batch_id` | MER-02. Built 2026-11-10 (migration `merchant_aliases`, pgTAP `18_merchant_aliases`). As for people, a name or an alias points to one merchant only: triggers refuse an alias equal to any merchant's name or another alias (`alias_taken`) and a name equal to an alias (`name_is_alias`). `merge_merchants` moves the source's aliases to the target and adds the source's name as one. No screen lists them yet. |
 
 `fold_name(text)` is `lower(unaccent(text))`, marked immutable so an index can use it
 (`unaccent` itself is only stable; the wrapper names its dictionary so it cannot change
@@ -208,9 +208,21 @@ Notes:
   every split's category as JSON, the largest share first. The day net (expenses and
   incomes as listed) is computed in SQL and null when it includes a missing rate.
   `security invoker`.
-- `import_ref` is unique per user, so re-running an import is idempotent.
-  `import_batch_id` lets a whole import be undone; `import_batches` is described in
-  [import.md](import.md#data-model).
+- **Import** (built 2026-11-10, migration `import`, pgTAP `17_import`, ADR-036). Columns
+  `import_ref` (unique per user, so re-running an import skips what is in) and
+  `import_batch_id` on `transactions`, and `import_batch_id` on `institutions`,
+  `accounts`, `categories`, `merchants`, `people` and `events`. Table `import_batches`
+  (RLS and MFA policy as the others; the data model is in [import.md](import.md#data-model)).
+  Functions, all `security invoker`: `import_batch(payload jsonb, dry_run boolean)` checks
+  every row and writes only when there is no error, in bulk except for rows with people,
+  which go through `save_transaction`; `import_undo(batch)`; and the helpers
+  `split_category_path`, `category_key` and `category_keys`. A merchant is found by its name
+  or an alias; an `aliases` list in the payload (kind, name, alias) teaches new spellings of
+  a merchant or a person, and `person_aliases` and `merchant_aliases` carry the batch id so
+  the undo removes them. The API gives a statement 8
+  seconds, so nothing in it loops over rows except the people lines. Its temporary tables
+  are declared to the linter with `internal.plpgsql_check_pragma`, a no-op in a schema of
+  its own (`plpgsql_check` cannot see a table made inside a function).
 
 ### Tags
 

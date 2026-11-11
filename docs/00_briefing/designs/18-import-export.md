@@ -1,6 +1,6 @@
 # Import and export
 
-**Status:** reviewed 2026-11-03; aligned with the built screens 2026-11-03. Shared rules:
+**Status:** reviewed 2026-11-03; the import half built 2026-11-10 (the export half, IMP-04, is not yet), after the format changed (ADR-033 to ADR-036). Shared rules:
 [02-screens.md](02-screens.md#shared-patterns).
 
 ## Purpose
@@ -15,137 +15,109 @@ gives all the data back in the same format.
 IMP-01, 04, 05, 06, SEC-04 (the export half). The format itself is
 [import.md](../../01_building/import.md); this spec is only the screens.
 
-## Importer et exporter
+## Importer
 
-Reached from the menu, and from the empty transactions list (spec 14).
+Two steps, shown in a centred stepper with no card (Fichiers, Importer): each a circle joined by a line,
+a small "Étape n" and its name, no status tags. A finished
+step is a solid circle with a check, the current one a ringed circle with its icon, the next
+a pale outlined circle. The active step has its title on the page, above its content
+("Extraire les fichiers", "Résumé de l'import"). The check is not a step: it is what
+Extraire does at the end of the first.
 
 ```
-┌──────────────────────────────┐
-│ IMPORTER ET EXPORTER         │
-│ ┌──────────────────────────┐ │
-│ │ IMPORTER                 │ │
-│ │ [ Choisir les fichiers ] │ │
-│ │ Modèles: accounts.csv ·  │ │
-│ │ transactions.csv ·       │ │
-│ │ splits.csv               │ │
-│ │ ▸ Règles du format       │ │
-│ └──────────────────────────┘ │
-│ ┌──────────────────────────┐ │
-│ │ EXPORTER                 │ │
-│ │ [ Exporter mes données ] │ │
-│ └──────────────────────────┘ │
-│ ┌──────────────────────────┐ │
-│ │ IMPORTS                  │ │
-│ │ 3 nov. 2026            ↶ │ │
-│ │ 9 812 transactions       │ │
-│ └──────────────────────────┘ │
-└──────────────────────────────┘
+ ◉────────────────────○
+ ÉTAPE 1             ÉTAPE 2
+ Fichiers            Importer
+ [En cours]          [À venir]
+
+ TÉLÉVERSER LES FICHIERS
+ ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┐
+ │      [+]                   │
+ │ Déposez les fichiers ici ou│
+ │ cliquez pour les choisir   │
+ └ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┘
+ (◉) transactions.csv   4 800 lignes   ✕
+ ──────────────────────────────────────
+ [Modèles ▾]                [Extraire]
 ```
 
 ## Import flow (IMP-01)
 
 ### 1. Files
 
-- "Choisir les fichiers" opens the file chooser (several files at once); dropping files
-  on the card works too on desktop.
-- Files are recognised by name: `accounts.csv`, `transactions.csv`, `splits.csv`. Each
-  shows as a chip with its row count; an unknown name is refused with "Fichier non
-  reconnu: {name}". `transactions.csv` is required, the other two optional.
-- Files are read in the browser and never uploaded or stored (import.md).
-- Template links download the example files. "Règles du format" opens a short summary of
-  import.md's rules (dates, decimals, signs, category paths) in place.
-- "Vérifier" starts step 2.
+- "Choisir les fichiers" opens the file chooser (several at once); dropping files on the
+  card works too. Files are recognised by name: `accounts.csv`, `transactions.csv`,
+  `splits.csv`, `people.csv`, `aliases.csv`. An unknown name is refused with a toast, "Fichier non
+  reconnu: {name}". `transactions.csv` is required; without it, "Vérifier" says so in a
+  toast. A file chosen again replaces the one of the same name.
+- Each file shows with its row count and, when its format is wrong, its error count, and
+  a ✕ to remove it. Files are read in the browser and never uploaded or stored.
+- A dashed area (a soft rounded-square icon, "Déposez les fichiers ici ou cliquez pour les
+  choisir") chooses or takes dropped files. Each loaded file is a row with its kind's icon in
+  a round tinted badge (`IconBubble`, the one a transfer has in the list), its name, its row
+  count and, when its format is wrong, an error tag and a ✕. There is no check mark: nothing
+  there is an action. The card's footer has `Modèles`, a menu that downloads the example
+  files, and **Extraire**, always shown and off until there are files and no error. There is no
+  "Règles du format" summary: it was explanatory text, and the shared patterns have none.
+- The browser checks each file before the server does: the columns (unknown or missing),
+  required values, dates as `AAAA-MM-JJ`, decimals with a point. Those errors show at
+  once and Extraire stays off until they are fixed.
 
 ### 2. Check
 
-- Every row is validated in the browser first, then again on the server. Nothing is
-  written.
-- **Errors:** grouped by file, one line each: line number, column, the problem, in plain
-  words ("ligne 214, amount: « 12,50 » utilise une virgule; le format attend un
-  point"). The first 100 show, with the total count; "Copier les erreurs" copies them
-  all as text for fixing the file.
-- Any error blocks the import (import.md: all or nothing). "Choisir d'autres fichiers"
-  goes back to step 1.
+- Extraire sends the rows to `checkImport`, which calls `import_batch` with `dry_run`.
+  Nothing is written, and the files are never stored. A good check opens step 2.
+- **Errors**: one card, under the files (step 1), grouped by file, one line each: "Ligne 214" and the problem in
+  plain words, from a code (`import.errors.*`). The first 100 show, with the total;
+  "Copier les erreurs" copies them all. Any error blocks the import.
 
-### 3. Summary
+### 3. Summary (step 2)
 
-```
-│ 9 812 transactions                 │
-│ du 2 janv. 2018 au 31 oct. 2026    │
-│ 7 104 dépenses · 1 290 revenus     │
-│ 1 401 transferts · 17 ajustements  │
-│ 212 déjà importées, ignorées       │
-│ Comptes: 6 existants, 1 nouveau ▸  │
-│ Catégories: 3 nouvelles ▸          │
-│ Magasins: 418 nouveaux ▸          │
-│ [ Importer 9 600 transactions ]    │
-```
-
-- Counts by kind, the date range, rows skipped because their `ref` was already imported
-  (IMP-05).
-- **New accounts, categories and merchants** are listed, each section expandable.
-  Categories show as a tree with their full paths.
-- **New categories need a decision** (IMP-06), since the tree was set up fresh. The
-  section opens by default, and the import button stays disabled until every new
-  category is decided. See the module below.
-- **Currencies not in the user's list** are an error at step 2, not a creation.
-- **Missing rates** (a currency without history on those dates): a warning, not an
-  error; those amounts will show "Taux manquant" until a rate exists (ADR-004).
-
-### New categories (IMP-06)
-
-```
-│ CATÉGORIES À DÉCIDER (3)                │
-│ Alimantation > Épicerie      214 tr.    │
-│   ( ) Créer                             │
-│   (•) Fusionner avec [Alimentation >    │
-│                       Épicerie      ▾]  │
-│ Sorties > Bars                38 tr.    │
-│   (•) Créer                             │
-│   ( ) Fusionner avec…                   │
-│ Taxi                          12 tr.    │
-│   ( ) Créer                             │
-│   (•) Fusionner avec [Transport (nouv.)▾]│
-│ [ Tout créer ]                          │
-```
-
-- One block per category path the file uses that does not exist yet, with the number of
-  transactions and splits using it. Parents that would be created only as part of a path
-  are not listed on their own.
-- **Créer**: created as written, with a suggested icon and colour (spec 12).
-- **Fusionner avec…**: the category picker (spec 15), showing existing categories, the
-  ones this import will create, and "Créer « {texte} »" for a new category under another
-  name. Its rows are booked to the chosen category instead. This catches a typo
-  ("Alimantation"), regroups old names ("Taxi" into "Transport"), and folds several
-  unknown names into one new category.
-- Nothing is chosen at first. "Tout créer" picks Créer for every block not yet decided.
-- The choices apply to this import only: the file is not changed, and the merges are not
-  remembered as rules (that is the import wizard, IMP-03, later). They are kept while the
-  page is open, so going back to fix a file does not lose them.
-- The summary's category count follows the choices.
+- It opens with the file's figures as large tiles (transactions, expenses, incomes,
+  transfers; a transfer counts once), then centred lines for the dates, the adjustments, the
+  rows already imported and skipped (IMP-05), and the aliases that will be kept. A file
+  that is all in already says so and has no import button.
+- **What would be created**, one card with a row per kind, its count and a chevron that
+  opens the items in place: currencies added to
+  the user's list, institutions, accounts, accounts that take the file's opening balance
+  and date (ADR-034, shown with the balance), categories (paths, parents included),
+  merchants, people, events. Currencies are created, not refused (ADR-033).
+- **Deciding (IMP-06)**: nothing has to be decided; an item is created as written. Each row
+  of categories, merchants, people and events has a merge icon opening a `FormSheet` with a
+  `Combobox` of the names that exist and the other new ones. Merchants, people and events
+  also have a pencil (a `FormSheet` with the name, which can be changed or emptied, and
+  "Dans la note" for the part of its text sent to the note, plus "Tout mettre dans la
+  note") and a trash icon (not created, text dropped). A decided row is struck through
+  with a tag ("Fusionné avec “…”", "Dans la note", "Retiré", "→ “…”") and an undo icon,
+  and the section's count follows. Decisions only change this import's rows (a merged
+  category carries what is under it). A merge of a merchant or a person is kept as an alias
+  (ADR-037), and the summary says how many aliases will be kept. The choices stay while
+  the page is open, so changing a file does not lose them.
+- Missing exchange rates are not checked here.
 
 ### 4. Commit
 
-- "Importer {n} transactions" sends everything in one request; one SQL call commits or
-  rolls back as a whole (import.md, ADR-012).
-- While it runs: a progress line, and leaving the page is guarded.
-- Done: "Import terminé: {n} transactions." with "Voir les transactions" (opens the
-  month of the newest row). The batch appears under Imports.
-- Failed: "L'import n'a rien écrit." and the reason; the files are still loaded, so it
-  can be retried.
+- Under the sections, the centred button "Importer {n} transactions" calls `commitImport` with the merges applied: one request,
+  one `import_batch` call, one transaction. While it runs the button reads "Import en
+  cours…" and leaving the page is guarded.
+- Done: "Import terminé: {n} transactions." with "Voir les transactions" and "Importer
+  d'autres fichiers". The batch appears under Imports.
+- Refused by the check after the merges: the errors card, nothing written. A call that
+  runs out of the API's 8 seconds: "Le fichier est trop long pour un seul import.
+  Importez-le par année." (a `ref` already imported is skipped, so the parts are safe).
+  Any other failure: "L'import n'a rien écrit." The files stay loaded.
 
-## Imports and undo (IMP-05)
+## Historique and undo (IMP-05)
+
+The card is titled "Historique" (the imports made).
 
 - One row per batch, newest first: the date, then the transaction count and what it
-  created ("1 compte, 3 catégories, 418 magasins") on the second line.
-- **Annuler l'import** is the undo icon in the row's action slot. The confirmation says
-  what goes: "9 600 transactions seront
-  supprimées, ainsi que les comptes, catégories et magasins créés par cet import qui ne
-  servent plus ailleurs." If some of its transactions were edited since, it adds "dont
-  {n} modifiées depuis".
-- An undone batch stays in the list, muted, with "Annulé le {date}" on the first line and
-  no action. Its `ref`s are free
-  again, so the same file can be imported again after fixing.
+  created ("1 compte, 1 catégorie, 613 magasins") on the second line.
+- **Annuler l'import** is the undo icon in the row's action slot, with a `ConfirmDialog`:
+  "{n} transactions seront supprimées, ainsi que ce que cet import a créé et qui ne sert
+  plus ailleurs." If some were edited since, it adds "dont {n} modifiées depuis".
+- An undone batch stays in the list, muted, "Annulé le {date}", no action. Its `ref`s are
+  free again, so the file can be imported again.
 
 ## Export (IMP-04, SEC-04)
 
@@ -164,24 +136,24 @@ Reached from the menu, and from the empty transactions list (spec 14).
 
 ## Data
 
-- Reads: `import_batches`, the existing accounts, categories, merchants and `ref`s (to
-  match and skip).
-- Writes: `checkImport(rows)` (validation and summary, writes nothing),
-  `commitImport(rows)` (calls `import_batch`), `undoImport(batchId)`,
-  `exportData()`.
+- Reads: `getImports` (the batches with how many of their transactions were edited
+  since), `getImportTargets` (the names to merge into).
+- Writes: `checkImport(rows)` (the dry run), `commitImport(rows)`, `undoImport(batchId)`;
+  `exportData()` is still to build.
 
 ## Copy
 
-| Key | Français |
-|---|---|
-| Screen title | Importer et exporter |
-| Cards | Importer, Exporter, Imports |
-| Files | Choisir les fichiers, Fichier non reconnu: {name}, Vérifier |
-| Templates | Modèles, Règles du format |
-| Errors | {count} erreurs, Copier les erreurs, Choisir d'autres fichiers |
-| Summary | déjà importées, ignorées; existants; nouveaux |
-| New categories | Catégories à décider ({count}), Créer, Fusionner avec…, Tout créer, {count} tr., nouv. |
-| Commit | Importer {count} transactions, Import terminé: {count} transactions., Voir les transactions, L'import n'a rien écrit. |
-| Undo | Annuler l'import du {date}, Annulé le {date}, dont {count} modifiées depuis |
-| Export | Exporter mes données |
-| Empty | Aucun import pour l'instant. |
+All under `import.*` in the French and English files, typed against each other; one
+message per error code.
+
+## Round 3 notes (import screen)
+
+- No title above either step's content.
+- Each group's count is in the accent colour; its header and rows have a minimum height of
+  4rem, like an institution on Comptes.
+- A new category shows the badge it will get (icon suggested from its name, the grey the
+  import writes).
+- A new merchant, person, event or category whose name is one typo from an existing or
+  another new name (two for a long name) has a "Fusionner avec X ?" link that merges in one
+  tap (`similarName`).
+- The last line is one link, "Modifier les {n} fichiers", back to step 1.

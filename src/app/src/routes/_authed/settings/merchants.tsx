@@ -24,16 +24,18 @@ import { useFormatLocale } from '#/hooks/app/use-locale'
 import { useStoredState } from '#/hooks/app/use-stored-state'
 import { getCategories } from '#/server/categories'
 import { getMerchants } from '#/server/merchants'
+import { getPeople } from '#/server/people'
 import { indexById, oneOf } from '#/lib/shared/collections'
 import { matcher } from '#/lib/shared/search'
 
 export const Route = createFileRoute('/_authed/settings/merchants')({
   loader: async () => {
-    const [merchants, categories] = await Promise.all([
+    const [merchants, categories, { people }] = await Promise.all([
       getMerchants(),
       getCategories(),
+      getPeople(),
     ])
-    return { merchants, categories }
+    return { merchants, categories, people }
   },
   component: Merchants,
 })

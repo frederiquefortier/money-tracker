@@ -1,0 +1,4 @@
+ref,role,person,head_count,amount,reimburses
+t-0002,me,,1,31.00,
+t-0002,owes,Alex,1,31.00,
+t-0010,from,Alex,1,31.00,t-0002

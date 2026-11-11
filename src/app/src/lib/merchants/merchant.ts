@@ -8,12 +8,15 @@ export type Merchant = {
   id: string
   name: string
   defaultCategoryId: string | null
+  /** The person this merchant is: "bought from Maman". */
+  personId: string | null
   transactionCount: number
 }
 
 export const merchantInputSchema = nameFormSchema.extend({
   id: z.uuid().optional(),
   defaultCategoryId: z.uuid().nullable(),
+  personId: z.uuid().nullable(),
 })
 export type MerchantInput = z.input<typeof merchantInputSchema>
 

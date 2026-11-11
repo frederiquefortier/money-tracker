@@ -4,6 +4,7 @@
 
 # Real financial data: spreadsheets, exports, dumps
 src/data/local/
+src/data/finetuning/
 *.dump
 *.sql.gz
 *.age

@@ -43,6 +43,15 @@ function SheetContent({
       <SheetPrimitive.Content
         ref={setPanel}
         aria-describedby={undefined}
+        onOpenAutoFocus={(event) => {
+          // The first field takes the focus, so typing starts at once.
+          const field = panel?.querySelector<HTMLElement>(
+            'form :is(input:not([type=hidden]), textarea, [role=combobox]):not([disabled])',
+          )
+          if (!field) return
+          event.preventDefault()
+          field.focus()
+        }}
         onCloseAutoFocus={onCloseAutoFocus}
         onEscapeKeyDown={(event) => {
           // A calendar closes on its own Escape; the sheet stays.

@@ -1,7 +1,12 @@
-ref,date,time,account,kind,amount,currency,original_amount,original_currency,category,merchant,status,transfer_group,note
-t-0001,2018-02-03,,Compte chèque,expense,-84.20,CAD,,,Alimentation > Épicerie,Marché Central,cleared,,
-t-0002,2018-02-05,19:30,Compte chèque,expense,-62.00,CAD,,,,Bistro du Coin,cleared,,Souper avec Alex
-t-0003,2018-02-15,,Compte chèque,income,1800.00,CAD,,,Salaire,,cleared,,
-t-0004,2018-02-16,,Compte chèque,transfer,-500.00,CAD,,,,,cleared,tr-1,
-t-0005,2018-02-16,,Épargne,transfer,500.00,CAD,,,,,cleared,tr-1,
-t-0006,2026-03-02,,Compte chèque,expense,-45.31,CAD,-30.00,CHF,Voyages > Activités,Musée Exemple,pending,,
+ref,date,account,institution,kind,amount,currency,original_amount,original_currency,merchant,event,status,transfer_group,note
+t-0001,2018-02-03,Compte chèque,,expense,-84.20,CAD,,,Marché Central,,cleared,,
+t-0002,2018-02-05,Compte chèque,,expense,-62.00,CAD,,,Bistro du Coin,,cleared,,Souper avec Alex
+t-0003,2018-02-15,Compte chèque,,income,1800.00,CAD,,,,,cleared,,
+t-0004,2018-02-16,Compte chèque,,transfer,-500.00,CAD,,,,,cleared,tr-1,
+t-0005,2018-02-16,Épargne,,transfer,500.00,CAD,,,,,cleared,tr-1,
+t-0006,2026-03-02,Compte chèque,,expense,-45.31,CAD,-30.00,CHF,Musée Exemple,Voyage en Suisse,pending,,
+t-0007,2026-03-10,Compte chèque,,transfer,-300.00,CAD,,,,,cleared,tr-2,
+t-0008,2026-03-10,Compte suisse,,transfer,200.00,CHF,,,,,cleared,tr-2,
+t-0009,2026-03-10,Compte chèque,,expense,-3.50,CAD,,,,,cleared,tr-2,Frais de virement
+t-0010,2026-03-12,Compte chèque,,income,31.00,CAD,,,,,cleared,,Remboursement du souper
+t-0011,2026-03-31,Épargne,,adjustment,-12.00,CAD,,,,,cleared,,

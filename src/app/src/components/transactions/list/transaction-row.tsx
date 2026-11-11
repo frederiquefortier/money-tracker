@@ -1,7 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { CategoryBadge } from '#/components/categories/category-badge'
 import { EventTag } from '#/components/display/event-tag'
-import { Icon } from '#/components/display/icon'
 import { AvatarStack } from '#/components/people/avatars'
 import type { IconName } from '#/components/display/icon'
 import { MissingRate, Money } from '#/components/display/money'
@@ -20,6 +19,7 @@ import type {
   ListedCategory,
   ListedTransaction,
 } from '#/lib/transactions/transaction-list'
+import { IconBubble } from '#/components/display/icon-bubble'
 import { useLocale } from '#/hooks/app/use-locale'
 import { cn } from '#/lib/utils'
 import { rowHover, stackRing, focusRing } from '#/components/styles'
@@ -38,17 +38,7 @@ const NEUTRAL_ICONS: Partial<Record<ListedTransaction['kind'], IconName>> = {
 function RowBadge({ row }: { row: ListedTransaction }) {
   const icon = NEUTRAL_ICONS[row.kind]
   if (icon || row.categories.length === 0)
-    return (
-      <span
-        aria-hidden="true"
-        className={cn(
-          'grid shrink-0 place-items-center rounded-full bg-secondary text-secondary-foreground',
-          badgeSize,
-        )}
-      >
-        <Icon name={icon ?? 'split'} />
-      </span>
-    )
+    return <IconBubble icon={icon ?? 'split'} className={badgeSize} />
   return (
     <span className="flex shrink-0">
       {row.categories.map((category, i) => (

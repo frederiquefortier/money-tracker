@@ -14,7 +14,7 @@ export const Route = createFileRoute('/_authed/settings/merchants/$merchantId')(
 
 function EditMerchant() {
   const { t } = useTranslation()
-  const { merchants, categories } = useMerchantsPage()
+  const { merchants, categories, people } = useMerchantsPage()
   const { merchantId } = Route.useParams()
   const merchant = merchants.find((m) => m.id === merchantId)
   if (!merchant)
@@ -36,6 +36,7 @@ function EditMerchant() {
         key={merchant.id}
         merchant={merchant}
         categories={categories}
+        people={people}
         savedText={t('merchants.updated')}
       />
     </RouteSheet>

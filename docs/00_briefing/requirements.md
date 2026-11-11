@@ -96,7 +96,8 @@ English; this file is in English like every other meta-doc.
 | ID | Requirement | Source | Phase |
 |---|---|---|---|
 | MER-01 | A merchant can have a default category, prefilled on new transactions. | v1, ai | 1 |
-| MER-02 | A merchant has aliases, used to match bank-CSV descriptions on import. A merge (MER-05) keeps the source's name and aliases as aliases of the target. | v1, ai | later (with IMP-03) |
+| MER-02 | A merchant has aliases, other spellings of its name, so an import finds it by name or alias. A merge (MER-05) and an import merge keep the source's name and aliases as aliases of the target. Built 2026-11-10 (no screen shows them yet). | v1, ai | 3 |
+| MER-07 | A merchant can be a person ("bought something from Maman"): the merchant is linked to the person, and the import links a merchant text that is a person's name or alias. Built 2026-11-10 (ADR-038). | author | 3 |
 | MER-03 | A merchant has a country of origin. | v1 | later |
 | MER-04 | For one merchant, see how the bill has changed over time, in percent. | v1, ai | 4 |
 | MER-06 | The merchant list sorts by name (A–Z, Z–A) or by category, kept per browser, and filters by default category (a parent keeps its branch) or none. | author | 1 |
@@ -198,12 +199,12 @@ The "Canada" section, generalised because the data already spans Canada and Swit
 
 | ID | Requirement | Source | Phase |
 |---|---|---|---|
-| IMP-01 | Import from one fixed, documented CSV format (accounts, transactions, optional splits). The user prepares their data beforehand. Missing categories, accounts and merchants are created and listed before commit. Files are read in the browser and never stored. See [import.md](../01_building/import.md). | sheet, ADR-010 | 3 |
+| IMP-01 | Import from one fixed, documented CSV format: accounts, transactions, splits, and optionally people lines (roles, head counts, reimbursement links) and aliases. The user prepares their data beforehand. See [import.md](../01_building/import.md). | sheet, ADR-010, ADR-033 | 3 |
 | IMP-02 | Net-worth history through the same format (optional holdings and snapshots files). | net-worth data | 5 |
-| IMP-03 | Import wizard: source profiles, column and category mapping, merchant-alias matching, suggested transfer pairs and reimbursements. | v1 misc ("Csv importer visual"), MER-02 | later |
+| IMP-03 | Import from a source in its own format (a bank CSV), with column mapping and saved source profiles. The author's own import is the fixed format (IMP-01), with the conversion done outside the app; what the "wizard" was meant to add for the first import (alias matching, merges, suggested pairs) is IMP-06 and MER-02, so this is only for other sources. | v1 misc ("Csv importer visual"), author 2026-11-10 | later |
 | IMP-04 | Export my data in the import format; export then import reproduces it. This is the export half of SEC-04. | ADR-010, SEC-04 | 3 |
 | IMP-05 | Each import is one all-or-nothing batch that can be undone in one action. Re-importing a row with a known `ref` is skipped. | ADR-010 | 3 |
-| IMP-06 | Before an import commits, each category it would create is decided: created as written, or merged into another category (existing, from the same import, or new under another name). The choices apply to that import only. | author | 3 |
+| IMP-06 | Anything an import names that does not exist yet is created: currencies, accounts, institutions, categories, merchants, people and events. Before it commits, each new category, merchant, person and event can be merged into another name, and each new merchant, person and event can be edited (another name, or none, with some of its text sent to the note) or removed. The choices apply to that import only, but a merge of a merchant or person is kept as an alias (MER-02, PPL-06). | author, ADR-033, ADR-037 | 3 |
 
 ## 16. Demo and portfolio (`DEM`)
 

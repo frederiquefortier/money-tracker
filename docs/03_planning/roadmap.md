@@ -107,6 +107,15 @@ so the dashboard and budgets are built and tried on real history.
    reimbursement links and holdings included.
 3. Import, read the summary, undo and re-import until it is right.
 
+Progress (2026-11-10): the converted files for the author's history are ready (outside the
+repo). The database side is built (`import_batch` with its dry run, `import_undo`, tested
+in `17_import`) and so is the import screen (Réglages, Importer): files, check, summary
+with merges, commit, imports and undo, the server functions behind it, and the strings in
+both languages, with merges and edits of new items, aliases (MER-02) and a stepper
+layout. The real files, read by the screen's own code, import in 5 to 6 s. Still to build:
+the export (IMP-04), a screen for merchant aliases, and the first real import by the
+author, then a read of the result.
+
 ## Phase 4: Seeing it
 - Dashboard: range picker, filters, per-category stats, tiles, ranking, needs, wants and
   savings, expenses waiting for a reimbursement. DSH-01..09.

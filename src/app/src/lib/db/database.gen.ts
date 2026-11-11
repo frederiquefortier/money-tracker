@@ -39,6 +39,7 @@ export type Database = {
           currency: string
           hidden_for_new: boolean
           id: string
+          import_batch_id: string | null
           institution_id: string | null
           name: string
           opened_on: string
@@ -53,6 +54,7 @@ export type Database = {
           currency: string
           hidden_for_new?: boolean
           id?: string
+          import_batch_id?: string | null
           institution_id?: string | null
           name: string
           opened_on?: string
@@ -67,6 +69,7 @@ export type Database = {
           currency?: string
           hidden_for_new?: boolean
           id?: string
+          import_batch_id?: string | null
           institution_id?: string | null
           name?: string
           opened_on?: string
@@ -91,6 +94,13 @@ export type Database = {
             referencedColumns: ["user_id", "code"]
           },
           {
+            foreignKeyName: "accounts_user_id_import_batch_id_fkey"
+            columns: ["user_id", "import_batch_id"]
+            isOneToOne: false
+            referencedRelation: "import_batches"
+            referencedColumns: ["user_id", "id"]
+          },
+          {
             foreignKeyName: "accounts_user_id_institution_id_fkey"
             columns: ["user_id", "institution_id"]
             isOneToOne: false
@@ -107,6 +117,7 @@ export type Database = {
           icon: string
           icon_is_auto: boolean
           id: string
+          import_batch_id: string | null
           kind: string
           name: string
           necessity: string | null
@@ -121,6 +132,7 @@ export type Database = {
           icon?: string
           icon_is_auto?: boolean
           id?: string
+          import_batch_id?: string | null
           kind?: string
           name: string
           necessity?: string | null
@@ -135,6 +147,7 @@ export type Database = {
           icon?: string
           icon_is_auto?: boolean
           id?: string
+          import_batch_id?: string | null
           kind?: string
           name?: string
           necessity?: string | null
@@ -143,6 +156,13 @@ export type Database = {
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "categories_user_id_import_batch_id_fkey"
+            columns: ["user_id", "import_batch_id"]
+            isOneToOne: false
+            referencedRelation: "import_batches"
+            referencedColumns: ["user_id", "id"]
+          },
           {
             foreignKeyName: "categories_user_id_parent_id_fkey"
             columns: ["user_id", "parent_id"]
@@ -319,6 +339,7 @@ export type Database = {
           created_at: string
           ends_on: string | null
           id: string
+          import_batch_id: string | null
           name: string
           starts_on: string | null
           type_id: string | null
@@ -329,6 +350,7 @@ export type Database = {
           created_at?: string
           ends_on?: string | null
           id?: string
+          import_batch_id?: string | null
           name: string
           starts_on?: string | null
           type_id?: string | null
@@ -339,6 +361,7 @@ export type Database = {
           created_at?: string
           ends_on?: string | null
           id?: string
+          import_batch_id?: string | null
           name?: string
           starts_on?: string | null
           type_id?: string | null
@@ -346,6 +369,13 @@ export type Database = {
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "events_user_id_import_batch_id_fkey"
+            columns: ["user_id", "import_batch_id"]
+            isOneToOne: false
+            referencedRelation: "import_batches"
+            referencedColumns: ["user_id", "id"]
+          },
           {
             foreignKeyName: "events_user_id_type_id_fkey"
             columns: ["user_id", "type_id"]
@@ -394,10 +424,44 @@ export type Database = {
           },
         ]
       }
+      import_batches: {
+        Row: {
+          committed_at: string
+          created_counts: Json
+          file_names: string[]
+          id: string
+          restored: Json
+          row_count: number
+          undone_at: string | null
+          user_id: string
+        }
+        Insert: {
+          committed_at?: string
+          created_counts?: Json
+          file_names?: string[]
+          id?: string
+          restored?: Json
+          row_count?: number
+          undone_at?: string | null
+          user_id?: string
+        }
+        Update: {
+          committed_at?: string
+          created_counts?: Json
+          file_names?: string[]
+          id?: string
+          restored?: Json
+          row_count?: number
+          undone_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       institutions: {
         Row: {
           created_at: string
           id: string
+          import_batch_id: string | null
           name: string
           updated_at: string
           user_id: string
@@ -406,6 +470,7 @@ export type Database = {
         Insert: {
           created_at?: string
           id?: string
+          import_batch_id?: string | null
           name: string
           updated_at?: string
           user_id?: string
@@ -414,19 +479,66 @@ export type Database = {
         Update: {
           created_at?: string
           id?: string
+          import_batch_id?: string | null
           name?: string
           updated_at?: string
           user_id?: string
           website_url?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "institutions_user_id_import_batch_id_fkey"
+            columns: ["user_id", "import_batch_id"]
+            isOneToOne: false
+            referencedRelation: "import_batches"
+            referencedColumns: ["user_id", "id"]
+          },
+        ]
+      }
+      merchant_aliases: {
+        Row: {
+          alias: string
+          import_batch_id: string | null
+          merchant_id: string
+          user_id: string
+        }
+        Insert: {
+          alias: string
+          import_batch_id?: string | null
+          merchant_id: string
+          user_id?: string
+        }
+        Update: {
+          alias?: string
+          import_batch_id?: string | null
+          merchant_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "merchant_aliases_user_id_import_batch_id_fkey"
+            columns: ["user_id", "import_batch_id"]
+            isOneToOne: false
+            referencedRelation: "import_batches"
+            referencedColumns: ["user_id", "id"]
+          },
+          {
+            foreignKeyName: "merchant_aliases_user_id_merchant_id_fkey"
+            columns: ["user_id", "merchant_id"]
+            isOneToOne: false
+            referencedRelation: "merchants"
+            referencedColumns: ["user_id", "id"]
+          },
+        ]
       }
       merchants: {
         Row: {
           created_at: string
           default_category_id: string | null
           id: string
+          import_batch_id: string | null
           name: string
+          person_id: string | null
           updated_at: string
           user_id: string
         }
@@ -434,7 +546,9 @@ export type Database = {
           created_at?: string
           default_category_id?: string | null
           id?: string
+          import_batch_id?: string | null
           name: string
+          person_id?: string | null
           updated_at?: string
           user_id?: string
         }
@@ -442,7 +556,9 @@ export type Database = {
           created_at?: string
           default_category_id?: string | null
           id?: string
+          import_batch_id?: string | null
           name?: string
+          person_id?: string | null
           updated_at?: string
           user_id?: string
         }
@@ -454,6 +570,20 @@ export type Database = {
             referencedRelation: "categories"
             referencedColumns: ["user_id", "id"]
           },
+          {
+            foreignKeyName: "merchants_user_id_import_batch_id_fkey"
+            columns: ["user_id", "import_batch_id"]
+            isOneToOne: false
+            referencedRelation: "import_batches"
+            referencedColumns: ["user_id", "id"]
+          },
+          {
+            foreignKeyName: "merchants_user_id_person_id_fkey"
+            columns: ["user_id", "person_id"]
+            isOneToOne: false
+            referencedRelation: "people"
+            referencedColumns: ["user_id", "id"]
+          },
         ]
       }
       people: {
@@ -461,6 +591,7 @@ export type Database = {
           archived_on: string | null
           created_at: string
           id: string
+          import_batch_id: string | null
           name: string
           updated_at: string
           user_id: string
@@ -469,6 +600,7 @@ export type Database = {
           archived_on?: string | null
           created_at?: string
           id?: string
+          import_batch_id?: string | null
           name: string
           updated_at?: string
           user_id?: string
@@ -477,29 +609,48 @@ export type Database = {
           archived_on?: string | null
           created_at?: string
           id?: string
+          import_batch_id?: string | null
           name?: string
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "people_user_id_import_batch_id_fkey"
+            columns: ["user_id", "import_batch_id"]
+            isOneToOne: false
+            referencedRelation: "import_batches"
+            referencedColumns: ["user_id", "id"]
+          },
+        ]
       }
       person_aliases: {
         Row: {
           alias: string
+          import_batch_id: string | null
           person_id: string
           user_id: string
         }
         Insert: {
           alias: string
+          import_batch_id?: string | null
           person_id: string
           user_id?: string
         }
         Update: {
           alias?: string
+          import_batch_id?: string | null
           person_id?: string
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "person_aliases_user_id_import_batch_id_fkey"
+            columns: ["user_id", "import_batch_id"]
+            isOneToOne: false
+            referencedRelation: "import_batches"
+            referencedColumns: ["user_id", "id"]
+          },
           {
             foreignKeyName: "person_aliases_user_id_person_id_fkey"
             columns: ["user_id", "person_id"]
@@ -786,6 +937,8 @@ export type Database = {
           event_id: string | null
           event_source: string | null
           id: string
+          import_batch_id: string | null
+          import_ref: string | null
           kind: string
           merchant_id: string | null
           note: string | null
@@ -805,6 +958,8 @@ export type Database = {
           event_id?: string | null
           event_source?: string | null
           id?: string
+          import_batch_id?: string | null
+          import_ref?: string | null
           kind: string
           merchant_id?: string | null
           note?: string | null
@@ -824,6 +979,8 @@ export type Database = {
           event_id?: string | null
           event_source?: string | null
           id?: string
+          import_batch_id?: string | null
+          import_ref?: string | null
           kind?: string
           merchant_id?: string | null
           note?: string | null
@@ -849,6 +1006,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "accounts"
             referencedColumns: ["user_id", "id", "currency"]
+          },
+          {
+            foreignKeyName: "transactions_user_id_import_batch_id_fkey"
+            columns: ["user_id", "import_batch_id"]
+            isOneToOne: false
+            referencedRelation: "import_batches"
+            referencedColumns: ["user_id", "id"]
           },
           {
             foreignKeyName: "transactions_user_id_merchant_id_fkey"
@@ -1024,6 +1188,17 @@ export type Database = {
         Args: { category: string; ends: string; starts: string }
         Returns: boolean
       }
+      category_key: { Args: { path: string }; Returns: string }
+      category_keys: {
+        Args: never
+        Returns: {
+          color: string
+          depth: number
+          id: string
+          key: string
+          kind: string
+        }[]
+      }
       category_status: { Args: { category: string }; Returns: string }
       check_money_amount: {
         Args: { amount: number; currency: string }
@@ -1058,6 +1233,11 @@ export type Database = {
         Returns: string
       }
       fold_name: { Args: { name: string }; Returns: string }
+      import_batch: {
+        Args: { dry_run?: boolean; payload: Json }
+        Returns: Json
+      }
+      import_undo: { Args: { batch: string }; Returns: Json }
       list_transactions: {
         Args: {
           account_ids?: string[]
@@ -1209,6 +1389,7 @@ export type Database = {
         Args: { category: string }
         Returns: undefined
       }
+      split_category_path: { Args: { path: string }; Returns: string[] }
     }
     Enums: {
       [_ in never]: never

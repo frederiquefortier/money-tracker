@@ -4,6 +4,190 @@ Document architectural choices with context, alternatives considered, and trade-
 
 <!-- Newest first: a new ADR goes directly below this line. Template at the bottom. -->
 
+### ADR-038: A merchant can be a person (2026-11-10)
+
+**Context:**
+- Buying something from a proche ("Maman - Amazon", "Juju") has no place in the
+  model: an expense has Moi, invited and owes lines, and only an income has a `from` person.
+  The author wanted this before running the first import.
+
+**Decision:**
+- `merchants.person_id` (nullable, composite FK with `user_id`, set null when the person is
+  deleted, unique per person) says the merchant is that person. The merchant keeps working
+  as a merchant everywhere (list, filters, search, merge), so no transaction code changes.
+- The import links them by itself: a merchant text equal to a person's name or alias (an
+  existing person, one from `people.csv`, or an alias from `aliases.csv` of kind `person`)
+  is that person's merchant, created named for them. The summary lists them under "Proches
+  comme magasins". A merchant that already has the name is used as it is.
+- The merchant form has a person field to set or clear it.
+
+**Alternatives Considered:**
+- A person column on the transaction -> Touches the list, form, filters, search and
+  dashboard; the merchant already carries all of those.
+- A new `from` role on expenses -> Mixes who shares the cost with who was paid.
+
+**Consequences:**
+- A person's page does not yet list what was bought from them.
+- Merging a linked merchant into another loses the link.
+
+### ADR-037: Merges leave aliases, and new items can be edited before they are created (2026-11-10)
+
+**Context:**
+- An import merge only renamed rows, so a re-import showed the same spelling as new again,
+  and the existing merchant merge deleted the source's name. The author also wanted to
+  change a new merchant before it exists, send part of it to the note, or drop a false
+  positive ("?", "Train de Paris"), and said the import being built is the wizard (IMP-03).
+
+**Decision:**
+- Merchants get `merchant_aliases` (MER-02), with people's rules: a name or an alias points
+  to one merchant. A merge of a merchant (MER-05) or a person keeps the old spelling as an
+  alias, and the import finds a merchant or person by name or alias. The import takes an
+  optional `aliases` file (kind, name, alias), which also carries the converter's spellings.
+- Before it is created, a new merchant, person or event can be edited: a new name (empty:
+  not created) and text sent to the note of its transactions. Removing is an edit with
+  nothing kept. This is applied in the browser to the rows, so the database sees only
+  names. Merge and edit exclude each other for an item.
+- IMP-03 is narrowed to reading other sources (column mapping, profiles); the rest of its
+  wizard is IMP-06 and MER-02.
+
+**Alternatives Considered:**
+- Merges as a plain rename for one import (as planned) -> No trace; the same question on
+  every import.
+- Dropping a person -> Allowed; its lines go, and a reimbursement by it goes too.
+- Flagging items for review in the app afterwards -> Not decided; see the session record.
+
+**Consequences:**
+- No screen lists merchant aliases yet.
+- A renamed item's new name is counted as created only once the import runs.
+
+---
+
+### ADR-036: import_batch is set-based, checks first, and creates events with dates (2026-11-10)
+
+**Context:**
+- The API role gives a statement 8 seconds (`authenticated`: `statement_timeout = 8s`), and
+  the first import is about 4,800 rows. Calling `save_transaction` per row would take far
+  longer, but it holds the rules for people parts and reimbursements.
+
+**Decision:**
+- `import_batch(payload jsonb, dry_run boolean)` is one `security invoker` function: it
+  parses the rows into temporary tables, checks everything (every error with its file and
+  line), and writes nothing unless there is none. `dry_run` returns the same checks plus
+  what would be created, which is the summary screen. The server applies the merge choices
+  (IMP-06) by renaming in the rows before the call.
+- Plain expenses, incomes, transfers, fees and adjustments are written in bulk. Rows with
+  people go through `save_transaction`, one call each, so the parts, the empty `Moi` and
+  `Invité` lines and the reimbursements follow the app's own rules; expenses first, then
+  the incomes that repay them.
+- Imported events are created by name with no dates (dates are optional, and an event
+  with none links nothing by itself), and the rows that name them are linked by hand
+  (`event_source = 'manual'`). The author sets dates in the app if wanted. Existing events
+  link the imported rows by their own dates, as everywhere in the app.
+- Parts on an expense are not set by the import (an amount there is an error): empty
+  lines take what is left, and an `owes` line is set by its reimbursement. Only a `from`
+  line carries an amount, the income's.
+- `import_undo(batch)` deletes the batch's transactions, then what it created if nothing
+  else uses it, and puts back the opening balance and date it changed.
+
+**Alternatives Considered:**
+- `save_transaction` for every row -> Too slow under 8 seconds.
+- Several calls in chunks -> Not all or nothing.
+- A staging table filled by several calls, then one commit call -> More tables and states
+  for a file that fits in one call.
+
+**Consequences:**
+- Two new columns on `transactions` (`import_ref`, `import_batch_id`) and a batch id on
+  everything the import can create. A re-import skips a `ref` already imported.
+- import.md changes: amounts on an expense's people lines are not used.
+- Correction, same day: this ADR first said an event needs a start date. It does not (made
+  optional in migration `events_without_categories`); the first events migration was read
+  instead of the latest.
+
+---
+
+### ADR-035: The import accepts an archived category before its archive date (2026-11-10)
+
+**Context:**
+- The author's old Animaux categories were archived in the app on 2026-05-27, but their
+  history (2019 to 2026) has to import under them.
+
+**Decision:**
+- A transaction may use an archived category when its date is up to and including the day
+  the category was archived (decided by the author: the archive day still counts as
+  inside). A later date is refused in the check, listed by line. Nothing is reactivated.
+- This differs from the stored periods, which are `[active_from, active_to)` and leave the
+  archive day out (CAT-04), so the import's check allows one more day than the pickers do.
+
+**Alternatives Considered:**
+- Refuse archived categories -> The author would have to reactivate and re-archive them.
+- Ignore the archive date -> A later transaction could land on a category hidden from pickers.
+
+**Consequences:**
+- The import checks the category's periods against each split's transaction date.
+
+---
+
+### ADR-034: The import sets the opening balance of an account that has no transactions (2026-11-10)
+
+**Context:**
+- ADR-033 said nothing in the app is overwritten by an import. The accounts exist in the
+  app with an opening balance of 0, and the history's real starting balances (the Aspire
+  "Starting Balance" rows, dated 2022-12-31) have to land somewhere.
+
+**Decision:**
+- An account matched by name and institution that has no transactions takes the file's
+  `opening_balance` and `opened_on`; the summary lists each change. Every other field, and
+  every account that already has transactions, is left alone.
+- Rows from before the accounts were tracked go to a placeholder account whose opening
+  balance is set so that it ends at zero, so it adds nothing to net worth.
+
+**Alternatives Considered:**
+- Starting balances as adjustment transactions -> An adjustment stores a gap against a
+  computed balance, which is not an opening balance.
+- Leave the balances at 0 for the author to edit -> Eight accounts by hand, and the
+  balances stay wrong until it is done.
+
+**Consequences:**
+- `import_batch` needs a rule to update `opening_balance` and `opened_on` for accounts
+  without transactions; undo restores the previous values.
+
+---
+
+### ADR-033: The import format, rewritten with people, events and everything created on demand (2026-11-10)
+
+**Context:**
+- import.md was written before accounts, merchants, people and events were built, and was
+  notes rather than a decision. The author asked to start it again from scratch.
+- Currencies and categories are already set by the author; the import must still add a
+  missing one, and the same for people, events and merchants.
+
+**Decision:**
+- Four files: accounts.csv, transactions.csv, splits.csv, people.csv (optional). No
+  events file: an event named on a transaction is created with a name only.
+- The category lives only in splits.csv, one row for a plain category and several for a
+  split, since every expense and income has at least one split.
+- People are lines in people.csv with the form's roles (`me`, `invited`, `owes`, `from`),
+  head count and amount; a `from` line can name the expense it repays.
+- Every named thing is matched ignoring case and accents and created when missing: currency,
+  account, institution, category, merchant, person, event. The summary lists them by kind,
+  each kept as written or merged into an existing one (IMP-06, widened from categories).
+- No time of day, following the schema.
+
+**Alternatives Considered:**
+- A `people` cell on transactions (`Alex; Marie`, shared equally) -> Cannot say who owes
+  what or who reimbursed.
+- An events.csv with dates, types and people -> Not wanted now; events are edited in the
+  app afterwards.
+- Refusing unknown currencies -> The author wants the import to add them.
+
+**Consequences:**
+- The author prepares four sheets instead of one; the converter script writes them.
+- `import_batch` writes through the same rules as `save_transaction`, `save_transfer` and
+  `save_person`, so it must create the people lines and reimbursements in one transaction.
+- Supersedes the earlier import.md notes, not an ADR.
+
+---
+
 ### ADR-032: One calendar for the period (2026-11-10)
 
 **Context:**

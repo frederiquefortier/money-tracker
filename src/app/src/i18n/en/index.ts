@@ -4,6 +4,7 @@ import { categoriesEn } from './categories'
 import { commonEn } from './common'
 import { currenciesEn } from './currencies'
 import { eventsEn } from './events'
+import { importEn } from './import'
 import { merchantsEn } from './merchants'
 import { peopleEn } from './people'
 import { shellEn } from './shell'
@@ -20,5 +21,6 @@ export const en: Messages = {
   ...merchantsEn,
   ...eventsEn,
   ...peopleEn,
+  ...importEn,
   ...transactionsEn,
 }

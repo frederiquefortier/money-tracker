@@ -24,10 +24,16 @@ export function MerchantPicker({
   const { items: merchants, create } = useInlineCreate(loaded, {
     save: async (name) => {
       const result = await saveMerchant({
-        data: { name, defaultCategoryId: null },
+        data: { name, defaultCategoryId: null, personId: null },
       })
       return result.ok
-        ? { id: result.id, name, defaultCategoryId: null, transactionCount: 0 }
+        ? {
+            id: result.id,
+            name,
+            defaultCategoryId: null,
+            personId: null,
+            transactionCount: 0,
+          }
         : null
     },
     onCreated: onChange,

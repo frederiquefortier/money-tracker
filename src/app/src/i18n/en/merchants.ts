@@ -10,6 +10,7 @@ export const merchantsEn: typeof merchantsFr = {
       nameDesc: 'Name (Z to A)',
       category: 'Category',
     },
+    person: 'This person is the merchant',
     newTitle: 'New merchant',
     editTitle: 'Edit merchant',
     name: 'Name',

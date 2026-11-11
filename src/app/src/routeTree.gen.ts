@@ -26,6 +26,7 @@ import { Route as AuthedAccountsNewRouteImport } from './routes/_authed/accounts
 import { Route as AuthedSettingsCategoriesRouteImport } from './routes/_authed/settings/categories'
 import { Route as AuthedSettingsCurrenciesRouteImport } from './routes/_authed/settings/currencies'
 import { Route as AuthedSettingsEventsRouteImport } from './routes/_authed/settings/events'
+import { Route as AuthedSettingsImportRouteImport } from './routes/_authed/settings/import'
 import { Route as AuthedSettingsMerchantsRouteImport } from './routes/_authed/settings/merchants'
 import { Route as AuthedSettingsPeopleRouteImport } from './routes/_authed/settings/people'
 import { Route as AuthedTransactionsTransactionIdRouteImport } from './routes/_authed/transactions/$transactionId'
@@ -132,6 +133,11 @@ const AuthedSettingsCurrenciesRoute =
 const AuthedSettingsEventsRoute = AuthedSettingsEventsRouteImport.update({
   id: '/settings/events',
   path: '/settings/events',
+  getParentRoute: () => AuthedRoute,
+} as any)
+const AuthedSettingsImportRoute = AuthedSettingsImportRouteImport.update({
+  id: '/settings/import',
+  path: '/settings/import',
   getParentRoute: () => AuthedRoute,
 } as any)
 const AuthedSettingsMerchantsRoute = AuthedSettingsMerchantsRouteImport.update({
@@ -273,6 +279,7 @@ export interface FileRoutesByFullPath {
   '/settings/categories': typeof AuthedSettingsCategoriesRouteWithChildren
   '/settings/currencies': typeof AuthedSettingsCurrenciesRouteWithChildren
   '/settings/events': typeof AuthedSettingsEventsRouteWithChildren
+  '/settings/import': typeof AuthedSettingsImportRoute
   '/settings/merchants': typeof AuthedSettingsMerchantsRouteWithChildren
   '/settings/people': typeof AuthedSettingsPeopleRouteWithChildren
   '/transactions/$transactionId': typeof AuthedTransactionsTransactionIdRoute
@@ -312,6 +319,7 @@ export interface FileRoutesByTo {
   '/settings/categories': typeof AuthedSettingsCategoriesRouteWithChildren
   '/settings/currencies': typeof AuthedSettingsCurrenciesRouteWithChildren
   '/settings/events': typeof AuthedSettingsEventsRouteWithChildren
+  '/settings/import': typeof AuthedSettingsImportRoute
   '/settings/merchants': typeof AuthedSettingsMerchantsRouteWithChildren
   '/settings/people': typeof AuthedSettingsPeopleRouteWithChildren
   '/transactions/$transactionId': typeof AuthedTransactionsTransactionIdRoute
@@ -353,6 +361,7 @@ export interface FileRoutesById {
   '/_authed/settings/categories': typeof AuthedSettingsCategoriesRouteWithChildren
   '/_authed/settings/currencies': typeof AuthedSettingsCurrenciesRouteWithChildren
   '/_authed/settings/events': typeof AuthedSettingsEventsRouteWithChildren
+  '/_authed/settings/import': typeof AuthedSettingsImportRoute
   '/_authed/settings/merchants': typeof AuthedSettingsMerchantsRouteWithChildren
   '/_authed/settings/people': typeof AuthedSettingsPeopleRouteWithChildren
   '/_authed/transactions/$transactionId': typeof AuthedTransactionsTransactionIdRoute
@@ -394,6 +403,7 @@ export interface FileRouteTypes {
     | '/settings/categories'
     | '/settings/currencies'
     | '/settings/events'
+    | '/settings/import'
     | '/settings/merchants'
     | '/settings/people'
     | '/transactions/$transactionId'
@@ -433,6 +443,7 @@ export interface FileRouteTypes {
     | '/settings/categories'
     | '/settings/currencies'
     | '/settings/events'
+    | '/settings/import'
     | '/settings/merchants'
     | '/settings/people'
     | '/transactions/$transactionId'
@@ -473,6 +484,7 @@ export interface FileRouteTypes {
     | '/_authed/settings/categories'
     | '/_authed/settings/currencies'
     | '/_authed/settings/events'
+    | '/_authed/settings/import'
     | '/_authed/settings/merchants'
     | '/_authed/settings/people'
     | '/_authed/transactions/$transactionId'
@@ -624,6 +636,13 @@ declare module '@tanstack/react-router' {
       path: '/settings/events'
       fullPath: '/settings/events'
       preLoaderRoute: typeof AuthedSettingsEventsRouteImport
+      parentRoute: typeof AuthedRoute
+    }
+    '/_authed/settings/import': {
+      id: '/_authed/settings/import'
+      path: '/settings/import'
+      fullPath: '/settings/import'
+      preLoaderRoute: typeof AuthedSettingsImportRouteImport
       parentRoute: typeof AuthedRoute
     }
     '/_authed/settings/merchants': {
@@ -908,6 +927,7 @@ interface AuthedRouteChildren {
   AuthedSettingsCategoriesRoute: typeof AuthedSettingsCategoriesRouteWithChildren
   AuthedSettingsCurrenciesRoute: typeof AuthedSettingsCurrenciesRouteWithChildren
   AuthedSettingsEventsRoute: typeof AuthedSettingsEventsRouteWithChildren
+  AuthedSettingsImportRoute: typeof AuthedSettingsImportRoute
   AuthedSettingsMerchantsRoute: typeof AuthedSettingsMerchantsRouteWithChildren
   AuthedSettingsPeopleRoute: typeof AuthedSettingsPeopleRouteWithChildren
 }
@@ -921,6 +941,7 @@ const AuthedRouteChildren: AuthedRouteChildren = {
   AuthedSettingsCategoriesRoute: AuthedSettingsCategoriesRouteWithChildren,
   AuthedSettingsCurrenciesRoute: AuthedSettingsCurrenciesRouteWithChildren,
   AuthedSettingsEventsRoute: AuthedSettingsEventsRouteWithChildren,
+  AuthedSettingsImportRoute: AuthedSettingsImportRoute,
   AuthedSettingsMerchantsRoute: AuthedSettingsMerchantsRouteWithChildren,
   AuthedSettingsPeopleRoute: AuthedSettingsPeopleRouteWithChildren,
 }

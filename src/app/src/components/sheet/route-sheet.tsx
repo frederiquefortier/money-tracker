@@ -27,7 +27,9 @@ export function FormSheet({
   const [open, setOpen] = useState(true)
   const [changed, setChanged] = useState(false)
   const [asking, setAsking] = useState(false)
-  const markChanged = () => setChanged(true)
+  // Stable: a field that reads it (a Combobox) is not re-rendered by the first keystroke,
+  // which would put back the text before its own change is applied.
+  const [markChanged] = useState(() => () => setChanged(true))
   const escapes = useRef<Array<() => void>>([])
   const [pushEscape] = useState(() => (handler: () => void) => {
     escapes.current.push(handler)
