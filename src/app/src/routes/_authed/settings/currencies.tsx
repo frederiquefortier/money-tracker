@@ -14,11 +14,15 @@ export const Route = createFileRoute('/_authed/settings/currencies')({
 
 function Currencies() {
   const { t } = useTranslation()
-  const { ratesFrom, openAccounts } = Route.useLoaderData()
+  const { ratesFrom, openAccounts, openHoldings } = Route.useLoaderData()
 
   return (
     <ListPage title={t('currencies.title')}>
-      <CurrencyManager ratesFrom={ratesFrom} openAccounts={openAccounts} />
+      <CurrencyManager
+        ratesFrom={ratesFrom}
+        openAccounts={openAccounts}
+        openHoldings={openHoldings}
+      />
       <AddCurrencyButton />
       {/* Adding a currency opens here as a sheet. */}
       <Outlet />

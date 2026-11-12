@@ -6,6 +6,7 @@ import { currenciesEn } from './currencies'
 import { eventsEn } from './events'
 import { importEn } from './import'
 import { merchantsEn } from './merchants'
+import { netWorthEn } from './net-worth'
 import { peopleEn } from './people'
 import { shellEn } from './shell'
 import { transactionsEn } from './transactions'
@@ -20,6 +21,7 @@ export const en: Messages = {
   ...categoriesEn,
   ...merchantsEn,
   ...eventsEn,
+  ...netWorthEn,
   ...peopleEn,
   ...importEn,
   ...transactionsEn,

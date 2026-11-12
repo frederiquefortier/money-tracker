@@ -3,7 +3,7 @@ import { useLoaderData } from '@tanstack/react-router'
 // The loader data of a list, for the sheets opened over it.
 
 export function useAccountsPage() {
-  return useLoaderData({ from: '/_authed/accounts' })
+  return useLoaderData({ from: '/_authed/net-worth/accounts' })
 }
 
 export function useCategoriesPage() {

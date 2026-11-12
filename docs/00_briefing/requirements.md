@@ -38,7 +38,7 @@ English; this file is in English like every other meta-doc.
 | ACC-03 | An account can be closed (keeps history, gone from pickers). | v1, ai | 1 |
 | ACC-04 | An account can be hidden from new transactions without being closed. | v1 | 1 |
 | ACC-05 | Institutions are reusable records with a name and an optional website URL. CRUD, inline "create" from the account form. | add, C1 | 1 |
-| ACC-06 | The accounts page groups accounts by institution: collapsible sections, institution name links to its site, per-institution balance total. | add, C1 | 1 |
+| ACC-06 | The accounts subpage groups accounts by institution: collapsible sections, institution name links to its site, per-institution balance total. | add, C1 | 1 |
 | ACC-07 | Sort accounts within each group by name, type, currency, balance ascending, balance descending. The choice persists per browser. | add, C2 | 1 |
 | ACC-08 | Each account shows when it was last reconciled and when its last transaction was. | sheet | 4 |
 
@@ -167,13 +167,14 @@ English; this file is in English like every other meta-doc.
 | ID | Requirement | Source | Phase |
 |---|---|---|---|
 | NW-01 | Holdings: investment accounts, debts and other assets, each with a type (TFSA/CELI, RRSP/REER, FHSA/CELIAPP, DPSP, 2nd pillar, 3a, life-insurance buyout...) and an institution and country. | v1, ai | 2 |
-| NW-02 | Dated value snapshots per holding. Months with no snapshot can be hidden in charts. | v1, ai | 5 |
-| NW-03 | Contributions per holding, split between my money (transactions linked to the holding) and employer or other money (entered on the holding). Shows amount placed and profit in amount and percent. | v1, ai, net-worth data | 2, 5 |
+| NW-02 | Dated value snapshots per holding. Months with no snapshot can be hidden in charts. | v1, ai | 2 |
+| NW-03 | Contributions per holding, split between my money (transactions linked to the holding) and employer or other money (entered on the holding). Shows amount placed and profit in amount and percent. | v1, ai, net-worth data | 2 |
 | NW-04 | Net worth chart (total, investments, debts) and percent change over any range; default is account start to today. | v1, ai | 5 |
-| NW-05 | A holding can be excluded from the net worth total (the life insurance "with/without" line). | net-worth data | 5 |
+| NW-05 | A holding can be excluded from the net worth total (the life insurance "with/without" line). | net-worth data | 2 |
 | NW-06 | Projections at fixed growth rates (5, 7, 10 %) or custom inputs. | v1, ai | later |
 | NW-07 | Goal solver: "to reach X in N years at r %, invest Y per year", with r defaulting to my actual return. | v1, ai | later |
 | NW-08 | "If this continues, in N years I'll have X." | v1, ai | later |
+| NW-10 | A net worth hub with the total and a card per subpage (accounts, holdings) showing its own total. Missing rates give "—", never a partial sum. | author (2026-11-12) | 2 |
 | NW-09 | Income by job: salary per employer per year, with a total. | misc ("Séparé par emploi..."), net-worth data | 5 |
 
 ## 13. Yearly review (`YR`)

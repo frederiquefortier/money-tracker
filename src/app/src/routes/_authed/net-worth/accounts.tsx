@@ -6,6 +6,7 @@ import { ClosedAccounts } from '#/components/accounts/list/closed-accounts'
 import { EmptyState } from '#/components/lists/list-card'
 import { ExpandAllButton } from '#/components/lists/expand-all-button'
 import { FloatingAddButton } from '#/components/layout/floating-add-button'
+import { NetWorthBackLink } from '#/components/net-worth/back-link'
 import { ListPage } from '#/components/layout/list-page'
 import { SortMenu } from '#/components/lists/sort-menu'
 import { FORMAT_LOCALE } from '#/i18n/locales'
@@ -23,7 +24,7 @@ import { useStoredIds, useStoredState } from '#/hooks/app/use-stored-state'
 import { getAccounts } from '#/server/accounts'
 import { oneOf } from '#/lib/shared/collections'
 
-export const Route = createFileRoute('/_authed/accounts')({
+export const Route = createFileRoute('/_authed/net-worth/accounts')({
   loader: () => getAccounts(),
   component: Accounts,
 })
@@ -68,17 +69,17 @@ function AddMenu() {
       label={t('common.add')}
       options={[
         {
-          to: '/accounts/new',
+          to: '/net-worth/accounts/new',
           label: t('accounts.addAccount'),
           icon: 'wallet',
         },
         {
-          to: '/accounts/institutions/new',
+          to: '/net-worth/accounts/institutions/new',
           label: t('accounts.addInstitution'),
           icon: 'bank',
         },
         {
-          to: '/accounts/adjust',
+          to: '/net-worth/accounts/adjust',
           label: t('transactions.adjustment.newTitle'),
           icon: 'scale',
         },
@@ -107,6 +108,7 @@ function Accounts() {
   return (
     <ListPage
       title={t('accounts.title')}
+      back={<NetWorthBackLink />}
       actions={
         <>
           {keys.length > 0 && (

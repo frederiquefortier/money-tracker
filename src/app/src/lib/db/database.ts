@@ -16,6 +16,9 @@ type SaveEventType = Public['Functions']['save_event_type']
 type WithTextAmount<T> = Omit<T, 'opening_balance'> & {
   opening_balance?: string
 }
+type WithAmount<T> = Omit<T, 'amount'> & { amount?: string }
+type Snapshots = Public['Tables']['holding_snapshots']
+type Contributions = Public['Tables']['holding_contributions']
 
 // Arguments with a SQL default can also be sent as null; amounts go as text.
 type SaveTransactionArgs = Omit<
@@ -26,6 +29,7 @@ type SaveTransactionArgs = Omit<
   | 'original_currency'
   | 'merchant_id'
   | 'seller_id'
+  | 'holding_id'
 > & {
   transaction_id: string | null
   amount: string
@@ -33,6 +37,7 @@ type SaveTransactionArgs = Omit<
   original_currency: string | null
   merchant_id: string | null
   seller_id: string | null
+  holding_id: string | null
 }
 
 // A null id creates the merchant; it may have no default category.
@@ -112,10 +117,21 @@ type ListTransactionsRow = Omit<ListedRow, NullableListed> & {
 /** The generated schema (`npm run db:types`), with amounts as decimal strings. */
 export type Database = Omit<Generated, 'public'> & {
   public: Omit<Public, 'Tables' | 'Functions'> & {
-    Tables: Omit<Public['Tables'], 'accounts'> & {
+    Tables: Omit<
+      Public['Tables'],
+      'accounts' | 'holding_snapshots' | 'holding_contributions'
+    > & {
       accounts: Omit<Accounts, 'Insert' | 'Update'> & {
         Insert: WithTextAmount<Accounts['Insert']>
         Update: WithTextAmount<Accounts['Update']>
+      }
+      holding_snapshots: Omit<Snapshots, 'Insert' | 'Update'> & {
+        Insert: WithAmount<Snapshots['Insert']>
+        Update: WithAmount<Snapshots['Update']>
+      }
+      holding_contributions: Omit<Contributions, 'Insert' | 'Update'> & {
+        Insert: WithAmount<Contributions['Insert']>
+        Update: WithAmount<Contributions['Update']>
       }
     }
     Functions: Omit<

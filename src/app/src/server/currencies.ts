@@ -21,6 +21,7 @@ const failure = failureFor<CurrencyError>('currencies', {
   '23503': 'unknown',
   default_currency_cannot_be_removed: 'isDefault',
   currency_used_by_open_account: 'usedByAccount',
+  currency_used_by_open_holding: 'usedByHolding',
 })
 
 // Undefined table, column or relationship, in Postgres and PostgREST.
@@ -68,11 +69,20 @@ export const getMyCurrencies = createServerFn({ method: 'GET' }).handler(
   },
 )
 
+function namesByCurrency(
+  rows: ReadonlyArray<{ name: string; currency: string }>,
+) {
+  return rows.reduce<Partial<Record<string, Array<string>>>>((byCode, row) => {
+    ;(byCode[row.currency] ??= []).push(row.name)
+    return byCode
+  }, {})
+}
+
 /** The ISO list for the add picker, and when the rates of each of the user's start. */
 export const getCurrencySettings = createServerFn({ method: 'GET' }).handler(
   async () => {
     const supabase = getSupabase()
-    const [catalog, mine, open] = await Promise.all([
+    const [catalog, mine, open, openHoldings] = await Promise.all([
       supabase
         .from('currencies')
         .select('code, name_fr, name_en, symbol')
@@ -84,12 +94,18 @@ export const getCurrencySettings = createServerFn({ method: 'GET' }).handler(
         .select('name, currency')
         .is('closed_on', null)
         .order('name'),
+      supabase
+        .from('holdings')
+        .select('name, currency')
+        .is('closed_on', null)
+        .order('name'),
     ])
-    const [catalogRows, mineRows, openRows] = loaded(
+    const [catalogRows, mineRows, openRows, holdingRows] = loaded(
       'Currencies',
       catalog,
       mine,
       open,
+      openHoldings,
     )
 
     // One primary-key lookup per currency; EUR is the base and always has rates.
@@ -112,13 +128,8 @@ export const getCurrencySettings = createServerFn({ method: 'GET' }).handler(
     return {
       catalog: catalogRows.map((row) => toCurrency(row.code, row)),
       ratesFrom: Object.fromEntries(firsts) as Record<string, string | null>,
-      openAccounts: openRows.reduce<Partial<Record<string, Array<string>>>>(
-        (byCode, account) => {
-          ;(byCode[account.currency] ??= []).push(account.name)
-          return byCode
-        },
-        {},
-      ),
+      openAccounts: namesByCurrency(openRows),
+      openHoldings: namesByCurrency(holdingRows),
     }
   },
 )

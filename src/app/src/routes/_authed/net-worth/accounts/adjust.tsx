@@ -6,7 +6,7 @@ import { todayIso } from '#/lib/shared/format'
 import type { FormAccount } from '#/lib/transactions/transaction'
 import { useAccountsPage } from '#/hooks/app/use-page-data'
 
-export const Route = createFileRoute('/_authed/accounts/adjust')({
+export const Route = createFileRoute('/_authed/net-worth/accounts/adjust')({
   staticData: { sheet: true },
   component: AdjustBalance,
 })
@@ -27,7 +27,10 @@ function AdjustBalance() {
   const open = choosable.filter((a) => !a.closedOn && !a.hiddenForNew)
 
   return (
-    <RouteSheet to="/accounts" title={t('transactions.adjustment.newTitle')}>
+    <RouteSheet
+      to="/net-worth/accounts"
+      title={t('transactions.adjustment.newTitle')}
+    >
       <AdjustmentForm
         accounts={choosable}
         initial={{

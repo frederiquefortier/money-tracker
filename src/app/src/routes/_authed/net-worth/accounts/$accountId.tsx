@@ -7,7 +7,7 @@ import { amountForInput } from '#/lib/shared/money'
 import { useAccountsPage } from '#/hooks/app/use-page-data'
 import { useLocale } from '#/hooks/app/use-locale'
 
-export const Route = createFileRoute('/_authed/accounts/$accountId')({
+export const Route = createFileRoute('/_authed/net-worth/accounts/$accountId')({
   staticData: { sheet: true },
   component: EditAccount,
 })
@@ -18,11 +18,11 @@ function EditAccount() {
   const locale = useLocale()
   const { accountId } = Route.useParams()
   const account = accounts.find((a) => a.id === accountId)
-  if (!account) return <Navigate to="/accounts" resetScroll={false} />
+  if (!account) return <Navigate to="/net-worth/accounts" resetScroll={false} />
 
   return (
     <RouteSheet
-      to="/accounts"
+      to="/net-worth/accounts"
       title={t('accounts.editTitle')}
       actions={<AccountActions account={account} placement="sheet" />}
     >

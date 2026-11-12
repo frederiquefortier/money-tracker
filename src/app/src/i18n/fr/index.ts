@@ -7,6 +7,7 @@ import { currenciesFr } from './currencies'
 import { eventsFr } from './events'
 import { importFr } from './import'
 import { merchantsFr } from './merchants'
+import { netWorthFr } from './net-worth'
 import { peopleFr } from './people'
 import { shellFr } from './shell'
 import { transactionsFr } from './transactions'
@@ -20,6 +21,7 @@ export const fr = {
   ...categoriesFr,
   ...merchantsFr,
   ...eventsFr,
+  ...netWorthFr,
   ...peopleFr,
   ...importFr,
   ...transactionsFr,

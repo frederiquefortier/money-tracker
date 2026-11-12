@@ -4,6 +4,54 @@ Technical and structural choices, with the alternatives that were rejected. Chec
 
 <!-- Newest first: a new ADR goes directly below this line. Template at the bottom. -->
 
+### ADR-046: One Net worth tab with the accounts and the holdings as subpages (2026-11-12)
+
+**Context:**
+- Holdings were planned as their own Placements page. Accounts and holdings are both parts of net worth, but their rows, actions and grouping differ. The author wanted one place for net worth, a dashboard feel, and the chart in phase 5.
+
+**Decision:**
+- The Comptes tab becomes "Net worth" (English in both languages). `/net-worth` is a hub: a total card, a slot for the phase 5 chart and a link card for each subpage with its own total. `/net-worth/accounts` is the accounts page moved, `/net-worth/holdings` is the new holdings page. Their sheets keep their own URLs below the page.
+- The tab stays active on all three paths. Each subpage has a back link to the hub (the rule of no back link had no use case before this).
+- The total counts open accounts and the open holdings not left out of net worth; a missing rate gives "—" per figure (ADR-004). The hub has no schema of its own.
+- `/accounts` has no redirect (one user, ADR-021).
+
+**Alternatives Considered:**
+- Keep `/accounts` and add `/holdings` as two more pages -> The tab needs a rule to stay active over unrelated paths, and nothing ties the totals together.
+- One merged list of accounts and holdings -> Blurs two models with different actions.
+- A tab for each -> Five tabs on a phone bar.
+
+**Consequences:**
+- Five links change (the tab, the transfer form, the account row, the institution group, the route files). The e2e specs use no `/accounts` path.
+- The Dashboard tab is untouched; whether it shows net worth is left open.
+
+---
+
+### ADR-045: Holdings, their values, and an optional holding on an investment transaction (2026-11-11)
+
+**Context:**
+- NW-01 to NW-03 need investments, assets and debts with dated values, and the money the owner put into each. The money already exists as transactions on investment-kind categories. Bank accounts count through their balance, not as holdings (database.md).
+
+**Decision:**
+- Tables: `holding_types` (reference, loaded from `holding-types.csv`, kind investment, asset or debt), `holdings` (type, name, optional institution, country, currency, `opened_on`, `closed_on`, `exclude_from_net_worth`), `holding_snapshots` (date and amount in the holding's currency, one per date) and `holding_contributions` (employer or government money, date, amount, label). Every foreign key to a user table includes `user_id` (ADR-005), every table has RLS and a pgTAP test.
+- `transactions.holding_id` is optional. A trigger allows it only on an expense or an income whose category is investment-kind, so a contribution is an expense and a withdrawal is an income. My own contributions are never entered twice.
+- A `holding_totals` view returns placed, latest value, profit and percent, converted with `exchange_rate`, null when a rate is missing and never a partial sum (ADR-004). Placed is the linked expenses minus the linked incomes plus the contributions, each converted at its own date.
+- Snapshots (NW-02) and the exclusion flag (NW-05) come with the holdings instead of phase 5, so the page shows profit from the start. The net worth chart (NW-04) stays in phase 5.
+- Debts have values only. A loan payment does not link to a debt holding.
+- The import format does not change. The history was imported before holdings existed, so the author links past contributions by hand, helped by a count of investment transactions without a holding and a transactions filter on them.
+
+**Alternatives Considered:**
+- A transfer to the holding, as if it were an account -> Holdings would need a balance and a currency per leg, and it blurs the line between accounts and holdings.
+- Only the category, one investment category per holding -> Renaming or merging a category silently breaks the totals.
+- A current value field now, snapshots in phase 5 -> A migration to unwind it, and no history.
+- A `holding` column in the import now -> More format work for a history that is already in.
+
+**Consequences:**
+- Export then import no longer reproduces the data exactly: the link is lost. Revisit when the export is built (IMP-04), by adding an optional `holding` column then.
+- Placed depends on exchange rates at each transaction date, so a missing rate empties the profit instead of showing a wrong one.
+- A holding with transactions cannot be deleted, only archived.
+
+---
+
 ### ADR-044: End-to-end tests with Playwright, on a local stack, in CI (2026-11-11)
 
 **Context:**

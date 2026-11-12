@@ -26,4 +26,9 @@ export function currencyName(currency: Currency, locale: Locale) {
 }
 
 export type CurrencyError =
-  'unavailable' | 'unknown' | 'isDefault' | 'usedByAccount' | 'failed'
+  | 'unavailable'
+  | 'unknown'
+  | 'isDefault'
+  | 'usedByAccount'
+  | 'usedByHolding'
+  | 'failed'

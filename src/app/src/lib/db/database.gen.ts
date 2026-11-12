@@ -427,6 +427,176 @@ export type Database = {
           },
         ]
       }
+      holding_contributions: {
+        Row: {
+          amount: number
+          created_at: string
+          holding_id: string
+          id: string
+          label: string | null
+          on_date: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          holding_id: string
+          id?: string
+          label?: string | null
+          on_date: string
+          updated_at?: string
+          user_id?: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          holding_id?: string
+          id?: string
+          label?: string | null
+          on_date?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "holding_contributions_user_id_holding_id_fkey"
+            columns: ["user_id", "holding_id"]
+            isOneToOne: false
+            referencedRelation: "holdings"
+            referencedColumns: ["user_id", "id"]
+          },
+        ]
+      }
+      holding_snapshots: {
+        Row: {
+          amount: number
+          created_at: string
+          holding_id: string
+          id: string
+          on_date: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          holding_id: string
+          id?: string
+          on_date: string
+          updated_at?: string
+          user_id?: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          holding_id?: string
+          id?: string
+          on_date?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "holding_snapshots_user_id_holding_id_fkey"
+            columns: ["user_id", "holding_id"]
+            isOneToOne: false
+            referencedRelation: "holdings"
+            referencedColumns: ["user_id", "id"]
+          },
+        ]
+      }
+      holding_types: {
+        Row: {
+          code: string
+          country: string | null
+          kind: string
+          label_en: string
+          label_fr: string
+        }
+        Insert: {
+          code: string
+          country?: string | null
+          kind: string
+          label_en: string
+          label_fr: string
+        }
+        Update: {
+          code?: string
+          country?: string | null
+          kind?: string
+          label_en?: string
+          label_fr?: string
+        }
+        Relationships: []
+      }
+      holdings: {
+        Row: {
+          closed_on: string | null
+          country: string | null
+          created_at: string
+          currency: string
+          exclude_from_net_worth: boolean
+          id: string
+          institution_id: string | null
+          name: string
+          opened_on: string
+          type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          closed_on?: string | null
+          country?: string | null
+          created_at?: string
+          currency: string
+          exclude_from_net_worth?: boolean
+          id?: string
+          institution_id?: string | null
+          name: string
+          opened_on?: string
+          type: string
+          updated_at?: string
+          user_id?: string
+        }
+        Update: {
+          closed_on?: string | null
+          country?: string | null
+          created_at?: string
+          currency?: string
+          exclude_from_net_worth?: boolean
+          id?: string
+          institution_id?: string | null
+          name?: string
+          opened_on?: string
+          type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "holdings_type_fkey"
+            columns: ["type"]
+            isOneToOne: false
+            referencedRelation: "holding_types"
+            referencedColumns: ["code"]
+          },
+          {
+            foreignKeyName: "holdings_user_id_currency_fkey"
+            columns: ["user_id", "currency"]
+            isOneToOne: false
+            referencedRelation: "user_currencies"
+            referencedColumns: ["user_id", "code"]
+          },
+          {
+            foreignKeyName: "holdings_user_id_institution_id_fkey"
+            columns: ["user_id", "institution_id"]
+            isOneToOne: false
+            referencedRelation: "institutions"
+            referencedColumns: ["user_id", "id"]
+          },
+        ]
+      }
       import_batches: {
         Row: {
           committed_at: string
@@ -929,6 +1099,7 @@ export type Database = {
           currency: string
           event_id: string | null
           event_source: string | null
+          holding_id: string | null
           id: string
           import_batch_id: string | null
           import_ref: string | null
@@ -951,6 +1122,7 @@ export type Database = {
           currency: string
           event_id?: string | null
           event_source?: string | null
+          holding_id?: string | null
           id?: string
           import_batch_id?: string | null
           import_ref?: string | null
@@ -973,6 +1145,7 @@ export type Database = {
           currency?: string
           event_id?: string | null
           event_source?: string | null
+          holding_id?: string | null
           id?: string
           import_batch_id?: string | null
           import_ref?: string | null
@@ -994,6 +1167,13 @@ export type Database = {
             columns: ["user_id", "event_id"]
             isOneToOne: false
             referencedRelation: "events"
+            referencedColumns: ["user_id", "id"]
+          },
+          {
+            foreignKeyName: "transactions_holding_fk"
+            columns: ["user_id", "holding_id"]
+            isOneToOne: false
+            referencedRelation: "holdings"
             referencedColumns: ["user_id", "id"]
           },
           {
@@ -1104,6 +1284,20 @@ export type Database = {
         }
         Relationships: []
       }
+      holding_totals: {
+        Row: {
+          currency: string | null
+          display_currency: string | null
+          display_value: number | null
+          holding_id: string | null
+          latest_on: string | null
+          latest_value: number | null
+          placed: number | null
+          profit: number | null
+          profit_percent: number | null
+        }
+        Relationships: []
+      }
       institution_totals: {
         Row: {
           converted: boolean | null
@@ -1205,6 +1399,10 @@ export type Database = {
       category_status: { Args: { category: string }; Returns: string }
       check_money_amount: {
         Args: { amount: number; currency: string }
+        Returns: undefined
+      }
+      check_transaction_holding: {
+        Args: { transaction: string }
         Returns: undefined
       }
       check_transaction_people: {
@@ -1373,6 +1571,7 @@ export type Database = {
           amount: number
           event_choice?: string
           event_id?: string
+          holding_id?: string
           kind: string
           merchant_id?: string
           note?: string

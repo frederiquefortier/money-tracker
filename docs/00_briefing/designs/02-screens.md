@@ -8,12 +8,14 @@ Rules every screen follows. A screen that disagrees with them is wrong until the
 |---|---|
 | [First run](17-first-run.md) | SET-01 |
 | [Export](18-export.md) | IMP-04, SEC-04 |
+| [Holdings](19-holdings.md) | NW-01, 02, 03, 05 |
+| [Net worth](20-net-worth.md) | NW-10, ACC-06 |
 
 Everything else in phases 1 to 3 is built; read the code.
 
 ## Rules
 
-- **Page:** the title with its buttons beside it, no back link. Order of controls: expand all, filter, sort. Adding is one round + bottom right, never beside the title.
+- **Page:** the title with its buttons beside it. A page opened from a hub card has "‹ {hub}" above the title, back to the hub; a tab or menu page has no back link, and a sheet closes instead. Order of controls: expand all, filter, sort. Adding is one round + bottom right, never beside the title.
 - **Lists:** cards, one line per item. Tapping an item opens its form. A chevron alone toggles a card or a tree branch. Collapsed state is remembered per browser.
 - **Row actions:** icons at the end of the row from `md` up; on phones they move to the item's sheet header, so the row keeps its width. Delete is always `trash-full`. An action that cannot apply is muted, and a tap says why in a toast. Any failure is a toast.
 - **Archive:** the word is "Archiver", a dialog asks the date (default today). Archived items sit in a collapsed "… archivé(e)s (n)" section, flat and muted.

@@ -6,6 +6,7 @@ import { FeedbackSection } from '#/components/design/feedback-section'
 import { FieldsSection } from '#/components/design/fields-section'
 import { FoundationsSection } from '#/components/design/foundations-section'
 import { ListsSection } from '#/components/design/lists-section'
+import { NetWorthSection } from '#/components/design/net-worth-section'
 import { PageTitle } from '#/components/layout/list-page'
 import { chipSurface } from '#/components/styles'
 import { cn } from '#/lib/utils'
@@ -16,6 +17,7 @@ const CONTENTS = [
   ['fields', 'Fields'],
   ['display', 'Display'],
   ['lists', 'Lists and cards'],
+  ['net-worth', 'Net worth'],
   ['feedback', 'Feedback'],
 ] as const
 
@@ -60,6 +62,7 @@ function Design() {
         <FieldsSection />
         <DisplaySection />
         <ListsSection />
+        <NetWorthSection />
         <FeedbackSection />
       </div>
     </div>

@@ -7,7 +7,7 @@ import { todayIso } from '#/lib/shared/format'
 import { useAccountsPage } from '#/hooks/app/use-page-data'
 import { useMyCurrencies } from '#/hooks/currencies/use-my-currencies'
 
-export const Route = createFileRoute('/_authed/accounts/new')({
+export const Route = createFileRoute('/_authed/net-worth/accounts/new')({
   staticData: { sheet: true },
   component: NewAccount,
 })
@@ -21,7 +21,7 @@ function NewAccount() {
     : (types[0]?.code ?? '')
 
   return (
-    <RouteSheet to="/accounts" title={t('accounts.newTitle')}>
+    <RouteSheet to="/net-worth/accounts" title={t('accounts.newTitle')}>
       <AccountForm
         initial={{
           name: '',

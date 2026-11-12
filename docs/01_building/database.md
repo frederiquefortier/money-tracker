@@ -111,14 +111,21 @@ narrower range wins, then the earlier created. `event_exclusions` remember an au
 removed by hand so it never comes back. `matching_event` is the one function the form,
 `save_transaction`, the import and `relink_events` all call.
 
+**Holdings.** `holdings` are investments, assets and debts (bank accounts count through their
+balance). `holding_snapshots` are the dated values, one per holding per date, in the holding's
+currency; `holding_contributions` only the employer or government money. My own contributions
+are the transactions with a `holding_id`, allowed on an expense or an income whose categories are
+all investment-kind, so a withdrawal is an income. Deleting a holding with transactions is
+refused; the currency is fixed once it has entries; it cannot close before its last entry, and
+takes nothing dated after. `holding_totals` gives placed, latest value, profit and percent,
+null (never zero or partial) when a rate or a value is missing (ADR-045). A category with
+linked transactions stays an investment.
+
 ## Not built yet
 
 | Table | Notes |
 |---|---|
 | `budgets` | `category_id` or `event_id` (exactly one), period, `metric` (amount/count), `direction` (max/min), `value`. BUD-01, 02, EVT-06. |
 | `budget_settings` | Expected monthly income, emergency fund months and account. BUD-03, 04. |
-| `holdings`, `holding_snapshots` | Investments, assets, debts and their dated values. NW-01, 02, 05. Bank accounts count through their balance, not as holdings. |
-| `holding_contributions` | Only money that did not leave one of my accounts (employer, government). My own contributions are the transactions pointing at the holding, so they are never entered twice. NW-03. |
 | `employers`, `salaries` | NW-09. |
-| `holding_types` | Region pack data (LOC-02), a CSV in `src/data/reference/`. |
 | Tags | Decided against, see [improvements.md](../03_planning/improvements.md#decided-against). |

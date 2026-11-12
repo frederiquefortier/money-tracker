@@ -13,8 +13,8 @@ const TABS = [
     activeIcon: 'receipt-fill',
   },
   {
-    to: '/accounts',
-    label: 'nav.accounts',
+    to: '/net-worth',
+    label: 'netWorth.title',
     icon: 'wallet',
     activeIcon: 'wallet-fill',
   },

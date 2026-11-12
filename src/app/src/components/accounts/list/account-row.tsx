@@ -25,7 +25,10 @@ export function AccountRow({
   const { t } = useTranslation()
   return (
     <ListRow
-      link={{ to: '/accounts/$accountId', params: { accountId: account.id } }}
+      link={{
+        to: '/net-worth/accounts/$accountId',
+        params: { accountId: account.id },
+      }}
       alignTop={alignTop}
       actions={
         <AccountActions

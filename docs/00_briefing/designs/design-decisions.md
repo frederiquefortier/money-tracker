@@ -6,7 +6,9 @@ Newest first inside each section.
 
 ## Navigation and layout
 
-- **Four tabs: Transactions, Comptes, Dashboard, Budget** (2026-11-05). Comptes is a tab because it shows balances. Everything set up once (categories, merchants, currencies, people, events, import) sits in the Réglages menu, a sheet from the left. Tab labels are one short word; "Dashboard" stays in French because "Tableau de bord" wraps.
+- **Four tabs: Transactions, Net worth, Dashboard, Budget** (2026-11-12, was Comptes since 2026-11-05). Net worth is a hub, and Comptes and Placements are its two subpages. Everything set up once (categories, merchants, currencies, people, events, import) sits in the Réglages menu, a sheet from the left. Tab labels are one short word; "Dashboard" stays in French because "Tableau de bord" wraps.
+- **Net worth is a hub with two subpages, not one list** (2026-11-12). Accounts and holdings differ in their rows, actions and grouping, and a merged list blurs both. The hub carries the totals on its two link cards, in a layout that takes the phase 5 chart above them. The subpages show no total of their own. The author asked for it; ADR-046.
+- **A page opened from a hub card has a link back to the hub** (2026-11-12). The earlier rule of no back link had no use case; this is the first. A tab or menu page has none, and sheets close instead.
 - **One round + button bottom right on every screen that adds something** (2026-11-05), in place of buttons beside the title. A screen with several things to add fans them out as round icons.
 - **No summary tiles on the transactions list** (2026-11-05). Spent-this-period belongs to the dashboard.
 - **Amounts at one size** (2026-11-05). TravelSpend sets cents smaller; not kept.

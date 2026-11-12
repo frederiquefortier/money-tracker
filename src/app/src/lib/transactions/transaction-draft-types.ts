@@ -25,6 +25,7 @@ export type TransactionDraft = {
   occurredOn: string
   merchantId: string | null
   sellerId: string | null
+  holdingId: string | null
   categoryId: string | null
   categoryByHand: boolean
   splitMode: SplitMode | null

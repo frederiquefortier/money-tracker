@@ -24,6 +24,8 @@ type TransactionResult<T = object> = Result<TransactionError, T>
 
 const failure = failureFor<TransactionError>('transactions', {
   P0002: 'notFound',
+  holding_needs_investment_category: 'holdingInvalid',
+  holding_closed: 'holdingInvalid',
 })
 
 const isKind = isOneOf(TRANSACTION_KINDS)
@@ -116,7 +118,7 @@ export const getTransaction = createServerFn({ method: 'GET' })
     const { data: row, error } = await getSupabase()
       .from('transactions')
       .select(
-        'id, account_id, kind, occurred_on, amount::text, original_amount::text, original_currency, status, merchant_id, seller_person_id, note, transfer_id, event_id, event_source, transaction_splits(category_id, input_mode, input_value::text, amount::text), transaction_people(id, position, role, person_id, head_count, input_mode, input_value::text, amount_unknown, fills_rest), reimbursements!reimbursements_user_id_income_id_fkey(owed_line_id)',
+        'id, account_id, kind, occurred_on, amount::text, original_amount::text, original_currency, status, merchant_id, seller_person_id, holding_id, note, transfer_id, event_id, event_source, transaction_splits(category_id, input_mode, input_value::text, amount::text), transaction_people(id, position, role, person_id, head_count, input_mode, input_value::text, amount_unknown, fills_rest), reimbursements!reimbursements_user_id_income_id_fkey(owed_line_id)',
       )
       .eq('id', data.id)
       .maybeSingle()
@@ -141,6 +143,7 @@ export const getTransaction = createServerFn({ method: 'GET' })
       pending: row.status === 'pending',
       merchantId: row.merchant_id,
       sellerId: row.seller_person_id,
+      holdingId: row.holding_id,
       note: row.note,
       splitMode: isMode(mode) ? mode : 'amount',
       // Splits keep no order of their own; largest first reads best.
@@ -186,6 +189,7 @@ export const saveTransaction = createServerFn({ method: 'POST' })
       status: data.pending ? 'pending' : 'cleared',
       merchant_id: data.merchantId,
       seller_id: data.sellerId,
+      holding_id: data.holdingId,
       note: data.note,
       splits: data.splits.map((s) => ({
         category_id: s.categoryId,

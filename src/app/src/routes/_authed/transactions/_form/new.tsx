@@ -72,7 +72,7 @@ function NewTransaction() {
       ) : (
         <SheetBody className="flex flex-col gap-2">
           <p>{t('transactions.noAccount')}</p>
-          <Link to="/accounts" className="font-semibold text-primary">
+          <Link to="/net-worth/accounts" className="font-semibold text-primary">
             {t('nav.accounts')}
           </Link>
         </SheetBody>

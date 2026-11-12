@@ -22,9 +22,11 @@ export function AddCurrencyButton() {
 export function CurrencyManager({
   ratesFrom,
   openAccounts,
+  openHoldings,
 }: {
   ratesFrom: Record<string, string | null>
   openAccounts: Partial<Record<string, Array<string>>>
+  openHoldings: Partial<Record<string, Array<string>>>
 }) {
   const { t } = useTranslation()
   const toast = useToast()
@@ -36,11 +38,18 @@ export function CurrencyManager({
     if (code === shown.defaultCurrency)
       return t('currencies.defaultCannotBeRemoved')
     const accounts = openAccounts[code] ?? []
-    if (accounts.length === 0) return null
-    return t('currencies.usedByAccount', {
-      name: accounts[0],
+    if (accounts.length > 0)
+      return t('currencies.usedByAccount', {
+        name: accounts[0],
+        code,
+        count: accounts.length - 1,
+      })
+    const holdings = openHoldings[code] ?? []
+    if (holdings.length === 0) return null
+    return t('currencies.usedByHolding', {
+      name: holdings[0],
       code,
-      count: accounts.length - 1,
+      count: holdings.length - 1,
     })
   }
 

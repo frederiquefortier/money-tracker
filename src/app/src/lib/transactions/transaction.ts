@@ -63,6 +63,8 @@ export type Transaction = {
   merchantId: string | null
   /** Who the expense was bought from (PPL-08). */
   sellerId: string | null
+  /** The holding an investment expense or income pays into or out of (NW-03). */
+  holdingId: string | null
   note: string | null
   splitMode: SplitMode
   splits: Array<{ categoryId: string; value: string }>
@@ -102,6 +104,7 @@ export const transactionInputSchema = z
     pending: z.boolean(),
     merchantId: z.uuid().nullable(),
     sellerId: z.uuid().nullable(),
+    holdingId: z.uuid().nullable(),
     note: noteSchema,
     splitMode: z.enum(SPLIT_MODES),
     splits: z
@@ -129,4 +132,4 @@ export const transactionInputSchema = z
   .refine((t) => (t.originalAmount === null) === (t.originalCurrency === null))
 export type TransactionInput = z.input<typeof transactionInputSchema>
 
-export type TransactionError = 'notFound' | 'failed'
+export type TransactionError = 'notFound' | 'holdingInvalid' | 'failed'

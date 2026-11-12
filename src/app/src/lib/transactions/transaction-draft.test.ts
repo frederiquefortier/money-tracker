@@ -168,6 +168,7 @@ describe('draftFromTransaction', () => {
         pending: false,
         merchantId: null,
         sellerId: null,
+        holdingId: null,
         note: null,
         splitMode: 'share',
         splits: [

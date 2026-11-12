@@ -11,15 +11,19 @@ export function PageTitle({ children }: { children: React.ReactNode }) {
 /** A list screen (Comptes, or one from the menu): one centred column under its title. */
 export function ListPage({
   title,
+  back,
   actions,
   children,
 }: {
   title: string
+  /** The link above the title, on a page opened from a hub card. */
+  back?: React.ReactNode
   actions?: React.ReactNode
   children: React.ReactNode
 }) {
   return (
     <div className={pageColumn}>
+      {back}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <PageTitle>{title}</PageTitle>
         {actions && (
