@@ -64,7 +64,7 @@ export function FormSheet({
                 onClosed()
               }}
             >
-              <div className="contents" onInputCapture={markChanged}>
+              <div className="contents" onChange={markChanged}>
                 {children}
               </div>
               <ConfirmDialog
