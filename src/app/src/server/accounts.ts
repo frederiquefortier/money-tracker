@@ -1,10 +1,6 @@
 import { createServerFn } from '@tanstack/react-start'
 import { z } from 'zod'
-import {
-  NO_INSTITUTION,
-  accountInputSchema,
-  institutionInputSchema,
-} from '#/lib/accounts/account'
+import { NO_INSTITUTION, accountInputSchema } from '#/lib/accounts/account'
 import {
   deleteRow,
   inUseIds,
@@ -16,11 +12,8 @@ import { failureFor } from '#/lib/shared/result'
 import type { Result } from '#/lib/shared/result'
 import { idInput } from '#/lib/shared/validation'
 import { getSupabase } from '#/lib/server/supabase.server'
-import type {
-  Institution,
-  AccountsPage,
-  AccountError,
-} from '#/lib/accounts/account'
+import type { AccountsPage, AccountError } from '#/lib/accounts/account'
+import type { Institution } from '#/lib/institutions/institution'
 
 type AccountResult<T = object> = Result<AccountError, T>
 
@@ -185,23 +178,4 @@ export const deleteAccount = createServerFn({ method: 'POST' })
   .handler(async ({ data }): Promise<AccountResult> => {
     const error = await deleteRow('accounts', data.id)
     return error ? failure('delete', error) : { ok: true }
-  })
-
-export const saveInstitution = createServerFn({ method: 'POST' })
-  .validator(institutionInputSchema)
-  .handler(async ({ data }): Promise<AccountResult<{ id: string }>> => {
-    const { saved, error } = await saveRow('institutions', data.id, {
-      name: data.name,
-      website_url: data.websiteUrl || null,
-    })
-    if (error) return failure('institution', error)
-    if (!saved) return { ok: false, error: 'notFound' }
-    return { ok: true, id: saved.id }
-  })
-
-export const deleteInstitution = createServerFn({ method: 'POST' })
-  .validator(idInput)
-  .handler(async ({ data }): Promise<AccountResult> => {
-    const error = await deleteRow('institutions', data.id)
-    return error ? failure('delete institution', error) : { ok: true }
   })

@@ -25,6 +25,7 @@ export const shellEn: typeof shellFr = {
   },
   settings: {
     title: 'Settings',
+    institutions: 'Institutions',
     categories: 'Categories',
     currencies: 'Currencies',
     merchants: 'Merchants',

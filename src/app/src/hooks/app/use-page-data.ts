@@ -10,6 +10,10 @@ export function useHoldingsPage() {
   return useLoaderData({ from: '/_authed/net-worth/holdings' })
 }
 
+export function useInstitutionsPage() {
+  return useLoaderData({ from: '/_authed/settings/institutions' })
+}
+
 export function useCategoriesPage() {
   return useLoaderData({ from: '/_authed/settings/categories' })
 }

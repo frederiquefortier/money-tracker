@@ -1,0 +1,40 @@
+import { Outlet, createFileRoute } from '@tanstack/react-router'
+import { useTranslation } from 'react-i18next'
+import { InstitutionRowView } from '#/components/institutions/institution-row'
+import { FloatingAddLink } from '#/components/layout/floating-add-button'
+import { ListPage } from '#/components/layout/list-page'
+import { EmptyState, ListCard } from '#/components/lists/list-card'
+import { getInstitutions } from '#/server/institutions'
+
+export const Route = createFileRoute('/_authed/settings/institutions')({
+  loader: () => getInstitutions(),
+  component: Institutions,
+})
+
+function Institutions() {
+  const { t } = useTranslation()
+  const institutions = Route.useLoaderData()
+
+  return (
+    <ListPage title={t('settings.institutions')}>
+      {institutions.length === 0 ? (
+        <EmptyState>{t('institutions.empty')}</EmptyState>
+      ) : (
+        <ListCard>
+          {institutions.map((institution) => (
+            <InstitutionRowView
+              key={institution.id}
+              institution={institution}
+            />
+          ))}
+        </ListCard>
+      )}
+      <FloatingAddLink
+        to="/settings/institutions/new"
+        label={t('institutions.add')}
+      />
+      {/* The institution form opens here as a sheet, over the list. */}
+      <Outlet />
+    </ListPage>
+  )
+}

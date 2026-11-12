@@ -37,8 +37,8 @@ English; this file is in English like every other meta-doc.
 | ACC-02 | Creating an account records its opening balance and date. | v1, ai | 1 |
 | ACC-03 | An account can be closed (keeps history, gone from pickers). | v1, ai | 1 |
 | ACC-04 | An account can be hidden from new transactions without being closed. | v1 | 1 |
-| ACC-05 | Institutions are reusable records with a name and an optional website URL. CRUD, inline "create" from the account form. | add, C1 | 1 |
-| ACC-06 | The accounts subpage groups accounts by institution: collapsible sections, institution name links to its site, per-institution balance total. | add, C1 | 1 |
+| ACC-05 | Institutions are reusable records with a name and an optional website URL, shared by accounts and holdings. CRUD in Réglages; the account and holding forms can also create one inline. | add, C1 | 1 |
+| ACC-06 | The accounts subpage groups open accounts by institution (only institutions with an open account, then the accounts with none): collapsible sections, institution name links to its site, per-institution balance total. | add, C1 | 1 |
 | ACC-07 | Sort accounts within each group by name, type, currency, balance ascending, balance descending. The choice persists per browser. | add, C2 | 1 |
 | ACC-08 | Each account shows when it was last reconciled and when its last transaction was. | sheet | 4 |
 

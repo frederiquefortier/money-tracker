@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { currencyOptions } from '#/components/accounts/form/account-fields'
-import { InstitutionPicker } from '#/components/accounts/institutions/institution-picker'
+import { InstitutionPicker } from '#/components/institutions/institution-picker'
 import { CheckboxField } from '#/components/forms/checkbox-field'
 import { DatePickerField } from '#/components/forms/date-picker-field'
 import { FormField } from '#/components/forms/form-field'
@@ -12,7 +12,7 @@ import type { HoldingType } from '#/lib/holdings/holding'
 import { useLocale } from '#/hooks/app/use-locale'
 import type { Currency } from '#/lib/currencies/currency'
 import type { FieldBinding } from '#/hooks/forms/use-sheet-form'
-import type { Institution } from '#/lib/accounts/account'
+import type { Institution } from '#/lib/institutions/institution'
 
 export type HoldingValues = {
   name: string

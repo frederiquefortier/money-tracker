@@ -1,8 +1,8 @@
 import { useTranslation } from 'react-i18next'
 import { Combobox } from '#/components/combobox/combobox'
 import { useInlineCreate } from '#/hooks/forms/use-inline-create'
-import { saveInstitution } from '#/server/accounts'
-import type { Institution } from '#/lib/accounts/account'
+import { saveInstitution } from '#/server/institutions'
+import type { Institution } from '#/lib/institutions/institution'
 
 /** ACC-05: pick an institution, or create one by typing its name. */
 export function InstitutionPicker({

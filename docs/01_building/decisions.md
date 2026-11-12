@@ -4,6 +4,27 @@ Technical and structural choices, with the alternatives that were rejected. Chec
 
 <!-- Newest first: a new ADR goes directly below this line. Template at the bottom. -->
 
+### ADR-047: Institutions are managed in Réglages (2026-11-12)
+
+**Context:**
+- Institutions were managed on the accounts page: one group per institution, with edit and delete. Holdings now share them, and the author's holdings sit mostly in other institutions than the accounts. The accounts page showed empty groups, and an institution used only by a holding looked deletable although the database refuses (the in-use check counted accounts only).
+
+**Decision:**
+- A Réglages list, `/settings/institutions`, with the form in a route sheet, replaces the institution routes under `/net-worth/accounts`. The account and holding forms keep the inline picker with "Créer « … »".
+- Delete is blocked while an account or a holding uses the institution. The list shows how many of each.
+- The accounts page groups only the institutions with an open account, plus the accounts with none. Its group header keeps the website icon and loses the form link and the delete.
+- The institution code moves from `accounts` to its own `institutions` folders in `lib/`, `server/` and `components/`.
+
+**Alternatives Considered:**
+- Keep them on the accounts page, hide the empty groups and count holdings in the in-use check -> Where an institution is managed would still depend on whether it has accounts.
+- Separate institutions for accounts and for holdings -> The same bank twice.
+
+**Consequences:**
+- ACC-05 and ACC-06 are reworded. The `/net-worth/accounts/institutions/*` URLs go, with no redirect (ADR-021).
+- An institution with only closed accounts or only holdings is findable only in Réglages.
+
+---
+
 ### ADR-046: One Net worth tab with the accounts and the holdings as subpages (2026-11-12)
 
 **Context:**

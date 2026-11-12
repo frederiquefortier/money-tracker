@@ -6,46 +6,46 @@ import {
   IconAnchor,
   IconButton,
 } from '#/components/display/icon-button'
-import { deleteInstitution } from '#/server/accounts'
+import type { ActionPlacement } from '#/components/display/icon-button'
+import { deleteInstitution } from '#/server/institutions'
 import { useToast } from '#/hooks/app/use-toast'
-import type { Institution } from '#/lib/accounts/account'
+import type { InstitutionRow } from '#/lib/institutions/institution'
 
 /**
- * The website (opens in a new tab) and delete on the institution's card header, after the total, from `md` up; on phones it is
- * in the institution's sheet (`placement="sheet"`). The header itself opens the form.
- * Delete waits until no account, open or closed, uses it (ACC-05).
+ * The website (opens in a new tab) and delete, as icons on the institution's row or its
+ * sheet. Delete waits until no account (open or closed) and no holding uses it (ACC-05).
  */
 export function InstitutionActions({
   institution,
-  inUse,
-  placement = 'row',
+  placement,
 }: {
-  institution: Institution
-  inUse: boolean
-  placement?: 'row' | 'sheet'
+  institution: InstitutionRow
+  placement?: ActionPlacement
 }) {
   const { t } = useTranslation()
   const toast = useToast()
   const [confirming, setConfirming] = useState(false)
   const { id, name } = institution
+  const inUse = institution.accountCount + institution.holdingCount > 0
   const deleteLabel = t('common.deleteName', { name })
 
   return (
     <>
-      {/* Two slots, as on account rows, so the total lines up with their balances. */}
       <IconActions slots={2} placement={placement}>
         {institution.websiteUrl ? (
           <IconAnchor
             icon="external-link"
-            label={t('accounts.website', { name })}
+            label={t('institutions.openWebsite', { name })}
             href={institution.websiteUrl}
           />
         ) : (
           <IconButton
             icon="external-link"
-            label={t('accounts.noWebsite', { name })}
+            label={t('institutions.noWebsite', { name })}
             muted
-            onClick={() => toast({ text: t('accounts.noWebsite', { name }) })}
+            onClick={() =>
+              toast({ text: t('institutions.noWebsite', { name }) })
+            }
           />
         )}
         <IconButton

@@ -2,9 +2,9 @@ import { useTranslation } from 'react-i18next'
 import { FormField } from '#/components/forms/form-field'
 import { SheetForm } from '#/components/sheet/sheet-form'
 import { useSheetForm } from '#/hooks/forms/use-sheet-form'
-import { institutionFormSchema } from '#/lib/accounts/account'
-import { saveInstitution } from '#/server/accounts'
-import type { Institution } from '#/lib/accounts/account'
+import { institutionFormSchema } from '#/lib/institutions/institution'
+import { saveInstitution } from '#/server/institutions'
+import type { Institution } from '#/lib/institutions/institution'
 
 /** ACC-05, in the same sheet as the account form. */
 export function InstitutionForm({

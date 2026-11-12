@@ -8,7 +8,7 @@ import { formValues } from '#/lib/forms/form-state'
 import { useMyCurrencies } from '#/hooks/currencies/use-my-currencies'
 import { saveHolding } from '#/server/holdings'
 import type { HoldingType } from '#/lib/holdings/holding'
-import type { Institution } from '#/lib/accounts/account'
+import type { Institution } from '#/lib/institutions/institution'
 
 const TEXT_FIELDS = ['name', 'type', 'country', 'openedOn'] as const
 

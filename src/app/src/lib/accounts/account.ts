@@ -5,6 +5,7 @@ import { currencyCodeSchema } from '#/lib/currencies/currency'
 import { compareDecimal, parseAmount } from '#/lib/shared/money'
 import { compareNames } from '#/lib/shared/collections'
 import { nameSchema } from '#/lib/shared/validation'
+import type { Institution } from '#/lib/institutions/institution'
 
 // Shared by the account forms and their server functions (SET-07).
 
@@ -53,21 +54,6 @@ export const accountInputSchema = accountFormSchema.extend({
   hiddenForNew: z.boolean(),
 })
 export type AccountInput = z.input<typeof accountInputSchema>
-
-export const institutionFormSchema = z.object({
-  name: nameSchema,
-  websiteUrl: z
-    .string()
-    .trim()
-    .max(500, { error: 'invalid' })
-    .refine((url) => url === '' || /^https:\/\/\S+$/.test(url), {
-      error: 'url',
-    }),
-})
-
-export const institutionInputSchema = institutionFormSchema.extend({
-  id: z.uuid().optional(),
-})
 
 export const SORTS = [
   'name',
@@ -127,12 +113,6 @@ export type Account = {
   displayBalance: string | null
   /** A transaction is in it, so it cannot be deleted. */
   inUse: boolean
-}
-
-export type Institution = {
-  id: string
-  name: string
-  websiteUrl: string | null
 }
 
 export type GroupTotal = { total: string | null; converted: boolean }

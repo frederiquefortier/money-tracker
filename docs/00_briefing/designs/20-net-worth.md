@@ -31,7 +31,7 @@ Route `/net-worth`, the "Net worth" tab (the name stays English in both language
 
 ## The subpages
 
-- `/net-worth/accounts`: the accounts page as built (ACC-06, ACC-07). `/net-worth/holdings`: [19-holdings.md](19-holdings.md).
+- `/net-worth/accounts`: the accounts page as built (ACC-06, ACC-07), except that it groups only institutions with an open account, and institutions are managed in Réglages ([21-institutions.md](21-institutions.md)). `/net-worth/holdings`: [19-holdings.md](19-holdings.md).
 - Each has a link above its title, "‹ Net worth", back to the hub. The tab also goes to the hub and stays active on all three paths.
 - Neither shows a total of its own; the totals are on the hub cards.
 - Each keeps its single round + bottom right, and its sheets keep their own URLs below the page (`/net-worth/accounts/new`, `/net-worth/holdings/$holdingId`).

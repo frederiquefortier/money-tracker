@@ -6,7 +6,7 @@ import { ListCard } from '#/components/lists/list-card'
 import { formatDate } from '#/lib/shared/format'
 import { useLocale } from '#/hooks/app/use-locale'
 import { useStoredState } from '#/hooks/app/use-stored-state'
-import type { Institution } from '#/lib/accounts/account'
+import type { Institution } from '#/lib/institutions/institution'
 
 const parseBoolean = (v: unknown) => (typeof v === 'boolean' ? v : undefined)
 

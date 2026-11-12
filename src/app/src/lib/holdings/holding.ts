@@ -4,7 +4,7 @@ import { inLocale } from '#/i18n/locales'
 import type { Locale } from '#/i18n/locales'
 import { compareDecimal, parseAmount } from '#/lib/shared/money'
 import { nameSchema } from '#/lib/shared/validation'
-import type { Institution } from '#/lib/accounts/account'
+import type { Institution } from '#/lib/institutions/institution'
 
 // Shared by the Placements screens, the transaction form and the server functions (NW-01..03, 05).
 

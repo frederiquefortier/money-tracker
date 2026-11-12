@@ -77,6 +77,7 @@ Dates went through four rounds in November 2026. The result:
 
 ## Accounts
 
+- **Institutions are managed in Réglages, not on the accounts page** (2026-11-12). Accounts and holdings share them, and most holdings sit in other institutions than the accounts, so the accounts page showed empty groups and could offer a delete the database refused. The accounts page groups only institutions with an open account. The author asked for it; ADR-047.
 - **One account per currency for multi-currency providers** (Wise CAD, Wise EUR, grouped under one institution). Each balance has its own statement and an account books in one currency (TRX-02), so balances stay exact. The `multi_currency` account type was dropped. Moving between balances is a transfer; paying in euros from CAD is an expense with an original price (CUR-08).
 - **A currency's favourite star removed** (2026-11-05): a user keeps a handful, so pinning saved nothing.
 - **Removing a currency never changes a transaction or account**; it leaves pickers only. An open account blocks it; the default cannot be removed. Adding it back skips the rate check (`removed_at`).

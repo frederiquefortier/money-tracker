@@ -50,16 +50,16 @@ function shape(page: AccountsPage, locale: Locale, sort: Sort) {
     FORMAT_LOCALE[locale],
   )
   const groups = [
-    ...page.institutions.map((institution) => ({
-      key: institution.id,
-      institution,
-    })),
+    ...page.institutions
+      .filter((institution) =>
+        open.some((a) => a.institutionId === institution.id),
+      )
+      .map((institution) => ({ key: institution.id, institution })),
     ...(open.some((a) => !a.institutionId)
       ? [{ key: NO_INSTITUTION, institution: null }]
       : []),
   ]
-  const used = new Set(page.accounts.map((a) => groupKey(a.institutionId)))
-  return { listed, open, groups, used }
+  return { listed, open, groups }
 }
 
 function AddMenu() {
@@ -72,11 +72,6 @@ function AddMenu() {
           to: '/net-worth/accounts/new',
           label: t('accounts.addAccount'),
           icon: 'wallet',
-        },
-        {
-          to: '/net-worth/accounts/institutions/new',
-          label: t('accounts.addInstitution'),
-          icon: 'bank',
         },
         {
           to: '/net-worth/accounts/adjust',
@@ -100,7 +95,7 @@ function Accounts() {
   )
   const collapsed = useStoredIds('accounts.collapsed')
 
-  const { listed, open, groups, used } = shape(page, locale, sort)
+  const { listed, open, groups } = shape(page, locale, sort)
 
   const keys = groups.map((group) => group.key)
   const allExpanded = keys.every((key) => !collapsed.ids.has(key))
@@ -134,7 +129,6 @@ function Accounts() {
           key={key}
           institution={institution}
           accounts={open.filter((a) => groupKey(a.institutionId) === key)}
-          inUse={used.has(key)}
           total={page.totals[key]}
           displayCurrency={displayCurrency}
           collapsed={collapsed.ids.has(key)}

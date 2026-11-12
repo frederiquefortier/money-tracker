@@ -23,6 +23,7 @@ export const shellFr = {
   },
   settings: {
     title: 'Réglages',
+    institutions: 'Institutions',
     categories: 'Catégories',
     currencies: 'Devises',
     merchants: 'Magasins',

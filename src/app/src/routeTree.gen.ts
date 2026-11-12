@@ -27,6 +27,7 @@ import { Route as AuthedSettingsCategoriesRouteImport } from './routes/_authed/s
 import { Route as AuthedSettingsCurrenciesRouteImport } from './routes/_authed/settings/currencies'
 import { Route as AuthedSettingsEventsRouteImport } from './routes/_authed/settings/events'
 import { Route as AuthedSettingsImportRouteImport } from './routes/_authed/settings/import'
+import { Route as AuthedSettingsInstitutionsRouteImport } from './routes/_authed/settings/institutions'
 import { Route as AuthedSettingsMerchantsRouteImport } from './routes/_authed/settings/merchants'
 import { Route as AuthedSettingsPeopleRouteImport } from './routes/_authed/settings/people'
 import { Route as AuthedTransactionsFormRouteImport } from './routes/_authed/transactions/_form'
@@ -40,6 +41,8 @@ import { Route as AuthedSettingsCategoriesNewRouteImport } from './routes/_authe
 import { Route as AuthedSettingsCurrenciesAddRouteImport } from './routes/_authed/settings/currencies/add'
 import { Route as AuthedSettingsEventsEventIdRouteImport } from './routes/_authed/settings/events/$eventId'
 import { Route as AuthedSettingsEventsNewRouteImport } from './routes/_authed/settings/events/new'
+import { Route as AuthedSettingsInstitutionsInstitutionIdRouteImport } from './routes/_authed/settings/institutions/$institutionId'
+import { Route as AuthedSettingsInstitutionsNewRouteImport } from './routes/_authed/settings/institutions/new'
 import { Route as AuthedSettingsMerchantsMerchantIdRouteImport } from './routes/_authed/settings/merchants/$merchantId'
 import { Route as AuthedSettingsMerchantsNewRouteImport } from './routes/_authed/settings/merchants/new'
 import { Route as AuthedSettingsPeoplePersonIdRouteImport } from './routes/_authed/settings/people/$personId'
@@ -47,8 +50,6 @@ import { Route as AuthedSettingsPeopleNewRouteImport } from './routes/_authed/se
 import { Route as AuthedTransactionsFormTransactionIdRouteImport } from './routes/_authed/transactions/_form/$transactionId'
 import { Route as AuthedTransactionsFormNewRouteImport } from './routes/_authed/transactions/_form/new'
 import { Route as AuthedTransactionsAdjustmentsAdjustmentIdRouteImport } from './routes/_authed/transactions/adjustments/$adjustmentId'
-import { Route as AuthedNetWorthAccountsInstitutionsInstitutionIdRouteImport } from './routes/_authed/net-worth/accounts/institutions/$institutionId'
-import { Route as AuthedNetWorthAccountsInstitutionsNewRouteImport } from './routes/_authed/net-worth/accounts/institutions/new'
 import { Route as AuthedSettingsEventsTypesTypeIdRouteImport } from './routes/_authed/settings/events/types/$typeId'
 import { Route as AuthedSettingsEventsTypesNewRouteImport } from './routes/_authed/settings/events/types/new'
 import { Route as AuthedSettingsPeopleGroupsGroupIdRouteImport } from './routes/_authed/settings/people/groups/$groupId'
@@ -146,6 +147,12 @@ const AuthedSettingsImportRoute = AuthedSettingsImportRouteImport.update({
   path: '/settings/import',
   getParentRoute: () => AuthedRoute,
 } as any)
+const AuthedSettingsInstitutionsRoute =
+  AuthedSettingsInstitutionsRouteImport.update({
+    id: '/settings/institutions',
+    path: '/settings/institutions',
+    getParentRoute: () => AuthedRoute,
+  } as any)
 const AuthedSettingsMerchantsRoute = AuthedSettingsMerchantsRouteImport.update({
   id: '/settings/merchants',
   path: '/settings/merchants',
@@ -219,6 +226,18 @@ const AuthedSettingsEventsNewRoute = AuthedSettingsEventsNewRouteImport.update({
   path: '/new',
   getParentRoute: () => AuthedSettingsEventsRoute,
 } as any)
+const AuthedSettingsInstitutionsInstitutionIdRoute =
+  AuthedSettingsInstitutionsInstitutionIdRouteImport.update({
+    id: '/$institutionId',
+    path: '/$institutionId',
+    getParentRoute: () => AuthedSettingsInstitutionsRoute,
+  } as any)
+const AuthedSettingsInstitutionsNewRoute =
+  AuthedSettingsInstitutionsNewRouteImport.update({
+    id: '/new',
+    path: '/new',
+    getParentRoute: () => AuthedSettingsInstitutionsRoute,
+  } as any)
 const AuthedSettingsMerchantsMerchantIdRoute =
   AuthedSettingsMerchantsMerchantIdRouteImport.update({
     id: '/$merchantId',
@@ -259,18 +278,6 @@ const AuthedTransactionsAdjustmentsAdjustmentIdRoute =
     id: '/adjustments/$adjustmentId',
     path: '/adjustments/$adjustmentId',
     getParentRoute: () => AuthedTransactionsRoute,
-  } as any)
-const AuthedNetWorthAccountsInstitutionsInstitutionIdRoute =
-  AuthedNetWorthAccountsInstitutionsInstitutionIdRouteImport.update({
-    id: '/institutions/$institutionId',
-    path: '/institutions/$institutionId',
-    getParentRoute: () => AuthedNetWorthAccountsRoute,
-  } as any)
-const AuthedNetWorthAccountsInstitutionsNewRoute =
-  AuthedNetWorthAccountsInstitutionsNewRouteImport.update({
-    id: '/institutions/new',
-    path: '/institutions/new',
-    getParentRoute: () => AuthedNetWorthAccountsRoute,
   } as any)
 const AuthedSettingsEventsTypesTypeIdRoute =
   AuthedSettingsEventsTypesTypeIdRouteImport.update({
@@ -320,6 +327,7 @@ export interface FileRoutesByFullPath {
   '/settings/currencies': typeof AuthedSettingsCurrenciesRouteWithChildren
   '/settings/events': typeof AuthedSettingsEventsRouteWithChildren
   '/settings/import': typeof AuthedSettingsImportRoute
+  '/settings/institutions': typeof AuthedSettingsInstitutionsRouteWithChildren
   '/settings/merchants': typeof AuthedSettingsMerchantsRouteWithChildren
   '/settings/people': typeof AuthedSettingsPeopleRouteWithChildren
   '/net-worth/': typeof AuthedNetWorthIndexRoute
@@ -333,6 +341,8 @@ export interface FileRoutesByFullPath {
   '/settings/currencies/add': typeof AuthedSettingsCurrenciesAddRoute
   '/settings/events/$eventId': typeof AuthedSettingsEventsEventIdRoute
   '/settings/events/new': typeof AuthedSettingsEventsNewRoute
+  '/settings/institutions/$institutionId': typeof AuthedSettingsInstitutionsInstitutionIdRoute
+  '/settings/institutions/new': typeof AuthedSettingsInstitutionsNewRoute
   '/settings/merchants/$merchantId': typeof AuthedSettingsMerchantsMerchantIdRoute
   '/settings/merchants/new': typeof AuthedSettingsMerchantsNewRoute
   '/settings/people/$personId': typeof AuthedSettingsPeoplePersonIdRoute
@@ -340,8 +350,6 @@ export interface FileRoutesByFullPath {
   '/transactions/$transactionId': typeof AuthedTransactionsFormTransactionIdRoute
   '/transactions/new': typeof AuthedTransactionsFormNewRoute
   '/transactions/adjustments/$adjustmentId': typeof AuthedTransactionsAdjustmentsAdjustmentIdRoute
-  '/net-worth/accounts/institutions/$institutionId': typeof AuthedNetWorthAccountsInstitutionsInstitutionIdRoute
-  '/net-worth/accounts/institutions/new': typeof AuthedNetWorthAccountsInstitutionsNewRoute
   '/settings/events/types/$typeId': typeof AuthedSettingsEventsTypesTypeIdRoute
   '/settings/events/types/new': typeof AuthedSettingsEventsTypesNewRoute
   '/settings/people/groups/$groupId': typeof AuthedSettingsPeopleGroupsGroupIdRoute
@@ -365,6 +373,7 @@ export interface FileRoutesByTo {
   '/settings/currencies': typeof AuthedSettingsCurrenciesRouteWithChildren
   '/settings/events': typeof AuthedSettingsEventsRouteWithChildren
   '/settings/import': typeof AuthedSettingsImportRoute
+  '/settings/institutions': typeof AuthedSettingsInstitutionsRouteWithChildren
   '/settings/merchants': typeof AuthedSettingsMerchantsRouteWithChildren
   '/settings/people': typeof AuthedSettingsPeopleRouteWithChildren
   '/net-worth': typeof AuthedNetWorthIndexRoute
@@ -378,6 +387,8 @@ export interface FileRoutesByTo {
   '/settings/currencies/add': typeof AuthedSettingsCurrenciesAddRoute
   '/settings/events/$eventId': typeof AuthedSettingsEventsEventIdRoute
   '/settings/events/new': typeof AuthedSettingsEventsNewRoute
+  '/settings/institutions/$institutionId': typeof AuthedSettingsInstitutionsInstitutionIdRoute
+  '/settings/institutions/new': typeof AuthedSettingsInstitutionsNewRoute
   '/settings/merchants/$merchantId': typeof AuthedSettingsMerchantsMerchantIdRoute
   '/settings/merchants/new': typeof AuthedSettingsMerchantsNewRoute
   '/settings/people/$personId': typeof AuthedSettingsPeoplePersonIdRoute
@@ -385,8 +396,6 @@ export interface FileRoutesByTo {
   '/transactions/$transactionId': typeof AuthedTransactionsFormTransactionIdRoute
   '/transactions/new': typeof AuthedTransactionsFormNewRoute
   '/transactions/adjustments/$adjustmentId': typeof AuthedTransactionsAdjustmentsAdjustmentIdRoute
-  '/net-worth/accounts/institutions/$institutionId': typeof AuthedNetWorthAccountsInstitutionsInstitutionIdRoute
-  '/net-worth/accounts/institutions/new': typeof AuthedNetWorthAccountsInstitutionsNewRoute
   '/settings/events/types/$typeId': typeof AuthedSettingsEventsTypesTypeIdRoute
   '/settings/events/types/new': typeof AuthedSettingsEventsTypesNewRoute
   '/settings/people/groups/$groupId': typeof AuthedSettingsPeopleGroupsGroupIdRoute
@@ -412,6 +421,7 @@ export interface FileRoutesById {
   '/_authed/settings/currencies': typeof AuthedSettingsCurrenciesRouteWithChildren
   '/_authed/settings/events': typeof AuthedSettingsEventsRouteWithChildren
   '/_authed/settings/import': typeof AuthedSettingsImportRoute
+  '/_authed/settings/institutions': typeof AuthedSettingsInstitutionsRouteWithChildren
   '/_authed/settings/merchants': typeof AuthedSettingsMerchantsRouteWithChildren
   '/_authed/settings/people': typeof AuthedSettingsPeopleRouteWithChildren
   '/_authed/transactions/_form': typeof AuthedTransactionsFormRouteWithChildren
@@ -426,6 +436,8 @@ export interface FileRoutesById {
   '/_authed/settings/currencies/add': typeof AuthedSettingsCurrenciesAddRoute
   '/_authed/settings/events/$eventId': typeof AuthedSettingsEventsEventIdRoute
   '/_authed/settings/events/new': typeof AuthedSettingsEventsNewRoute
+  '/_authed/settings/institutions/$institutionId': typeof AuthedSettingsInstitutionsInstitutionIdRoute
+  '/_authed/settings/institutions/new': typeof AuthedSettingsInstitutionsNewRoute
   '/_authed/settings/merchants/$merchantId': typeof AuthedSettingsMerchantsMerchantIdRoute
   '/_authed/settings/merchants/new': typeof AuthedSettingsMerchantsNewRoute
   '/_authed/settings/people/$personId': typeof AuthedSettingsPeoplePersonIdRoute
@@ -433,8 +445,6 @@ export interface FileRoutesById {
   '/_authed/transactions/_form/$transactionId': typeof AuthedTransactionsFormTransactionIdRoute
   '/_authed/transactions/_form/new': typeof AuthedTransactionsFormNewRoute
   '/_authed/transactions/adjustments/$adjustmentId': typeof AuthedTransactionsAdjustmentsAdjustmentIdRoute
-  '/_authed/net-worth/accounts/institutions/$institutionId': typeof AuthedNetWorthAccountsInstitutionsInstitutionIdRoute
-  '/_authed/net-worth/accounts/institutions/new': typeof AuthedNetWorthAccountsInstitutionsNewRoute
   '/_authed/settings/events/types/$typeId': typeof AuthedSettingsEventsTypesTypeIdRoute
   '/_authed/settings/events/types/new': typeof AuthedSettingsEventsTypesNewRoute
   '/_authed/settings/people/groups/$groupId': typeof AuthedSettingsPeopleGroupsGroupIdRoute
@@ -460,6 +470,7 @@ export interface FileRouteTypes {
     | '/settings/currencies'
     | '/settings/events'
     | '/settings/import'
+    | '/settings/institutions'
     | '/settings/merchants'
     | '/settings/people'
     | '/net-worth/'
@@ -473,6 +484,8 @@ export interface FileRouteTypes {
     | '/settings/currencies/add'
     | '/settings/events/$eventId'
     | '/settings/events/new'
+    | '/settings/institutions/$institutionId'
+    | '/settings/institutions/new'
     | '/settings/merchants/$merchantId'
     | '/settings/merchants/new'
     | '/settings/people/$personId'
@@ -480,8 +493,6 @@ export interface FileRouteTypes {
     | '/transactions/$transactionId'
     | '/transactions/new'
     | '/transactions/adjustments/$adjustmentId'
-    | '/net-worth/accounts/institutions/$institutionId'
-    | '/net-worth/accounts/institutions/new'
     | '/settings/events/types/$typeId'
     | '/settings/events/types/new'
     | '/settings/people/groups/$groupId'
@@ -505,6 +516,7 @@ export interface FileRouteTypes {
     | '/settings/currencies'
     | '/settings/events'
     | '/settings/import'
+    | '/settings/institutions'
     | '/settings/merchants'
     | '/settings/people'
     | '/net-worth'
@@ -518,6 +530,8 @@ export interface FileRouteTypes {
     | '/settings/currencies/add'
     | '/settings/events/$eventId'
     | '/settings/events/new'
+    | '/settings/institutions/$institutionId'
+    | '/settings/institutions/new'
     | '/settings/merchants/$merchantId'
     | '/settings/merchants/new'
     | '/settings/people/$personId'
@@ -525,8 +539,6 @@ export interface FileRouteTypes {
     | '/transactions/$transactionId'
     | '/transactions/new'
     | '/transactions/adjustments/$adjustmentId'
-    | '/net-worth/accounts/institutions/$institutionId'
-    | '/net-worth/accounts/institutions/new'
     | '/settings/events/types/$typeId'
     | '/settings/events/types/new'
     | '/settings/people/groups/$groupId'
@@ -551,6 +563,7 @@ export interface FileRouteTypes {
     | '/_authed/settings/currencies'
     | '/_authed/settings/events'
     | '/_authed/settings/import'
+    | '/_authed/settings/institutions'
     | '/_authed/settings/merchants'
     | '/_authed/settings/people'
     | '/_authed/transactions/_form'
@@ -565,6 +578,8 @@ export interface FileRouteTypes {
     | '/_authed/settings/currencies/add'
     | '/_authed/settings/events/$eventId'
     | '/_authed/settings/events/new'
+    | '/_authed/settings/institutions/$institutionId'
+    | '/_authed/settings/institutions/new'
     | '/_authed/settings/merchants/$merchantId'
     | '/_authed/settings/merchants/new'
     | '/_authed/settings/people/$personId'
@@ -572,8 +587,6 @@ export interface FileRouteTypes {
     | '/_authed/transactions/_form/$transactionId'
     | '/_authed/transactions/_form/new'
     | '/_authed/transactions/adjustments/$adjustmentId'
-    | '/_authed/net-worth/accounts/institutions/$institutionId'
-    | '/_authed/net-worth/accounts/institutions/new'
     | '/_authed/settings/events/types/$typeId'
     | '/_authed/settings/events/types/new'
     | '/_authed/settings/people/groups/$groupId'
@@ -718,6 +731,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthedSettingsImportRouteImport
       parentRoute: typeof AuthedRoute
     }
+    '/_authed/settings/institutions': {
+      id: '/_authed/settings/institutions'
+      path: '/settings/institutions'
+      fullPath: '/settings/institutions'
+      preLoaderRoute: typeof AuthedSettingsInstitutionsRouteImport
+      parentRoute: typeof AuthedRoute
+    }
     '/_authed/settings/merchants': {
       id: '/_authed/settings/merchants'
       path: '/settings/merchants'
@@ -809,6 +829,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthedSettingsEventsNewRouteImport
       parentRoute: typeof AuthedSettingsEventsRoute
     }
+    '/_authed/settings/institutions/$institutionId': {
+      id: '/_authed/settings/institutions/$institutionId'
+      path: '/$institutionId'
+      fullPath: '/settings/institutions/$institutionId'
+      preLoaderRoute: typeof AuthedSettingsInstitutionsInstitutionIdRouteImport
+      parentRoute: typeof AuthedSettingsInstitutionsRoute
+    }
+    '/_authed/settings/institutions/new': {
+      id: '/_authed/settings/institutions/new'
+      path: '/new'
+      fullPath: '/settings/institutions/new'
+      preLoaderRoute: typeof AuthedSettingsInstitutionsNewRouteImport
+      parentRoute: typeof AuthedSettingsInstitutionsRoute
+    }
     '/_authed/settings/merchants/$merchantId': {
       id: '/_authed/settings/merchants/$merchantId'
       path: '/$merchantId'
@@ -857,20 +891,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/transactions/adjustments/$adjustmentId'
       preLoaderRoute: typeof AuthedTransactionsAdjustmentsAdjustmentIdRouteImport
       parentRoute: typeof AuthedTransactionsRoute
-    }
-    '/_authed/net-worth/accounts/institutions/$institutionId': {
-      id: '/_authed/net-worth/accounts/institutions/$institutionId'
-      path: '/institutions/$institutionId'
-      fullPath: '/net-worth/accounts/institutions/$institutionId'
-      preLoaderRoute: typeof AuthedNetWorthAccountsInstitutionsInstitutionIdRouteImport
-      parentRoute: typeof AuthedNetWorthAccountsRoute
-    }
-    '/_authed/net-worth/accounts/institutions/new': {
-      id: '/_authed/net-worth/accounts/institutions/new'
-      path: '/institutions/new'
-      fullPath: '/net-worth/accounts/institutions/new'
-      preLoaderRoute: typeof AuthedNetWorthAccountsInstitutionsNewRouteImport
-      parentRoute: typeof AuthedNetWorthAccountsRoute
     }
     '/_authed/settings/events/types/$typeId': {
       id: '/_authed/settings/events/types/$typeId'
@@ -948,8 +968,6 @@ interface AuthedNetWorthAccountsRouteChildren {
   AuthedNetWorthAccountsAccountIdRoute: typeof AuthedNetWorthAccountsAccountIdRoute
   AuthedNetWorthAccountsAdjustRoute: typeof AuthedNetWorthAccountsAdjustRoute
   AuthedNetWorthAccountsNewRoute: typeof AuthedNetWorthAccountsNewRoute
-  AuthedNetWorthAccountsInstitutionsInstitutionIdRoute: typeof AuthedNetWorthAccountsInstitutionsInstitutionIdRoute
-  AuthedNetWorthAccountsInstitutionsNewRoute: typeof AuthedNetWorthAccountsInstitutionsNewRoute
 }
 
 const AuthedNetWorthAccountsRouteChildren: AuthedNetWorthAccountsRouteChildren =
@@ -957,10 +975,6 @@ const AuthedNetWorthAccountsRouteChildren: AuthedNetWorthAccountsRouteChildren =
     AuthedNetWorthAccountsAccountIdRoute: AuthedNetWorthAccountsAccountIdRoute,
     AuthedNetWorthAccountsAdjustRoute: AuthedNetWorthAccountsAdjustRoute,
     AuthedNetWorthAccountsNewRoute: AuthedNetWorthAccountsNewRoute,
-    AuthedNetWorthAccountsInstitutionsInstitutionIdRoute:
-      AuthedNetWorthAccountsInstitutionsInstitutionIdRoute,
-    AuthedNetWorthAccountsInstitutionsNewRoute:
-      AuthedNetWorthAccountsInstitutionsNewRoute,
   }
 
 const AuthedNetWorthAccountsRouteWithChildren =
@@ -1032,6 +1046,23 @@ const AuthedSettingsEventsRouteChildren: AuthedSettingsEventsRouteChildren = {
 const AuthedSettingsEventsRouteWithChildren =
   AuthedSettingsEventsRoute._addFileChildren(AuthedSettingsEventsRouteChildren)
 
+interface AuthedSettingsInstitutionsRouteChildren {
+  AuthedSettingsInstitutionsInstitutionIdRoute: typeof AuthedSettingsInstitutionsInstitutionIdRoute
+  AuthedSettingsInstitutionsNewRoute: typeof AuthedSettingsInstitutionsNewRoute
+}
+
+const AuthedSettingsInstitutionsRouteChildren: AuthedSettingsInstitutionsRouteChildren =
+  {
+    AuthedSettingsInstitutionsInstitutionIdRoute:
+      AuthedSettingsInstitutionsInstitutionIdRoute,
+    AuthedSettingsInstitutionsNewRoute: AuthedSettingsInstitutionsNewRoute,
+  }
+
+const AuthedSettingsInstitutionsRouteWithChildren =
+  AuthedSettingsInstitutionsRoute._addFileChildren(
+    AuthedSettingsInstitutionsRouteChildren,
+  )
+
 interface AuthedSettingsMerchantsRouteChildren {
   AuthedSettingsMerchantsMerchantIdRoute: typeof AuthedSettingsMerchantsMerchantIdRoute
   AuthedSettingsMerchantsNewRoute: typeof AuthedSettingsMerchantsNewRoute
@@ -1079,6 +1110,7 @@ interface AuthedRouteChildren {
   AuthedSettingsCurrenciesRoute: typeof AuthedSettingsCurrenciesRouteWithChildren
   AuthedSettingsEventsRoute: typeof AuthedSettingsEventsRouteWithChildren
   AuthedSettingsImportRoute: typeof AuthedSettingsImportRoute
+  AuthedSettingsInstitutionsRoute: typeof AuthedSettingsInstitutionsRouteWithChildren
   AuthedSettingsMerchantsRoute: typeof AuthedSettingsMerchantsRouteWithChildren
   AuthedSettingsPeopleRoute: typeof AuthedSettingsPeopleRouteWithChildren
   AuthedNetWorthIndexRoute: typeof AuthedNetWorthIndexRoute
@@ -1096,6 +1128,7 @@ const AuthedRouteChildren: AuthedRouteChildren = {
   AuthedSettingsCurrenciesRoute: AuthedSettingsCurrenciesRouteWithChildren,
   AuthedSettingsEventsRoute: AuthedSettingsEventsRouteWithChildren,
   AuthedSettingsImportRoute: AuthedSettingsImportRoute,
+  AuthedSettingsInstitutionsRoute: AuthedSettingsInstitutionsRouteWithChildren,
   AuthedSettingsMerchantsRoute: AuthedSettingsMerchantsRouteWithChildren,
   AuthedSettingsPeopleRoute: AuthedSettingsPeopleRouteWithChildren,
   AuthedNetWorthIndexRoute: AuthedNetWorthIndexRoute,

@@ -20,6 +20,11 @@ const SCREENS = [
     label: 'settings.import',
     icon: 'arrow-left-right',
   },
+  {
+    to: '/settings/institutions',
+    label: 'settings.institutions',
+    icon: 'bank',
+  },
   { to: '/settings/merchants', label: 'settings.merchants', icon: 'store' },
   { to: '/settings/people', label: 'settings.people', icon: 'users' },
 ] as const satisfies ReadonlyArray<{

@@ -1,12 +1,12 @@
 import { Navigate, createFileRoute } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
-import { InstitutionActions } from '#/components/accounts/institutions/institution-actions'
-import { InstitutionForm } from '#/components/accounts/institutions/institution-form'
+import { InstitutionActions } from '#/components/institutions/institution-actions'
+import { InstitutionForm } from '#/components/institutions/institution-form'
 import { RouteSheet } from '#/components/sheet/route-sheet'
-import { useAccountsPage } from '#/hooks/app/use-page-data'
+import { useInstitutionsPage } from '#/hooks/app/use-page-data'
 
 export const Route = createFileRoute(
-  '/_authed/net-worth/accounts/institutions/$institutionId',
+  '/_authed/settings/institutions/$institutionId',
 )({
   staticData: { sheet: true },
   component: EditInstitution,
@@ -14,22 +14,18 @@ export const Route = createFileRoute(
 
 function EditInstitution() {
   const { t } = useTranslation()
-  const { accounts, institutions } = useAccountsPage()
+  const institutions = useInstitutionsPage()
   const { institutionId } = Route.useParams()
   const institution = institutions.find((i) => i.id === institutionId)
   if (!institution)
-    return <Navigate to="/net-worth/accounts" resetScroll={false} />
+    return <Navigate to="/settings/institutions" resetScroll={false} />
 
   return (
     <RouteSheet
-      to="/net-worth/accounts"
+      to="/settings/institutions"
       title={t('institutions.editTitle')}
       actions={
-        <InstitutionActions
-          institution={institution}
-          inUse={accounts.some((a) => a.institutionId === institution.id)}
-          placement="sheet"
-        />
+        <InstitutionActions institution={institution} placement="sheet" />
       }
     >
       <InstitutionForm key={institution.id} institution={institution} />

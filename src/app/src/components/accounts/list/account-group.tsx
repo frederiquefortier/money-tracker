@@ -1,22 +1,15 @@
 import { useTranslation } from 'react-i18next'
 import { AccountRow } from '#/components/accounts/list/account-row'
 import type { ListedAccount } from '#/components/accounts/list/account-row'
-import { InstitutionActions } from '#/components/accounts/institutions/institution-actions'
+import { IconActions, IconAnchor } from '#/components/display/icon-button'
 import { CollapseToggle } from '#/components/lists/collapse-toggle'
-import { Link } from '@tanstack/react-router'
-import { Icon } from '#/components/display/icon'
 import { MissingRate, Money } from '#/components/display/money'
 import { compareDecimal } from '#/lib/shared/money'
 import { formatMoney } from '#/lib/shared/format'
-import { cn } from '#/lib/utils'
 import { useLocale } from '#/hooks/app/use-locale'
-import type { GroupTotal, Institution } from '#/lib/accounts/account'
-import {
-  cardSurface,
-  rowHover,
-  iconHover,
-  focusRing,
-} from '#/components/styles'
+import type { GroupTotal } from '#/lib/accounts/account'
+import type { Institution } from '#/lib/institutions/institution'
+import { cardSurface } from '#/components/styles'
 
 function Balance({ account }: { account: ListedAccount }) {
   const { t } = useTranslation()
@@ -59,91 +52,44 @@ function GroupTotalAmount({
   )
 }
 
-/** Shows or hides the institution's accounts: the chevron alone, as on a category parent. */
-function GroupToggle({
-  name,
-  expanded,
-  onToggle,
-}: {
-  name: string
-  expanded: boolean
-  onToggle: () => void
-}) {
-  const { t } = useTranslation()
-  return (
-    <button
-      type="button"
-      onClick={onToggle}
-      aria-expanded={expanded}
-      aria-label={t('accounts.accountsOf', { name })}
-      className={cn('z-10 shrink-0 rounded-lg', iconHover.self, focusRing)}
-    >
-      <Icon
-        name="chevron-down"
-        className={cn(
-          'block size-5 transition-transform',
-          !expanded && '-rotate-90',
-        )}
-      />
-    </button>
-  )
-}
-
 /**
- * The card header. An institution's opens its form from anywhere on the line, like any
- * row: its name is a link stretched over the header, the controls sit above it. The
- * group without an institution has no form, so its name toggles.
+ * The card header: the name toggles the accounts. An institution with a website has its
+ * icon after the total (from `md` up, as the account rows' actions); the form and the
+ * delete are in Réglages.
  */
 function GroupHeader({
   institution,
   name,
-  inUse,
   collapsed,
   onToggle,
   children,
 }: {
   institution: Institution | null
   name: string
-  inUse: boolean
   collapsed: boolean
   onToggle: () => void
   children: React.ReactNode
 }) {
-  if (!institution)
-    return (
-      <header className="flex items-center gap-2 py-2.5 pr-2 pl-3">
-        <CollapseToggle
-          expanded={!collapsed}
-          onToggle={onToggle}
-          className="font-bold"
-        >
-          {name}
-        </CollapseToggle>
-        <span className="ml-auto">{children}</span>
-      </header>
-    )
+  const { t } = useTranslation()
   return (
-    <header
-      className={cn(
-        'relative flex items-center gap-1.5 py-2.5 pr-2 pl-3',
-        rowHover,
-      )}
-    >
-      <GroupToggle name={name} expanded={!collapsed} onToggle={onToggle} />
-      <Link
-        to="/net-worth/accounts/institutions/$institutionId"
-        params={{ institutionId: institution.id }}
-        className={cn(
-          'min-w-0 truncate rounded-lg font-bold after:absolute after:inset-0',
-          focusRing,
-        )}
+    <header className="flex items-center gap-2 py-2.5 pr-2 pl-3">
+      <CollapseToggle
+        expanded={!collapsed}
+        onToggle={onToggle}
+        className="font-bold"
       >
         {name}
-      </Link>
+      </CollapseToggle>
       <span className="ml-auto md:pr-4">{children}</span>
-      <span className="relative z-10">
-        <InstitutionActions institution={institution} inUse={inUse} />
-      </span>
+      <IconActions slots={2}>
+        {institution?.websiteUrl && (
+          <IconAnchor
+            icon="external-link"
+            label={t('institutions.openWebsite', { name })}
+            href={institution.websiteUrl}
+          />
+        )}
+      </IconActions>
     </header>
   )
 }
@@ -152,7 +98,6 @@ function GroupHeader({
 export function AccountGroup({
   institution,
   accounts,
-  inUse,
   total,
   displayCurrency,
   collapsed,
@@ -160,8 +105,6 @@ export function AccountGroup({
 }: {
   institution: Institution | null
   accounts: ReadonlyArray<ListedAccount>
-  /** Any account, open or closed, is in this institution. */
-  inUse: boolean
   total: GroupTotal | undefined
   displayCurrency: string
   collapsed: boolean
@@ -174,7 +117,6 @@ export function AccountGroup({
       <GroupHeader
         institution={institution}
         name={name}
-        inUse={inUse}
         collapsed={collapsed}
         onToggle={onToggle}
       >
@@ -191,12 +133,6 @@ export function AccountGroup({
             />
           ))}
         </ul>
-      )}
-      {/* An institution with no open account still shows, so it can be found (ACC-05). */}
-      {!collapsed && accounts.length === 0 && institution && (
-        <p className="border-t px-4 py-3 text-sm text-muted-foreground">
-          {t('accounts.emptyInstitution')}
-        </p>
       )}
     </section>
   )

@@ -7,7 +7,8 @@ import { accountFormSchema } from '#/lib/accounts/account'
 import { formValues } from '#/lib/forms/form-state'
 import { useMyCurrencies } from '#/hooks/currencies/use-my-currencies'
 import { saveAccount } from '#/server/accounts'
-import type { AccountType, Institution } from '#/lib/accounts/account'
+import type { AccountType } from '#/lib/accounts/account'
+import type { Institution } from '#/lib/institutions/institution'
 
 const TEXT_FIELDS = [
   'name',
