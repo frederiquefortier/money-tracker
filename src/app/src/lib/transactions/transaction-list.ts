@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import type { LinkedEvent } from '#/lib/events/event'
+import type { HoldingParts } from '#/lib/holdings/holding'
 
 // The transactions list: a period, its days, a page at a time.
 
@@ -64,9 +65,6 @@ export type AccountName = { name: string; institution: string | null }
 /** In a list's event filter, the choice of transactions with no event. */
 export const NO_EVENT = 'none'
 
-/** In a list's holding filter, the investment transactions that name no holding. */
-export const NO_HOLDING = 'none'
-
 export type ListedCategory = { name: string; icon: string; color: string }
 
 export type ListedPerson = {
@@ -103,8 +101,8 @@ export type ListedTransaction = {
   reimburses: Array<{ label: string | null; date: string }>
   /** The event it carries as a tag. */
   event: LinkedEvent | null
-  /** The holding an investment transaction pays into, by name. */
-  holding: string | null
+  /** The holding an investment transaction pays into, as the parts of its name. */
+  holding: HoldingParts | null
   /** As booked, in the account's currency; a transfer is unsigned in the full list. */
   amount: string
   currency: string
@@ -142,8 +140,6 @@ export type ListQuery = {
   personIds?: Array<string>
   /** Event ids, or NO_EVENT for the transactions with none. */
   eventIds?: Array<string>
-  /** Holding ids, or NO_HOLDING for the investment transactions with none. */
-  holdingIds?: Array<string>
   search?: string
   pendingOnly?: boolean
   owedOnly?: boolean
@@ -156,7 +152,6 @@ export type ListFilters = {
   merchants: Array<{ id: string; name: string }>
   people: Array<{ id: string; name: string }>
   events: Array<{ id: string; name: string }>
-  holdings: Array<{ id: string; name: string }>
 }
 
 export type PageRow = { row: ListedTransaction; dayNet: string | null }

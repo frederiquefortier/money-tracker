@@ -12,6 +12,7 @@ import {
   hasFees,
 } from '#/components/transactions/list/fee-lines'
 import { useRowText } from '#/hooks/transactions/use-row-text'
+import { holdingLabel } from '#/lib/holdings/holding'
 import { formatDate, formatMoney, formatRate } from '#/lib/shared/format'
 import { absDecimal } from '#/lib/shared/money'
 import { isOwed } from '#/lib/transactions/transaction-list'
@@ -132,6 +133,7 @@ function RowAmount({
 
 /** The event's and the holding's tags, beside the name as labels do. */
 function RowTags({ row }: { row: ListedTransaction }) {
+  const locale = useLocale()
   return (
     <>
       {row.event && (
@@ -142,7 +144,11 @@ function RowTags({ row }: { row: ListedTransaction }) {
           className="max-w-[45%] shrink-0"
         />
       )}
-      {row.holding && <Tag className="max-w-[45%] truncate">{row.holding}</Tag>}
+      {row.holding && (
+        <Tag className="max-w-[45%] truncate">
+          {holdingLabel(row.holding, locale)}
+        </Tag>
+      )}
     </>
   )
 }

@@ -136,7 +136,6 @@ export const transactionsFr = {
       merchants: 'Magasins',
       people: 'Proches',
       events: 'Événements',
-      holdings: 'Placements',
       pastEvents: 'Événements passés',
       noGroup: 'Sans groupe',
       search: {
@@ -145,7 +144,6 @@ export const transactionsFr = {
         merchants: 'Rechercher un magasin',
         people: 'Rechercher un proche',
         events: 'Rechercher un événement',
-        holdings: 'Rechercher un placement',
       },
       all: 'Tout',
       none: 'Aucun',

@@ -1,12 +1,12 @@
 import { useState } from 'react'
 import { Combobox } from '#/components/combobox/combobox'
 import { GallerySection, Specimen } from '#/components/design/gallery-section'
+import { ChoiceField } from '#/components/forms/choice-field'
 import { CheckboxField } from '#/components/forms/checkbox-field'
 import { DatePickerField } from '#/components/forms/date-picker-field'
 import { FormField } from '#/components/forms/form-field'
 import { LinkedFields } from '#/components/forms/linked-fields'
 import { InfoTooltip } from '#/components/forms/info-tooltip'
-import { RadioGroupField } from '#/components/forms/radio-group-field'
 import { SearchField } from '#/components/forms/search-field'
 import { SelectField } from '#/components/forms/select-field'
 import type { ComboboxOption } from '#/hooks/forms/use-combobox'
@@ -109,7 +109,7 @@ export function FieldsSection() {
         </Specimen>
         <Specimen
           name="Choices"
-          source="forms/checkbox-field.tsx, radio-group-field.tsx"
+          source="forms/checkbox-field.tsx, choice-field.tsx"
         >
           <div className="flex w-full flex-col gap-4">
             <CheckboxField
@@ -118,8 +118,8 @@ export function FieldsSection() {
               checked={checked}
               onCheckedChange={setChecked}
             />
-            <RadioGroupField
-              label="RadioGroupField"
+            <ChoiceField
+              label="ChoiceField"
               options={KINDS.map((value) => ({ value, label: value }))}
               value={kind}
               onChange={setKind}

@@ -6,6 +6,9 @@ import { CurrencyRow } from '#/components/currencies/currency-row'
 import { useCurrencyActions } from '#/hooks/currencies/use-currency-actions'
 import { ListCard } from '#/components/lists/list-card'
 import { useToast } from '#/hooks/app/use-toast'
+import { useLocale } from '#/hooks/app/use-locale'
+import { holdingLabel } from '#/lib/holdings/holding'
+import type { HoldingParts } from '#/lib/holdings/holding'
 
 /** One thing to add, so the + goes straight to its form (shared patterns). */
 export function AddCurrencyButton() {
@@ -26,9 +29,10 @@ export function CurrencyManager({
 }: {
   ratesFrom: Record<string, string | null>
   openAccounts: Partial<Record<string, Array<string>>>
-  openHoldings: Partial<Record<string, Array<string>>>
+  openHoldings: Partial<Record<string, Array<HoldingParts>>>
 }) {
   const { t } = useTranslation()
+  const locale = useLocale()
   const toast = useToast()
   const { shown, makeDefault, remove } = useCurrencyActions()
   const [removing, setRemoving] = useState<string | null>(null)
@@ -47,7 +51,7 @@ export function CurrencyManager({
     const holdings = openHoldings[code] ?? []
     if (holdings.length === 0) return null
     return t('currencies.usedByHolding', {
-      name: holdings[0],
+      name: holdingLabel(holdings[0], locale),
       code,
       count: holdings.length - 1,
     })

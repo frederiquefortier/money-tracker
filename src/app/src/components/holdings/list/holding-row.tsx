@@ -28,7 +28,23 @@ function Profit({ holding }: { holding: ListedHolding }) {
   )
 }
 
-/** One holding in a list: name, institution and type, the latest value and the profit. */
+/** A debt's value shows negative, so a drawer's rows add up to its total. */
+function Value({ holding }: { holding: ListedHolding }) {
+  if (holding.latestValue === null) return null
+  const debt = holding.kind === 'debt' && holding.latestValue !== '0.0000'
+  return (
+    <>
+      <Money
+        amount={debt ? `-${holding.latestValue}` : holding.latestValue}
+        currency={holding.currency}
+        className="text-lg font-semibold"
+      />
+      <Profit holding={holding} />
+    </>
+  )
+}
+
+/** One holding in a drawer: its label and kind, the type, the latest value and the profit. */
 export function HoldingRow({
   holding,
   aside,
@@ -40,9 +56,6 @@ export function HoldingRow({
   alignTop?: boolean
 }) {
   const { t } = useTranslation()
-  const details = [holding.institutionName, holding.typeLabel]
-    .filter(Boolean)
-    .join(' · ')
   return (
     <ListRow
       link={{
@@ -57,33 +70,18 @@ export function HoldingRow({
         />
       }
     >
-      <span
-        className={cn(
-          'min-w-0 flex-1',
-          holding.excludeFromNetWorth && 'text-muted-foreground',
-        )}
-      >
+      <span className="min-w-0 flex-1">
         <span className="flex items-center gap-1.5 font-semibold">
-          <span className="truncate">{holding.name}</span>
-          {holding.excludeFromNetWorth && <Tag>{t('holdings.excluded')}</Tag>}
+          <span className="truncate">{holding.label}</span>
+          <Tag>{t(`holdings.kindOne.${holding.kind}`)}</Tag>
         </span>
         <span className="block truncate text-sm text-muted-foreground">
-          {details}{' '}
+          {holding.name && <>{holding.typeText} </>}
           <CurrencyCode code={holding.currency} className="font-semibold" />
         </span>
       </span>
       <span className="text-right md:pr-4">
-        {aside ??
-          (holding.latestValue !== null && (
-            <>
-              <Money
-                amount={holding.latestValue}
-                currency={holding.currency}
-                className="font-semibold"
-              />
-              <Profit holding={holding} />
-            </>
-          ))}
+        {aside ?? <Value holding={holding} />}
       </span>
     </ListRow>
   )

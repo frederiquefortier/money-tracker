@@ -78,7 +78,6 @@ function CategoryFilter({
     merchants: [],
     people: [],
     events: [],
-    holdings: [],
   }
   return (
     <div className="flex flex-col items-start gap-3">

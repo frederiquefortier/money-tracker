@@ -28,6 +28,10 @@
   --accent-foreground: oklch(0.42 0.14 320);
   --destructive: oklch(0.52 0.19 30);
   --destructive-foreground: oklch(0.52 0.19 30);
+  /* A notice that is not an error: #FF9300 for its tint, a darker shade of it for the
+     text, 7:1 on a card. */
+  --warning: oklch(0.762 0.176 62);
+  --warning-foreground: oklch(0.45 0.12 62);
   /* Incomes on the list: 5.4:1 on a card, 4.9:1 on the background. */
   --income: oklch(0.5 0.13 150);
   /* A pending row's background, the spreadsheet's blue (TRX-09). */
@@ -70,6 +74,8 @@
   --accent-foreground: oklch(0.92 0.04 320);
   --destructive: oklch(0.7 0.17 27);
   --destructive-foreground: oklch(0.7 0.17 27);
+  --warning: oklch(0.762 0.176 62);
+  --warning-foreground: oklch(0.85 0.15 65);
   --income: oklch(0.78 0.13 150);
   --pending: oklch(0.3 0.05 240);
   --owed: oklch(0.32 0.05 85);
@@ -104,6 +110,8 @@
   --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
   --color-income: var(--income);
   --color-pending: var(--pending);
   --color-owed: var(--owed);

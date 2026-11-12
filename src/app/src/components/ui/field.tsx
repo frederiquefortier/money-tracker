@@ -8,7 +8,7 @@ import { focusRing } from '#/components/styles'
  * 44px tall on phones for touch, 36px from md up.
  */
 export const fieldControl = cn(
-  'h-11 w-full min-w-0 rounded-field border border-input bg-transparent px-3 text-base placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-destructive md:h-9 md:text-sm dark:bg-input/30',
+  'h-11 w-full min-w-0 rounded-field border border-input bg-transparent px-3 text-base placeholder:font-mono placeholder:text-[0.85em] placeholder:text-muted-foreground/60 disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-destructive md:h-9 md:text-sm dark:bg-input/30',
   focusRing,
 )
 

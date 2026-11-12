@@ -8,7 +8,7 @@ One tab for what the user owns and owes. A hub shows the net worth and, below it
 
 ## Requirements
 
-NW-10, ACC-06. The chart and percent change (NW-04) come in phase 5.
+NW-10, ACC-06. The chart, its filters and the percent change (NW-04, NW-05) come in phase 5.
 
 ## The hub
 
@@ -23,7 +23,7 @@ Route `/net-worth`, the "Net worth" tab (the name stays English in both language
 ## What the total counts
 
 - Open accounts, hidden ones included. A credit card is an account with a negative balance, so debts of that kind are already in the accounts card.
-- Open holdings that are not left out of net worth (NW-05): investments and assets add, debts subtract, each at its latest value. Closed holdings are left out. A left-out holding still shows on the holdings page, muted.
+- Open holdings: investments and assets add, debts subtract, each at its latest value. Closed holdings are left out. Nothing else is: what a holding or an account leaves out is a choice in the phase 5 chart, never a setting that changes these totals (NW-05, ADR-048).
 - The grand total is the accounts card plus the holdings card.
 - A figure with a missing exchange rate is "—", never a partial sum (ADR-004). The grand total is "—" when either card is.
 - No holding yet: the Placements card reads "Aucun placement pour l'instant." with no amount and still opens the subpage. The grand total is the accounts card alone, with no warning.
@@ -33,7 +33,7 @@ Route `/net-worth`, the "Net worth" tab (the name stays English in both language
 
 - `/net-worth/accounts`: the accounts page as built (ACC-06, ACC-07), except that it groups only institutions with an open account, and institutions are managed in Réglages ([21-institutions.md](21-institutions.md)). `/net-worth/holdings`: [19-holdings.md](19-holdings.md).
 - Each has a link above its title, "‹ Net worth", back to the hub. The tab also goes to the hub and stays active on all three paths.
-- Neither shows a total of its own; the totals are on the hub cards.
+- Neither shows a total of its own in the title; the totals are on the hub cards. Each institution's drawer shows its own total, at the size of a transaction's amount.
 - Each keeps its single round + bottom right, and its sheets keep their own URLs below the page (`/net-worth/accounts/new`, `/net-worth/holdings/$holdingId`).
 
 ## Edge cases

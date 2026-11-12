@@ -1,6 +1,8 @@
 import { useTranslation } from 'react-i18next'
 import { Combobox } from '#/components/combobox/combobox'
-import { isOpenOn } from '#/lib/holdings/holding'
+import { FORMAT_LOCALE } from '#/i18n/locales'
+import { holdingLabel, isOpenOn } from '#/lib/holdings/holding'
+import { useLocale } from '#/hooks/app/use-locale'
 import type { FormHolding } from '#/lib/holdings/holding'
 
 /**
@@ -19,9 +21,11 @@ export function HoldingPicker({
   onChange: (holdingId: string | null) => void
 }) {
   const { t } = useTranslation()
+  const locale = useLocale()
   const options = holdings
     .filter((h) => h.id === value || isOpenOn(h, date))
-    .map((h) => ({ value: h.id, label: h.name }))
+    .map((h) => ({ value: h.id, label: holdingLabel(h, locale) }))
+    .sort((a, b) => a.label.localeCompare(b.label, FORMAT_LOCALE[locale]))
   return (
     <Combobox
       label={t('holdings.field')}

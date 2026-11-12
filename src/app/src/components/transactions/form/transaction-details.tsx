@@ -1,7 +1,6 @@
-import { useId, useState } from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { FieldLabel } from '#/components/ui/field'
-import { ToggleGroup, ToggleGroupItem } from '#/components/ui/toggle-group'
+import { ChoiceField } from '#/components/forms/choice-field'
 import { LinkedFields } from '#/components/forms/linked-fields'
 import { EventPicker } from '#/components/events/event-picker'
 import { HoldingPicker } from '#/components/holdings/holding-picker'
@@ -78,7 +77,6 @@ function StoreOrPerson({
   onChange,
 }: Pick<DetailsProps, 'id' | 'draft' | 'data' | 'onChange'>) {
   const { t } = useTranslation()
-  const labelId = useId()
   const income = draft.kind === 'income'
   const label = t(
     income ? 'transactions.receivedFrom' : 'transactions.boughtFrom',
@@ -95,24 +93,18 @@ function StoreOrPerson({
   }
   return (
     <>
-      <div className="flex flex-col gap-2">
-        <FieldLabel id={labelId}>{label}</FieldLabel>
-        <ToggleGroup
-          type="single"
-          aria-labelledby={labelId}
-          value={where}
-          // Pressing the chosen item again would clear it: one side is always chosen.
-          onValueChange={(next) => next && select(next as Where)}
-        >
-          {WHERE.map((tab) => (
-            <ToggleGroupItem key={tab} value={tab}>
-              {tab === 'store'
-                ? t('transactions.merchant')
-                : t('transactions.people.source')}
-            </ToggleGroupItem>
-          ))}
-        </ToggleGroup>
-      </div>
+      <ChoiceField
+        label={label}
+        options={WHERE.map((tab) => ({
+          value: tab,
+          label:
+            tab === 'store'
+              ? t('transactions.merchant')
+              : t('transactions.people.source'),
+        }))}
+        value={where}
+        onChange={select}
+      />
       <LinkedFields>
         <div className="contents">
           {where === 'store' ? (

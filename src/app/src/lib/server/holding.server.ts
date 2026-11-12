@@ -32,11 +32,11 @@ export const entryFailure = failureFor('holdings', {
 })
 
 export const TOTALS_COLUMNS =
-  'holding_id, placed::text, latest_on, latest_value::text, profit::text, profit_percent::text'
+  'holding_id, placed::text, latest_on, latest_value::text, display_value::text, profit::text, profit_percent::text'
 
 // Amounts as text: PostgREST sends numeric as a JSON number, a float (ADR-004).
 export const HOLDING_COLUMNS =
-  'id, type, name, institution_id, country, currency, opened_on, closed_on, exclude_from_net_worth'
+  'id, type, type_label, kind, name, institution_id, country, currency, opened_on, closed_on'
 
 export async function loadHoldingTypes(): Promise<Array<HoldingType>> {
   const [data] = loaded(
@@ -63,14 +63,15 @@ export async function loadHoldingTypes(): Promise<Array<HoldingType>> {
 
 export type HoldingRow = {
   id: string
-  type: string
-  name: string
+  type: string | null
+  type_label: string | null
+  kind: string
+  name: string | null
   institution_id: string | null
-  country: string | null
+  country: string
   currency: string
   opened_on: string
   closed_on: string | null
-  exclude_from_net_worth: boolean
 }
 
 export type TotalsRow = {
@@ -78,37 +79,48 @@ export type TotalsRow = {
   placed: string | null
   latest_on: string | null
   latest_value: string | null
+  display_value: string | null
   profit: string | null
   profit_percent: string | null
 }
 
 export function toHolding({
   row,
-  kinds,
+  types,
   totals,
   inUse,
 }: {
   row: HoldingRow
-  kinds: ReadonlyMap<string, HoldingKind>
+  types: ReadonlyMap<string, HoldingType>
   totals: TotalsRow | undefined
   inUse: boolean
 }): Holding {
+  const type = row.type ? types.get(row.type) : undefined
+  const typed = row.type_label ?? row.type ?? ''
   return {
     id: row.id,
     type: row.type,
-    kind: kinds.get(row.type) ?? 'investment',
+    typeFr: type?.labelFr ?? typed,
+    typeEn: type?.labelEn ?? typed,
+    kind: isKind(row.kind) ? row.kind : 'investment',
     name: row.name,
     institutionId: row.institution_id,
     country: row.country,
     currency: row.currency,
     openedOn: row.opened_on,
     closedOn: row.closed_on,
-    excludeFromNetWorth: row.exclude_from_net_worth,
+    ...figuresOf(totals),
+    inUse,
+  }
+}
+
+function figuresOf(totals: TotalsRow | undefined) {
+  return {
     placed: totals?.placed ?? null,
     latestOn: totals?.latest_on ?? null,
     latestValue: totals?.latest_value ?? null,
+    displayValue: totals?.display_value ?? null,
     profit: totals?.profit ?? null,
     profitPercent: totals?.profit_percent ?? null,
-    inUse,
   }
 }

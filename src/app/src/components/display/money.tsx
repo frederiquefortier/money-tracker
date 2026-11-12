@@ -26,11 +26,9 @@ export function Money({
 }) {
   const { t } = useTranslation()
   const locale = useLocale()
-  const text = moneyFormat(
-    currency,
-    locale,
-    signed ? 'exceptZero' : 'auto',
-  ).format(amount as Intl.StringNumericLiteral)
+  const format = moneyFormat(currency, locale, signed ? 'exceptZero' : 'auto')
+  const parts = format.formatToParts(amount as Intl.StringNumericLiteral)
+  const text = parts.map((part) => part.value).join('')
   const label =
     detail ??
     (converted ? t('money.converted', { amount: text, currency }) : text)
@@ -43,7 +41,15 @@ export function Money({
     >
       <span aria-hidden="true">
         {converted && <span className="text-muted-foreground">≈ </span>}
-        {text}
+        {parts.map((part, i) =>
+          part.type === 'decimal' || part.type === 'fraction' ? (
+            <span key={i} className="text-[0.75em]">
+              {part.value}
+            </span>
+          ) : (
+            part.value
+          ),
+        )}
       </span>
     </span>
   )

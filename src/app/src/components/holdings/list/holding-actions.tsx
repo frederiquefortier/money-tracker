@@ -9,10 +9,10 @@ import { useServerAction } from '#/hooks/app/use-server-action'
 import { closeHolding, deleteHolding, reopenHolding } from '#/server/holdings'
 import type { Holding } from '#/lib/holdings/holding'
 
-type RowHolding = Pick<
-  Holding,
-  'id' | 'name' | 'currency' | 'closedOn' | 'inUse'
->
+type RowHolding = Pick<Holding, 'id' | 'currency' | 'closedOn' | 'inUse'> & {
+  /** The name, or what stands in for it. */
+  label: string
+}
 
 /** Archive or reactivate and delete, as icons on the holding's row or its sheet. */
 export function HoldingActions({
@@ -28,7 +28,7 @@ export function HoldingActions({
   const { run } = useServerAction()
   const toast = useToast()
   const [dialog, setDialog] = useState<'close' | 'delete' | null>(null)
-  const { id, name } = holding
+  const { id, label: name } = holding
   const close = () => setDialog(null)
   const archiveLabel = t('common.archiveName', { name })
   const deleteLabel = t('common.deleteName', { name })

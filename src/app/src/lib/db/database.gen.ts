@@ -533,43 +533,46 @@ export type Database = {
       holdings: {
         Row: {
           closed_on: string | null
-          country: string | null
+          country: string
           created_at: string
           currency: string
-          exclude_from_net_worth: boolean
           id: string
           institution_id: string | null
-          name: string
+          kind: string
+          name: string | null
           opened_on: string
-          type: string
+          type: string | null
+          type_label: string | null
           updated_at: string
           user_id: string
         }
         Insert: {
           closed_on?: string | null
-          country?: string | null
+          country: string
           created_at?: string
           currency: string
-          exclude_from_net_worth?: boolean
           id?: string
           institution_id?: string | null
-          name: string
+          kind: string
+          name?: string | null
           opened_on?: string
-          type: string
+          type?: string | null
+          type_label?: string | null
           updated_at?: string
           user_id?: string
         }
         Update: {
           closed_on?: string | null
-          country?: string | null
+          country?: string
           created_at?: string
           currency?: string
-          exclude_from_net_worth?: boolean
           id?: string
           institution_id?: string | null
-          name?: string
+          kind?: string
+          name?: string | null
           opened_on?: string
-          type?: string
+          type?: string | null
+          type_label?: string | null
           updated_at?: string
           user_id?: string
         }
@@ -1446,7 +1449,6 @@ export type Database = {
           category_ids?: string[]
           event_ids?: string[]
           from_date?: string
-          holding_ids?: string[]
           max_rows?: number
           merchant_ids?: string[]
           owed_only?: boolean
@@ -1455,7 +1457,6 @@ export type Database = {
           search?: string
           to_date?: string
           without_event?: boolean
-          without_holding?: boolean
         }
         Returns: {
           account_name: string
@@ -1470,7 +1471,7 @@ export type Database = {
           fee_category: string
           from_account: string
           from_institution: string
-          holding: string
+          holding: Json
           id: string
           institution: string
           kind: string

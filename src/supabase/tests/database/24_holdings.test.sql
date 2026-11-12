@@ -1,7 +1,7 @@
 begin;
 create extension if not exists pgtap with schema extensions;
 
-select plan(37);
+select plan(42);
 
 insert into auth.users (id, email) values
   ('11111111-1111-1111-1111-111111111111', 'alice@example.test'),
@@ -23,9 +23,9 @@ insert into public.institutions (id, user_id, name) values
   ('b0000000-0000-0000-0000-000000000001', '22222222-2222-2222-2222-222222222222', 'Banque Bruno');
 
 -- Bruno's holding, with a value and an employer contribution, made as the owner of the tables.
-insert into public.holdings (id, user_id, type, name, currency, opened_on) values
+insert into public.holdings (id, user_id, type, name, country, currency, opened_on) values
   ('b5000000-0000-0000-0000-000000000001', '22222222-2222-2222-2222-222222222222',
-   'CA_RRSP', 'REER Bruno', 'CAD', '2020-01-01');
+   'CA_RRSP', 'REER Bruno', 'CA', 'CAD', '2020-01-01');
 insert into public.holding_snapshots (user_id, holding_id, on_date, amount) values
   ('22222222-2222-2222-2222-222222222222', 'b5000000-0000-0000-0000-000000000001', '2026-10-01', 500);
 insert into public.holding_contributions (user_id, holding_id, on_date, amount) values
@@ -50,30 +50,55 @@ select is((select count(*)::int from public.holding_types), 17, 'holding types a
 
 -- Holdings (NW-01)
 select lives_ok(
-  $$ insert into public.holdings (type, name, currency, opened_on)
-     values ('CA_TFSA', 'CELI', 'CAD', '2020-01-01') $$,
+  $$ insert into public.holdings (type, name, country, currency, opened_on)
+     values ('CA_TFSA', 'CELI', 'CA', 'CAD', '2020-01-01') $$,
   'a user creates a holding'
 );
 select throws_ok(
-  $$ insert into public.holdings (type, name, currency, opened_on)
-     values ('CA_RRSP', 'céli', 'CAD', '2020-01-01') $$,
+  $$ insert into public.holdings (type, name, country, currency, opened_on)
+     values ('CA_RRSP', 'céli', 'CA', 'CAD', '2020-01-01') $$,
   '23505', null, 'open holding names are unique ignoring case and accents'
 );
 select throws_ok(
-  $$ insert into public.holdings (type, name, currency, opened_on)
-     values ('NOPE', 'Autre', 'CAD', '2020-01-01') $$,
+  $$ insert into public.holdings (type, kind, name, country, currency, opened_on)
+     values ('NOPE', 'asset', 'Autre', 'CA', 'CAD', '2020-01-01') $$,
   '23503', null, 'a holding has a known type'
 );
 select throws_ok(
-  $$ insert into public.holdings (type, name, currency, institution_id, opened_on)
-     values ('CA_RRSP', 'REER', 'CAD', 'b0000000-0000-0000-0000-000000000001', '2020-01-01') $$,
+  $$ insert into public.holdings (type, name, country, currency, institution_id, opened_on)
+     values ('CA_RRSP', 'REER', 'CA', 'CAD', 'b0000000-0000-0000-0000-000000000001', '2020-01-01') $$,
   '23503', null, 'a holding cannot use another user''s institution'
 );
 select lives_ok(
-  $$ insert into public.holdings (type, name, currency, opened_on)
-     values ('CH_PILLAR3A', 'Pilier 3a', 'CHF', '2020-01-01'),
-            ('ANY_BROKERAGE', 'Courtage', 'CAD', '2020-01-01') $$,
+  $$ insert into public.holdings (type, name, country, currency, opened_on)
+     values ('CH_PILLAR3A', 'Pilier 3a', 'CH', 'CHF', '2020-01-01'),
+            ('ANY_BROKERAGE', 'Courtage', 'CA', 'CAD', '2020-01-01') $$,
   'a holding can book in another currency'
+);
+select is(
+  (select kind from public.holdings where name = 'Pilier 3a'), 'investment',
+  'a predefined type gives the holding its kind'
+);
+select lives_ok(
+  $$ insert into public.holdings (type, country, currency, opened_on)
+     values ('CA_RRSP', 'CA', 'CAD', '2020-01-01'),
+            ('CA_RRSP', 'CA', 'CAD', '2020-01-01') $$,
+  'holdings need no name, and unnamed ones never conflict'
+);
+select lives_ok(
+  $$ insert into public.holdings (type_label, kind, country, currency, opened_on)
+     values ('Rente viagère', 'asset', 'FR', 'EUR', '2020-01-01') $$,
+  'a typed type takes the kind chosen with it'
+);
+select throws_ok(
+  $$ insert into public.holdings (type, type_label, kind, country, currency, opened_on)
+     values ('CA_RRSP', 'Autre', 'asset', 'CA', 'CAD', '2020-01-01') $$,
+  '23514', null, 'a holding has a predefined type or a typed one, not both'
+);
+select throws_ok(
+  $$ insert into public.holdings (kind, country, currency, opened_on)
+     values ('asset', 'CA', 'CAD', '2020-01-01') $$,
+  '23514', null, 'a holding has one or the other'
 );
 select is(
   (select count(*)::int from public.holdings where name = 'REER Bruno'), 0,
@@ -236,8 +261,8 @@ select throws_ok(
   '23514', 'holding_closed', 'a closed holding takes no later transaction'
 );
 select lives_ok(
-  $$ insert into public.holdings (type, name, currency, opened_on)
-     values ('CA_RRSP', 'CELI', 'CAD', '2020-01-01') $$,
+  $$ insert into public.holdings (type, name, country, currency, opened_on)
+     values ('CA_RRSP', 'CELI', 'CA', 'CAD', '2020-01-01') $$,
   'a closed holding frees its name'
 );
 

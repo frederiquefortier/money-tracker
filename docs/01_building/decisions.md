@@ -4,6 +4,32 @@ Technical and structural choices, with the alternatives that were rejected. Chec
 
 <!-- Newest first: a new ADR goes directly below this line. Template at the bottom. -->
 
+### ADR-048: Holdings by country and type, optional name, no exclusion flag (2026-11-12)
+
+**Context:**
+- After trying the first holdings screens the author asked for: the country to come first and the type to follow from it, with a text box when no type is predefined; a name that is not mandatory; the "leave out of net worth" choice to move from the holding to the chart filters; no holdings filter in the transactions list. This changes parts of ADR-045.
+
+**Decision:**
+- `holdings` gets a required `country`. `type` becomes optional; a typed type goes in `type_label`, with exactly one of the two set. `kind` is stored on the holding: for a predefined type the database sets it from the type, for a typed one the user chooses it (placement, asset or debt).
+- `name` becomes optional. An unnamed holding reads "type · institution · currency". Names stay unique among open named holdings, ignoring case and accents.
+- `exclude_from_net_worth` is dropped. The hub totals count every open holding and account. Leaving some out is a filter of the phase 5 chart, remembered per browser (NW-05).
+- The `holding_ids` and `without_holding` arguments of `list_transactions` are dropped. The "n transactions sans placement" count stays on the holdings page and links to the transactions list on the investment categories. The row keeps the holding, now as its name, type labels, institution and currency, so the client composes the label ("type currency (institution)" when unnamed).
+- The holdings page groups by institution, with each drawer's total.
+- Amended 2026-11-12: an unnamed holding reads "type en currency (institution)" ("REER en CAD (Desjardins)"), not "type currency (institution)".
+- Supersedes ADR-045 on: the exclusion flag, the name being required, the type list, and the list filter and unlinked count. The rest of ADR-045 stands.
+
+**Alternatives Considered:**
+- Keep the exclusion flag and add the chart filter -> Two ways to leave something out, and a headline total that silently differs from the page.
+- A free-text type always -> No kind, no profit logic, no translations.
+- Keep the holdings filter for finding unlinked contributions -> The author's call: the category filter is enough, opened from the count's link.
+
+**Consequences:**
+- A migration changes the table, rebuilds `holding_totals`, drops the filter arguments and changes the list row's holding column.
+- A typed type is not translated (user-typed content is never translated).
+- The link lists every investment transaction, linked ones included; the ones without a holding tag are the ones to link.
+
+---
+
 ### ADR-047: Institutions are managed in Réglages (2026-11-12)
 
 **Context:**

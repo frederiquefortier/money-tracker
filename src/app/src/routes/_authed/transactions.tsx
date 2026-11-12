@@ -16,7 +16,6 @@ import { useTransactionPages } from '#/hooks/transactions/use-transaction-pages'
 import { formatDate, formatMonth, todayIso } from '#/lib/shared/format'
 import {
   NO_EVENT,
-  NO_HOLDING,
   PERIOD_UNITS,
   lastThirtyDays,
   monthOf,
@@ -44,7 +43,6 @@ const KEPT = [
   'merchant',
   'person',
   'event',
-  'holding',
   'q',
   'pending',
   'owed',
@@ -71,7 +69,6 @@ export const Route = createFileRoute('/_authed/transactions')({
     merchant: ids,
     person: ids,
     event: orNone(NO_EVENT),
-    holding: orNone(NO_HOLDING),
     q: z.string().max(200).optional().catch(undefined),
     pending: z.boolean().optional().catch(undefined),
     owed: z.boolean().optional().catch(undefined),
@@ -124,8 +121,7 @@ function useEmptyText() {
     deps.categoryIds.length +
     deps.merchantIds.length +
     deps.personIds.length +
-    deps.eventIds.length +
-    deps.holdingIds.length
+    deps.eventIds.length
   if (deps.search || filtered || deps.pendingOnly || deps.owedOnly)
     return t('common.noMatch')
   if (period === 'month')
@@ -188,7 +184,6 @@ function useListNavigation() {
           merchant: f.merchantIds.length ? f.merchantIds : undefined,
           person: f.personIds.length ? f.personIds : undefined,
           event: f.eventIds.length ? f.eventIds : undefined,
-          holding: f.holdingIds.length ? f.holdingIds : undefined,
         }),
       }),
     search: (text: string) =>

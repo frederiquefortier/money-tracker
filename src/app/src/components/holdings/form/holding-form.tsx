@@ -1,18 +1,22 @@
-import { useState } from 'react'
 import { HoldingFields } from '#/components/holdings/form/holding-fields'
 import type { HoldingValues } from '#/components/holdings/form/holding-fields'
 import { SheetForm } from '#/components/sheet/sheet-form'
 import { useSheetForm } from '#/hooks/forms/use-sheet-form'
+import {
+  useHoldingChoices,
+  useNamePlaceholder,
+} from '#/hooks/holdings/use-holding-choices'
 import { holdingFormSchema } from '#/lib/holdings/holding'
+import { holdingInputOf } from '#/lib/holdings/holding-input'
+import type { HoldingType } from '#/lib/holdings/holding'
 import { formValues } from '#/lib/forms/form-state'
 import { useMyCurrencies } from '#/hooks/currencies/use-my-currencies'
 import { saveHolding } from '#/server/holdings'
-import type { HoldingType } from '#/lib/holdings/holding'
 import type { Institution } from '#/lib/institutions/institution'
 
-const TEXT_FIELDS = ['name', 'type', 'country', 'openedOn'] as const
+const TEXT_FIELDS = ['customType', 'kind', 'name', 'openedOn'] as const
 
-/** The institution and the currency are chosen live; the rest is read on submit. */
+/** The country, type, institution and currency are chosen live; the rest is read on submit. */
 export function HoldingForm({
   holdingId,
   initial,
@@ -36,41 +40,59 @@ export function HoldingForm({
   children?: React.ReactNode
 }) {
   const { currencies } = useMyCurrencies()
-  const [institutionId, setInstitutionId] = useState(initialInstitutionId)
-  const [currency, setCurrency] = useState(initialCurrency)
+  const choice = useHoldingChoices({
+    country: initial.country,
+    type: initial.type,
+    typed: initial.customType,
+    kind: initial.kind,
+    institutionId: initialInstitutionId,
+    currency: initialCurrency,
+    types,
+  })
+
   const form = useSheetForm({
-    schema: holdingFormSchema.omit({ currency: true }),
+    schema: holdingFormSchema,
     initial,
     read: (data) => ({
       ...formValues(data, TEXT_FIELDS),
-      excludeFromNetWorth: data.get('excludeFromNetWorth') === 'on',
+      country: choice.country,
+      type: choice.type,
     }),
-    save: (data, values) =>
+    save: (data) =>
       saveHolding({
-        data: {
-          ...data,
+        data: holdingInputOf({
+          values: data,
+          types,
           id: holdingId,
-          currency,
-          institutionId,
-          excludeFromNetWorth: values.excludeFromNetWorth,
-        },
+          currency: choice.currency,
+          institutionId: choice.institutionId,
+        }),
       }),
     savedText,
   })
 
+  const placeholder = useNamePlaceholder(choice, types, institutions)
+
   return (
     <SheetForm {...form.formProps}>
       <HoldingFields
-        values={form.values}
         field={form.field}
+        onTyped={choice.setTyped}
+        kind={choice.kind}
+        onKindChange={choice.setKind}
         types={types}
+        country={choice.country}
+        onCountryChange={choice.setCountry}
+        type={choice.type}
+        onTypeChange={choice.setType}
         currencies={currencies}
         institutions={institutions}
-        institutionId={institutionId}
-        onInstitutionChange={setInstitutionId}
-        currency={currency}
-        onCurrencyChange={setCurrency}
+        institutionId={choice.institutionId}
+        onInstitutionChange={choice.setInstitutionId}
+        currency={choice.currency}
+        onCurrencyChange={choice.setCurrency}
         currencyLocked={currencyLocked}
+        namePlaceholder={placeholder}
       />
       {children}
     </SheetForm>

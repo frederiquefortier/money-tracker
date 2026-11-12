@@ -6,12 +6,19 @@ Newest first inside each section.
 
 ## Navigation and layout
 
+- **Cents are smaller** (2026-11-12): in every amount drawn by `Money`, the decimal separator and the cents are 0.75em. The author asked for it, reversing "Amounts at one size". Amounts written into a sentence stay plain text.
+- **One control for a short choice: ChoiceField** (2026-11-12), the segmented toggle: a store or a person, a holding's nature, a category's need or want. It replaces the radios (`RadioGroupField` is gone). Nothing chosen on a required choice turns the group red, with the message under it. The author asked for one pattern; the need-or-want label "Comme {parent} ({value})" became "Hérité ({value})" so it fits.
+- **Placeholders are lighter and smaller** (2026-11-12): 60% of the muted text colour, 0.85em, in the mono font, so a suggestion never reads as a typed value. The author asked for it.
+- **A notice that is not an error is orange** (2026-11-12), based on #FF9300 (a darker shade of it for the text), in the shape of the form's error message (`FormAlert` with `tone="warning"`, as wide as its text): the "n transactions sans placement" link, which has a chevron and a darker tint on hover as it is a button. The author disliked amber, then found the first orange too red and gave #FF9300.
+- **No "(facultatif)" on any field** (2026-11-12). A required field has its asterisk, and the others say nothing.
+- **Holdings are grouped by institution, like accounts** (2026-11-12, was by kind). Institutions are shared and the author's holdings sit in few of them. The kind is a tag on the row; a drawer's total nets debts, as a credit card does in an accounts drawer, and a debt's value shows negative. The assistant recommended it when the author asked which was better.
+- **The transactions list has no holdings filter** (2026-11-12). The category filter does that job. The author's call.
 - **Four tabs: Transactions, Net worth, Dashboard, Budget** (2026-11-12, was Comptes since 2026-11-05). Net worth is a hub, and Comptes and Placements are its two subpages. Everything set up once (categories, merchants, currencies, people, events, import) sits in the Réglages menu, a sheet from the left. Tab labels are one short word; "Dashboard" stays in French because "Tableau de bord" wraps.
 - **Net worth is a hub with two subpages, not one list** (2026-11-12). Accounts and holdings differ in their rows, actions and grouping, and a merged list blurs both. The hub carries the totals on its two link cards, in a layout that takes the phase 5 chart above them. The subpages show no total of their own. The author asked for it; ADR-046.
 - **A page opened from a hub card has a link back to the hub** (2026-11-12). The earlier rule of no back link had no use case; this is the first. A tab or menu page has none, and sheets close instead.
 - **One round + button bottom right on every screen that adds something** (2026-11-05), in place of buttons beside the title. A screen with several things to add fans them out as round icons.
 - **No summary tiles on the transactions list** (2026-11-05). Spent-this-period belongs to the dashboard.
-- **Amounts at one size** (2026-11-05). TravelSpend sets cents smaller; not kept.
+- **Amounts at one size** (2026-11-05). TravelSpend sets cents smaller; not kept. Reversed 2026-11-12: see "Cents are smaller".
 - **No helper text, legends or "(facultatif)"** (author's standing rule). If a field needs explaining, fix its label or layout. A reason something is unavailable goes in a toast on tap.
 - **One column width, 48rem** (2026-11-11), for the lists and the transactions list alike (`pageColumn` in `styles.ts`). The lists were 40rem.
 - **Amounts and currency codes are in Inconsolata** (2026-11-11), wherever they show: `Money`, `CurrencyCode`, the typed amounts on the receipt slip and the opening balance field. Amounts inside a translated sentence (a toast, a dialog) stay in the body face.
@@ -45,7 +52,7 @@ Dates went through four rounds in November 2026. The result:
 ## Categories
 
 - **Free colour, quick picks, automatic variation for sub-categories** (2026-11-03). A new top-level category takes the first quick pick no sibling-level category of its kind uses. A sub-category starts from a variation of its parent's colour and follows it until a colour is picked by hand. The icon is drawn white or a dark shade of the same hue, whichever passes 3:1.
-- **Need or want is three radios** (2026-11-05): "Comme {parent} ({value})" (follows the parent, stores nothing), Besoin, Envie. Tried first: a select, a pill with icons, chips, then two buttons; two buttons cannot show three states.
+- **Need or want is three choices** (2026-11-05; radios then, a ChoiceField since 2026-11-12): "Hérité ({value})" (follows the parent, stores nothing; was "Comme {parent} ({value})"), Besoin, Envie. Tried first: a select, a pill with icons, chips, then two buttons; two buttons cannot show three states.
 - **The transfer-fee category is a checkbox on one expense category** with an info popover (2026-11-05). One category holds the role; ticking it elsewhere takes it over and moves existing fees.
 - **Icons are coolicons, no emoji** (ADR-020). The icon follows the name until the user picks one by hand.
 - **Favourite star removed** (2026-11-04); the picker's "Fréquentes" works out frequent categories from transactions (CAT-06).
@@ -77,6 +84,7 @@ Dates went through four rounds in November 2026. The result:
 
 ## Accounts
 
+- **A drawer's total is as large as a transaction's amount** (2026-11-12): `text-lg`, semibold, on the accounts and the holdings drawers and on their rows. The author asked for it; "Amounts at one size" stays for the rest.
 - **Institutions are managed in Réglages, not on the accounts page** (2026-11-12). Accounts and holdings share them, and most holdings sit in other institutions than the accounts, so the accounts page showed empty groups and could offer a delete the database refused. The accounts page groups only institutions with an open account. The author asked for it; ADR-047.
 - **One account per currency for multi-currency providers** (Wise CAD, Wise EUR, grouped under one institution). Each balance has its own statement and an account books in one currency (TRX-02), so balances stay exact. The `multi_currency` account type was dropped. Moving between balances is a transfer; paying in euros from CAD is an expense with an original price (CUR-08).
 - **A currency's favourite star removed** (2026-11-05): a user keeps a handful, so pinning saved nothing.

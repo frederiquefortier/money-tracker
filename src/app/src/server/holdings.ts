@@ -31,9 +31,9 @@ type HoldingResult<T = object> = Result<HoldingError, T>
 export const getHoldings = createServerFn({ method: 'GET' }).handler(
   async (): Promise<HoldingsPage> => {
     const supabase = getSupabase()
-    const [results, types, institutions] = await Promise.all([
+    const [results, types, institutions, investments] = await Promise.all([
       Promise.all([
-        supabase.from('holdings').select(HOLDING_COLUMNS).order('name'),
+        supabase.from('holdings').select(HOLDING_COLUMNS),
         supabase.from('holding_totals').select(TOTALS_COLUMNS),
       ]),
       loadHoldingTypes(),
@@ -41,9 +41,14 @@ export const getHoldings = createServerFn({ method: 'GET' }).handler(
         .from('institutions')
         .select('id, name, website_url')
         .order('name'),
+      supabase.from('categories').select('id').eq('kind', 'investment'),
     ])
     const [rows, totals] = loaded('Holdings', ...results)
-    const [institutionRows] = loaded('Institutions', institutions)
+    const [institutionRows, investmentRows] = loaded(
+      'Institutions',
+      institutions,
+      investments,
+    )
 
     const used = await inUseIds(
       rows.map((r) => r.id),
@@ -68,13 +73,13 @@ export const getHoldings = createServerFn({ method: 'GET' }).handler(
         `Unlinked investments could not be counted (${unlinked.error.code})`,
       )
 
-    const kinds = new Map(types.map((t) => [t.code, t.kind]))
+    const typeByCode = new Map(types.map((t) => [t.code, t]))
     const byHolding = new Map(totals.map((t) => [t.holding_id, t]))
     return {
       holdings: rows.map((r) =>
         toHolding({
           row: r,
-          kinds,
+          types: typeByCode,
           totals: byHolding.get(r.id),
           inUse: used.has(r.id),
         }),
@@ -86,6 +91,7 @@ export const getHoldings = createServerFn({ method: 'GET' }).handler(
       })),
       types,
       unlinkedCount: unlinked.count ?? 0,
+      investmentCategoryIds: investmentRows.map((c) => c.id),
     }
   },
 )
@@ -131,11 +137,11 @@ export const getHolding = createServerFn({ method: 'GET' })
       throw new Error(`The holding could not be loaded (${failed.error.code})`)
     if (!row.data) return null
 
-    const kinds = new Map(types.map((t) => [t.code, t.kind]))
+    const typeByCode = new Map(types.map((t) => [t.code, t]))
     return {
       ...toHolding({
         row: row.data,
-        kinds,
+        types: typeByCode,
         totals: totals.data ?? undefined,
         inUse: used.has(data.id),
       }),
@@ -160,12 +166,17 @@ export const getFormHoldings = createServerFn({ method: 'GET' }).handler(
       'Holdings',
       await getSupabase()
         .from('holdings')
-        .select('id, name, currency, opened_on, closed_on')
-        .order('name'),
+        .select(
+          'id, name, type, type_label, currency, opened_on, closed_on, institutions(name), holding_types(label_fr, label_en)',
+        )
+        .order('created_at'),
     )
     return data.map((h) => ({
       id: h.id,
       name: h.name,
+      typeFr: h.holding_types?.label_fr ?? h.type_label ?? '',
+      typeEn: h.holding_types?.label_en ?? h.type_label ?? '',
+      institution: h.institutions?.name ?? null,
       currency: h.currency,
       openedOn: h.opened_on,
       closedOn: h.closed_on,
@@ -178,12 +189,13 @@ export const saveHolding = createServerFn({ method: 'POST' })
   .handler(async ({ data }): Promise<HoldingResult<{ id: string }>> => {
     const { saved, error } = await saveRow('holdings', data.id, {
       type: data.type,
+      type_label: data.typeLabel,
+      kind: data.kind,
       name: data.name,
       institution_id: data.institutionId,
-      country: data.country || null,
+      country: data.country,
       currency: data.currency,
       opened_on: data.openedOn,
-      exclude_from_net_worth: data.excludeFromNetWorth,
     })
     if (error) return failure('save', error)
     if (!saved) return { ok: false, error: 'notFound' }

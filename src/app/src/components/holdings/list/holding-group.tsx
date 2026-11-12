@@ -1,37 +1,57 @@
-import { useTranslation } from 'react-i18next'
+import { DrawerHeader } from '#/components/institutions/drawer-header'
 import { HoldingRow } from '#/components/holdings/list/holding-row'
-import { CollapseToggle } from '#/components/lists/collapse-toggle'
-import { ListCard } from '#/components/lists/list-card'
-import type { HoldingKind, ListedHolding } from '#/lib/holdings/holding'
+import { MissingRate, Money } from '#/components/display/money'
+import { cardSurface } from '#/components/styles'
+import { summarizeHoldings } from '#/lib/net-worth/net-worth'
+import type { HoldingDrawer } from '#/lib/holdings/holding'
 
-/** The open holdings of one kind: a collapsible heading over one card. */
+/** An institution's drawer of holdings, with their total in the display currency. */
 export function HoldingGroup({
-  kind,
-  holdings,
+  drawer,
+  name,
+  displayCurrency,
   collapsed,
   onToggle,
 }: {
-  kind: HoldingKind
-  holdings: ReadonlyArray<ListedHolding>
+  drawer: HoldingDrawer
+  name: string
+  displayCurrency: string
   collapsed: boolean
   onToggle: () => void
 }) {
-  const { t } = useTranslation()
+  const { total } = summarizeHoldings(
+    drawer.holdings.map((h) => ({
+      kind: h.kind,
+      latestOn: h.latestOn,
+      displayValue: h.displayValue,
+    })),
+  )
+  const converted = drawer.holdings.some((h) => h.currency !== displayCurrency)
   return (
-    <section className="flex flex-col gap-2">
-      <CollapseToggle
-        expanded={!collapsed}
+    <section className={cardSurface}>
+      <DrawerHeader
+        institution={drawer.institution}
+        name={name}
+        collapsed={collapsed}
         onToggle={onToggle}
-        className="self-start font-bold"
       >
-        {t(`holdings.kinds.${kind}`)}
-      </CollapseToggle>
+        {total === null ? (
+          <MissingRate />
+        ) : (
+          <Money
+            amount={total}
+            currency={displayCurrency}
+            converted={converted}
+            className="text-lg font-semibold"
+          />
+        )}
+      </DrawerHeader>
       {!collapsed && (
-        <ListCard>
-          {holdings.map((holding) => (
+        <ul className="divide-y border-t">
+          {drawer.holdings.map((holding) => (
             <HoldingRow key={holding.id} holding={holding} />
           ))}
-        </ListCard>
+        </ul>
       )}
     </section>
   )

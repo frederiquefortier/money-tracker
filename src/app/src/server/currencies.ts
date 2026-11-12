@@ -6,6 +6,7 @@ import type {
   MyCurrencies,
   CurrencyError,
 } from '#/lib/currencies/currency'
+import type { HoldingParts } from '#/lib/holdings/holding'
 import { loaded, updateProfile } from '#/lib/server/db.server'
 import { fetchHexaRate } from '#/lib/currencies/rate-sources'
 import { failureFor } from '#/lib/shared/result'
@@ -96,9 +97,10 @@ export const getCurrencySettings = createServerFn({ method: 'GET' }).handler(
         .order('name'),
       supabase
         .from('holdings')
-        .select('name, currency')
-        .is('closed_on', null)
-        .order('name'),
+        .select(
+          'name, type_label, currency, institutions(name), holding_types(label_fr, label_en)',
+        )
+        .is('closed_on', null),
     ])
     const [catalogRows, mineRows, openRows, holdingRows] = loaded(
       'Currencies',
@@ -129,7 +131,18 @@ export const getCurrencySettings = createServerFn({ method: 'GET' }).handler(
       catalog: catalogRows.map((row) => toCurrency(row.code, row)),
       ratesFrom: Object.fromEntries(firsts) as Record<string, string | null>,
       openAccounts: namesByCurrency(openRows),
-      openHoldings: namesByCurrency(holdingRows),
+      openHoldings: holdingRows.reduce<
+        Partial<Record<string, Array<HoldingParts>>>
+      >((byCode, h) => {
+        ;(byCode[h.currency] ??= []).push({
+          name: h.name,
+          typeFr: h.holding_types?.label_fr ?? h.type_label ?? '',
+          typeEn: h.holding_types?.label_en ?? h.type_label ?? '',
+          institution: h.institutions?.name ?? null,
+          currency: h.currency,
+        })
+        return byCode
+      }, {}),
     }
   },
 )

@@ -20,21 +20,47 @@ export type HoldingType = {
   labelEn: string
 }
 
+/** What names a holding when it has no name of its own (ADR-048). */
+export type HoldingParts = {
+  name: string | null
+  typeFr: string
+  typeEn: string
+  institution: string | null
+  currency: string
+}
+
+/**
+ * The holding's name; with none, "type en currency (institution)" as an account reads
+ * "Chèque (Desjardins)": "REER en CAD (Desjardins)", "Hypothèque en CHF". In English,
+ * "RRSP in CAD (Desjardins)".
+ */
+export function holdingLabel(parts: HoldingParts, locale: Locale): string {
+  if (parts.name) return parts.name
+  const type = inLocale(locale, parts.typeFr, parts.typeEn)
+  const label = `${type} ${inLocale(locale, 'en', 'in')} ${parts.currency}`
+  return parts.institution ? `${label} (${parts.institution})` : label
+}
+
 export type Holding = {
   id: string
-  type: string
+  /** The predefined type's code; null for a typed type. */
+  type: string | null
+  /** The type's name in each language; a typed type is the same in both. */
+  typeFr: string
+  typeEn: string
   kind: HoldingKind
-  name: string
+  name: string | null
   institutionId: string | null
-  country: string | null
+  country: string
   currency: string
   openedOn: string
   closedOn: string | null
-  excludeFromNetWorth: boolean
   /** In the holding's currency; null when a rate is missing. */
   placed: string | null
   latestOn: string | null
   latestValue: string | null
+  /** The latest value in the display currency; null when a rate is missing. */
+  displayValue: string | null
   /** Null with no value yet, no money placed or a missing rate. */
   profit: string | null
   profitPercent: string | null
@@ -62,13 +88,13 @@ export type HoldingsPage = {
   types: Array<HoldingType>
   /** Investment transactions that name no holding. */
   unlinkedCount: number
+  /** The investment categories, for the link to the transactions that name no holding. */
+  investmentCategoryIds: Array<string>
 }
 
 /** What the transaction form offers: a holding it can pay into. */
-export type FormHolding = {
+export type FormHolding = HoldingParts & {
   id: string
-  name: string
-  currency: string
   openedOn: string
   closedOn: string | null
 }
@@ -103,25 +129,55 @@ function amountSchema(allowZero: boolean) {
   })
 }
 
-export const holdingFormSchema = z.object({
-  type: z.string().min(1, { error: 'required' }),
-  name: nameSchema,
-  currency: currencyCodeSchema,
-  country: z
-    .string()
-    .trim()
-    .toUpperCase()
-    .refine((value) => value === '' || /^[A-Z]{2}$/.test(value), {
-      error: 'invalid',
-    }),
-  openedOn: isoDate,
-})
+/** The type field's choice of a typed type; the others are predefined codes. */
+export const OTHER_TYPE = 'other'
 
-export const holdingInputSchema = holdingFormSchema.extend({
-  id: z.uuid().optional(),
-  institutionId: z.uuid().nullable(),
-  excludeFromNetWorth: z.boolean(),
-})
+/**
+ * The type the field really holds: the one chosen if the country offers it, else the
+ * first one offered. A select shows its first option when its value matches none, so
+ * the value must follow what is shown or the first pick would register as no change.
+ */
+export function offeredType(
+  chosen: string,
+  offered: ReadonlyArray<{ code: string }>,
+): string {
+  if (chosen === OTHER_TYPE || offered.some((one) => one.code === chosen))
+    return chosen
+  return offered.at(0)?.code ?? OTHER_TYPE
+}
+
+// The currency and the institution are chosen live, so they are not in the form's schema.
+export const holdingFormSchema = z
+  .object({
+    country: z.string().regex(/^[A-Z]{2}$/, { error: 'required' }),
+    type: z.string().min(1, { error: 'required' }),
+    customType: z.string().trim().max(100, { error: 'invalid' }),
+    kind: z.enum([...HOLDING_KINDS, '']),
+    name: z.string().trim().max(100, { error: 'invalid' }),
+    openedOn: isoDate,
+  })
+  .refine((v) => v.type !== OTHER_TYPE || v.customType !== '', {
+    path: ['customType'],
+    error: 'required',
+  })
+  .refine((v) => v.type !== OTHER_TYPE || v.kind !== '', {
+    path: ['kind'],
+    error: 'required',
+  })
+
+export const holdingInputSchema = z
+  .object({
+    id: z.uuid().optional(),
+    country: z.string().regex(/^[A-Z]{2}$/),
+    type: z.string().min(1).nullable(),
+    typeLabel: nameSchema.nullable(),
+    kind: z.enum(HOLDING_KINDS),
+    name: nameSchema.nullable(),
+    currency: currencyCodeSchema,
+    institutionId: z.uuid().nullable(),
+    openedOn: isoDate,
+  })
+  .refine((v) => (v.type === null) !== (v.typeLabel === null))
 export type HoldingInput = z.input<typeof holdingInputSchema>
 
 export const snapshotFormSchema = z.object({
@@ -145,16 +201,6 @@ export const contributionInputSchema = contributionFormSchema.extend({
   holdingId: z.uuid(),
 })
 
-/** The holdings of each kind, in the order the page draws them. */
-export function groupByKind<T extends { kind: HoldingKind }>(
-  holdings: ReadonlyArray<T>,
-): Array<{ kind: HoldingKind; holdings: Array<T> }> {
-  return HOLDING_KINDS.map((kind) => ({
-    kind,
-    holdings: holdings.filter((h) => h.kind === kind),
-  })).filter((group) => group.holdings.length > 0)
-}
-
 /** Whether the form offers the holding for a transaction on `date`. */
 export function isOpenOn(
   holding: { openedOn: string; closedOn: string | null },
@@ -173,6 +219,43 @@ export function holdingTypeLabel(
 }
 
 export type ListedHolding = Holding & {
-  typeLabel: string
   institutionName: string | null
+  /** The type in the user's language. */
+  typeText: string
+  /** The name, or what stands in for it (ADR-048). */
+  label: string
+}
+
+/** The holdings of one institution, or of none (`institution` null). */
+export type HoldingDrawer = {
+  key: string
+  institution: Institution | null
+  holdings: Array<ListedHolding>
+}
+
+/** The key of the drawer of holdings with no institution. */
+export const NO_INSTITUTION_KEY = ''
+
+/** Open holdings in drawers by institution, A to Z, then the ones with none (spec 19). */
+export function drawersOf(
+  holdings: ReadonlyArray<ListedHolding>,
+  institutions: ReadonlyArray<Institution>,
+  compare: (a: { name: string }, b: { name: string }) => number,
+): Array<HoldingDrawer> {
+  const named = institutions
+    .map((institution) => ({
+      key: institution.id,
+      institution,
+      holdings: holdings
+        .filter((h) => h.institutionId === institution.id)
+        .sort((a, b) => compare({ name: a.label }, { name: b.label })),
+    }))
+    .filter((drawer) => drawer.holdings.length > 0)
+    .sort((a, b) => compare(a.institution, b.institution))
+  const rest = holdings
+    .filter((h) => !h.institutionId)
+    .sort((a, b) => compare({ name: a.label }, { name: b.label }))
+  return rest.length > 0
+    ? [...named, { key: NO_INSTITUTION_KEY, institution: null, holdings: rest }]
+    : named
 }

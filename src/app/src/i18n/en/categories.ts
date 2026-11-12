@@ -24,7 +24,7 @@ export const categoriesEn: typeof categoriesFr = {
     necessities: { need: 'Need', want: 'Want' },
     unclassified: 'Unclassified',
     unclassifiedLower: 'unclassified',
-    followedFrom: 'Same as {{parent}} ({{value}})',
+    followedFrom: 'Inherited ({{value}})',
     clearCategory: 'Remove the category',
     archivedTag: 'Archived',
     frequent: 'Frequent',

@@ -166,11 +166,11 @@ English; this file is in English like every other meta-doc.
 
 | ID | Requirement | Source | Phase |
 |---|---|---|---|
-| NW-01 | Holdings: investment accounts, debts and other assets, each with a type (TFSA/CELI, RRSP/REER, FHSA/CELIAPP, DPSP, 2nd pillar, 3a, life-insurance buyout...) and an institution and country. | v1, ai | 2 |
+| NW-01 | Holdings: investment accounts, debts and other assets. Each has a country, a type (predefined by country, or typed with a kind), an optional name (otherwise type, institution and currency name it), an institution and a currency. | v1, ai, author (2026-11-12) | 2 |
 | NW-02 | Dated value snapshots per holding. Months with no snapshot can be hidden in charts. | v1, ai | 2 |
 | NW-03 | Contributions per holding, split between my money (transactions linked to the holding) and employer or other money (entered on the holding). Shows amount placed and profit in amount and percent. | v1, ai, net-worth data | 2 |
 | NW-04 | Net worth chart (total, investments, debts) and percent change over any range; default is account start to today. | v1, ai | 5 |
-| NW-05 | A holding can be excluded from the net worth total (the life insurance "with/without" line). | net-worth data | 2 |
+| NW-05 | The net worth chart can leave out chosen holdings and accounts, to simulate (the life insurance "with/without" line). The choice is remembered per browser; the totals on the hub always list everything open. | net-worth data, author (2026-11-12) | 5 |
 | NW-06 | Projections at fixed growth rates (5, 7, 10 %) or custom inputs. | v1, ai | later |
 | NW-07 | Goal solver: "to reach X in N years at r %, invest Y per year", with r defaulting to my actual return. | v1, ai | later |
 | NW-08 | "If this continues, in N years I'll have X." | v1, ai | later |

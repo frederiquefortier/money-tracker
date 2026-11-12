@@ -4,7 +4,7 @@ import { AppearanceFields } from '#/components/categories/form/appearance-fields
 import { CategoryBadge } from '#/components/categories/category-badge'
 import { FeeField } from '#/components/categories/form/fee-field'
 import { KindTabs } from '#/components/categories/list/kind-tabs'
-import { NecessityRadios } from '#/components/categories/form/necessity-radios'
+import { NecessityChoice } from '#/components/categories/form/necessity-choice'
 import { useCategoryDraft } from '#/hooks/categories/use-category-draft'
 import type {
   CategoryDraft,
@@ -98,9 +98,9 @@ function NecessityField({
     indexById(categories),
   )
   return (
-    <NecessityRadios
+    <NecessityChoice
       value={draft.necessity}
-      parentName={draft.parent?.name}
+      inherits={Boolean(draft.parent)}
       source={source}
       onChange={draft.setNecessity}
     />

@@ -8,7 +8,7 @@ Rules every screen follows. A screen that disagrees with them is wrong until the
 |---|---|
 | [First run](17-first-run.md) | SET-01 |
 | [Export](18-export.md) | IMP-04, SEC-04 |
-| [Holdings](19-holdings.md) | NW-01, 02, 03, 05 |
+| [Holdings](19-holdings.md) | NW-01, 02, 03 |
 | [Net worth](20-net-worth.md) | NW-10, ACC-06 |
 | [Institutions](21-institutions.md) | ACC-05 |
 

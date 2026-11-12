@@ -26,12 +26,7 @@ function useSummary(
     if (screen === 'period') return period ? periodLabel(period) : ''
     const count = values[FILTER_KEYS[screen]].length
     if (count === 0) return t('transactions.list.all')
-    const picked = pickedOf({
-      tab: screen,
-      names,
-      values,
-      noHolding: t('holdings.none'),
-    })
+    const picked = pickedOf(screen, names, values)
     return picked.length
       ? picked.map((one) => one.name).join(', ')
       : String(count)

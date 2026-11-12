@@ -1,8 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import { AccountRow } from '#/components/accounts/list/account-row'
 import type { ListedAccount } from '#/components/accounts/list/account-row'
-import { IconActions, IconAnchor } from '#/components/display/icon-button'
-import { CollapseToggle } from '#/components/lists/collapse-toggle'
+import { DrawerHeader } from '#/components/institutions/drawer-header'
 import { MissingRate, Money } from '#/components/display/money'
 import { compareDecimal } from '#/lib/shared/money'
 import { formatMoney } from '#/lib/shared/format'
@@ -19,7 +18,7 @@ function Balance({ account }: { account: ListedAccount }) {
       <Money
         amount={account.balance}
         currency={account.currency}
-        className="font-semibold"
+        className="text-lg font-semibold"
       />
       {compareDecimal(account.pending, '0') !== 0 && (
         <span className="block text-xs text-muted-foreground">
@@ -47,50 +46,8 @@ function GroupTotalAmount({
       amount={total.total}
       currency={currency}
       converted={total.converted}
-      className="font-bold"
+      className="text-lg font-semibold"
     />
-  )
-}
-
-/**
- * The card header: the name toggles the accounts. An institution with a website has its
- * icon after the total (from `md` up, as the account rows' actions); the form and the
- * delete are in Réglages.
- */
-function GroupHeader({
-  institution,
-  name,
-  collapsed,
-  onToggle,
-  children,
-}: {
-  institution: Institution | null
-  name: string
-  collapsed: boolean
-  onToggle: () => void
-  children: React.ReactNode
-}) {
-  const { t } = useTranslation()
-  return (
-    <header className="flex items-center gap-2 py-2.5 pr-2 pl-3">
-      <CollapseToggle
-        expanded={!collapsed}
-        onToggle={onToggle}
-        className="font-bold"
-      >
-        {name}
-      </CollapseToggle>
-      <span className="ml-auto md:pr-4">{children}</span>
-      <IconActions slots={2}>
-        {institution?.websiteUrl && (
-          <IconAnchor
-            icon="external-link"
-            label={t('institutions.openWebsite', { name })}
-            href={institution.websiteUrl}
-          />
-        )}
-      </IconActions>
-    </header>
   )
 }
 
@@ -114,14 +71,14 @@ export function AccountGroup({
   const name = institution?.name ?? t('accounts.noInstitution')
   return (
     <section className={cardSurface}>
-      <GroupHeader
+      <DrawerHeader
         institution={institution}
         name={name}
         collapsed={collapsed}
         onToggle={onToggle}
       >
         <GroupTotalAmount total={total} currency={displayCurrency} />
-      </GroupHeader>
+      </DrawerHeader>
       {!collapsed && accounts.length > 0 && (
         <ul className="divide-y border-t">
           {accounts.map((account) => (

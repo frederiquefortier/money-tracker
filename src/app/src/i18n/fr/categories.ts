@@ -23,7 +23,7 @@ export const categoriesFr = {
     necessities: { need: 'Besoin', want: 'Envie' },
     unclassified: 'Non classée',
     unclassifiedLower: 'non classée',
-    followedFrom: 'Comme {{parent}} ({{value}})',
+    followedFrom: 'Hérité ({{value}})',
     clearCategory: 'Retirer la catégorie',
     archivedTag: 'Archivée',
     frequent: 'Fréquents',

@@ -4,7 +4,7 @@ import { Icon } from '#/components/display/icon'
 import { Input } from '#/components/ui/input'
 import { FieldLabel } from '#/components/ui/field'
 import { cn } from '#/lib/utils'
-import { errorTint, focusRing } from '#/components/styles'
+import { errorTint, focusRing, warningTint } from '#/components/styles'
 
 type FormFieldProps = Omit<React.ComponentProps<typeof Input>, 'id'> & {
   name: string
@@ -99,26 +99,34 @@ export function FieldMessage({
   )
 }
 
+const ALERT_TONES = {
+  error: { surface: errorTint, icon: 'circle-warning' },
+  warning: { surface: warningTint, icon: 'circle-warning' },
+  success: {
+    surface: 'bg-secondary text-secondary-foreground',
+    icon: 'circle-check',
+  },
+} as const
+
 export function FormAlert({
   tone = 'error',
+  className,
   children,
 }: {
-  tone?: 'error' | 'success'
+  tone?: 'error' | 'success' | 'warning'
+  className?: string
   children: React.ReactNode
 }) {
-  const error = tone === 'error'
   return (
     <p
-      role={error ? 'alert' : 'status'}
+      role={tone === 'error' ? 'alert' : 'status'}
       className={cn(
         'flex items-start gap-2 rounded-lg px-3 py-2 text-sm',
-        error ? errorTint : 'bg-secondary text-secondary-foreground',
+        ALERT_TONES[tone].surface,
+        className,
       )}
     >
-      <Icon
-        name={error ? 'circle-warning' : 'circle-check'}
-        className="mt-0.5 size-4"
-      />
+      <Icon name={ALERT_TONES[tone].icon} className="mt-0.5 size-4" />
       {children}
     </p>
   )

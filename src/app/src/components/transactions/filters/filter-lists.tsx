@@ -9,8 +9,6 @@ import {
 } from '#/components/forms/check-ticks'
 import { Button } from '#/components/ui/button'
 import { todayIso } from '#/lib/shared/format'
-import { matcher } from '#/lib/shared/search'
-import { NO_HOLDING } from '#/lib/transactions/transaction-list'
 import type { Merchant } from '#/lib/merchants/merchant'
 import { useFormatLocale } from '#/hooks/app/use-locale'
 import {
@@ -115,39 +113,6 @@ function EventList({
   )
 }
 
-/** "Sans placement" first, then the holdings A to Z (NW-03). */
-function HoldingList({
-  options,
-  query,
-  values,
-  onChange,
-}: {
-  options: FilterOptions
-  query: string
-  values: FilterValues
-  onChange: (values: FilterValues) => void
-}) {
-  const { t } = useTranslation()
-  const matches = matcher(query)
-  const nodes: Array<CheckNode> = [
-    { id: NO_HOLDING, label: t('holdings.none') },
-    ...[...options.holdings]
-      .sort((a, b) => a.name.localeCompare(b.name))
-      .map((h) => ({ id: h.id, label: h.name })),
-  ].filter((node) => matches(node.label))
-  const ticks = groupTicks(values.holdingIds)
-  if (nodes.length === 0) return <NoMatch />
-  return (
-    <CheckList
-      nodes={nodes}
-      stateOf={ticks.stateOf}
-      onToggle={(node) =>
-        onChange({ ...values, holdingIds: ticks.toggle(node) })
-      }
-    />
-  )
-}
-
 /**
  * The open tab's list: accounts by institution, the categories tree by type, merchants,
  * people by group.
@@ -210,17 +175,15 @@ export function FilterList({
       />
     )
   }
-  if (tab === 'holdings' || tab === 'events') {
-    const List = tab === 'holdings' ? HoldingList : EventList
+  if (tab === 'events')
     return (
-      <List
+      <EventList
         options={options}
         query={query}
         values={values}
         onChange={onChange}
       />
     )
-  }
   return (
     <MerchantList
       merchants={options.merchants}
