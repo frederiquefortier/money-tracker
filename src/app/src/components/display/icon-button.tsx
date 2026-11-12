@@ -79,9 +79,15 @@ export function IconAnchor({
   )
 }
 
-// Width of 1 to 4 icon actions plus the 12px gap before them, so the amounts in one
+// Width of 1 to 5 icon actions plus the 12px gap before them, so the amounts in one
 // list line up whatever actions each row has.
-const SLOT_WIDTH = { 1: 'w-11', 2: 'w-19', 3: 'w-27', 4: 'w-35' } as const
+const SLOT_WIDTH = {
+  1: 'w-11',
+  2: 'w-19',
+  3: 'w-27',
+  4: 'w-35',
+  5: 'w-43',
+} as const
 
 export type ActionPlacement = 'row' | 'sheet' | 'always'
 

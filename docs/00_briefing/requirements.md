@@ -168,7 +168,7 @@ English; this file is in English like every other meta-doc.
 |---|---|---|---|
 | NW-01 | Holdings: investment accounts, debts and other assets. Each has a country, a type (predefined by country, or typed with a kind), an optional name (otherwise type, institution and currency name it), an institution and a currency. | v1, ai, author (2026-11-12) | 2 |
 | NW-02 | Dated value snapshots per holding. Months with no snapshot can be hidden in charts. | v1, ai | 2 |
-| NW-03 | Contributions per holding, split between my money (transactions linked to the holding) and employer or other money (entered on the holding). Shows amount placed and profit in amount and percent. | v1, ai, net-worth data | 2 |
+| NW-03 | Contributions per holding, split between my money (transactions linked to the holding) and external money (employer, government; entered on the holding). Money can be transferred from one holding to another on a date. Holdings sort as accounts do (ACC-07). Shows amount placed (never reduced by a withdrawal), amount withdrawn, and profit in amount and percent. | v1, ai, net-worth data, author (2026-11-12) | 2 |
 | NW-04 | Net worth chart (total, investments, debts) and percent change over any range; default is account start to today. | v1, ai | 5 |
 | NW-05 | The net worth chart can leave out chosen holdings and accounts, to simulate (the life insurance "with/without" line). The choice is remembered per browser; the totals on the hub always list everything open. | net-worth data, author (2026-11-12) | 5 |
 | NW-06 | Projections at fixed growth rates (5, 7, 10 %) or custom inputs. | v1, ai | later |

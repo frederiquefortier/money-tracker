@@ -11,12 +11,19 @@ import { ListPage } from '#/components/layout/list-page'
 import { EmptyState } from '#/components/lists/list-card'
 import { ExpandAllButton } from '#/components/lists/expand-all-button'
 import { NetWorthBackLink } from '#/components/net-worth/back-link'
-import { drawersOf, holdingLabel } from '#/lib/holdings/holding'
+import { holdingLabel } from '#/lib/holdings/holding'
 import type { HoldingsPage, ListedHolding } from '#/lib/holdings/holding'
+import {
+  HOLDING_SORTS,
+  drawersOf,
+  holdingComparator,
+} from '#/lib/holdings/holding-list'
+import type { HoldingSort } from '#/lib/holdings/holding-list'
 import { useLocale } from '#/hooks/app/use-locale'
-import { useStoredIds } from '#/hooks/app/use-stored-state'
+import { useStoredIds, useStoredState } from '#/hooks/app/use-stored-state'
 import { useMyCurrencies } from '#/hooks/currencies/use-my-currencies'
-import { compareNames } from '#/lib/shared/collections'
+import { compareNames, oneOf } from '#/lib/shared/collections'
+import { SortMenu } from '#/components/lists/sort-menu'
 import { FORMAT_LOCALE, inLocale } from '#/i18n/locales'
 import type { Locale } from '#/i18n/locales'
 import { getHoldings } from '#/server/holdings'
@@ -27,7 +34,9 @@ export const Route = createFileRoute('/_authed/net-worth/holdings')({
 })
 
 /** Rows with their label and institution; the open ones in drawers by institution (spec 19). */
-function shape(page: HoldingsPage, locale: Locale) {
+const parseSort = oneOf(HOLDING_SORTS)
+
+function shape(page: HoldingsPage, locale: Locale, sort: HoldingSort) {
   const institutions = new Map(page.institutions.map((i) => [i.id, i.name]))
   const listed: Array<ListedHolding> = page.holdings.map((holding) => {
     const institutionName = holding.institutionId
@@ -37,7 +46,11 @@ function shape(page: HoldingsPage, locale: Locale) {
       ...holding,
       institutionName,
       typeText: inLocale(locale, holding.typeFr, holding.typeEn),
-      label: holdingLabel({ ...holding, institution: institutionName }, locale),
+      // An open holding sits in its institution's drawer, so its label leaves the institution out.
+      label: holdingLabel(
+        { ...holding, institution: holding.closedOn ? institutionName : null },
+        locale,
+      ),
     }
   })
   const byName = compareNames(FORMAT_LOCALE[locale])
@@ -45,7 +58,10 @@ function shape(page: HoldingsPage, locale: Locale) {
     drawers: drawersOf(
       listed.filter((h) => !h.closedOn),
       page.institutions,
-      byName,
+      {
+        compare: byName,
+        compareHoldings: holdingComparator(sort, FORMAT_LOCALE[locale]),
+      },
     ),
     closed: listed
       .filter((h) => h.closedOn)
@@ -59,7 +75,12 @@ function Holdings() {
   const locale = useLocale()
   const collapsed = useStoredIds('holdings.collapsed')
   const { displayCurrency } = useMyCurrencies()
-  const { drawers, closed } = shape(page, locale)
+  const [sort, setSort] = useStoredState<HoldingSort>(
+    'holdings.sort',
+    'name',
+    parseSort,
+  )
+  const { drawers, closed } = shape(page, locale, sort)
 
   const keys = drawers.map((drawer) => drawer.key)
   const allExpanded = keys.every((key) => !collapsed.ids.has(key))
@@ -69,12 +90,20 @@ function Holdings() {
       title={t('holdings.title')}
       back={<NetWorthBackLink />}
       actions={
-        keys.length > 0 && (
-          <ExpandAllButton
-            allExpanded={allExpanded}
-            onToggle={() => collapsed.setAll(keys, allExpanded)}
+        <>
+          {keys.length > 0 && (
+            <ExpandAllButton
+              allExpanded={allExpanded}
+              onToggle={() => collapsed.setAll(keys, allExpanded)}
+            />
+          )}
+          <SortMenu
+            sort={sort}
+            options={HOLDING_SORTS}
+            labelOf={(option) => t(`holdings.sort.${option}`)}
+            onChange={setSort}
           />
-        )
+        </>
       }
     >
       {page.unlinkedCount > 0 && (

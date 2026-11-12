@@ -26,7 +26,7 @@ export function HoldingForm({
   types,
   currencyLocked,
   savedText,
-  children,
+  onSaved,
 }: {
   holdingId?: string
   initial: HoldingValues
@@ -36,8 +36,8 @@ export function HoldingForm({
   types: ReadonlyArray<HoldingType>
   currencyLocked: boolean
   savedText: string
-  /** The lists below the fields, on a saved holding. */
-  children?: React.ReactNode
+  /** Called with the id once saved, for a form that opens over another. */
+  onSaved?: (id: string) => void
 }) {
   const { currencies } = useMyCurrencies()
   const choice = useHoldingChoices({
@@ -58,8 +58,8 @@ export function HoldingForm({
       country: choice.country,
       type: choice.type,
     }),
-    save: (data) =>
-      saveHolding({
+    save: async (data) => {
+      const result = await saveHolding({
         data: holdingInputOf({
           values: data,
           types,
@@ -67,7 +67,10 @@ export function HoldingForm({
           currency: choice.currency,
           institutionId: choice.institutionId,
         }),
-      }),
+      })
+      if (result.ok) onSaved?.(result.id)
+      return result
+    },
     savedText,
   })
 
@@ -94,7 +97,6 @@ export function HoldingForm({
         currencyLocked={currencyLocked}
         namePlaceholder={placeholder}
       />
-      {children}
     </SheetForm>
   )
 }

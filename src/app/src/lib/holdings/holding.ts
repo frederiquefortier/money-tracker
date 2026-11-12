@@ -55,8 +55,10 @@ export type Holding = {
   currency: string
   openedOn: string
   closedOn: string | null
-  /** In the holding's currency; null when a rate is missing. */
+  /** In the holding's currency, null when a rate is missing: the money that went in. It never goes down. */
   placed: string | null
+  /** The money that came out: linked incomes and transfers out. */
+  withdrawn: string | null
   latestOn: string | null
   latestValue: string | null
   /** The latest value in the display currency; null when a rate is missing. */
@@ -64,7 +66,7 @@ export type Holding = {
   /** Null with no value yet, no money placed or a missing rate. */
   profit: string | null
   profitPercent: string | null
-  /** A transaction is linked to it, so it cannot be deleted. */
+  /** It has a transaction, a value, a contribution or a transfer, so it can only be archived. */
   inUse: boolean
 }
 
@@ -77,9 +79,19 @@ export type Contribution = {
   label: string | null
 }
 
+/** Money moved between two holdings; `other` is the holding on the other side. */
+export type HoldingTransfer = {
+  id: string
+  onDate: string
+  amount: string
+  other: string
+  outgoing: boolean
+}
+
 export type HoldingDetail = Holding & {
   snapshots: Array<Snapshot>
   contributions: Array<Contribution>
+  transfers: Array<HoldingTransfer>
 }
 
 export type HoldingsPage = {
@@ -104,6 +116,7 @@ export type HoldingError =
   | 'dateTaken'
   | 'inUse'
   | 'currencyLocked'
+  | 'currencyMismatch'
   | 'currencyRemoved'
   | 'closedBeforeEntry'
   | 'closed'
@@ -196,10 +209,33 @@ export const contributionFormSchema = z.object({
   label: z.string().trim().max(100, { error: 'invalid' }),
 })
 
+export const transferFormSchema = z.object({
+  onDate: isoDate,
+  amount: amountSchema(false),
+  to: z.uuid({ error: 'required' }),
+})
+
+export const transferInputSchema = transferFormSchema
+  .omit({ to: true })
+  .extend({ from: z.uuid(), to: z.uuid() })
+
 export const contributionInputSchema = contributionFormSchema.extend({
   id: z.uuid().optional(),
   holdingId: z.uuid(),
 })
+
+/** The holdings a source can transfer to: other open investments in the same currency. */
+export function transferTargets<
+  T extends Pick<Holding, 'id' | 'kind' | 'currency' | 'closedOn'>,
+>(holdings: ReadonlyArray<T>, source: Pick<Holding, 'id' | 'currency'>) {
+  return holdings.filter(
+    (h) =>
+      h.id !== source.id &&
+      h.kind === 'investment' &&
+      !h.closedOn &&
+      h.currency === source.currency,
+  )
+}
 
 /** Whether the form offers the holding for a transaction on `date`. */
 export function isOpenOn(
@@ -224,38 +260,4 @@ export type ListedHolding = Holding & {
   typeText: string
   /** The name, or what stands in for it (ADR-048). */
   label: string
-}
-
-/** The holdings of one institution, or of none (`institution` null). */
-export type HoldingDrawer = {
-  key: string
-  institution: Institution | null
-  holdings: Array<ListedHolding>
-}
-
-/** The key of the drawer of holdings with no institution. */
-export const NO_INSTITUTION_KEY = ''
-
-/** Open holdings in drawers by institution, A to Z, then the ones with none (spec 19). */
-export function drawersOf(
-  holdings: ReadonlyArray<ListedHolding>,
-  institutions: ReadonlyArray<Institution>,
-  compare: (a: { name: string }, b: { name: string }) => number,
-): Array<HoldingDrawer> {
-  const named = institutions
-    .map((institution) => ({
-      key: institution.id,
-      institution,
-      holdings: holdings
-        .filter((h) => h.institutionId === institution.id)
-        .sort((a, b) => compare({ name: a.label }, { name: b.label })),
-    }))
-    .filter((drawer) => drawer.holdings.length > 0)
-    .sort((a, b) => compare(a.institution, b.institution))
-  const rest = holdings
-    .filter((h) => !h.institutionId)
-    .sort((a, b) => compare({ name: a.label }, { name: b.label }))
-  return rest.length > 0
-    ? [...named, { key: NO_INSTITUTION_KEY, institution: null, holdings: rest }]
-    : named
 }

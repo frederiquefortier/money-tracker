@@ -11,7 +11,7 @@ import { FORMAT_LOCALE } from '#/i18n/locales'
 import type { Locale } from '#/i18n/locales'
 import { countryOptions } from '#/lib/holdings/countries'
 import { HOLDING_KINDS, OTHER_TYPE } from '#/lib/holdings/holding'
-import type { HoldingKind, HoldingType } from '#/lib/holdings/holding'
+import type { Holding, HoldingKind, HoldingType } from '#/lib/holdings/holding'
 import { useLocale } from '#/hooks/app/use-locale'
 import type { Currency } from '#/lib/currencies/currency'
 import type { FieldBinding } from '#/hooks/forms/use-sheet-form'
@@ -227,4 +227,21 @@ export function HoldingFields({
       />
     </>
   )
+}
+
+/** The values of a form opened on a source's country and type, as a new holding. */
+export function startingValues(
+  source: Pick<Holding, 'country' | 'type' | 'typeFr' | 'kind'>,
+  name: string,
+  openedOn: string,
+): HoldingValues {
+  const typed = source.type === null
+  return {
+    country: source.country,
+    type: source.type ?? OTHER_TYPE,
+    customType: typed ? source.typeFr : '',
+    kind: typed ? source.kind : '',
+    name,
+    openedOn,
+  }
 }

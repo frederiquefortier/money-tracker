@@ -4,8 +4,6 @@ import { DeleteDialog } from '#/components/feedback/delete-dialog'
 import { IconButton } from '#/components/display/icon-button'
 import { Money } from '#/components/display/money'
 import { CreateButton } from '#/components/forms/create-row'
-import { FieldLabel } from '#/components/ui/field'
-import { deleteContribution, deleteSnapshot } from '#/server/holding-entries'
 import { formatDate } from '#/lib/shared/format'
 import { useLocale } from '#/hooks/app/use-locale'
 import { cn } from '#/lib/utils'
@@ -13,8 +11,6 @@ import { fieldCard, focusRing, rowHover } from '#/components/styles'
 import type { Result } from '#/lib/shared/result'
 
 export type EntryKind = 'snapshot' | 'contribution'
-export type EntryTarget = { kind: EntryKind; id: string | null }
-
 type Row = { id: string; onDate: string; amount: string; label?: string | null }
 
 function EntryRow({
@@ -70,7 +66,8 @@ function EntryRow({
   )
 }
 
-function EntryList({
+/** The dated rows of a holding's values or external contributions, and the row that adds one. */
+export function EntryList({
   label,
   addLabel,
   rows,
@@ -86,8 +83,7 @@ function EntryList({
   onDelete: (id: string) => Promise<Result<string>>
 }) {
   return (
-    <div role="group" aria-label={label} className="flex flex-col gap-2">
-      <FieldLabel>{label}</FieldLabel>
+    <div role="group" aria-label={label}>
       <div className={fieldCard}>
         {rows.length > 0 && (
           <ul className="divide-y">
@@ -105,44 +101,5 @@ function EntryList({
         <CreateButton label={addLabel} onClick={() => onOpen(null)} />
       </div>
     </div>
-  )
-}
-
-/** A saved holding's values, and the employer money on an investment (NW-02, NW-03). */
-export function EntryLists({
-  snapshots,
-  contributions,
-  currency,
-  showContributions,
-  onOpen,
-}: {
-  snapshots: ReadonlyArray<Row>
-  contributions: ReadonlyArray<Row>
-  currency: string
-  showContributions: boolean
-  onOpen: (target: EntryTarget) => void
-}) {
-  const { t } = useTranslation()
-  return (
-    <>
-      <EntryList
-        label={t('holdings.values')}
-        addLabel={t('holdings.addValue')}
-        rows={snapshots}
-        currency={currency}
-        onOpen={(id) => onOpen({ kind: 'snapshot', id })}
-        onDelete={(id) => deleteSnapshot({ data: { id } })}
-      />
-      {showContributions && (
-        <EntryList
-          label={t('holdings.contributions')}
-          addLabel={t('holdings.addContribution')}
-          rows={contributions}
-          currency={currency}
-          onOpen={(id) => onOpen({ kind: 'contribution', id })}
-          onDelete={(id) => deleteContribution({ data: { id } })}
-        />
-      )}
-    </>
   )
 }

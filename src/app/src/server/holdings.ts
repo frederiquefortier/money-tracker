@@ -7,16 +7,11 @@ import type {
   HoldingError,
   HoldingsPage,
 } from '#/lib/holdings/holding'
-import {
-  deleteRow,
-  inUseIds,
-  loaded,
-  saveRow,
-  updateRow,
-} from '#/lib/server/db.server'
+import { deleteRow, loaded, saveRow, updateRow } from '#/lib/server/db.server'
 import {
   HOLDING_COLUMNS,
   TOTALS_COLUMNS,
+  historyIds,
   holdingFailure as failure,
   loadHoldingTypes,
   toHolding,
@@ -50,15 +45,7 @@ export const getHoldings = createServerFn({ method: 'GET' }).handler(
       investments,
     )
 
-    const used = await inUseIds(
-      rows.map((r) => r.id),
-      (id) =>
-        supabase
-          .from('transactions')
-          .select('id')
-          .eq('holding_id', id)
-          .limit(1),
-    )
+    const used = await historyIds(rows.map((r) => r.id))
     const unlinked = await supabase
       .from('transactions')
       .select('id, transaction_splits!inner(categories!inner(kind))', {
@@ -101,7 +88,7 @@ export const getHolding = createServerFn({ method: 'GET' })
   .validator(idInput)
   .handler(async ({ data }): Promise<HoldingDetail | null> => {
     const supabase = getSupabase()
-    const [row, totals, snapshots, contributions, types, used] =
+    const [row, totals, snapshots, contributions, transfers, types, used] =
       await Promise.all([
         supabase
           .from('holdings')
@@ -123,16 +110,17 @@ export const getHolding = createServerFn({ method: 'GET' })
           .select('id, on_date, amount::text, label')
           .eq('holding_id', data.id)
           .order('on_date', { ascending: false }),
+        supabase
+          .from('holding_transfers')
+          .select('id, on_date, amount::text, from_holding_id, to_holding_id')
+          .or(`from_holding_id.eq.${data.id},to_holding_id.eq.${data.id}`)
+          .order('on_date', { ascending: false }),
         loadHoldingTypes(),
-        inUseIds([data.id], (id) =>
-          supabase
-            .from('transactions')
-            .select('id')
-            .eq('holding_id', id)
-            .limit(1),
-        ),
+        historyIds([data.id]),
       ])
-    const failed = [row, totals, snapshots, contributions].find((r) => r.error)
+    const failed = [row, totals, snapshots, contributions, transfers].find(
+      (r) => r.error,
+    )
     if (failed?.error)
       throw new Error(`The holding could not be loaded (${failed.error.code})`)
     if (!row.data) return null
@@ -155,6 +143,14 @@ export const getHolding = createServerFn({ method: 'GET' })
         onDate: x.on_date,
         amount: x.amount,
         label: x.label,
+      })),
+      transfers: (transfers.data ?? []).map((x) => ({
+        id: x.id,
+        onDate: x.on_date,
+        amount: x.amount,
+        outgoing: x.from_holding_id === data.id,
+        other:
+          x.from_holding_id === data.id ? x.to_holding_id : x.from_holding_id,
       })),
     }
   })
@@ -218,10 +214,12 @@ export const reopenHolding = createServerFn({ method: 'POST' })
     return error ? failure('reopen', error) : { ok: true }
   })
 
-/** A holding with transactions refuses (23503): archive it instead. */
+/** A holding with a history is archived instead: transactions refuse in the database, values and contributions here. */
 export const deleteHolding = createServerFn({ method: 'POST' })
   .validator(idInput)
   .handler(async ({ data }): Promise<HoldingResult> => {
+    if ((await historyIds([data.id])).has(data.id))
+      return { ok: false, error: 'inUse' }
     const error = await deleteRow('holdings', data.id)
     return error ? failure('delete', error) : { ok: true }
   })

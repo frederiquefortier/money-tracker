@@ -506,6 +506,54 @@ export type Database = {
           },
         ]
       }
+      holding_transfers: {
+        Row: {
+          amount: number
+          created_at: string
+          from_holding_id: string
+          id: string
+          on_date: string
+          to_holding_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          from_holding_id: string
+          id?: string
+          on_date: string
+          to_holding_id: string
+          updated_at?: string
+          user_id?: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          from_holding_id?: string
+          id?: string
+          on_date?: string
+          to_holding_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "holding_transfers_user_id_from_holding_id_fkey"
+            columns: ["user_id", "from_holding_id"]
+            isOneToOne: false
+            referencedRelation: "holdings"
+            referencedColumns: ["user_id", "id"]
+          },
+          {
+            foreignKeyName: "holding_transfers_user_id_to_holding_id_fkey"
+            columns: ["user_id", "to_holding_id"]
+            isOneToOne: false
+            referencedRelation: "holdings"
+            referencedColumns: ["user_id", "id"]
+          },
+        ]
+      }
       holding_types: {
         Row: {
           code: string
@@ -1298,6 +1346,7 @@ export type Database = {
           placed: number | null
           profit: number | null
           profit_percent: number | null
+          withdrawn: number | null
         }
         Relationships: []
       }

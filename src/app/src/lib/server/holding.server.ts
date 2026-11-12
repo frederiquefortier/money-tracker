@@ -6,7 +6,7 @@ import type {
   HoldingKind,
   HoldingType,
 } from '#/lib/holdings/holding'
-import { loaded } from '#/lib/server/db.server'
+import { inUseIds, loaded } from '#/lib/server/db.server'
 import { isOneOf } from '#/lib/shared/collections'
 import { failureFor } from '#/lib/shared/result'
 import { getSupabase } from '#/lib/server/supabase.server'
@@ -19,6 +19,7 @@ const KNOWN: Partial<Record<string, HoldingError>> = {
   holding_currency_locked: 'currencyLocked',
   holding_closed_before_entry: 'closedBeforeEntry',
   holding_closed: 'closed',
+  holding_transfer_currency: 'currencyMismatch',
   amount_precision: 'precision',
 }
 
@@ -32,7 +33,7 @@ export const entryFailure = failureFor('holdings', {
 })
 
 export const TOTALS_COLUMNS =
-  'holding_id, placed::text, latest_on, latest_value::text, display_value::text, profit::text, profit_percent::text'
+  'holding_id, placed::text, latest_on, latest_value::text, display_value::text, profit::text, profit_percent::text, withdrawn::text'
 
 // Amounts as text: PostgREST sends numeric as a JSON number, a float (ADR-004).
 export const HOLDING_COLUMNS =
@@ -77,6 +78,7 @@ export type HoldingRow = {
 export type TotalsRow = {
   holding_id: string | null
   placed: string | null
+  withdrawn: string | null
   latest_on: string | null
   latest_value: string | null
   display_value: string | null
@@ -117,10 +119,45 @@ export function toHolding({
 function figuresOf(totals: TotalsRow | undefined) {
   return {
     placed: totals?.placed ?? null,
+    withdrawn: totals?.withdrawn ?? null,
     latestOn: totals?.latest_on ?? null,
     latestValue: totals?.latest_value ?? null,
     displayValue: totals?.display_value ?? null,
     profit: totals?.profit ?? null,
     profitPercent: totals?.profit_percent ?? null,
   }
+}
+
+/** The holdings with a history, which can only be archived: a transaction, a value, a contribution or a transfer. */
+export async function historyIds(
+  ids: ReadonlyArray<string>,
+): Promise<Set<string>> {
+  const supabase = getSupabase()
+  const found = await Promise.all([
+    inUseIds(ids, (id) =>
+      supabase.from('transactions').select('id').eq('holding_id', id).limit(1),
+    ),
+    inUseIds(ids, (id) =>
+      supabase
+        .from('holding_snapshots')
+        .select('id')
+        .eq('holding_id', id)
+        .limit(1),
+    ),
+    inUseIds(ids, (id) =>
+      supabase
+        .from('holding_contributions')
+        .select('id')
+        .eq('holding_id', id)
+        .limit(1),
+    ),
+    inUseIds(ids, (id) =>
+      supabase
+        .from('holding_transfers')
+        .select('id')
+        .or(`from_holding_id.eq.${id},to_holding_id.eq.${id}`)
+        .limit(1),
+    ),
+  ])
+  return new Set(found.flatMap((set) => [...set]))
 }

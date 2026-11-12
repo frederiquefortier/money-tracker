@@ -113,11 +113,11 @@ removed by hand so it never comes back. `matching_event` is the one function the
 
 **Holdings.** `holdings` are investments, assets and debts (bank accounts count through their
 balance). `holding_snapshots` are the dated values, one per holding per date, in the holding's
-currency; `holding_contributions` only the employer or government money. My own contributions
+currency; `holding_contributions` only the external (employer or government) money; `holding_transfers` are dated amounts moved from one holding to another, both investments in one currency (a withdrawal on one side, a contribution on the other). My own contributions
 are the transactions with a `holding_id`, allowed on an expense or an income whose categories are
-all investment-kind, so a withdrawal is an income. Deleting a holding with transactions is
-refused; the currency is fixed once it has entries; it cannot close before its last entry, and
-takes nothing dated after. `holding_totals` gives placed, latest value, profit and percent,
+all investment-kind, so a withdrawal is an income. Deleting a holding with transactions or transfers is
+refused by the database, and by the server once it has values or contributions (a history means archive); the currency is fixed once it has entries; it cannot close before its last entry, and
+takes nothing dated after. `holding_totals` gives placed (money in, never down), withdrawn (money out), latest value, profit (value plus withdrawn minus placed) and percent,
 null (never zero or partial) when a rate or a value is missing (ADR-045). A category with
 linked transactions stays an investment.
 

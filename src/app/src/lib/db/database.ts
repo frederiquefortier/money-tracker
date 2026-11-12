@@ -19,6 +19,7 @@ type WithTextAmount<T> = Omit<T, 'opening_balance'> & {
 type WithAmount<T> = Omit<T, 'amount'> & { amount?: string }
 type Snapshots = Public['Tables']['holding_snapshots']
 type Contributions = Public['Tables']['holding_contributions']
+type Transfers = Public['Tables']['holding_transfers']
 
 // Arguments with a SQL default can also be sent as null; amounts go as text.
 type SaveTransactionArgs = Omit<
@@ -120,7 +121,10 @@ export type Database = Omit<Generated, 'public'> & {
   public: Omit<Public, 'Tables' | 'Functions'> & {
     Tables: Omit<
       Public['Tables'],
-      'accounts' | 'holding_snapshots' | 'holding_contributions'
+      | 'accounts'
+      | 'holding_snapshots'
+      | 'holding_contributions'
+      | 'holding_transfers'
     > & {
       accounts: Omit<Accounts, 'Insert' | 'Update'> & {
         Insert: WithTextAmount<Accounts['Insert']>
@@ -133,6 +137,10 @@ export type Database = Omit<Generated, 'public'> & {
       holding_contributions: Omit<Contributions, 'Insert' | 'Update'> & {
         Insert: WithAmount<Contributions['Insert']>
         Update: WithAmount<Contributions['Update']>
+      }
+      holding_transfers: Omit<Transfers, 'Insert' | 'Update'> & {
+        Insert: WithAmount<Transfers['Insert']>
+        Update: WithAmount<Transfers['Update']>
       }
     }
     Functions: Omit<

@@ -38,7 +38,7 @@ Everything the owner can set on a transaction exists before the import, so eight
 - [x] Reimbursement links. TRX-07, PPL-05.
 - [x] Events with types and automatic linking by date. EVT-01..03, 07.
 - [ ] The Net worth tab: a hub with totals and two subpages, accounts moved under it. NW-10, ACC-06 ([spec](../00_briefing/designs/20-net-worth.md), ADR-046).
-- [ ] Holdings with their dated values, employer contributions, and transactions linked to the holding they pay into, as the second subpage. NW-01, 02, 03 ([spec](../00_briefing/designs/19-holdings.md), ADR-045, ADR-048).
+- [ ] Holdings with their dated values, external contributions, transfers between holdings, and transactions linked to the holding they pay into, as the second subpage. NW-01, 02, 03 ([spec](../00_briefing/designs/19-holdings.md), ADR-045, ADR-048).
 
 ## Phase 3: The import
 The milestone: eight years of history in the app. It comes before the dashboard so the dashboard and budgets are built and tried on real history.

@@ -2,19 +2,61 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ArchiveDialog } from '#/components/feedback/archive-dialog'
 import { DeleteDialog } from '#/components/feedback/delete-dialog'
-import { IconActions, IconButton } from '#/components/display/icon-button'
+import {
+  IconActions,
+  IconButton,
+  IconLink,
+} from '#/components/display/icon-button'
 import type { ActionPlacement } from '#/components/display/icon-button'
 import { useToast } from '#/hooks/app/use-toast'
 import { useServerAction } from '#/hooks/app/use-server-action'
 import { closeHolding, deleteHolding, reopenHolding } from '#/server/holdings'
 import type { Holding } from '#/lib/holdings/holding'
 
-type RowHolding = Pick<Holding, 'id' | 'currency' | 'closedOn' | 'inUse'> & {
+type RowHolding = Pick<
+  Holding,
+  'id' | 'kind' | 'currency' | 'closedOn' | 'inUse'
+> & {
   /** The name, or what stands in for it. */
   label: string
 }
 
-/** Archive or reactivate and delete, as icons on the holding's row or its sheet. */
+/** The values, and on an investment its external contributions and their transfer. */
+function EntryLinks({ holding, name }: { holding: RowHolding; name: string }) {
+  const { t } = useTranslation()
+  const { id } = holding
+  return (
+    <>
+      <IconLink
+        icon="chart-line"
+        label={t('holdings.valuesOf', { name })}
+        to="/net-worth/holdings/$holdingId/values"
+        params={{ holdingId: id }}
+      />
+      {holding.kind === 'investment' && (
+        <>
+          <IconLink
+            icon="coins"
+            label={t('holdings.contributionsOf', { name })}
+            to="/net-worth/holdings/$holdingId/contributions"
+            params={{ holdingId: id }}
+          />
+          <IconLink
+            icon="arrow-left-right"
+            label={t('holdings.transferOf', { name })}
+            to="/net-worth/holdings/$holdingId/transfer"
+            params={{ holdingId: id }}
+          />
+        </>
+      )}
+    </>
+  )
+}
+
+/**
+ * Values, external contributions and their transfer, archive or reactivate, and delete, as
+ * icons on the holding's row or its sheet. Contributions only exist on an investment.
+ */
 export function HoldingActions({
   holding,
   placement,
@@ -41,7 +83,8 @@ export function HoldingActions({
   }
 
   return (
-    <IconActions slots={2} placement={placement} className={className}>
+    <IconActions slots={5} placement={placement} className={className}>
+      <EntryLinks holding={holding} name={name} />
       {holding.closedOn ? (
         <IconButton
           icon="undo"

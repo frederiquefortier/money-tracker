@@ -50,6 +50,9 @@ import { Route as AuthedSettingsPeopleNewRouteImport } from './routes/_authed/se
 import { Route as AuthedTransactionsFormTransactionIdRouteImport } from './routes/_authed/transactions/_form/$transactionId'
 import { Route as AuthedTransactionsFormNewRouteImport } from './routes/_authed/transactions/_form/new'
 import { Route as AuthedTransactionsAdjustmentsAdjustmentIdRouteImport } from './routes/_authed/transactions/adjustments/$adjustmentId'
+import { Route as AuthedNetWorthHoldingsHoldingIdContributionsRouteImport } from './routes/_authed/net-worth/holdings/$holdingId_.contributions'
+import { Route as AuthedNetWorthHoldingsHoldingIdTransferRouteImport } from './routes/_authed/net-worth/holdings/$holdingId_.transfer'
+import { Route as AuthedNetWorthHoldingsHoldingIdValuesRouteImport } from './routes/_authed/net-worth/holdings/$holdingId_.values'
 import { Route as AuthedSettingsEventsTypesTypeIdRouteImport } from './routes/_authed/settings/events/types/$typeId'
 import { Route as AuthedSettingsEventsTypesNewRouteImport } from './routes/_authed/settings/events/types/new'
 import { Route as AuthedSettingsPeopleGroupsGroupIdRouteImport } from './routes/_authed/settings/people/groups/$groupId'
@@ -279,6 +282,24 @@ const AuthedTransactionsAdjustmentsAdjustmentIdRoute =
     path: '/adjustments/$adjustmentId',
     getParentRoute: () => AuthedTransactionsRoute,
   } as any)
+const AuthedNetWorthHoldingsHoldingIdContributionsRoute =
+  AuthedNetWorthHoldingsHoldingIdContributionsRouteImport.update({
+    id: '/$holdingId_/contributions',
+    path: '/$holdingId/contributions',
+    getParentRoute: () => AuthedNetWorthHoldingsRoute,
+  } as any)
+const AuthedNetWorthHoldingsHoldingIdTransferRoute =
+  AuthedNetWorthHoldingsHoldingIdTransferRouteImport.update({
+    id: '/$holdingId_/transfer',
+    path: '/$holdingId/transfer',
+    getParentRoute: () => AuthedNetWorthHoldingsRoute,
+  } as any)
+const AuthedNetWorthHoldingsHoldingIdValuesRoute =
+  AuthedNetWorthHoldingsHoldingIdValuesRouteImport.update({
+    id: '/$holdingId_/values',
+    path: '/$holdingId/values',
+    getParentRoute: () => AuthedNetWorthHoldingsRoute,
+  } as any)
 const AuthedSettingsEventsTypesTypeIdRoute =
   AuthedSettingsEventsTypesTypeIdRouteImport.update({
     id: '/types/$typeId',
@@ -350,6 +371,9 @@ export interface FileRoutesByFullPath {
   '/transactions/$transactionId': typeof AuthedTransactionsFormTransactionIdRoute
   '/transactions/new': typeof AuthedTransactionsFormNewRoute
   '/transactions/adjustments/$adjustmentId': typeof AuthedTransactionsAdjustmentsAdjustmentIdRoute
+  '/net-worth/holdings/$holdingId/contributions': typeof AuthedNetWorthHoldingsHoldingIdContributionsRoute
+  '/net-worth/holdings/$holdingId/transfer': typeof AuthedNetWorthHoldingsHoldingIdTransferRoute
+  '/net-worth/holdings/$holdingId/values': typeof AuthedNetWorthHoldingsHoldingIdValuesRoute
   '/settings/events/types/$typeId': typeof AuthedSettingsEventsTypesTypeIdRoute
   '/settings/events/types/new': typeof AuthedSettingsEventsTypesNewRoute
   '/settings/people/groups/$groupId': typeof AuthedSettingsPeopleGroupsGroupIdRoute
@@ -396,6 +420,9 @@ export interface FileRoutesByTo {
   '/transactions/$transactionId': typeof AuthedTransactionsFormTransactionIdRoute
   '/transactions/new': typeof AuthedTransactionsFormNewRoute
   '/transactions/adjustments/$adjustmentId': typeof AuthedTransactionsAdjustmentsAdjustmentIdRoute
+  '/net-worth/holdings/$holdingId/contributions': typeof AuthedNetWorthHoldingsHoldingIdContributionsRoute
+  '/net-worth/holdings/$holdingId/transfer': typeof AuthedNetWorthHoldingsHoldingIdTransferRoute
+  '/net-worth/holdings/$holdingId/values': typeof AuthedNetWorthHoldingsHoldingIdValuesRoute
   '/settings/events/types/$typeId': typeof AuthedSettingsEventsTypesTypeIdRoute
   '/settings/events/types/new': typeof AuthedSettingsEventsTypesNewRoute
   '/settings/people/groups/$groupId': typeof AuthedSettingsPeopleGroupsGroupIdRoute
@@ -445,6 +472,9 @@ export interface FileRoutesById {
   '/_authed/transactions/_form/$transactionId': typeof AuthedTransactionsFormTransactionIdRoute
   '/_authed/transactions/_form/new': typeof AuthedTransactionsFormNewRoute
   '/_authed/transactions/adjustments/$adjustmentId': typeof AuthedTransactionsAdjustmentsAdjustmentIdRoute
+  '/_authed/net-worth/holdings/$holdingId_/contributions': typeof AuthedNetWorthHoldingsHoldingIdContributionsRoute
+  '/_authed/net-worth/holdings/$holdingId_/transfer': typeof AuthedNetWorthHoldingsHoldingIdTransferRoute
+  '/_authed/net-worth/holdings/$holdingId_/values': typeof AuthedNetWorthHoldingsHoldingIdValuesRoute
   '/_authed/settings/events/types/$typeId': typeof AuthedSettingsEventsTypesTypeIdRoute
   '/_authed/settings/events/types/new': typeof AuthedSettingsEventsTypesNewRoute
   '/_authed/settings/people/groups/$groupId': typeof AuthedSettingsPeopleGroupsGroupIdRoute
@@ -493,6 +523,9 @@ export interface FileRouteTypes {
     | '/transactions/$transactionId'
     | '/transactions/new'
     | '/transactions/adjustments/$adjustmentId'
+    | '/net-worth/holdings/$holdingId/contributions'
+    | '/net-worth/holdings/$holdingId/transfer'
+    | '/net-worth/holdings/$holdingId/values'
     | '/settings/events/types/$typeId'
     | '/settings/events/types/new'
     | '/settings/people/groups/$groupId'
@@ -539,6 +572,9 @@ export interface FileRouteTypes {
     | '/transactions/$transactionId'
     | '/transactions/new'
     | '/transactions/adjustments/$adjustmentId'
+    | '/net-worth/holdings/$holdingId/contributions'
+    | '/net-worth/holdings/$holdingId/transfer'
+    | '/net-worth/holdings/$holdingId/values'
     | '/settings/events/types/$typeId'
     | '/settings/events/types/new'
     | '/settings/people/groups/$groupId'
@@ -587,6 +623,9 @@ export interface FileRouteTypes {
     | '/_authed/transactions/_form/$transactionId'
     | '/_authed/transactions/_form/new'
     | '/_authed/transactions/adjustments/$adjustmentId'
+    | '/_authed/net-worth/holdings/$holdingId_/contributions'
+    | '/_authed/net-worth/holdings/$holdingId_/transfer'
+    | '/_authed/net-worth/holdings/$holdingId_/values'
     | '/_authed/settings/events/types/$typeId'
     | '/_authed/settings/events/types/new'
     | '/_authed/settings/people/groups/$groupId'
@@ -892,6 +931,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthedTransactionsAdjustmentsAdjustmentIdRouteImport
       parentRoute: typeof AuthedTransactionsRoute
     }
+    '/_authed/net-worth/holdings/$holdingId_/contributions': {
+      id: '/_authed/net-worth/holdings/$holdingId_/contributions'
+      path: '/$holdingId/contributions'
+      fullPath: '/net-worth/holdings/$holdingId/contributions'
+      preLoaderRoute: typeof AuthedNetWorthHoldingsHoldingIdContributionsRouteImport
+      parentRoute: typeof AuthedNetWorthHoldingsRoute
+    }
+    '/_authed/net-worth/holdings/$holdingId_/transfer': {
+      id: '/_authed/net-worth/holdings/$holdingId_/transfer'
+      path: '/$holdingId/transfer'
+      fullPath: '/net-worth/holdings/$holdingId/transfer'
+      preLoaderRoute: typeof AuthedNetWorthHoldingsHoldingIdTransferRouteImport
+      parentRoute: typeof AuthedNetWorthHoldingsRoute
+    }
+    '/_authed/net-worth/holdings/$holdingId_/values': {
+      id: '/_authed/net-worth/holdings/$holdingId_/values'
+      path: '/$holdingId/values'
+      fullPath: '/net-worth/holdings/$holdingId/values'
+      preLoaderRoute: typeof AuthedNetWorthHoldingsHoldingIdValuesRouteImport
+      parentRoute: typeof AuthedNetWorthHoldingsRoute
+    }
     '/_authed/settings/events/types/$typeId': {
       id: '/_authed/settings/events/types/$typeId'
       path: '/types/$typeId'
@@ -985,12 +1045,21 @@ const AuthedNetWorthAccountsRouteWithChildren =
 interface AuthedNetWorthHoldingsRouteChildren {
   AuthedNetWorthHoldingsHoldingIdRoute: typeof AuthedNetWorthHoldingsHoldingIdRoute
   AuthedNetWorthHoldingsNewRoute: typeof AuthedNetWorthHoldingsNewRoute
+  AuthedNetWorthHoldingsHoldingIdContributionsRoute: typeof AuthedNetWorthHoldingsHoldingIdContributionsRoute
+  AuthedNetWorthHoldingsHoldingIdTransferRoute: typeof AuthedNetWorthHoldingsHoldingIdTransferRoute
+  AuthedNetWorthHoldingsHoldingIdValuesRoute: typeof AuthedNetWorthHoldingsHoldingIdValuesRoute
 }
 
 const AuthedNetWorthHoldingsRouteChildren: AuthedNetWorthHoldingsRouteChildren =
   {
     AuthedNetWorthHoldingsHoldingIdRoute: AuthedNetWorthHoldingsHoldingIdRoute,
     AuthedNetWorthHoldingsNewRoute: AuthedNetWorthHoldingsNewRoute,
+    AuthedNetWorthHoldingsHoldingIdContributionsRoute:
+      AuthedNetWorthHoldingsHoldingIdContributionsRoute,
+    AuthedNetWorthHoldingsHoldingIdTransferRoute:
+      AuthedNetWorthHoldingsHoldingIdTransferRoute,
+    AuthedNetWorthHoldingsHoldingIdValuesRoute:
+      AuthedNetWorthHoldingsHoldingIdValuesRoute,
   }
 
 const AuthedNetWorthHoldingsRouteWithChildren =

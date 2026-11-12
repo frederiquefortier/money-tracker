@@ -21,12 +21,13 @@ export type EntryValues = {
   label: string
 }
 
-function EntryFields({
+export function EntryFields({
   field,
-  withLabel,
+  label,
 }: {
-  field: (name: keyof EntryValues) => FieldBinding
-  withLabel: boolean
+  field: (name: 'onDate' | 'amount') => FieldBinding
+  /** The description field's binding, on a contribution. */
+  label?: FieldBinding
 }) {
   const { t } = useTranslation()
   return (
@@ -46,9 +47,7 @@ function EntryFields({
         label={t('holdings.amount')}
         required
       />
-      {withLabel && (
-        <FormField {...field('label')} label={t('holdings.label')} />
-      )}
+      {label && <FormField {...label} label={t('holdings.label')} />}
     </>
   )
 }
@@ -72,7 +71,7 @@ function ValueForm({
   })
   return (
     <SheetForm {...form.formProps}>
-      <EntryFields field={form.field} withLabel={false} />
+      <EntryFields field={form.field} />
     </SheetForm>
   )
 }
@@ -96,7 +95,7 @@ function ContributionForm({
   })
   return (
     <SheetForm {...form.formProps}>
-      <EntryFields field={form.field} withLabel />
+      <EntryFields field={form.field} label={form.field('label')} />
     </SheetForm>
   )
 }

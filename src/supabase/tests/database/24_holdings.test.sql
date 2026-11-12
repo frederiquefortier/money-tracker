@@ -180,10 +180,10 @@ select lives_ok(
   'an income on an investment category is a withdrawal from the holding'
 );
 select results_eq(
-  $$ select placed, profit, profit_percent
+  $$ select placed, withdrawn, profit, profit_percent
      from public.holding_totals t join public.holdings h on h.id = t.holding_id where h.name = 'CELI' $$,
-  $$ values (200::numeric, 100::numeric, 50::numeric) $$,
-  'a withdrawal lowers placed'
+  $$ values (250::numeric, 50::numeric, 100::numeric, 40::numeric) $$,
+  'a withdrawal keeps placed and adds to profit through withdrawn'
 );
 select results_eq(
   $$ select placed, latest_value, profit, profit_percent

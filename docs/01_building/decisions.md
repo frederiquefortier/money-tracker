@@ -4,6 +4,28 @@ Technical and structural choices, with the alternatives that were rejected. Chec
 
 <!-- Newest first: a new ADR goes directly below this line. Template at the bottom. -->
 
+### ADR-049: Transfers between holdings are dated entries (2026-11-12)
+
+**Context:**
+- The author closes an account at one institution and moves the money to another holding, new or existing. The author asked for a transfer to have a date, "like a transaction", and chose a dated entry on both holdings over moving the history.
+
+**Decision:**
+- A `holding_transfers` table: from, to, date, amount above zero. Both holdings are investments in the same currency, so one amount serves both; neither is closed before the date. RLS and a pgTAP test come with it.
+- Amended the same day, supersedes ADR-045 on "placed": a withdrawal used to be subtracted from placed, which shrank the basis and inflated the percent. Placed is now only money in (linked expenses, external contributions, transfers in) and never goes down. `holding_totals` gains `withdrawn` (linked incomes, transfers out). Profit is latest value + withdrawn - placed; percent is over placed. A transfer is withdrawn on the source and placed on the target. History stays on the holding that earned it. The row shows "Retiré" only above zero.
+- A holding with a transfer cannot be deleted (foreign keys without cascade). More generally, a holding with any history (transactions, values, external contributions, transfers) can only be archived; the server checks it, so the delete icon is muted.
+- The currency lock and the closing date also look at transfers.
+- On the page, values, external contributions and transfers each have an icon and a sheet of their own; the holding form carries no lists. "Contribution de l'employeur ou de l'État" is renamed "contribution externe".
+
+**Alternatives Considered:**
+- Move the linked transactions and contributions to the target -> Rewrites history, and the author wanted a dated entry.
+- Allow different currencies with two amounts -> More form and no use case yet; listed in improvements if needed.
+
+**Consequences:**
+- A transfer has no edit; delete and add again.
+- Export and import do not carry transfers yet (as with the link, ADR-045).
+
+---
+
 ### ADR-048: Holdings by country and type, optional name, no exclusion flag (2026-11-12)
 
 **Context:**

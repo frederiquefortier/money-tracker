@@ -5,9 +5,23 @@ import { Tag } from '#/components/display/tag'
 import { HoldingActions } from '#/components/holdings/list/holding-actions'
 import { ListRow } from '#/components/lists/list-row'
 import { percentFormat } from '#/lib/shared/format'
+import { compareDecimal } from '#/lib/shared/money'
 import { cn } from '#/lib/utils'
 import { useLocale } from '#/hooks/app/use-locale'
 import type { ListedHolding } from '#/lib/holdings/holding'
+
+/** What came out of the holding, shown only once something did. */
+function Withdrawn({ holding }: { holding: ListedHolding }) {
+  const { t } = useTranslation()
+  if (!holding.withdrawn || compareDecimal(holding.withdrawn, '0') <= 0)
+    return null
+  return (
+    <span className="block text-xs text-muted-foreground">
+      {t('holdings.withdrawn')}{' '}
+      <Money amount={holding.withdrawn} currency={holding.currency} />
+    </span>
+  )
+}
 
 function Profit({ holding }: { holding: ListedHolding }) {
   const locale = useLocale()
@@ -40,6 +54,7 @@ function Value({ holding }: { holding: ListedHolding }) {
         className="text-lg font-semibold"
       />
       <Profit holding={holding} />
+      <Withdrawn holding={holding} />
     </>
   )
 }

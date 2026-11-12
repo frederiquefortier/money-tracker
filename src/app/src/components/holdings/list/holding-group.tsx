@@ -3,7 +3,7 @@ import { HoldingRow } from '#/components/holdings/list/holding-row'
 import { MissingRate, Money } from '#/components/display/money'
 import { cardSurface } from '#/components/styles'
 import { summarizeHoldings } from '#/lib/net-worth/net-worth'
-import type { HoldingDrawer } from '#/lib/holdings/holding'
+import type { HoldingDrawer } from '#/lib/holdings/holding-list'
 
 /** An institution's drawer of holdings, with their total in the display currency. */
 export function HoldingGroup({
