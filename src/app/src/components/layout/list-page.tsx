@@ -1,3 +1,4 @@
+import { cn } from '#/lib/utils'
 import { pageColumn } from '#/components/styles'
 
 export function PageTitle({ children }: { children: React.ReactNode }) {
@@ -14,6 +15,7 @@ export function ListPage({
   back,
   titleNote,
   actions,
+  wide = false,
   children,
 }: {
   title: string
@@ -22,10 +24,12 @@ export function ListPage({
   /** A status beside the title, such as a warning tag. */
   titleNote?: React.ReactNode
   actions?: React.ReactNode
+  /** Fills the screen, for a page with charts. */
+  wide?: boolean
   children: React.ReactNode
 }) {
   return (
-    <div className={pageColumn}>
+    <div className={cn(pageColumn, wide && 'max-w-none')}>
       {back}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex flex-wrap items-center gap-3">

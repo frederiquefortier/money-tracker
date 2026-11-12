@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next'
+import { ThinGap } from '#/components/display/thin-gap'
 import { Icon } from '#/components/display/icon'
 import { moneyFormat } from '#/lib/shared/format'
 import { useLocale } from '#/hooks/app/use-locale'
@@ -41,15 +42,18 @@ export function Money({
     >
       <span aria-hidden="true">
         {converted && <span className="text-muted-foreground">≈ </span>}
-        {parts.map((part, i) =>
-          part.type === 'decimal' || part.type === 'fraction' ? (
-            <span key={i} className="text-[0.75em]">
-              {part.value}
-            </span>
-          ) : (
-            part.value
-          ),
-        )}
+        {parts.map((part, i) => {
+          // French puts a full space before the symbol; a thin gap replaces it.
+          if (part.type === 'literal' && parts[i + 1]?.type === 'currency')
+            return <ThinGap key={i} />
+          if (part.type === 'decimal' || part.type === 'fraction')
+            return (
+              <span key={i} className="text-[0.75em]">
+                {part.value}
+              </span>
+            )
+          return part.value
+        })}
       </span>
     </span>
   )

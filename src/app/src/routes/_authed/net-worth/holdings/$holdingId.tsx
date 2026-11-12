@@ -28,6 +28,7 @@ function EditHolding() {
         institutions.find((i) => i.id === holding.institutionId)?.name ?? null,
     },
     locale,
+    { currency: false },
   )
 
   return (

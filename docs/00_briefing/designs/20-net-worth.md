@@ -18,7 +18,7 @@ Route `/net-worth`, the "Net worth" tab (the name stays English in both language
 - Under it, a slot kept for the phase 5 chart. Nothing is drawn there yet.
 - Two link cards, side by side from `md` up and stacked on phones. Each has an icon bubble, a name, its total, one quiet line and a chevron. The whole card opens its subpage.
   - **Comptes** (Accounts): the sum of the open accounts' balances, and "n comptes".
-  - **Placements** (Holdings): investments plus assets minus debts, and "n placements, n actifs, n dettes" (kinds with none are left out), then "Mis à jour le {date}" with the most recent value date.
+  - **Avoirs** (Holdings): investments plus assets minus debts, and "n placements, n actifs, n dettes" (kinds with none are left out), then "Mis à jour le {date}" with the most recent value date.
 
 ## What the total counts
 
@@ -26,7 +26,7 @@ Route `/net-worth`, the "Net worth" tab (the name stays English in both language
 - Open holdings: investments and assets add, debts subtract, each at its latest value. Closed holdings are left out. Nothing else is: what a holding or an account leaves out is a choice in the phase 5 chart, never a setting that changes these totals (NW-05, ADR-048).
 - The grand total is the accounts card plus the holdings card.
 - A figure with a missing exchange rate is "—", never a partial sum (ADR-004). The grand total is "—" when either card is.
-- No holding yet: the Placements card reads "Aucun placement pour l'instant." with no amount and still opens the subpage. The grand total is the accounts card alone, with no warning.
+- No holding yet: the Avoirs card reads "Aucun avoir pour l'instant." with no amount and still opens the subpage. The grand total is the accounts card alone, with no warning.
 - No value yet on a holding: it adds nothing, and does not set the "Mis à jour le" date.
 
 ## The subpages

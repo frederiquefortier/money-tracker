@@ -31,7 +31,7 @@ export const shellEn: typeof shellFr = {
     merchants: 'Merchants',
     people: 'People',
     events: 'Events',
-    import: 'Import',
+    import: 'Data management',
   },
   displayCurrency: {
     label: 'Display currency: {{code}}',

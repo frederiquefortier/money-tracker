@@ -1,13 +1,12 @@
 import { useTranslation } from 'react-i18next'
 import { CurrencyCode } from '#/components/display/currency-code'
 import { Money } from '#/components/display/money'
+import { Percent } from '#/components/display/percent'
 import { Tag } from '#/components/display/tag'
 import { HoldingActions } from '#/components/holdings/list/holding-actions'
 import { ListRow } from '#/components/lists/list-row'
-import { percentFormat } from '#/lib/shared/format'
 import { compareDecimal } from '#/lib/shared/money'
 import { cn } from '#/lib/utils'
-import { useLocale } from '#/hooks/app/use-locale'
 import type { ListedHolding } from '#/lib/holdings/holding'
 
 /** What came out of the holding, shown only once something did. */
@@ -24,7 +23,6 @@ function Withdrawn({ holding }: { holding: ListedHolding }) {
 }
 
 function Profit({ holding }: { holding: ListedHolding }) {
-  const locale = useLocale()
   if (holding.kind !== 'investment' || holding.profit === null) return null
   const gain = !holding.profit.startsWith('-')
   return (
@@ -34,8 +32,9 @@ function Profit({ holding }: { holding: ListedHolding }) {
       <Money amount={holding.profit} currency={holding.currency} signed />
       {holding.profitPercent !== null && (
         <>
-          {' '}
-          {percentFormat(locale, 1).format(Number(holding.profitPercent) / 100)}
+          {' ('}
+          <Percent points={holding.profitPercent} />
+          {')'}
         </>
       )}
     </span>

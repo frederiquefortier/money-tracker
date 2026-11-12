@@ -5,8 +5,8 @@ export const importTilesFr = {
   transfers: 'Virements',
   adjustments: 'Ajustements',
   snapshots: 'Valeurs',
-  holdingsCount: 'Comptes',
-  contributions: 'Contributions',
+  holdingsCount: 'Avoirs',
+  contributions: 'Contributions externes',
   holdingTransfers: 'Transferts',
-  holdings: 'Placements',
+  holdings: 'Avoirs',
 }

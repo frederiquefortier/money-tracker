@@ -4,6 +4,24 @@ Technical and structural choices, with the alternatives that were rejected. Chec
 
 <!-- Newest first: a new ADR goes directly below this line. Template at the bottom. -->
 
+### ADR-051: "Avoirs" names the holdings in French (2026-11-12)
+
+**Context:**
+- The French page and each item were called "Placement(s)", and "Placement" was also one of the three natures (placement, actif, dette). The author found it odd for one word to mean two things on the same screens. English already separates them (Holdings; Investment, Asset, Debt).
+
+**Decision:**
+- In French the holdings are "Avoirs" (one item: "un avoir"); the natures keep Placement, Actif and Dette, and the investment category kind stays "Placements". Only labels change: code, tables, routes and the import's file names (`holdings.csv`) keep "holding".
+- The import's "Comptes" tile, which counted holdings, now reads "Avoirs", and the "Contributions" labels read "Contributions externes" as in the app.
+
+**Alternatives Considered:**
+- "Patrimoine" -> No clean singular for one item.
+- "Positions" -> A market term, odd for a house or a mortgage.
+
+**Consequences:**
+- A debt is an "avoir" in the accounting sense only.
+
+---
+
 ### ADR-050: Holdings join the import in the same batch (2026-11-12)
 
 **Context:**

@@ -62,13 +62,71 @@ type DetailsProps = {
   onChange: (changes: Partial<TransactionDraft>) => void
 }
 
-const WHERE = ['store', 'person'] as const
+const WHERE = ['store', 'person', 'holding'] as const
 type Where = (typeof WHERE)[number]
 
+function initialWhere(draft: TransactionDraft, person: string | null): Where {
+  if (draft.holdingId) return 'holding'
+  return person ? 'person' : 'store'
+}
+
+const TAB_LABELS = {
+  store: 'transactions.merchant',
+  person: 'transactions.people.source',
+  holding: 'holdings.field',
+} as const
+
+/** The field behind the toggle's choice. */
+function WhereField({
+  where,
+  draft,
+  data,
+  onChange,
+}: Pick<DetailsProps, 'draft' | 'data' | 'onChange'> & { where: Where }) {
+  const income = draft.kind === 'income'
+  if (where === 'holding')
+    return (
+      <HoldingPicker
+        hideLabel
+        holdings={data.holdings}
+        value={draft.holdingId}
+        date={draft.occurredOn}
+        onChange={(holdingId) => onChange({ holdingId })}
+      />
+    )
+  if (where === 'person')
+    return (
+      <PersonPicker
+        hideLabel
+        people={data.people}
+        value={income ? sourceOf(draft) : draft.sellerId}
+        anonymous={income}
+        onChange={(personId) =>
+          onChange(
+            income
+              ? { ...withSource(personId), reimburses: [] }
+              : { sellerId: personId },
+          )
+        }
+      />
+    )
+  return (
+    <MerchantPicker
+      hideLabel
+      merchants={data.merchants}
+      value={draft.merchantId}
+      onChange={(merchant) =>
+        onChange(merchantChanges(draft, merchant, data.categories))
+      }
+    />
+  )
+}
+
 /**
- * A store or a person, one or the other: where an expense was bought (PPL-08) or who an
- * income came from. The toggle only decides which field shows; switching clears
- * the other side.
+ * A store, a person or a holding, one of the three: where an expense was bought (PPL-08),
+ * who an income came from, or the holding an investment pays into or out of (NW-03). The
+ * toggle only decides which field shows; switching clears the other sides. The holding
+ * only offers itself on an investment category.
  */
 function StoreOrPerson({
   id,
@@ -78,59 +136,35 @@ function StoreOrPerson({
 }: Pick<DetailsProps, 'id' | 'draft' | 'data' | 'onChange'>) {
   const { t } = useTranslation()
   const income = draft.kind === 'income'
-  const label = t(
-    income ? 'transactions.receivedFrom' : 'transactions.boughtFrom',
-  )
+  const label = t('transactions.linkedTo')
   const person = income ? sourceOf(draft) : draft.sellerId
-  const [where, setWhere] = useState<Where>(person ? 'person' : 'store')
+  const investment = isInvestmentDraft(draft, data.categories)
+  const [chosen, setWhere] = useState<Where>(initialWhere(draft, person))
+  const where: Where = chosen === 'holding' && !investment ? 'store' : chosen
+  const options = investment ? WHERE : WHERE.filter((tab) => tab !== 'holding')
+  const clearPerson = income
+    ? { ...withSource(null), reimburses: [] }
+    : { sellerId: null }
   const select = (next: Where) => {
     setWhere(next)
-    if (next === 'person') onChange({ merchantId: null })
-    else
-      onChange(
-        income ? { ...withSource(null), reimburses: [] } : { sellerId: null },
-      )
+    if (next === 'store') onChange({ ...clearPerson, holdingId: null })
+    else if (next === 'person') onChange({ merchantId: null, holdingId: null })
+    else onChange({ ...clearPerson, merchantId: null })
   }
   return (
     <>
       <ChoiceField
         label={label}
-        options={WHERE.map((tab) => ({
+        options={options.map((tab) => ({
           value: tab,
-          label:
-            tab === 'store'
-              ? t('transactions.merchant')
-              : t('transactions.people.source'),
+          label: t(TAB_LABELS[tab]),
         }))}
         value={where}
         onChange={select}
       />
       <LinkedFields>
         <div className="contents">
-          {where === 'store' ? (
-            <MerchantPicker
-              hideLabel
-              merchants={data.merchants}
-              value={draft.merchantId}
-              onChange={(merchant) =>
-                onChange(merchantChanges(draft, merchant, data.categories))
-              }
-            />
-          ) : (
-            <PersonPicker
-              hideLabel
-              people={data.people}
-              value={person}
-              anonymous={income}
-              onChange={(personId) =>
-                onChange(
-                  income
-                    ? { ...withSource(personId), reimburses: [] }
-                    : { sellerId: personId },
-                )
-              }
-            />
-          )}
+          <WhereField where={where} {...{ draft, data, onChange }} />
         </div>
       </LinkedFields>
       {income && where === 'person' && (
@@ -176,14 +210,6 @@ export function TransactionDetails({
         error={error('occurredOn')}
         onChange={(occurredOn) => onChange({ occurredOn })}
       />
-      {isInvestmentDraft(draft, data.categories) && (
-        <HoldingPicker
-          holdings={data.holdings}
-          value={draft.holdingId}
-          date={draft.occurredOn}
-          onChange={(holdingId) => onChange({ holdingId })}
-        />
-      )}
       <EventPicker
         events={data.events}
         types={data.eventTypes}

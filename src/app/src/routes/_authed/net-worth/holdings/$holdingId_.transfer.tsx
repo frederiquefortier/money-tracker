@@ -27,6 +27,7 @@ function Transfer() {
           null,
       },
       locale,
+      { currency: false },
     ),
   }))
   const source = listed.find((h) => h.id === detail?.id)

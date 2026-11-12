@@ -34,10 +34,16 @@ export type HoldingParts = {
  * "Chèque (Desjardins)": "REER en CAD (Desjardins)", "Hypothèque en CHF". In English,
  * "RRSP in CAD (Desjardins)".
  */
-export function holdingLabel(parts: HoldingParts, locale: Locale): string {
+export function holdingLabel(
+  parts: HoldingParts,
+  locale: Locale,
+  { currency = true }: { currency?: boolean } = {},
+): string {
   if (parts.name) return parts.name
   const type = inLocale(locale, parts.typeFr, parts.typeEn)
-  const label = `${type} ${inLocale(locale, 'en', 'in')} ${parts.currency}`
+  const label = currency
+    ? `${type} ${inLocale(locale, 'en', 'in')} ${parts.currency}`
+    : type
   return parts.institution ? `${label} (${parts.institution})` : label
 }
 

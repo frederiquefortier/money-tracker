@@ -56,6 +56,7 @@ export function HubCard({
   to,
   icon,
   title,
+  titleNote,
   detail,
   total,
   currency,
@@ -64,6 +65,8 @@ export function HubCard({
   to: '/net-worth/accounts' | '/net-worth/holdings'
   icon: IconName
   title: string
+  /** Quiet text beside the title. */
+  titleNote?: string | null
   detail: React.ReactNode
   /** Undefined draws no amount: nothing in the subpage yet. */
   total: string | null | undefined
@@ -82,7 +85,12 @@ export function HubCard({
     >
       <IconBubble icon={icon} tone="primary" />
       <span className="min-w-0 flex-1">
-        <span className="block font-bold">{title}</span>
+        <span className="flex flex-wrap items-baseline gap-x-2">
+          <span className="font-bold">{title}</span>
+          {titleNote && (
+            <span className="text-xs text-muted-foreground">{titleNote}</span>
+          )}
+        </span>
         <span className="block text-sm text-muted-foreground">{detail}</span>
       </span>
       {total !== undefined && (

@@ -49,6 +49,7 @@ function shape(page: HoldingsPage, locale: Locale, sort: HoldingSort) {
       label: holdingLabel(
         { ...holding, institution: holding.closedOn ? institutionName : null },
         locale,
+        { currency: false },
       ),
     }
   })

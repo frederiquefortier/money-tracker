@@ -2,62 +2,23 @@ import { useTranslation } from 'react-i18next'
 import { NewItemSections } from '#/components/import/new-item-sections'
 import { FormAlert } from '#/components/forms/form-field'
 import { Button } from '#/components/ui/button'
-import { cardSurface } from '#/components/styles'
 import { useLocale } from '#/hooks/app/use-locale'
-import { formatCount, formatDate } from '#/lib/shared/format'
+import { formatDate } from '#/lib/shared/format'
 import type { Edit } from '#/lib/import/import-edits'
 import type { Decisions } from '#/lib/import/import-merges'
-import { holdingsRange, summariseRows } from '#/lib/import/import-summary'
+import { summariseRows } from '#/lib/import/import-summary'
 import type {
   ImportCheck,
   ImportInput,
   ImportTargets,
   MergeKind,
 } from '#/lib/import/import'
-import { cn } from '#/lib/utils'
+import { BigNumber, Tile } from '#/components/import/figure-cards'
+import { HoldingsFigures } from '#/components/import/holdings-figures'
+import type { HoldingTypeNames } from '#/lib/import/import-names'
 import { Spinner } from '#/components/feedback/spinner'
 
 type Checked = Extract<ImportCheck, { ok: true }>
-
-function Tile({
-  value,
-  label,
-  className,
-}: {
-  value: number
-  label: string
-  className?: string
-}) {
-  const locale = useLocale()
-  return (
-    <div
-      className={cn(
-        cardSurface,
-        'flex flex-col items-center gap-1 p-3',
-        className,
-      )}
-    >
-      <span className="font-mono text-2xl font-bold">
-        {formatCount(value, locale)}
-      </span>
-      <span className="text-sm text-muted-foreground">{label}</span>
-    </div>
-  )
-}
-
-function BigNumber({ value, label }: { value: number; label: string }) {
-  const locale = useLocale()
-  return (
-    <div
-      className={cn(cardSurface, 'flex flex-col items-center gap-1 px-4 py-5')}
-    >
-      <span className="font-mono text-4xl font-bold">
-        {formatCount(value, locale)}
-      </span>
-      <span className="text-muted-foreground">{label}</span>
-    </div>
-  )
-}
 
 /** The file's figures first, then the lines that qualify them. */
 function Figures({ input, check }: { input: ImportInput; check: Checked }) {
@@ -106,83 +67,13 @@ function Figures({ input, check }: { input: ImportInput; check: Checked }) {
   )
 }
 
-/** What the holdings files bring, in the same cards as the transactions. */
-function HoldingsFigures({
-  check,
-  input,
-}: {
-  check: Checked
-  input: ImportInput
-}) {
-  const { t } = useTranslation()
-  const locale = useLocale()
-  const { counts, willCreate } = check
-  const range = holdingsRange(input)
-  const tiles = [
-    {
-      value: counts.holdings + counts.holdingsMatched,
-      label: t('import.tiles.holdingsCount'),
-    },
-    {
-      value: input.contributions.length,
-      label: t('import.tiles.contributions'),
-    },
-    {
-      value: input.holding_transfers.length,
-      label: t('import.tiles.holdingTransfers'),
-    },
-  ].filter((tile) => tile.value > 0)
-  const values = input.snapshots.length
-  if (values + tiles.length === 0) return null
-  return (
-    <div className="flex flex-col gap-3">
-      <div className="flex flex-wrap items-center gap-2">
-        <h2 className="text-lg font-semibold">{t('import.tiles.holdings')}</h2>
-        {counts.holdingRowsSkipped > 0 && (
-          <FormAlert tone="warning" size="tag">
-            {t('import.skipped', { count: counts.holdingRowsSkipped })}
-          </FormAlert>
-        )}
-      </div>
-      {values > 0 && (
-        <BigNumber value={values} label={t('import.tiles.snapshots')} />
-      )}
-      {tiles.length > 0 && (
-        <div className="grid grid-cols-2 gap-3 sm:grid-flow-col sm:auto-cols-fr">
-          {tiles.map((tile) => (
-            <Tile key={tile.label} value={tile.value} label={tile.label} />
-          ))}
-        </div>
-      )}
-      <div className="flex flex-col items-center gap-1 text-center text-muted-foreground">
-        {range.from && range.to && (
-          <p>
-            {t('import.range', {
-              from: formatDate(range.from, locale, 'medium'),
-              to: formatDate(range.to, locale, 'medium'),
-            })}
-          </p>
-        )}
-        {willCreate.holdings.length > 0 && (
-          <p>
-            {willCreate.holdings
-              .map((h) =>
-                [h.name ?? h.type, h.institution].filter(Boolean).join(' · '),
-              )
-              .join(', ')}
-          </p>
-        )}
-      </div>
-    </div>
-  )
-}
-
 /** Step 2: the figures, what would be created, and the import button. */
 export function ImportSummary({
   check,
   input,
   decisions,
   targets,
+  holdingTypes,
   importing,
   onMerge,
   onEdit,
@@ -195,6 +86,7 @@ export function ImportSummary({
   input: ImportInput
   decisions: Decisions
   targets: ImportTargets
+  holdingTypes: HoldingTypeNames
   importing: boolean
   onMerge: (kind: MergeKind, key: string, target: string | null) => void
   onEdit: (kind: MergeKind, key: string, edit: Edit | null) => void
@@ -218,6 +110,7 @@ export function ImportSummary({
         input={input}
         decisions={decisions}
         targets={targets}
+        holdingTypes={holdingTypes}
         onMerge={onMerge}
         onEdit={onEdit}
         onPerson={onPerson}

@@ -3,10 +3,12 @@ import { useImportSuggestions } from '#/hooks/import/use-import-suggestions'
 import { EditSheet } from '#/components/import/edit-sheet'
 import { MergeSheet } from '#/components/import/merge-sheet'
 import { NewItemsSection } from '#/components/import/new-items-section'
+import { useLocale } from '#/hooks/app/use-locale'
 import { isEditKey, REMOVED } from '#/lib/import/import-edits'
 import type { Edit } from '#/lib/import/import-edits'
 import type { Decisions } from '#/lib/import/import-merges'
-import { foldName } from '#/lib/import/import-names'
+import { foldName, holdingTypeName } from '#/lib/import/import-names'
+import type { HoldingTypeNames } from '#/lib/import/import-names'
 import { buildSections, mergeOptions } from '#/lib/import/import-sections'
 import type { Section, SectionItem } from '#/lib/import/import-sections'
 import type {
@@ -160,6 +162,7 @@ export function NewItemSections({
   input,
   decisions,
   targets,
+  holdingTypes,
   onMerge,
   onEdit,
   onPerson,
@@ -169,12 +172,21 @@ export function NewItemSections({
   input: ImportInput
   decisions: Decisions
   targets: ImportTargets
+  holdingTypes: HoldingTypeNames
 } & Decide) {
   const [pending, setPending] = useState<Pending | null>(null)
-  const sections = useMemo(
-    () => buildSections(will, input, decisions),
-    [will, input, decisions],
-  )
+  const locale = useLocale()
+  const sections = useMemo(() => {
+    // A new holding reads by its type's name, not the code the file gave.
+    const named = {
+      ...will,
+      holdings: will.holdings.map((h) => ({
+        ...h,
+        type: holdingTypeName(h.type, holdingTypes, locale),
+      })),
+    }
+    return buildSections(named, input, decisions)
+  }, [will, input, decisions, holdingTypes, locale])
   const similar = useImportSuggestions(sections, targets)
   return (
     <>

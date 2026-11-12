@@ -11,10 +11,10 @@ export const currenciesFr = {
     usedByAccount_one: 'Le compte {{name}} et 1 autre sont en {{code}}.',
     usedByAccount_other:
       'Le compte {{name}} et {{count}} autres sont en {{code}}.',
-    usedByHolding_zero: 'Le placement {{name}} est en {{code}}.',
-    usedByHolding_one: 'Le placement {{name}} et 1 autre sont en {{code}}.',
+    usedByHolding_zero: 'L’avoir {{name}} est en {{code}}.',
+    usedByHolding_one: 'L’avoir {{name}} et 1 autre sont en {{code}}.',
     usedByHolding_other:
-      'Le placement {{name}} et {{count}} autres sont en {{code}}.',
+      'L’avoir {{name}} et {{count}} autres sont en {{code}}.',
     hexaRateDown:
       'La validation des taux est indisponible. Réessayez dans un moment.',
     unknown: 'Le service de taux ne connaît pas {{code}}.',

@@ -19,24 +19,19 @@ const COUNT_KEYS = {
   debt: 'netWorth.debts',
 } as const
 
-/** "2 placements, 1 actif", then when the values were last updated. */
+/** "2 placements, 1 actif". */
 function useHoldingsDetail(holdings: NetWorth['holdings']) {
   const { t } = useTranslation()
-  const locale = useLocale()
-  const counts = HOLDING_KINDS.filter((kind) => holdings.counts[kind] > 0)
+  return HOLDING_KINDS.filter((kind) => holdings.counts[kind] > 0)
     .map((kind) => t(COUNT_KEYS[kind], { count: holdings.counts[kind] }))
     .join(', ')
-  return holdings.updatedOn
-    ? `${counts} · ${t('netWorth.updatedOn', {
-        date: formatDate(holdings.updatedOn, locale, 'medium'),
-      })}`
-    : counts
 }
 
 function NetWorthHub() {
   const { t } = useTranslation()
   const { displayCurrency, accounts, holdings, total, converted } =
     Route.useLoaderData()
+  const locale = useLocale()
   const holdingsDetail = useHoldingsDetail(holdings)
   const holdingsCount = HOLDING_KINDS.reduce(
     (sum, kind) => sum + holdings.counts[kind],
@@ -44,7 +39,7 @@ function NetWorthHub() {
   )
 
   return (
-    <ListPage title={t('netWorth.title')}>
+    <ListPage title={t('netWorth.title')} wide>
       <TotalCard
         total={total}
         currency={displayCurrency}
@@ -65,6 +60,13 @@ function NetWorthHub() {
           to="/net-worth/holdings"
           icon="coins"
           title={t('holdings.title')}
+          titleNote={
+            holdings.updatedOn
+              ? t('netWorth.updatedOn', {
+                  date: formatDate(holdings.updatedOn, locale, 'medium'),
+                })
+              : null
+          }
           detail={holdingsCount > 0 ? holdingsDetail : t('holdings.empty')}
           total={holdingsCount > 0 ? holdings.total : undefined}
           currency={displayCurrency}

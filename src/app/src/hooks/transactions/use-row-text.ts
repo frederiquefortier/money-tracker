@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next'
 import { accountLabel } from '#/lib/accounts/account'
 import { formatDate } from '#/lib/shared/format'
 import { useLocale } from '#/hooks/app/use-locale'
+import { holdingLabel } from '#/lib/holdings/holding'
 import type { ListedTransaction } from '#/lib/transactions/transaction-list'
 
 /** The title, then the muted line: categories, account and note. */
@@ -39,11 +40,17 @@ export function useRowText(row: ListedTransaction) {
         .join(', '),
     )
     .join('; ')
+  // A holding names the transaction as a store does.
+  const name =
+    row.merchant ??
+    (row.holding
+      ? holdingLabel(row.holding, locale, { currency: false })
+      : null)
   return {
-    title: row.merchant ?? categories,
+    title: name ?? categories,
     details: join([
       reimburses && t('transactions.list.reimburses', { what: reimburses }),
-      row.merchant ? categories : '',
+      name ? categories : '',
       accountLabel(row.account),
       row.note,
     ]),

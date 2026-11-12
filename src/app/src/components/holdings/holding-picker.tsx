@@ -13,11 +13,13 @@ export function HoldingPicker({
   holdings,
   value,
   date,
+  hideLabel = false,
   onChange,
 }: {
   holdings: ReadonlyArray<FormHolding>
   value: string | null
   date: string
+  hideLabel?: boolean
   onChange: (holdingId: string | null) => void
 }) {
   const { t } = useTranslation()
@@ -29,6 +31,7 @@ export function HoldingPicker({
   return (
     <Combobox
       label={t('holdings.field')}
+      hideLabel={hideLabel}
       options={options}
       value={value}
       onChange={onChange}

@@ -14,15 +14,20 @@ import { useImportFiles } from '#/hooks/import/use-import-files'
 import { useImportRun } from '#/hooks/import/use-import-run'
 import { decisionCount } from '#/lib/import/import-merges'
 import { stageOf } from '#/lib/import/import-stage'
-import { getImports, getImportTargets } from '#/server/import'
+import {
+  getHoldingTypeNames,
+  getImports,
+  getImportTargets,
+} from '#/server/import'
 
 export const Route = createFileRoute('/_authed/settings/import')({
   loader: async () => {
-    const [batches, targets] = await Promise.all([
+    const [batches, targets, holdingTypes] = await Promise.all([
       getImports(),
       getImportTargets(),
+      getHoldingTypeNames(),
     ])
-    return { batches, targets }
+    return { batches, targets, holdingTypes }
   },
   component: Import,
 })
@@ -31,7 +36,7 @@ export const Route = createFileRoute('/_authed/settings/import')({
 function Import() {
   const { t } = useTranslation()
   const toast = useToast()
-  const { batches, targets } = Route.useLoaderData()
+  const { batches, targets, holdingTypes } = Route.useLoaderData()
   const files = useImportFiles()
   const { decisions, setMerge, setEdit, setNote, setPerson, reset } =
     useImportDecisions()
@@ -90,7 +95,7 @@ function Import() {
           check={check}
           input={files.input}
           decisions={decisions}
-          targets={targets}
+          {...{ targets, holdingTypes }}
           importing={run.busy === 'importing'}
           onMerge={setMerge}
           onEdit={setEdit}

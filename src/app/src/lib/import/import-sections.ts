@@ -23,6 +23,7 @@ export const SECTION_KEYS = [
   'institutions',
   'accounts',
   'accountChanges',
+  'holdings',
   'categories',
   'merchants',
   'counterparties',
@@ -123,6 +124,12 @@ function labelsOf(
 ): Array<string> {
   if (key === 'accounts' || key === 'accountChanges') {
     return will[key].map((a) => accountLabel(a.name, a.institution))
+  }
+  // The type is already a name here: the summary swaps the code for it.
+  if (key === 'holdings') {
+    return will.holdings.map((h) =>
+      accountLabel(h.name ?? h.type, h.institution),
+    )
   }
   return will[key]
 }

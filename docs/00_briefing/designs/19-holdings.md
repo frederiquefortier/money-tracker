@@ -17,7 +17,7 @@ NW-01, NW-02, NW-03. The net worth chart and what it leaves out (NW-04, NW-05) a
 - Drawers by institution, like Comptes: collapsible, A to Z, then "Sans institution". The drawer's header shows the institution's name and its total in the display currency, at the size of a transaction's amount (`text-lg`, semibold). The total adds investments and assets and subtracts debts, and is "—" when a rate is missing (ADR-004). A drawer with only archived holdings is not drawn.
 - A row shows the kind as a tag, the holding's label (below), the type and currency as a quiet line, and the latest value on the right at the same larger size. A debt's value is shown negative. An investment also shows the profit in amount and percent, coloured by sign.
 - When investment transactions name no holding, a warning (orange, the shape of a form's error message, with a chevron as it is a button) reads "n transactions sans placement" and opens the transactions list on the investment categories (the category filter); the rows without a holding tag are the ones to link.
-- Archived holdings sit in the collapsed "Placements archivés (n)" section.
+- Archived holdings sit in the collapsed "Avoirs archivés (n)" section.
 - Row actions from `md` up: Valeurs, Contributions externes, Transférer, Archiver, Supprimer. On phones they move to the sheet header.
 
 ## The label
@@ -37,7 +37,7 @@ The form has no lists. Values, external contributions and transfers have their o
 
 - **Valeurs** (icon: line chart): date and amount, newest first. One value per date; a second for the same date is a validation error under the date. Shown for every kind. A debt's value is entered as a positive amount. A row opens in a sheet over this one.
 - **Contributions externes** (icon: coins): the employer or government money. Date, amount, optional description. Investments only. The new one reads "Nouvelle contribution externe".
-- **Transférer** (icon: arrows, investments only): money moved on a date to another holding, as when an account closes at one institution and its money goes to another. Fields: date, amount, **Vers le placement**. The combobox lists the other open investments in the same currency (an amount is in the holding's currency), and "Créer « … »" opens the holding form in a sheet over this one, with the source's country, type and currency, and the typed name. The sheet lists the holding's transfers, out (→) and in (←), each with a trash. History stays where it is.
+- **Transferts** (icon: arrows, investments only): a sheet of the holding's transfers like the values and contributions, out (→) and in (←), each with a trash and no edit, and a row "Ajouter un transfert". That opens a sheet over it for money moved on a date to another holding, as when an account closes at one institution and its money goes to another. Fields: date, amount, **Vers l'avoir**. The combobox lists the other open investments in the same currency (an amount is in the holding's currency), and "Créer « … »" opens the holding form in a sheet over this one, with the source's country, type and currency, and the typed name. History stays where it is.
 
 ## Figures
 
@@ -49,7 +49,7 @@ The form has no lists. Values, external contributions and transfers have their o
 
 ## In the transaction form
 
-- When every chosen category is an investment, a "Placement" combobox appears under it (shared Combobox, clears with ×, no "Créer"). It lists holdings open on the transaction's date, by label.
+- When every chosen category is an investment, an "Avoir" combobox appears under it (shared Combobox, clears with ×, no "Créer"). It lists holdings open on the transaction's date, by label.
 - Only an expense or an income can carry it. Changing the category to a non-investment one clears the field.
 - In the transactions list the holding's label shows as a tag beside the merchant. There is no holdings filter: the category filter does that job, and the link on the holdings page opens it.
 

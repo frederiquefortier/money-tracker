@@ -4,7 +4,7 @@ import { importTilesEn } from './import-tiles'
 
 export const importEn: typeof importFr = {
   import: {
-    title: 'Import',
+    title: 'Data management',
     steps: { files: 'Files', import: 'Import' },
     stepLabel: 'Step {{number}}',
     stepState: { done: 'Done', active: 'In progress', todo: 'Upcoming' },
@@ -50,6 +50,7 @@ export const importEn: typeof importFr = {
       institutions: 'New institutions',
       accounts: 'New accounts',
       accountChanges: 'Opening balances changed',
+      holdings: 'New holdings',
       categories: 'New categories',
       counterparties: 'Bought from people',
       merchants: 'New merchants',
@@ -100,7 +101,7 @@ export const importEn: typeof importFr = {
       aliases: 'Aliases',
       holdings: 'Holdings',
       snapshots: 'Holding values',
-      contributions: 'Contributions',
+      contributions: 'External contributions',
       holding_transfers: 'Transfers between holdings',
     },
     viewTransactions: 'View the transactions',

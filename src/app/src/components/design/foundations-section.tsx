@@ -13,6 +13,7 @@ const COLORS = [
   ['accent', 'bg-accent'],
   ['destructive', 'bg-destructive'],
   ['income', 'bg-income'],
+  ['warning', 'bg-warning'],
   ['pending', 'bg-pending'],
   ['owed', 'bg-owed'],
   ['border', 'bg-border'],
@@ -46,6 +47,7 @@ export function FoundationsSection() {
           <p className="text-sm text-muted-foreground">Muted</p>
           <p className="text-income">Income</p>
           <p className="text-destructive">Error</p>
+          <p className="text-warning-foreground">Warning</p>
         </div>
       </Specimen>
       <Specimen name="Radius" source="styles.css">

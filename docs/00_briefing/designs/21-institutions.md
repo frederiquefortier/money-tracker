@@ -13,8 +13,8 @@ ACC-05.
 ## The page
 
 - Route `/settings/institutions`, "Institutions" in the Réglages menu (bank icon). A list page like the other menu pages: no back link, the round + bottom right.
-- One card of rows, A to Z. A row shows the name and a quiet line "n comptes, n placements" ("Aucun compte ni placement" when unused), then icons: the website (opens in a new tab; muted with a toast when there is none) and delete.
-- Delete is muted while any account (open or closed) or holding (open or archived) uses the institution; a tap says "Des comptes ou des placements utilisent encore cette institution.".
+- One card of rows, A to Z. A row shows the name and a quiet line "n comptes, n avoirs" ("Aucun compte ni avoir" when unused), then icons: the website (opens in a new tab; muted with a toast when there is none) and delete.
+- Delete is muted while any account (open or closed) or holding (open or archived) uses the institution; a tap says "Des comptes ou des avoirs utilisent encore cette institution.".
 - Tapping a row opens its sheet: name, website (https). Empty state: "Aucune institution pour l'instant.".
 
 ## Sheet

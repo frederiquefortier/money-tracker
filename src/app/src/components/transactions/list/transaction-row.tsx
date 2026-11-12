@@ -1,7 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { CategoryBadge } from '#/components/categories/category-badge'
 import { EventTag } from '#/components/display/event-tag'
-import { Tag } from '#/components/display/tag'
 import { AvatarStack } from '#/components/people/avatars'
 import type { IconName } from '#/components/display/icon'
 import { MissingRate, Money } from '#/components/display/money'
@@ -12,7 +11,6 @@ import {
   hasFees,
 } from '#/components/transactions/list/fee-lines'
 import { useRowText } from '#/hooks/transactions/use-row-text'
-import { holdingLabel } from '#/lib/holdings/holding'
 import { formatDate, formatMoney, formatRate } from '#/lib/shared/format'
 import { absDecimal } from '#/lib/shared/money'
 import { isOwed } from '#/lib/transactions/transaction-list'
@@ -131,9 +129,8 @@ function RowAmount({
   )
 }
 
-/** The event's and the holding's tags, beside the name as labels do. */
+/** The event's tag, beside the name as labels do. */
 function RowTags({ row }: { row: ListedTransaction }) {
-  const locale = useLocale()
   return (
     <>
       {row.event && (
@@ -143,11 +140,6 @@ function RowTags({ row }: { row: ListedTransaction }) {
           auto={row.event.source === 'auto'}
           className="max-w-[45%] shrink-0"
         />
-      )}
-      {row.holding && (
-        <Tag className="max-w-[45%] truncate">
-          {holdingLabel(row.holding, locale)}
-        </Tag>
       )}
     </>
   )

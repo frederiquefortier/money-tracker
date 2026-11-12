@@ -1,7 +1,7 @@
 export const netWorthFr = {
   netWorth: {
-    title: 'Net worth',
-    back: 'Net worth',
+    title: 'Patrimoine',
+    back: 'Patrimoine',
     accountsCount_one: '{{count}} compte',
     accountsCount_other: '{{count}} comptes',
     investments_one: '{{count}} placement',

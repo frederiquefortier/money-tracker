@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { DeleteDialog } from '#/components/feedback/delete-dialog'
 import { IconButton } from '#/components/display/icon-button'
 import { Money } from '#/components/display/money'
+import { CreateButton } from '#/components/forms/create-row'
 import { deleteHoldingTransfer } from '#/server/holding-entries'
 import { formatDate } from '#/lib/shared/format'
 import { useLocale } from '#/hooks/app/use-locale'
@@ -52,34 +53,38 @@ function TransferRow({
   )
 }
 
-/** A holding's transfers, out (→) and in (←), each with the holding on the other side. */
+/** A holding's transfers, out (→) and in (←), each with the holding on the other side, and the row that adds one. */
 export function TransferList({
   transfers,
   labels,
   currency,
+  onAdd,
 }: {
   transfers: ReadonlyArray<HoldingTransfer>
   labels: ReadonlyMap<string, string>
   currency: string
+  onAdd: () => void
 }) {
   const { t } = useTranslation()
-  if (transfers.length === 0) return null
   return (
     <div
       role="group"
       aria-label={t('holdings.transfers')}
       className={fieldCard}
     >
-      <ul className="divide-y">
-        {transfers.map((transfer) => (
-          <TransferRow
-            key={transfer.id}
-            transfer={transfer}
-            other={labels.get(transfer.other) ?? ''}
-            currency={currency}
-          />
-        ))}
-      </ul>
+      <CreateButton label={t('holdings.addTransfer')} onClick={onAdd} />
+      {transfers.length > 0 && (
+        <ul className="divide-y border-t">
+          {transfers.map((transfer) => (
+            <TransferRow
+              key={transfer.id}
+              transfer={transfer}
+              other={labels.get(transfer.other) ?? ''}
+              currency={currency}
+            />
+          ))}
+        </ul>
+      )}
     </div>
   )
 }

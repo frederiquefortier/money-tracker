@@ -189,3 +189,21 @@ export const getImportTargets = createServerFn({ method: 'GET' }).handler(
     }
   },
 )
+
+/** The holding types' names by code, so an import can name a new holding by its type. */
+export const getHoldingTypeNames = createServerFn({ method: 'GET' }).handler(
+  async (): Promise<Record<string, { fr: string; en: string }>> => {
+    const [types] = loaded(
+      'Holding type names',
+      await getSupabase()
+        .from('holding_types')
+        .select('code, label_fr, label_en'),
+    )
+    return Object.fromEntries(
+      types.map((type) => [
+        type.code,
+        { fr: type.label_fr, en: type.label_en },
+      ]),
+    )
+  },
+)

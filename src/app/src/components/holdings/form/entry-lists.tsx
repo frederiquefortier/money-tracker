@@ -85,8 +85,9 @@ export function EntryList({
   return (
     <div role="group" aria-label={label}>
       <div className={fieldCard}>
+        <CreateButton label={addLabel} onClick={() => onOpen(null)} />
         {rows.length > 0 && (
-          <ul className="divide-y">
+          <ul className="divide-y border-t">
             {rows.map((row) => (
               <EntryRow
                 key={row.id}
@@ -98,7 +99,6 @@ export function EntryList({
             ))}
           </ul>
         )}
-        <CreateButton label={addLabel} onClick={() => onOpen(null)} />
       </div>
     </div>
   )

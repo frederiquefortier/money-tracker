@@ -29,7 +29,7 @@ export const shellFr = {
     merchants: 'Magasins',
     people: 'Proches',
     events: 'Événements',
-    import: 'Importer',
+    import: 'Gestion des données',
   },
   displayCurrency: {
     label: 'Devise d’affichage: {{code}}',
