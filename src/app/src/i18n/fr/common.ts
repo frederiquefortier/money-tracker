@@ -50,6 +50,7 @@ export const commonFr = {
     date: 'Entrez une date valide.',
     url: 'L’adresse doit commencer par https://.',
     nameTaken: 'Ce nom est déjà utilisé.',
+    dateTaken: 'Une valeur existe déjà à cette date.',
     splitsSum: 'Répartissez tout le montant.',
     percentTotal: 'Les pourcentages doivent totaliser 100.',
     duplicateCategory: 'Chaque catégorie une seule fois.',

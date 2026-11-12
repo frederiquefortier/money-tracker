@@ -4,6 +4,7 @@ import { categoriesEn } from './categories'
 import { commonEn } from './common'
 import { currenciesEn } from './currencies'
 import { eventsEn } from './events'
+import { holdingsEn } from './holdings'
 import { importEn } from './import'
 import { merchantsEn } from './merchants'
 import { netWorthEn } from './net-worth'
@@ -18,6 +19,7 @@ export const en: Messages = {
   ...authEn,
   ...accountsEn,
   ...currenciesEn,
+  ...holdingsEn,
   ...categoriesEn,
   ...merchantsEn,
   ...eventsEn,

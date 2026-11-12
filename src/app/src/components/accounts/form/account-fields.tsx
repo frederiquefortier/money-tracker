@@ -26,7 +26,7 @@ export type AccountValues = {
 type Field = (name: keyof AccountValues) => FieldBinding
 
 // A currency the user removed still shows on an account that uses it.
-function currencyOptions(
+export function currencyOptions(
   currencies: ReadonlyArray<Currency>,
   current: string,
   locale: Locale,

@@ -15,8 +15,8 @@ const TABS = [
   {
     to: '/net-worth',
     label: 'netWorth.title',
-    icon: 'wallet',
-    activeIcon: 'wallet-fill',
+    icon: 'chart-line',
+    activeIcon: 'chart-line-fill',
   },
   {
     to: '/dashboard',

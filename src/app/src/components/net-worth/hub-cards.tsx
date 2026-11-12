@@ -61,7 +61,7 @@ export function HubCard({
   currency,
   converted,
 }: {
-  to: '/net-worth/accounts'
+  to: '/net-worth/accounts' | '/net-worth/holdings'
   icon: IconName
   title: string
   detail: React.ReactNode

@@ -16,6 +16,7 @@ export const VALIDATION_IDS = [
   'date',
   'url',
   'nameTaken',
+  'dateTaken',
   'splitsSum',
   'percentTotal',
   'duplicateCategory',

@@ -6,6 +6,10 @@ export function useAccountsPage() {
   return useLoaderData({ from: '/_authed/net-worth/accounts' })
 }
 
+export function useHoldingsPage() {
+  return useLoaderData({ from: '/_authed/net-worth/holdings' })
+}
+
 export function useCategoriesPage() {
   return useLoaderData({ from: '/_authed/settings/categories' })
 }

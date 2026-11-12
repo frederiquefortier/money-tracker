@@ -52,6 +52,7 @@ export const commonEn: typeof commonFr = {
     date: 'Enter a valid date.',
     url: 'The address must start with https://.',
     nameTaken: 'This name is already used.',
+    dateTaken: 'A value already exists on that date.',
     splitsSum: 'Split the whole amount.',
     percentTotal: 'Percentages must total 100.',
     duplicateCategory: 'Each category only once.',

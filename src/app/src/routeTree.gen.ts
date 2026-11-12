@@ -22,6 +22,7 @@ import { Route as AuthedTransactionsRouteImport } from './routes/_authed/transac
 import { Route as AuthConfirmRouteImport } from './routes/auth/confirm'
 import { Route as AuthedNetWorthIndexRouteImport } from './routes/_authed/net-worth/index'
 import { Route as AuthedNetWorthAccountsRouteImport } from './routes/_authed/net-worth/accounts'
+import { Route as AuthedNetWorthHoldingsRouteImport } from './routes/_authed/net-worth/holdings'
 import { Route as AuthedSettingsCategoriesRouteImport } from './routes/_authed/settings/categories'
 import { Route as AuthedSettingsCurrenciesRouteImport } from './routes/_authed/settings/currencies'
 import { Route as AuthedSettingsEventsRouteImport } from './routes/_authed/settings/events'
@@ -32,6 +33,8 @@ import { Route as AuthedTransactionsFormRouteImport } from './routes/_authed/tra
 import { Route as AuthedNetWorthAccountsAccountIdRouteImport } from './routes/_authed/net-worth/accounts/$accountId'
 import { Route as AuthedNetWorthAccountsAdjustRouteImport } from './routes/_authed/net-worth/accounts/adjust'
 import { Route as AuthedNetWorthAccountsNewRouteImport } from './routes/_authed/net-worth/accounts/new'
+import { Route as AuthedNetWorthHoldingsHoldingIdRouteImport } from './routes/_authed/net-worth/holdings/$holdingId'
+import { Route as AuthedNetWorthHoldingsNewRouteImport } from './routes/_authed/net-worth/holdings/new'
 import { Route as AuthedSettingsCategoriesCategoryIdRouteImport } from './routes/_authed/settings/categories/$categoryId'
 import { Route as AuthedSettingsCategoriesNewRouteImport } from './routes/_authed/settings/categories/new'
 import { Route as AuthedSettingsCurrenciesAddRouteImport } from './routes/_authed/settings/currencies/add'
@@ -116,6 +119,11 @@ const AuthedNetWorthAccountsRoute = AuthedNetWorthAccountsRouteImport.update({
   path: '/net-worth/accounts',
   getParentRoute: () => AuthedRoute,
 } as any)
+const AuthedNetWorthHoldingsRoute = AuthedNetWorthHoldingsRouteImport.update({
+  id: '/net-worth/holdings',
+  path: '/net-worth/holdings',
+  getParentRoute: () => AuthedRoute,
+} as any)
 const AuthedSettingsCategoriesRoute =
   AuthedSettingsCategoriesRouteImport.update({
     id: '/settings/categories',
@@ -169,6 +177,18 @@ const AuthedNetWorthAccountsNewRoute =
     id: '/new',
     path: '/new',
     getParentRoute: () => AuthedNetWorthAccountsRoute,
+  } as any)
+const AuthedNetWorthHoldingsHoldingIdRoute =
+  AuthedNetWorthHoldingsHoldingIdRouteImport.update({
+    id: '/$holdingId',
+    path: '/$holdingId',
+    getParentRoute: () => AuthedNetWorthHoldingsRoute,
+  } as any)
+const AuthedNetWorthHoldingsNewRoute =
+  AuthedNetWorthHoldingsNewRouteImport.update({
+    id: '/new',
+    path: '/new',
+    getParentRoute: () => AuthedNetWorthHoldingsRoute,
   } as any)
 const AuthedSettingsCategoriesCategoryIdRoute =
   AuthedSettingsCategoriesCategoryIdRouteImport.update({
@@ -295,6 +315,7 @@ export interface FileRoutesByFullPath {
   '/transactions': typeof AuthedTransactionsRouteWithChildren
   '/auth/confirm': typeof AuthConfirmRoute
   '/net-worth/accounts': typeof AuthedNetWorthAccountsRouteWithChildren
+  '/net-worth/holdings': typeof AuthedNetWorthHoldingsRouteWithChildren
   '/settings/categories': typeof AuthedSettingsCategoriesRouteWithChildren
   '/settings/currencies': typeof AuthedSettingsCurrenciesRouteWithChildren
   '/settings/events': typeof AuthedSettingsEventsRouteWithChildren
@@ -305,6 +326,8 @@ export interface FileRoutesByFullPath {
   '/net-worth/accounts/$accountId': typeof AuthedNetWorthAccountsAccountIdRoute
   '/net-worth/accounts/adjust': typeof AuthedNetWorthAccountsAdjustRoute
   '/net-worth/accounts/new': typeof AuthedNetWorthAccountsNewRoute
+  '/net-worth/holdings/$holdingId': typeof AuthedNetWorthHoldingsHoldingIdRoute
+  '/net-worth/holdings/new': typeof AuthedNetWorthHoldingsNewRoute
   '/settings/categories/$categoryId': typeof AuthedSettingsCategoriesCategoryIdRoute
   '/settings/categories/new': typeof AuthedSettingsCategoriesNewRoute
   '/settings/currencies/add': typeof AuthedSettingsCurrenciesAddRoute
@@ -337,6 +360,7 @@ export interface FileRoutesByTo {
   '/auth/confirm': typeof AuthConfirmRoute
   '/': typeof AuthedIndexRoute
   '/net-worth/accounts': typeof AuthedNetWorthAccountsRouteWithChildren
+  '/net-worth/holdings': typeof AuthedNetWorthHoldingsRouteWithChildren
   '/settings/categories': typeof AuthedSettingsCategoriesRouteWithChildren
   '/settings/currencies': typeof AuthedSettingsCurrenciesRouteWithChildren
   '/settings/events': typeof AuthedSettingsEventsRouteWithChildren
@@ -347,6 +371,8 @@ export interface FileRoutesByTo {
   '/net-worth/accounts/$accountId': typeof AuthedNetWorthAccountsAccountIdRoute
   '/net-worth/accounts/adjust': typeof AuthedNetWorthAccountsAdjustRoute
   '/net-worth/accounts/new': typeof AuthedNetWorthAccountsNewRoute
+  '/net-worth/holdings/$holdingId': typeof AuthedNetWorthHoldingsHoldingIdRoute
+  '/net-worth/holdings/new': typeof AuthedNetWorthHoldingsNewRoute
   '/settings/categories/$categoryId': typeof AuthedSettingsCategoriesCategoryIdRoute
   '/settings/categories/new': typeof AuthedSettingsCategoriesNewRoute
   '/settings/currencies/add': typeof AuthedSettingsCurrenciesAddRoute
@@ -381,6 +407,7 @@ export interface FileRoutesById {
   '/auth/confirm': typeof AuthConfirmRoute
   '/_authed/': typeof AuthedIndexRoute
   '/_authed/net-worth/accounts': typeof AuthedNetWorthAccountsRouteWithChildren
+  '/_authed/net-worth/holdings': typeof AuthedNetWorthHoldingsRouteWithChildren
   '/_authed/settings/categories': typeof AuthedSettingsCategoriesRouteWithChildren
   '/_authed/settings/currencies': typeof AuthedSettingsCurrenciesRouteWithChildren
   '/_authed/settings/events': typeof AuthedSettingsEventsRouteWithChildren
@@ -392,6 +419,8 @@ export interface FileRoutesById {
   '/_authed/net-worth/accounts/$accountId': typeof AuthedNetWorthAccountsAccountIdRoute
   '/_authed/net-worth/accounts/adjust': typeof AuthedNetWorthAccountsAdjustRoute
   '/_authed/net-worth/accounts/new': typeof AuthedNetWorthAccountsNewRoute
+  '/_authed/net-worth/holdings/$holdingId': typeof AuthedNetWorthHoldingsHoldingIdRoute
+  '/_authed/net-worth/holdings/new': typeof AuthedNetWorthHoldingsNewRoute
   '/_authed/settings/categories/$categoryId': typeof AuthedSettingsCategoriesCategoryIdRoute
   '/_authed/settings/categories/new': typeof AuthedSettingsCategoriesNewRoute
   '/_authed/settings/currencies/add': typeof AuthedSettingsCurrenciesAddRoute
@@ -426,6 +455,7 @@ export interface FileRouteTypes {
     | '/transactions'
     | '/auth/confirm'
     | '/net-worth/accounts'
+    | '/net-worth/holdings'
     | '/settings/categories'
     | '/settings/currencies'
     | '/settings/events'
@@ -436,6 +466,8 @@ export interface FileRouteTypes {
     | '/net-worth/accounts/$accountId'
     | '/net-worth/accounts/adjust'
     | '/net-worth/accounts/new'
+    | '/net-worth/holdings/$holdingId'
+    | '/net-worth/holdings/new'
     | '/settings/categories/$categoryId'
     | '/settings/categories/new'
     | '/settings/currencies/add'
@@ -468,6 +500,7 @@ export interface FileRouteTypes {
     | '/auth/confirm'
     | '/'
     | '/net-worth/accounts'
+    | '/net-worth/holdings'
     | '/settings/categories'
     | '/settings/currencies'
     | '/settings/events'
@@ -478,6 +511,8 @@ export interface FileRouteTypes {
     | '/net-worth/accounts/$accountId'
     | '/net-worth/accounts/adjust'
     | '/net-worth/accounts/new'
+    | '/net-worth/holdings/$holdingId'
+    | '/net-worth/holdings/new'
     | '/settings/categories/$categoryId'
     | '/settings/categories/new'
     | '/settings/currencies/add'
@@ -511,6 +546,7 @@ export interface FileRouteTypes {
     | '/auth/confirm'
     | '/_authed/'
     | '/_authed/net-worth/accounts'
+    | '/_authed/net-worth/holdings'
     | '/_authed/settings/categories'
     | '/_authed/settings/currencies'
     | '/_authed/settings/events'
@@ -522,6 +558,8 @@ export interface FileRouteTypes {
     | '/_authed/net-worth/accounts/$accountId'
     | '/_authed/net-worth/accounts/adjust'
     | '/_authed/net-worth/accounts/new'
+    | '/_authed/net-worth/holdings/$holdingId'
+    | '/_authed/net-worth/holdings/new'
     | '/_authed/settings/categories/$categoryId'
     | '/_authed/settings/categories/new'
     | '/_authed/settings/currencies/add'
@@ -645,6 +683,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthedNetWorthAccountsRouteImport
       parentRoute: typeof AuthedRoute
     }
+    '/_authed/net-worth/holdings': {
+      id: '/_authed/net-worth/holdings'
+      path: '/net-worth/holdings'
+      fullPath: '/net-worth/holdings'
+      preLoaderRoute: typeof AuthedNetWorthHoldingsRouteImport
+      parentRoute: typeof AuthedRoute
+    }
     '/_authed/settings/categories': {
       id: '/_authed/settings/categories'
       path: '/settings/categories'
@@ -714,6 +759,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/net-worth/accounts/new'
       preLoaderRoute: typeof AuthedNetWorthAccountsNewRouteImport
       parentRoute: typeof AuthedNetWorthAccountsRoute
+    }
+    '/_authed/net-worth/holdings/$holdingId': {
+      id: '/_authed/net-worth/holdings/$holdingId'
+      path: '/$holdingId'
+      fullPath: '/net-worth/holdings/$holdingId'
+      preLoaderRoute: typeof AuthedNetWorthHoldingsHoldingIdRouteImport
+      parentRoute: typeof AuthedNetWorthHoldingsRoute
+    }
+    '/_authed/net-worth/holdings/new': {
+      id: '/_authed/net-worth/holdings/new'
+      path: '/new'
+      fullPath: '/net-worth/holdings/new'
+      preLoaderRoute: typeof AuthedNetWorthHoldingsNewRouteImport
+      parentRoute: typeof AuthedNetWorthHoldingsRoute
     }
     '/_authed/settings/categories/$categoryId': {
       id: '/_authed/settings/categories/$categoryId'
@@ -909,6 +968,22 @@ const AuthedNetWorthAccountsRouteWithChildren =
     AuthedNetWorthAccountsRouteChildren,
   )
 
+interface AuthedNetWorthHoldingsRouteChildren {
+  AuthedNetWorthHoldingsHoldingIdRoute: typeof AuthedNetWorthHoldingsHoldingIdRoute
+  AuthedNetWorthHoldingsNewRoute: typeof AuthedNetWorthHoldingsNewRoute
+}
+
+const AuthedNetWorthHoldingsRouteChildren: AuthedNetWorthHoldingsRouteChildren =
+  {
+    AuthedNetWorthHoldingsHoldingIdRoute: AuthedNetWorthHoldingsHoldingIdRoute,
+    AuthedNetWorthHoldingsNewRoute: AuthedNetWorthHoldingsNewRoute,
+  }
+
+const AuthedNetWorthHoldingsRouteWithChildren =
+  AuthedNetWorthHoldingsRoute._addFileChildren(
+    AuthedNetWorthHoldingsRouteChildren,
+  )
+
 interface AuthedSettingsCategoriesRouteChildren {
   AuthedSettingsCategoriesCategoryIdRoute: typeof AuthedSettingsCategoriesCategoryIdRoute
   AuthedSettingsCategoriesNewRoute: typeof AuthedSettingsCategoriesNewRoute
@@ -999,6 +1074,7 @@ interface AuthedRouteChildren {
   AuthedTransactionsRoute: typeof AuthedTransactionsRouteWithChildren
   AuthedIndexRoute: typeof AuthedIndexRoute
   AuthedNetWorthAccountsRoute: typeof AuthedNetWorthAccountsRouteWithChildren
+  AuthedNetWorthHoldingsRoute: typeof AuthedNetWorthHoldingsRouteWithChildren
   AuthedSettingsCategoriesRoute: typeof AuthedSettingsCategoriesRouteWithChildren
   AuthedSettingsCurrenciesRoute: typeof AuthedSettingsCurrenciesRouteWithChildren
   AuthedSettingsEventsRoute: typeof AuthedSettingsEventsRouteWithChildren
@@ -1015,6 +1091,7 @@ const AuthedRouteChildren: AuthedRouteChildren = {
   AuthedTransactionsRoute: AuthedTransactionsRouteWithChildren,
   AuthedIndexRoute: AuthedIndexRoute,
   AuthedNetWorthAccountsRoute: AuthedNetWorthAccountsRouteWithChildren,
+  AuthedNetWorthHoldingsRoute: AuthedNetWorthHoldingsRouteWithChildren,
   AuthedSettingsCategoriesRoute: AuthedSettingsCategoriesRouteWithChildren,
   AuthedSettingsCurrenciesRoute: AuthedSettingsCurrenciesRouteWithChildren,
   AuthedSettingsEventsRoute: AuthedSettingsEventsRouteWithChildren,

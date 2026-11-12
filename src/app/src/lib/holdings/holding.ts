@@ -1,5 +1,8 @@
 import { z } from 'zod'
 import { currencyCodeSchema } from '#/lib/currencies/currency'
+import { inLocale } from '#/i18n/locales'
+import type { Locale } from '#/i18n/locales'
+import { compareDecimal, parseAmount } from '#/lib/shared/money'
 import { nameSchema } from '#/lib/shared/validation'
 import type { Institution } from '#/lib/accounts/account'
 
@@ -84,14 +87,21 @@ export type HoldingError =
 
 const isoDate = z.iso.date({ error: 'date' })
 
-const decimal = z
-  .string()
-  .trim()
-  .regex(/^\d{1,15}(\.\d{1,4})?$/, { error: 'amount' })
-
-const positive = decimal.refine((value) => /[1-9]/.test(value), {
-  error: 'amount',
-})
+// Typed as "1 250,50" or "1250.5"; a value may be zero, a contribution may not.
+function amountSchema(allowZero: boolean) {
+  return z.string().transform((value, ctx) => {
+    const amount = parseAmount(value)
+    if (
+      amount === null ||
+      amount.startsWith('-') ||
+      (!allowZero && compareDecimal(amount, '0') === 0)
+    ) {
+      ctx.addIssue({ code: 'custom', message: 'amount' })
+      return z.NEVER
+    }
+    return amount
+  })
+}
 
 export const holdingFormSchema = z.object({
   type: z.string().min(1, { error: 'required' }),
@@ -116,7 +126,7 @@ export type HoldingInput = z.input<typeof holdingInputSchema>
 
 export const snapshotFormSchema = z.object({
   onDate: isoDate,
-  amount: decimal,
+  amount: amountSchema(true),
 })
 
 export const snapshotInputSchema = snapshotFormSchema.extend({
@@ -126,7 +136,7 @@ export const snapshotInputSchema = snapshotFormSchema.extend({
 
 export const contributionFormSchema = z.object({
   onDate: isoDate,
-  amount: positive,
+  amount: amountSchema(false),
   label: z.string().trim().max(100, { error: 'invalid' }),
 })
 
@@ -153,4 +163,16 @@ export function isOpenOn(
   return (
     holding.openedOn <= date && (!holding.closedOn || date <= holding.closedOn)
   )
+}
+
+export function holdingTypeLabel(
+  type: { labelFr: string; labelEn: string },
+  locale: Locale,
+) {
+  return inLocale(locale, type.labelFr, type.labelEn)
+}
+
+export type ListedHolding = Holding & {
+  typeLabel: string
+  institutionName: string | null
 }

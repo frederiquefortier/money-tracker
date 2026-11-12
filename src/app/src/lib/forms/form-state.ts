@@ -13,6 +13,7 @@ export type FormState<TValues> = {
 // Save failures that belong under one field.
 const FIELD_FAILURES: Partial<Record<string, string>> = {
   nameTaken: 'name',
+  dateTaken: 'onDate',
   balanceMatches: 'realBalance',
 }
 
