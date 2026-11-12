@@ -30,7 +30,7 @@ export function useInlineCreate<T extends { id: string }>(
   async function create(name: string) {
     const item = await save(name, items).catch(() => null)
     if (!item) {
-      toast({ text: t('common.saveFailed') })
+      toast({ text: t('common.saveFailed'), tone: 'error' })
       return
     }
     setCreated((list) => [...list, item])

@@ -69,7 +69,7 @@ function useSubmit({
       const result = await saveTransfer({ data: input }).catch(() => null)
       if (!result?.ok) return { errors: {}, failed: true, submitted: true }
       onSaved?.(input.fromAccountId)
-      toast({ text: savedText })
+      toast({ text: savedText, tone: 'success' })
       closeSheet()
       return { errors: {}, failed: false, submitted: true }
     },

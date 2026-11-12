@@ -87,7 +87,9 @@ export function ImportErrors({
           onClick={() => {
             void navigator.clipboard
               .writeText(plainText(t, errors))
-              .then(() => toast({ text: t('import.errorsCopied') }))
+              .then(() =>
+                toast({ text: t('import.errorsCopied'), tone: 'success' }),
+              )
           }}
         />
         {choices && choices.count > 0 && (

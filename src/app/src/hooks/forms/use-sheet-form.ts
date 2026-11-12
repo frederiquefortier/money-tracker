@@ -61,7 +61,7 @@ export function useSheetForm<
         error: 'failed',
       }))
       if (result.ok) {
-        toast({ text: savedText })
+        toast({ text: savedText, tone: 'success' })
         closeSheet()
       }
       return savedState(values, result)

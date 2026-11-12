@@ -1,12 +1,14 @@
+import { useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
-import { FormAlert } from '#/components/forms/form-field'
+import { useToast } from '#/hooks/app/use-toast'
 import { Button } from '#/components/ui/button'
 import { SheetBody, SheetClose, SheetFooter } from '#/components/ui/sheet'
 import { Spinner } from '#/components/feedback/spinner'
 
 /**
  * The form of a RouteSheet: fields in the scrolling body, Annuler and the submit button
- * in the footer. `error` shows above the footer; validation stays under each field.
+ * in the footer. `error` is a toast when a save ends, so it is seen without scrolling;
+ * validation stays under each field.
  */
 export function SheetForm({
   action,
@@ -22,10 +24,17 @@ export function SheetForm({
   pending: boolean
   canSubmit?: boolean
   submitLabel?: string
-  error?: React.ReactNode
+  error?: string | false | null
   children: React.ReactNode
 }) {
   const { t } = useTranslation()
+  const toast = useToast()
+  const wasPending = useRef(false)
+  useEffect(() => {
+    if (wasPending.current && !pending && error)
+      toast({ text: error, tone: 'error' })
+    wasPending.current = pending
+  }, [pending, error, toast])
   return (
     <form
       ref={formRef}
@@ -33,10 +42,7 @@ export function SheetForm({
       noValidate
       className="flex min-h-0 flex-1 flex-col"
     >
-      <SheetBody className="flex flex-col gap-5">
-        {children}
-        {error && <FormAlert>{error}</FormAlert>}
-      </SheetBody>
+      <SheetBody className="flex flex-col gap-5">{children}</SheetBody>
       <SheetFooter>
         <SheetClose asChild>
           <Button type="button" variant="ghost">

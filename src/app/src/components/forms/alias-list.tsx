@@ -34,7 +34,7 @@ export function AliasList({
   function add(alias: string) {
     const folded = foldForSearch(alias)
     if (taken.has(folded) || aliases.some((a) => foldForSearch(a) === folded)) {
-      toast({ text: t('validation.nameTaken') })
+      toast({ text: t('validation.nameTaken'), tone: 'error' })
       return
     }
     markChanged()

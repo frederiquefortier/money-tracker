@@ -4,7 +4,12 @@ import { Icon } from '#/components/display/icon'
 import { Input } from '#/components/ui/input'
 import { FieldLabel } from '#/components/ui/field'
 import { cn } from '#/lib/utils'
-import { errorTint, focusRing, warningTint } from '#/components/styles'
+import {
+  errorTint,
+  focusRing,
+  successTint,
+  warningTint,
+} from '#/components/styles'
 
 type FormFieldProps = Omit<React.ComponentProps<typeof Input>, 'id'> & {
   name: string
@@ -99,11 +104,11 @@ export function FieldMessage({
   )
 }
 
-const ALERT_TONES = {
+export const ALERT_TONES = {
   error: { surface: errorTint, icon: 'circle-warning' },
   warning: { surface: warningTint, icon: 'circle-warning' },
   success: {
-    surface: 'bg-secondary text-secondary-foreground',
+    surface: successTint,
     icon: 'circle-check',
   },
 } as const

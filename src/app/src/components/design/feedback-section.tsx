@@ -23,9 +23,23 @@ export function FeedbackSection() {
       <Specimen name="Toast" source="feedback/toaster.tsx">
         <Button
           variant="outline"
-          onClick={() => toast({ text: 'A reason, or a result.' })}
+          onClick={() => toast({ text: 'A reason, or a note.' })}
         >
-          Show a toast
+          Neutral
+        </Button>
+        <Button
+          variant="outline"
+          onClick={() => toast({ text: 'Saved.', tone: 'success' })}
+        >
+          Success
+        </Button>
+        <Button
+          variant="outline"
+          onClick={() =>
+            toast({ text: 'The change was not saved.', tone: 'error' })
+          }
+        >
+          Error
         </Button>
       </Specimen>
       <Specimen name="ConfirmDialog" source="feedback/confirm-dialog.tsx">

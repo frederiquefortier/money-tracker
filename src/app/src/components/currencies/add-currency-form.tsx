@@ -30,7 +30,7 @@ export function AddCurrencyForm({
       if (!code) return null
       const result = await addCurrency({ data: { code } }).catch(() => null)
       if (result?.ok) {
-        toast({ text: t('currencies.added', { code }) })
+        toast({ text: t('currencies.added', { code }), tone: 'success' })
         closeSheet()
         return null
       }

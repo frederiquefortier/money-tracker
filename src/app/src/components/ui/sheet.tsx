@@ -3,6 +3,8 @@ import { Dialog as SheetPrimitive } from 'radix-ui'
 import { Icon } from '#/components/display/icon'
 import { cn } from '#/lib/utils'
 import { iconAction } from '#/components/styles'
+import { useVisualViewport } from '#/hooks/app/use-visual-viewport'
+import { isTouchDevice } from '#/lib/shared/touch'
 import {
   OverlayContainerProvider,
   inAriaOverlay,
@@ -37,6 +39,7 @@ function SheetContent({
   onEscapeKeyDown?: (event: KeyboardEvent) => void
 }) {
   const [panel, setPanel] = React.useState<HTMLElement | null>(null)
+  useVisualViewport(panel)
   return (
     <SheetPrimitive.Portal>
       <SheetPrimitive.Overlay className="sheet-overlay fixed inset-0 z-50 bg-black/40" />
@@ -44,7 +47,10 @@ function SheetContent({
         ref={setPanel}
         aria-describedby={undefined}
         onOpenAutoFocus={(event) => {
-          // The first field takes the focus, so typing starts at once.
+          // The first field takes the focus, so typing starts at once. Not on a phone: Safari
+          // focuses without opening the keyboard, and the layout then shifts under the
+          // first tap.
+          if (isTouchDevice()) return
           const field = panel?.querySelector<HTMLElement>(
             'form :is(input:not([type=hidden]), textarea, [role=combobox]):not([disabled])',
           )

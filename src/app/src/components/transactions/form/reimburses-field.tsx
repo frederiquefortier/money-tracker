@@ -25,7 +25,7 @@ function useOwedLines(personId: string | null, incomeId: string | undefined) {
     let current = true
     getOwedLines({ data: { personId, incomeId } })
       .then((found) => current && setLines(found))
-      .catch(() => toast({ text: t('common.genericError') }))
+      .catch(() => toast({ text: t('common.genericError'), tone: 'error' }))
     return () => {
       current = false
     }

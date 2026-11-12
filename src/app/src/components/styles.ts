@@ -12,6 +12,9 @@ export const pageColumn = cn(
 /** The red tint of an error message, a badge or a destructive row hover. */
 export const errorTint = 'bg-destructive/10 text-destructive'
 
+/** The green tint of a success message (the income green). */
+export const successTint = 'bg-income/10 text-income'
+
 /** The orange tint of a notice that asks for a look but is not an error. */
 export const warningTint = 'bg-warning/15 text-warning-foreground'
 

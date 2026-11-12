@@ -1,97 +1,16 @@
-import { Fragment, useId, useRef } from 'react'
-import { useTranslation } from 'react-i18next'
+import { useId, useRef } from 'react'
 import { Icon } from '#/components/display/icon'
 import { useCombobox } from '#/hooks/forms/use-combobox'
-import type { ComboboxOption, ComboboxRow } from '#/hooks/forms/use-combobox'
-import {
-  GroupHeading,
-  OptionContent,
-} from '#/components/combobox/combobox-option'
+import type { ComboboxOption } from '#/hooks/forms/use-combobox'
+import { ComboboxPopup } from '#/components/combobox/combobox-list'
 import { FieldMessage } from '#/components/forms/form-field'
 import { SelectChevron } from '#/components/forms/select-field'
 import { Tag } from '#/components/display/tag'
 import { FieldLabel, fieldControl } from '#/components/ui/field'
-import { Popover, PopoverAnchor, PopoverContent } from '#/components/ui/popover'
-import { treeGuides } from '#/lib/shared/tree-layout'
+import { Popover, PopoverAnchor } from '#/components/ui/popover'
 import { cn } from '#/lib/utils'
-import { fieldSurface, focusRing } from '#/components/styles'
-
-// The chosen option is tinted, as in a native select; hover and the keyboard's position
-// are grey so the two never look alike.
-function optionClass(row: ComboboxRow, selected: boolean, active: boolean) {
-  return cn(
-    'flex cursor-pointer items-center gap-2 rounded-field px-2 py-2',
-    selected && 'bg-accent font-semibold text-accent-foreground',
-    'hover:bg-muted',
-    active && 'bg-muted',
-    row.kind === 'create' && 'font-semibold text-primary',
-    // Options under a heading sit one step in, so the heading reads as their parent.
-    row.kind === 'option' && row.option.group !== undefined && 'pl-6',
-  )
-}
-
-function ComboboxList({
-  id,
-  rows,
-  active,
-  value,
-  query,
-  createLabel,
-  onPick,
-}: {
-  id: string
-  rows: ReadonlyArray<ComboboxRow>
-  active: number
-  value: string | null
-  query: string
-  createLabel?: (text: string) => string
-  onPick: (row: ComboboxRow) => void
-}) {
-  const guides = treeGuides(
-    rows.map((row) => (row.kind === 'option' ? (row.option.depth ?? 0) : 0)),
-  )
-  return (
-    <ul id={id} role="listbox" className="max-h-72 overflow-y-auto">
-      {rows.map((row, i) => {
-        const group = row.kind === 'option' ? row.option.group : undefined
-        const previous = i > 0 ? rows[i - 1] : undefined
-        const newGroup =
-          group !== undefined &&
-          (previous?.kind !== 'option' || previous.option.group !== group)
-        const selected = row.kind === 'option' && row.option.value === value
-        return (
-          <Fragment
-            key={
-              row.kind === 'option'
-                ? `${group ?? ''}:${row.option.value}`
-                : 'create'
-            }
-          >
-            {newGroup && <GroupHeading>{group}</GroupHeading>}
-            <li
-              id={`${id}-${i}`}
-              role="option"
-              aria-selected={selected}
-              // Keep focus in the input while choosing with the mouse.
-              onMouseDown={(event) => event.preventDefault()}
-              onClick={() => onPick(row)}
-              className={optionClass(row, selected, i === active)}
-            >
-              {row.kind === 'option' ? (
-                <OptionContent option={row.option} guide={guides[i]} />
-              ) : (
-                <>
-                  <Icon name="plus" className="size-4" />
-                  {createLabel?.(query.trim())}
-                </>
-              )}
-            </li>
-          </Fragment>
-        )
-      })}
-    </ul>
-  )
-}
+import { focusRing } from '#/components/styles'
+import { isTouchDevice } from '#/lib/shared/touch'
 
 type ComboboxState = ReturnType<typeof useCombobox>
 
@@ -105,8 +24,10 @@ function ComboboxInput({
   clearLabel,
   onClear,
   errorId,
+  inputRef,
   ...anchor
 }: React.ComponentProps<'div'> & {
+  inputRef: React.Ref<HTMLInputElement>
   id: string
   listId: string
   state: ComboboxState
@@ -118,6 +39,7 @@ function ComboboxInput({
   return (
     <div {...anchor} className="relative">
       <input
+        ref={inputRef}
         id={id}
         role="combobox"
         aria-expanded={state.expanded}
@@ -151,6 +73,9 @@ function ComboboxInput({
       {hasValue && (
         <button
           type="button"
+          // The field keeps the focus: a tap would otherwise close the list first, and the
+          // layout moving under the finger would lose the click.
+          onMouseDown={(event) => event.preventDefault()}
           onClick={onClear}
           aria-label={clearLabel}
           title={clearLabel}
@@ -200,11 +125,11 @@ export function Combobox({
   /** A validation message under the field (SET-07). */
   error?: string
 }) {
-  const { t } = useTranslation()
   const inputId = useId()
   const listId = useId()
   const state = useCombobox({ options, value, onChange, onCreate, typedOrder })
   const anchorRef = useRef<HTMLDivElement>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
 
   return (
     <div className="flex flex-col gap-2">
@@ -219,6 +144,7 @@ export function Combobox({
         <PopoverAnchor asChild>
           <ComboboxInput
             ref={anchorRef}
+            inputRef={inputRef}
             id={inputId}
             listId={listId}
             errorId={error ? `${inputId}-error` : undefined}
@@ -228,26 +154,21 @@ export function Combobox({
             onClear={state.clear}
           />
         </PopoverAnchor>
-        <PopoverContent
-          className={cn('w-(--radix-popper-anchor-width) p-1', fieldSurface)}
-          onOpenAutoFocus={(event) => event.preventDefault()}
-          // The field is outside the list; typing or clicking in it must not close it.
-          onInteractOutside={(event) => {
-            const target = event.target as Node | null
-            if (anchorRef.current?.contains(target)) event.preventDefault()
+        <ComboboxPopup
+          label={label}
+          anchor={anchorRef}
+          id={listId}
+          rows={state.rows}
+          active={state.active}
+          value={value}
+          query={state.query}
+          createLabel={createLabel}
+          onPick={(row) => {
+            state.pick(row)
+            // A phone keeps its keyboard up while the field has the focus.
+            if (isTouchDevice()) inputRef.current?.blur()
           }}
-          aria-label={t('common.suggestions', { label })}
-        >
-          <ComboboxList
-            id={listId}
-            rows={state.rows}
-            active={state.active}
-            value={value}
-            query={state.query}
-            createLabel={createLabel}
-            onPick={state.pick}
-          />
-        </PopoverContent>
+        />
       </Popover>
       {error && <FieldMessage id={`${inputId}-error`}>{error}</FieldMessage>}
     </div>
