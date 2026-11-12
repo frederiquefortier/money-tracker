@@ -20,7 +20,7 @@ import {
   getImportTargets,
 } from '#/server/import'
 
-export const Route = createFileRoute('/_authed/settings/import')({
+export const Route = createFileRoute('/_authed/data/import')({
   loader: async () => {
     const [batches, targets, holdingTypes] = await Promise.all([
       getImports(),

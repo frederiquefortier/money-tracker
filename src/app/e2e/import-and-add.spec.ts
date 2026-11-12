@@ -11,7 +11,7 @@ const FILES = ['accounts', 'transactions', 'splits'].map((name) =>
 test.describe.configure({ mode: 'serial' })
 
 test('importing the example files creates the history', async ({ page }) => {
-  await page.goto('/settings/import')
+  await page.goto('/data/import')
   await page.locator('input[type="file"]').setInputFiles(FILES)
   await page.getByRole('button', { name: 'Extract' }).click()
   await page.getByRole('button', { name: 'Import 11 transactions' }).click()

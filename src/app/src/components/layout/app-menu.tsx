@@ -16,11 +16,6 @@ const SCREENS = [
   { to: '/settings/currencies', label: 'settings.currencies', icon: 'coins' },
   { to: '/settings/events', label: 'settings.events', icon: 'calendar' },
   {
-    to: '/settings/import',
-    label: 'settings.import',
-    icon: 'arrow-left-right',
-  },
-  {
     to: '/settings/institutions',
     label: 'settings.institutions',
     icon: 'bank',
@@ -82,7 +77,20 @@ export function AppMenu() {
               </li>
             ))}
           </ListCard>
-          <div className={cardSurface}>
+          <div className={cn(cardSurface, 'divide-y')}>
+            <Link
+              to="/data"
+              className={row}
+              activeProps={{ 'aria-current': 'page' }}
+              onClick={() => setOpen(false)}
+            >
+              <Icon name="arrow-left-right" className="text-primary" />
+              <span className="flex-1">{t('settings.data')}</span>
+              <Icon
+                name="arrow-right"
+                className="size-5 text-muted-foreground [&_path]:stroke-[2.5]"
+              />
+            </Link>
             <button
               type="button"
               className={cn(row, 'text-destructive hover:bg-destructive/10')}

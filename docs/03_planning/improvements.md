@@ -4,6 +4,58 @@ Ideas not built and not decided against. Review during planning to pick the next
 
 <!-- Newest first: a new idea goes directly below this line. Template at the bottom. -->
 
+### 2026-11-12 - Privacy mode
+
+**Description:**
+- A toggle that replaces every amount with `####` so the screen can be shown or used in public.
+- Beyond amounts, the same toggle would also cover: balances and net worth, chart axes and tooltips, memos and names typed by the user, and the browser tab title and page text a screenshot would catch.
+
+**Motivation:**
+- The author works in places where others can see the screen.
+
+**Potential Approach:**
+- One setting read by `Money`, `Percent` and the chart components, kept in the browser (not the database). Charts hide values and tooltips, not only the numbers in text.
+- The toggle sits in the top bar so it is one tap away.
+
+**Priority:**
+- [ ] High - Critical improvement
+- [x] Medium - Nice to have
+- [ ] Low - Future consideration
+
+**Dependencies:**
+- None. Easier once every amount goes through `Money`.
+
+**Status:**
+- [x] Proposed
+- [ ] In Progress
+- [ ] Completed
+- [ ] Deferred
+
+### 2026-11-12 - Relationship view on the Proches page
+
+**Description:**
+- A diagram of the people around the author (a graph or family-tree style view), as an alternative to the list on the Proches page. The author gave two example images of the look wanted.
+
+**Motivation:**
+- Show at a glance who is linked to whom and who shares what, beyond the flat list.
+
+**Potential Approach:**
+- Needs a relationship between two people in the data (the schema has none today). Draw with SVG or a small graph library; name the library in ADR-011 if one is added.
+
+**Priority:**
+- [ ] High - Critical improvement
+- [ ] Medium - Nice to have
+- [x] Low - Future consideration
+
+**Dependencies:**
+- A people-to-people relationship in the schema (database.md, RLS and pgTAP test).
+
+**Status:**
+- [x] Proposed
+- [ ] In Progress
+- [ ] Completed
+- [ ] Deferred
+
 ### 2026-11-05 - Region packs, local purchases and the goal celebration
 
 **Description:**
