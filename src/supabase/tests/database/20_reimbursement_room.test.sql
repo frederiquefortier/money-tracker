@@ -86,7 +86,7 @@ $j$::jsonb);
 select is(
   (select array_agg(p.amount order by p.position) from public.transaction_people p
    join public.transactions t on t.id = p.transaction_id where t.import_ref = 'g1'),
-  array[-3.3300, -3.3300, -3.3400], 'guests share an expense with Moi, the last line taking the rounding'
+  array[-10.0000, 0.0000, 0.0000], 'invited guests have no part: Moi has the whole amount (ADR-052)'
 );
 select is(
   (select array_agg(p.role order by p.position) from public.transaction_people p

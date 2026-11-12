@@ -4,6 +4,27 @@ Technical and structural choices, with the alternatives that were rejected. Chec
 
 <!-- Newest first: a new ADR goes directly below this line. Template at the bottom. -->
 
+### ADR-052: An invited person carries no amount of their own (2026-11-12)
+
+**Context:**
+- "Invited" means the author paid for the person. The check on `transaction_people` still wanted a part above zero for every line but Moi and With, so a gift or an item bought for someone (the whole amount on Moi, their part at 0) could only be saved as a With line, which says the person was there, not that the author paid for them. The author found the amount requirement meaningless for the state.
+
+**Decision:**
+- An invited person is "with me, and I paid for them": a step above With, no amount of their own, the transaction amount is what the author paid for everyone. `transaction_people_value_check` therefore lets `invited` lines have a part of 0, like `me` and `with`. Owes and From lines still need a part (or an unknown amount for owes).
+- Applied 2026-11-12 by `npm run db:push`; the 42 "pour" rows (gifts, items for someone) are Moi at the whole amount and the person invited at 0.
+- No change to `save_transaction`, the parts sum or the deferred checks. The form already sends 0.
+
+**Alternatives Considered:**
+- Keep "with" for gifts -> The person page and the label say "with me", not "paid for".
+- A tiny positive part -> Rounds to 0 in some amounts and not in others.
+
+**Consequences:**
+- A transaction whose lines are all 0 still fails the sum check (the form prevents it).
+- Every invited line was set to a part of 0 on 2026-11-12 (DUO, TRIO and QUATUOR rows included: DUO means the author paid for both). Moi holds the whole amount, less what others owe back. The form treats an invited person like a With line: no part field, no share in the preview, sent with a part of 0 (a nameless invited line keeps its head count). The import does the same (`20261112150000_import_invited_without_part.sql`, test 29): an invited person is written with a part of 0 and Moi has the whole amount.
+- Migration `20261112140000_invited_without_part.sql`, test `28_invited_without_part.test.sql`.
+
+---
+
 ### ADR-051: "Avoirs" names the holdings in French (2026-11-12)
 
 **Context:**

@@ -34,14 +34,20 @@ export type PeopleChanges = Partial<
 >
 
 /**
- * In Parts, every line starts at one per person; Montant and % start empty. A Me doit
- * line always starts empty: its part is not known until typed.
+ * In Parts, Moi and a source start at one per person; Montant and % start empty. Me doit,
+ * Invité and Avec moi lines always start empty: a Me doit part is not known until typed,
+ * the other two have no part (ADR-052).
  */
 function startValue(
   line: Pick<PersonLine, 'role' | 'headCount'>,
   mode: SplitMode,
 ) {
-  if (mode !== 'share' || line.role === 'owes' || line.role === 'with')
+  if (
+    mode !== 'share' ||
+    line.role === 'owes' ||
+    line.role === 'with' ||
+    line.role === 'invited'
+  )
     return ''
   return String(line.role === 'me' ? 1 : line.headCount)
 }
@@ -177,7 +183,9 @@ export function withHeadCount(
     people: draft.people.map((l) => {
       if (l.key !== key) return l
       const follows =
-        draft.peopleMode === 'share' && l.value === String(l.headCount)
+        draft.peopleMode === 'share' &&
+        l.role !== 'invited' &&
+        l.value === String(l.headCount)
       return { ...l, headCount, value: follows ? String(headCount) : l.value }
     }),
   }

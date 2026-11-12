@@ -29,7 +29,6 @@ Deployed; sign-in, MFA, invitations, reset and FR/EN work. Backups run nightly a
 - [x] Transactions: expense, income, adjustment, transfer with fee across currencies, splits, status, notes. TRX-01..06, 09..11.
 - [x] The list over a chosen period with search and filters. TRX-12..14.
 - [x] Gate before retiring the spreadsheet: backup workflow, tested restore, offline copy, private key in the password manager and on paper (met 2026-11-02, security.md).
-- [ ] First run (SET-01, [spec](../00_briefing/designs/17-first-run.md)).
 
 ## Phase 2: What a transaction carries
 Everything the owner can set on a transaction exists before the import, so eight years of history are prepared in one pass (author, 2026-11-05).

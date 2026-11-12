@@ -98,7 +98,7 @@ the same rule holds for people. `save_merchant` replaces the alias list.
   schedules this simple. A rule's amount history is `recurring_rule_amounts`.
 
 **People.** `transaction_people.role` is `me`, `invited`, `owes`, `from` or `with` (`with`
-carries no money). One `me` per expense, an income only `from`, a person once per
+carries no money; `invited` may have a part of 0, ADR-052). One `me` per expense, an income only `from`, a person once per
 transaction, parts sum to the amount (deferred trigger). A group is only a way to add its
 members, never a line. Deleting a person keeps their lines as lines without a name.
 `merge_people` refuses a transaction both people share (ADR-039). The seller of an expense is

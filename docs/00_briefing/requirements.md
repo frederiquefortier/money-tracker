@@ -21,7 +21,7 @@ English; this file is in English like every other meta-doc.
 
 | ID | Requirement | Source | Phase |
 |---|---|---|---|
-| SET-01 | A new user is walked through choosing a language and a default currency (both required), then creating their first accounts and categories (each can wait). No starter category set in v1. | v1 | 1 |
+| SET-01 | A new user is walked through choosing a language and a default currency (both required), then creating their first accounts and categories (each can wait). No starter category set in v1. | v1 | later |
 | SET-02 | Birth date (drives the age-based account recommendations in `LOC`). | v1 | later |
 | SET-03 | Home country, used for "local purchase" stats and for which region pack applies. | v1, inferred | later |
 | SET-04 | The interface is available in French and English, nothing regional (ADR-019). Dates and amounts use Canadian conventions in either language ("15 janvier 2024", "1 234,50 $" / "January 15, 2024", "$1,234.50"). | C10, brief | 0 |
@@ -116,7 +116,7 @@ English; this file is in English like every other meta-doc.
 |---|---|---|---|
 | PPL-01 | People have a name and, for now, its first letter as their icon; they can be grouped, and a group shows its members' avatars. | v1, ai, author | 2 |
 | PPL-02 | A person or a group can be archived and hidden. | ai | 2 |
-| PPL-03 | An expense can be linked to people or groups (a group adds its members), each in a role: invited (I paid for them, the default) or owes (they will pay me back), beside my own part. Their part is set by amount, share or percentage. An income names the one person it came from. | v1, ai, author | 2 |
+| PPL-03 | An expense can be linked to people or groups (a group adds its members), each in a role: invited (I paid for them, the default) or owes (they will pay me back), beside my own part. Their part is set by amount, share or percentage, and an invited person's part can be 0 (a gift: the whole amount on me, ADR-052). An income names the one person it came from. | v1, ai, author | 2 |
 | PPL-04 | Without naming anyone: tick "I treated someone" with an amount and a head count, or "I expect a reimbursement" with an amount. | v1 | 2 |
 | PPL-05 | What each person owes me, at a glance: on their row and in their sheet, and the owed bubble on Transactions. Money I owe others is out of scope. | misc, author | 2 |
 | PPL-06 | A person can have aliases, other spellings of their name, so the import finds them by name or alias, ignoring case and accents. A name or an alias points to one person only. | author | 2 |

@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest'
 import {
-  withHeadCount,
   withPeople,
   withPeopleMode,
   withRoleSwitched,
@@ -35,11 +34,11 @@ const roles = (lines: ReadonlyArray<PersonLine> = []) =>
   lines.map((l) => [l.role, l.personId, l.value])
 
 describe('withPeople', () => {
-  it('starts an expense with Moi, everyone at one part, invited', () => {
+  it('starts an expense with Moi at one part and everyone invited, with no part', () => {
     expect(roles(withPeople(draft(), [ALEX, SAM]).people)).toEqual([
       ['me', null, '1'],
-      ['invited', ALEX, '1'],
-      ['invited', SAM, '1'],
+      ['invited', ALEX, ''],
+      ['invited', SAM, ''],
     ])
   })
 
@@ -65,15 +64,6 @@ describe('removing', () => {
   })
 })
 
-describe('a line without a name', () => {
-  it('in Parts, follows its count while untouched', () => {
-    const lines = withPeople(draft(), [null]).people ?? []
-    const line = lines[1]
-    const grown = withHeadCount(draft(lines), line.key, 3).people ?? []
-    expect([grown[1].headCount, grown[1].value]).toEqual([3, '3'])
-  })
-})
-
 describe('peoplePreview', () => {
   it('lets Moi be zero in Montant', () => {
     const lines =
@@ -81,6 +71,7 @@ describe('peoplePreview', () => {
         .people ?? []
     const typed = lines.map((l) => ({
       ...l,
+      role: l.role === 'me' ? l.role : ('owes' as const),
       value: l.role === 'me' ? '0' : '40',
     }))
     expect(
@@ -92,7 +83,11 @@ describe('peoplePreview', () => {
   })
 
   it('shares the rounding to the last line', () => {
-    const lines = withPeople(draft(), [ALEX, SAM]).people ?? []
+    const lines = (withPeople(draft(), [ALEX, SAM]).people ?? []).map((l) => ({
+      ...l,
+      role: l.role === 'me' ? l.role : ('owes' as const),
+      value: '1',
+    }))
     expect(peoplePreview(draft(lines), 10000n, 'CAD').amounts).toEqual([
       3333n,
       3333n,
@@ -132,7 +127,7 @@ describe('an income', () => {
       roles(peopleForKind(draft(income, 'income'), 'expense').people),
     ).toEqual([
       ['me', null, '1'],
-      ['invited', ALEX, '1'],
+      ['invited', ALEX, ''],
     ])
   })
 })
@@ -148,10 +143,10 @@ describe('an empty Me doit part', () => {
     const lines = withPeople(draft(), [ALEX, SAM]).people ?? []
     const owes = withRoleSwitched(draft(lines), lines[2].key).people ?? []
     expect(peoplePreview(draft(owes), 9000n, 'CAD')).toMatchObject({
-      amounts: [4500n, 4500n, undefined],
+      amounts: [9000n, undefined, undefined],
       remaining: 0n,
     })
-    expect(peopleInput(draft(owes), 'CAD', 9000n)[2]).toMatchObject({
+    expect(peopleInput(draft(owes), 'CAD', 9000n)[1]).toMatchObject({
       amountUnknown: true,
     })
   })
@@ -184,7 +179,7 @@ describe('an empty field never stops the save', () => {
 
   it('in Montant, empty lines share what the typed ones leave, Moi included', () => {
     const montant = draft(
-      [line(1, 'me', ''), line(2, 'invited', '30')],
+      [line(1, 'me', ''), line(2, 'owes', '30')],
       'expense',
       'amount',
     )
@@ -197,7 +192,7 @@ describe('an empty field never stops the save', () => {
 
   it('in %, empty lines share the percentage left', () => {
     const percent = draft(
-      [line(1, 'me', ''), line(2, 'invited', '25')],
+      [line(1, 'me', ''), line(2, 'owes', '25')],
       'expense',
       'percent',
     )
@@ -206,13 +201,13 @@ describe('an empty field never stops the save', () => {
   })
 
   it('in Parts, an empty line counts one part', () => {
-    const parts = draft([line(1, 'me', ''), line(2, 'invited', '1')])
+    const parts = draft([line(1, 'me', ''), line(2, 'owes', '1')])
     expect(peoplePreview(parts, 1000n, 'CAD').amounts).toEqual([500n, 500n])
   })
 
   it('counts only the typed lines in what is left to share, as % does', () => {
     const montant = draft(
-      [line(1, 'me', ''), line(2, 'invited', '30')],
+      [line(1, 'me', ''), line(2, 'owes', '30')],
       'expense',
       'amount',
     )
@@ -221,7 +216,7 @@ describe('an empty field never stops the save', () => {
 
   it('says the typed lines take everything when nothing is left', () => {
     const montant = draft(
-      [line(1, 'me', ''), line(2, 'invited', '90')],
+      [line(1, 'me', ''), line(2, 'owes', '90')],
       'expense',
       'amount',
     )

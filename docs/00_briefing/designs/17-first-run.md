@@ -1,6 +1,6 @@
 # First run
 
-**Status:** not built. Shared rules: [02-screens.md](02-screens.md).
+**Status:** not built, not scheduled (an idea in [improvements.md](../../03_planning/improvements.md)). Shared rules: [02-screens.md](02-screens.md).
 
 ## Purpose
 

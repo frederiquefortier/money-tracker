@@ -39,8 +39,8 @@ export function LinePart({
   onChange: DraftUpdate
 }) {
   const { t } = useTranslation()
-  // Someone with me has no part.
-  if (line.role === 'with') return null
+  // Someone invited or with me has no part.
+  if (line.role === 'with' || line.role === 'invited') return null
   // An empty field shows what it comes to under it.
   const empty = line.value.trim() === ''
   return (

@@ -158,17 +158,20 @@ function moneyPreview(
   }
 }
 
-/** The people with me have no part: the calculations leave them out. */
+/** Invited and with me have no part (ADR-052): the calculations leave them out. */
+const hasNoPart = (l: Pick<PersonLine, 'role'>) =>
+  l.role === 'with' || l.role === 'invited'
+
 const moneyOf = <T extends Pick<TransactionPeople, 'people'>>(draft: T): T => ({
   ...draft,
-  people: draft.people.filter((l) => l.role !== 'with'),
+  people: draft.people.filter((l) => !hasNoPart(l)),
 })
 
 /** The typed values of the lines that have a part. */
 export const moneyValues = (draft: Pick<TransactionPeople, 'people'>) =>
   moneyOf(draft).people.map((l) => l.value)
 
-/** `moneyPreview` for the whole list: a line with me has no amount. */
+/** `moneyPreview` for the whole list: an invited or with-me line has no amount. */
 export function peoplePreview(
   draft: Pick<TransactionPeople, 'people' | 'peopleMode'>,
   total: bigint | null,
@@ -179,7 +182,7 @@ export function peoplePreview(
   return {
     ...preview,
     amounts: draft.people.map((l) =>
-      l.role === 'with' ? undefined : preview.amounts[i++],
+      hasNoPart(l) ? undefined : preview.amounts[i++],
     ),
   }
 }
@@ -239,16 +242,14 @@ export function peopleInput(
   const money = moneyOf(draft)
   const { amounts } = moneyPreview(money, total, accountCurrency)
   const { lines } = filledLines(money, total, accountCurrency)
-  const withMe = draft.people
-    .filter((l) => l.role === 'with')
-    .map((l) => ({
-      role: l.role,
-      personId: l.personId,
-      headCount: 1,
-      amountUnknown: false,
-      fillsRest: false,
-      value: '0',
-    }))
+  const withMe = draft.people.filter(hasNoPart).map((l) => ({
+    role: l.role,
+    personId: l.personId,
+    headCount: l.role === 'with' ? 1 : l.headCount,
+    amountUnknown: false,
+    fillsRest: false,
+    value: '0',
+  }))
   const paid = lines.map((l, i) => {
     // Left empty: recomputed by the database when a reimbursement comes (Montant).
     const fillsRest = money.people[i].value.trim() === '' && !isUnknown(l)

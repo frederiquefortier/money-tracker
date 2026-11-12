@@ -43,10 +43,10 @@ describe('someone with me (PPL-08)', () => {
     )
   })
 
-  it('takes no part: the others share the whole amount', () => {
+  it('takes no part, and neither does an invited person: Moi has the whole amount', () => {
     const lines = withSam()
     expect(peoplePreview(draft(lines), 9000n, 'CAD')).toMatchObject({
-      amounts: [4500n, 4500n, undefined],
+      amounts: [9000n, undefined, undefined],
       remaining: 0n,
     })
     expect(peopleErrors(draft(lines), 'CAD', 9000n)).toEqual({})
@@ -55,6 +55,7 @@ describe('someone with me (PPL-08)', () => {
   it('is sent with no value, after the lines with a part', () => {
     const input = peopleInput(draft(withSam()), 'CAD', 9000n)
     expect(input.map((l) => l.role)).toEqual(['me', 'invited', 'with'])
+    expect(input[1]).toMatchObject({ value: '0', headCount: 1 })
     expect(input[2]).toMatchObject({ value: '0', headCount: 1 })
   })
 })

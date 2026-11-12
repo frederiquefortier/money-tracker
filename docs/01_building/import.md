@@ -139,8 +139,8 @@ The people on a transaction, one row per person, the same lines as the transacti
 | `ref` | yes | The transaction's `ref` |
 | `role` | yes | `me`, `invited`, `owes`, `from` or `with` (someone with me, with no part; a person is required; expenses only, PPL-08) |
 | `person` | no | A name or alias. Empty on an `invited`, `owes` or `from` line means a guest with no name (PPL-04); `me` has none. |
-| `head_count` | no | Default 1. On an unnamed line, how many people it stands for (a `DUO` meal with nobody named is one unnamed guest). |
-| `amount` | no | Only on a `from` line, where it is the income's amount (default). On an expense the parts are not set by the import: leave it empty, and a line takes its share of what is left (by head count) or, for `owes`, what its reimbursement pays. |
+| `head_count` | no | Default 1. On an unnamed line, how many people it stands for. |
+| `amount` | no | Only on a `from` line, where it is the income's amount (default). On an expense the parts are not set by the import: leave it empty. `me` takes what is left, `invited` and `with` have no part (ADR-052), and `owes` takes what its reimbursement pays. |
 | `reimburses` | `from` only | The `ref` of the expense this income repays |
 
 A group is never a line: the converter writes a group's members one by one, as the form does.

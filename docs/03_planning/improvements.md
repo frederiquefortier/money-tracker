@@ -4,6 +4,56 @@ Ideas not built and not decided against. Review during planning to pick the next
 
 <!-- Newest first: a new idea goes directly below this line. Template at the bottom. -->
 
+### 2026-11-12 - Import: invited people with no part
+
+**Description:**
+- The import still gives an invited person a share of the expense (its bulk path writes shares, and its call to `save_transaction` does too). Since ADR-052 an invited person has no amount of their own, so a new import would split an expense with invited people again.
+
+**Motivation:**
+- The import is driven only by the columns of `people.csv` (role, person, head_count, amount, reimburses), never by words from the converter. The shares come from the import function in the database, not from the file.
+
+**Potential Approach:**
+- A migration replacing the import function so an invited line is written with a part of 0, and a test in `17_import.test.sql`. The function is large and cannot be tried locally (no Docker), so it needs a careful copy.
+
+**Priority:**
+- [ ] High - Critical improvement
+- [x] Medium - Nice to have
+- [ ] Low - Future consideration
+
+**Dependencies:**
+- ADR-052 (applied).
+
+**Status:**
+- [x] Proposed
+- [ ] In Progress
+- [x] Completed (2026-11-12, migration `20261112150000_import_invited_without_part.sql`)
+- [ ] Deferred
+
+### 2026-11-12 - First run
+
+**Description:**
+- Four short steps after a new user's first sign-in with two-factor: language, currencies, accounts, categories. Language and currencies are required; accounts and categories can wait. Every signed-in page redirects there until it is done (`profiles.onboarded_at`).
+
+**Motivation:**
+- Only useful for someone who starts from an empty account. The owner's account already exists with real data, so nothing is blocked without it.
+
+**Potential Approach:**
+- Follow [the spec](../00_briefing/designs/17-first-run.md) (SET-01). It reuses the currency list, account form and category form. One migration for `onboarded_at` (set for existing users in the same migration, so nobody is locked out) with its pgTAP test, and a redirect guard.
+
+**Priority:**
+- [ ] High - Critical improvement
+- [ ] Medium - Nice to have
+- [x] Low - Future consideration
+
+**Dependencies:**
+- Needed before a second real user, with custom SMTP and the sign-in throttle (roadmap).
+
+**Status:**
+- [x] Proposed
+- [ ] In Progress
+- [ ] Completed
+- [ ] Deferred
+
 ### 2026-11-12 - Privacy mode
 
 **Description:**
