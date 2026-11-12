@@ -1,0 +1,5 @@
+holding,type,institution,name,country,currency,opened_on,closed_on
+TFSA Banque Exemple,CA_TFSA,Banque Exemple,,CA,CAD,2019-03-01,2023-01-01
+TFSA Courtier,CA_TFSA,Courtier Exemple,,CA,CAD,2023-01-01,
+Régime de l'employeur,CA_DPSP,Assureur Exemple,Régime Acme,CA,CAD,2022-04-01,
+2e pilier,CH_PILLAR2,Caisse Alpine,2e pilier (Acme SA),CH,CHF,2026-01-01,

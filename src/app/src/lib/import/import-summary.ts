@@ -42,3 +42,22 @@ export function summariseRows(
   }
   return summary
 }
+
+/** The first and last date of the holdings files' rows: values, contributions, transfers. */
+export function holdingsRange(input: {
+  snapshots: ReadonlyArray<ImportRow>
+  contributions: ReadonlyArray<ImportRow>
+  holding_transfers: ReadonlyArray<ImportRow>
+}) {
+  const dates = [
+    ...input.snapshots,
+    ...input.contributions,
+    ...input.holding_transfers,
+  ]
+    .map((row) => row.date ?? '')
+    .filter((date) => date !== '')
+    .sort()
+  return dates.length === 0
+    ? { from: null, to: null }
+    : { from: dates[0], to: dates[dates.length - 1] }
+}

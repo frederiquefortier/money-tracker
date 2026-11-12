@@ -12,12 +12,15 @@ export function PageTitle({ children }: { children: React.ReactNode }) {
 export function ListPage({
   title,
   back,
+  titleNote,
   actions,
   children,
 }: {
   title: string
   /** The link above the title, on a page opened from a hub card. */
   back?: React.ReactNode
+  /** A status beside the title, such as a warning tag. */
+  titleNote?: React.ReactNode
   actions?: React.ReactNode
   children: React.ReactNode
 }) {
@@ -25,7 +28,10 @@ export function ListPage({
     <div className={pageColumn}>
       {back}
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <PageTitle>{title}</PageTitle>
+        <div className="flex flex-wrap items-center gap-3">
+          <PageTitle>{title}</PageTitle>
+          {titleNote}
+        </div>
         {actions && (
           <div className="flex flex-wrap items-center gap-2">{actions}</div>
         )}

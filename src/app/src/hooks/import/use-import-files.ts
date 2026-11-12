@@ -33,7 +33,16 @@ export function useImportFiles() {
     files,
     input,
     errors: files.flatMap((file) => file.errors),
-    hasTransactions: files.some((file) => file.name === 'transactions'),
+    // Transactions, or a holdings file on its own (IMP-02).
+    hasContent: files.some((file) =>
+      [
+        'transactions',
+        'holdings',
+        'snapshots',
+        'contributions',
+        'holding_transfers',
+      ].includes(file.name),
+    ),
     pick,
     remove: (name: ImportFileRead['name']) =>
       setFiles((kept) => kept.filter((file) => file.name !== name)),

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { summariseRows } from './import-summary'
+import { holdingsRange, summariseRows } from './import-summary'
 
 describe('summariseRows', () => {
   it('counts by kind and gives the dates', () => {
@@ -33,5 +33,27 @@ describe('summariseRows', () => {
 
   it('has no dates for no rows', () => {
     expect(summariseRows([])).toMatchObject({ from: null, to: null })
+  })
+})
+
+describe('holdingsRange', () => {
+  it('spans the values, contributions and transfers', () => {
+    expect(
+      holdingsRange({
+        snapshots: [{ date: '2023-02-18' }, { date: '2026-11-02' }],
+        contributions: [{ date: '2022-04-29' }],
+        holding_transfers: [{ date: '2026-04-01' }],
+      }),
+    ).toEqual({ from: '2022-04-29', to: '2026-11-02' })
+  })
+
+  it('has no dates for no rows', () => {
+    expect(
+      holdingsRange({
+        snapshots: [],
+        contributions: [],
+        holding_transfers: [],
+      }),
+    ).toEqual({ from: null, to: null })
   })
 })

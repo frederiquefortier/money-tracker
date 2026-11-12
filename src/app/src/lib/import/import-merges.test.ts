@@ -26,6 +26,10 @@ const input: ImportInput = {
   people: [{ ref: 't1', role: 'invited', person: 'Antoine' }],
   aliases: [],
   counterparties: [],
+  holdings: [],
+  snapshots: [],
+  contributions: [],
+  holding_transfers: [],
 }
 
 describe('foldName', () => {

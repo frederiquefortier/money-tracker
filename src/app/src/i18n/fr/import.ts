@@ -1,3 +1,6 @@
+import { importHoldingsFr } from './import-holdings'
+import { importTilesFr } from './import-tiles'
+
 export const importFr = {
   import: {
     title: 'Importer',
@@ -7,7 +10,7 @@ export const importFr = {
     chooseFiles: 'Choisir les fichiers',
     templates: 'Modèles',
     unknownFile: 'Fichier non reconnu: {{name}}',
-    missingTransactions: 'Il manque le fichier transactions.csv.',
+    missingTransactions: 'Ajoutez transactions.csv ou des placements.',
     rows_one: '{{count, number}} ligne',
     rows_other: '{{count, number}} lignes',
     upload: 'Extraire',
@@ -16,13 +19,7 @@ export const importFr = {
     changeFiles_one: 'Modifier le fichier',
     changeFiles_other: 'Modifier les {{count, number}} fichiers',
     similarTo: 'Fusionner avec {{name}} ?',
-    tiles: {
-      transactions: 'Transactions',
-      expenses: 'Dépenses',
-      incomes: 'Revenus',
-      transfers: 'Virements',
-      adjustments: 'Ajustements',
-    },
+    tiles: importTilesFr,
     checkFailed: 'La vérification a échoué. Réessayez.',
     errorsHeading: 'L’import ne peut pas continuer',
     errorsTitle_one: '{{count, number}} erreur',
@@ -87,8 +84,8 @@ export const importFr = {
       renamedNote: '→ “{{name}}”, avec une note',
     },
     mergedInto: 'Fusionné avec “{{target}}”',
-    importNow_one: 'Importer {{count, number}} transaction',
-    importNow_other: 'Importer {{count, number}} transactions',
+    importNow: 'Importer',
+    holdings: importHoldingsFr.summary,
     doneTitle: 'Import terminé',
     doneCount_one: '{{count, number}} transaction importée',
     doneCount_other: '{{count, number}} transactions importées',
@@ -100,6 +97,10 @@ export const importFr = {
       people: 'Proches',
       events: 'Événements',
       aliases: 'Alias',
+      holdings: 'Placements',
+      snapshots: 'Valeurs des placements',
+      contributions: 'Contributions',
+      holding_transfers: 'Transferts entre placements',
     },
     viewTransactions: 'Voir les transactions',
     anotherImport: 'Importer d’autres fichiers',
@@ -121,6 +122,14 @@ export const importFr = {
       events_other: '{{count, number}} événements',
       aliases_one: '{{count, number}} alias',
       aliases_other: '{{count, number}} alias',
+      holdings_one: '{{count, number}} placement',
+      holdings_other: '{{count, number}} placements',
+      snapshots_one: '{{count, number}} valeur de placement',
+      snapshots_other: '{{count, number}} valeurs de placements',
+      contributions_one: '{{count, number}} contribution',
+      contributions_other: '{{count, number}} contributions',
+      holding_transfers_one: '{{count, number}} transfert entre placements',
+      holding_transfers_other: '{{count, number}} transferts entre placements',
     },
     history: {
       title: 'Historique',
@@ -138,6 +147,7 @@ export const importFr = {
       undoFailed: 'L’import n’a pas été annulé.',
     },
     errors: {
+      ...importHoldingsFr.errors,
       unknown: 'Erreur inconnue ({{code}}).',
       file_empty: 'Le fichier est vide.',
       csv_unterminated: 'Un guillemet n’est jamais refermé.',

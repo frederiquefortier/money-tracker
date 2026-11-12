@@ -4,6 +4,29 @@ Technical and structural choices, with the alternatives that were rejected. Chec
 
 <!-- Newest first: a new ADR goes directly below this line. Template at the bottom. -->
 
+### ADR-050: Holdings join the import in the same batch (2026-11-12)
+
+**Context:**
+- The author wants eight years of net-worth history (values, employer contributions, a TFSA moving to another institution) in the app through the CSV import, not typed one entry at a time (IMP-02). Part of the history is estimated: the employer share of an employer plan is not on any account, and a Swiss second pillar was filled in from its balance.
+
+**Decision:**
+- `import_batch` takes four more optional arrays: `holdings`, `snapshots`, `contributions`, `holding_transfers`. A new function, `import_holdings(payload, batch)`, checks them (no batch) and writes them (with the batch), so `import_batch` keeps one transaction, one summary and one undo. Its errors join the others, by file and line.
+- A holding is matched by type, institution and name, the app's version is kept, and the other files name a holding by a key from holdings.csv. Lines already in the app are skipped, so a file can be sent twice.
+- `import_batch_id` on holdings, values, contributions and transfers; `import_undo` removes them, and a holding only when nothing else points at it.
+- An estimate is entered as a normal line with a label that says so ("Employer 3% (estimate)"). The app has no estimate flag.
+
+**Alternatives Considered:**
+- A second function and a second request for the holdings -> Two transactions: a bad holdings file could leave the transactions in and the net worth out, against ADR-012.
+- A `holding` column on transactions.csv now -> Needs the 800-line import function to link rows already imported; left for when a history is imported with its holdings from the start.
+- An estimate flag on contributions -> A column for one import; the label does the job.
+
+**Consequences:**
+- The summary shows holdings counts and the holdings to create; they cannot be merged or edited in the screen.
+- Existing transactions that pay into a holding are linked by hand or by a one-off update.
+- The export (IMP-04) must write these files too for the round trip to hold.
+
+---
+
 ### ADR-049: Transfers between holdings are dated entries (2026-11-12)
 
 **Context:**

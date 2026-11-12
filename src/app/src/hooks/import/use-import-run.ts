@@ -43,10 +43,22 @@ export function useImportRun(input: ImportInput, decisions: Decisions) {
   async function runCheck() {
     setBusy('checking')
     setDone(null)
-    const result = await checkImport({ data: input }).catch(() => null)
+    const result = await checkImport({ data: input }).catch(
+      (error: unknown) => {
+        console.error(
+          '[import] check request failed:',
+          error instanceof Error ? error.name : 'unknown',
+        )
+        return null
+      },
+    )
     setBusy(null)
-    if (result?.ok) setChecked({ input, check: result.check })
-    else toast({ text: t('import.checkFailed') })
+    if (result?.ok) {
+      setChecked({ input, check: result.check })
+    } else {
+      const code = result && 'code' in result ? result.code : 'request'
+      toast({ text: `${t('import.checkFailed')} (${code})` })
+    }
   }
 
   async function runImport() {

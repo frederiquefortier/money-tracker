@@ -18,6 +18,10 @@ const input: ImportInput = {
   ],
   aliases: [],
   counterparties: [],
+  holdings: [],
+  snapshots: [],
+  contributions: [],
+  holding_transfers: [],
 }
 
 describe('applyEdits', () => {

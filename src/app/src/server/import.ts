@@ -47,14 +47,26 @@ export type CommitResult =
 export const checkImport = createServerFn({ method: 'POST' })
   .validator(importInputSchema)
   .handler(
-    async ({ data }): Promise<Result<ImportError, { check: ImportCheck }>> => {
+    async ({
+      data,
+    }): Promise<
+      Result<ImportError, { check: ImportCheck }> & { code?: string }
+    > => {
       const { data: answer, error } = await getSupabase().rpc('import_batch', {
         payload: data,
         dry_run: true,
       })
-      if (error) return failure('check', error)
+      // The message of a check names a rule, never a value.
+      if (error) {
+        return {
+          ...failure('check', error),
+          code: `${error.code}: ${error.message}`,
+        }
+      }
       const check = parseImportCheck(answer)
-      return check ? { ok: true, check } : failure('check', { code: 'shape' })
+      return check
+        ? { ok: true, check }
+        : { ...failure('check', { code: 'shape' }), code: 'shape' }
     },
   )
 

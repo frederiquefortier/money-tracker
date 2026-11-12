@@ -23,6 +23,10 @@ const input: ImportInput = {
   people: [],
   aliases: [],
   counterparties: [],
+  holdings: [],
+  snapshots: [],
+  contributions: [],
+  holding_transfers: [],
 }
 
 function sectionOf(sections: ReturnType<typeof buildSections>, key: string) {
@@ -83,6 +87,7 @@ describe('mergeOptions', () => {
     merchants: ['Coop'],
     people: [],
     events: [],
+    holdings: [],
   }
 
   it('offers the names that exist and the other new ones, not itself', () => {

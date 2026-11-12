@@ -110,10 +110,13 @@ const ALERT_TONES = {
 
 export function FormAlert({
   tone = 'error',
+  size = 'default',
   className,
   children,
 }: {
   tone?: 'error' | 'success' | 'warning'
+  /** `tag`: one line, pill-shaped, to sit beside a title. */
+  size?: 'default' | 'tag'
   className?: string
   children: React.ReactNode
 }) {
@@ -121,12 +124,18 @@ export function FormAlert({
     <p
       role={tone === 'error' ? 'alert' : 'status'}
       className={cn(
-        'flex items-start gap-2 rounded-lg px-3 py-2 text-sm',
+        'flex gap-2',
+        size === 'tag'
+          ? 'items-center rounded-full px-2 py-0.5 text-xs font-semibold'
+          : 'items-start rounded-lg px-3 py-2 text-sm',
         ALERT_TONES[tone].surface,
         className,
       )}
     >
-      <Icon name={ALERT_TONES[tone].icon} className="mt-0.5 size-4" />
+      <Icon
+        name={ALERT_TONES[tone].icon}
+        className={size === 'tag' ? 'size-3.5' : 'mt-0.5 size-4'}
+      />
       {children}
     </p>
   )

@@ -119,7 +119,7 @@ all investment-kind, so a withdrawal is an income. Deleting a holding with trans
 refused by the database, and by the server once it has values or contributions (a history means archive); the currency is fixed once it has entries; it cannot close before its last entry, and
 takes nothing dated after. `holding_totals` gives placed (money in, never down), withdrawn (money out), latest value, profit (value plus withdrawn minus placed) and percent,
 null (never zero or partial) when a rate or a value is missing (ADR-045). A category with
-linked transactions stays an investment.
+linked transactions stays an investment. The four holding tables carry `import_batch_id`, so an import is undone (ADR-050).
 
 ## Not built yet
 

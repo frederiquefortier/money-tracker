@@ -433,6 +433,7 @@ export type Database = {
           created_at: string
           holding_id: string
           id: string
+          import_batch_id: string | null
           label: string | null
           on_date: string
           updated_at: string
@@ -443,6 +444,7 @@ export type Database = {
           created_at?: string
           holding_id: string
           id?: string
+          import_batch_id?: string | null
           label?: string | null
           on_date: string
           updated_at?: string
@@ -453,6 +455,7 @@ export type Database = {
           created_at?: string
           holding_id?: string
           id?: string
+          import_batch_id?: string | null
           label?: string | null
           on_date?: string
           updated_at?: string
@@ -466,6 +469,13 @@ export type Database = {
             referencedRelation: "holdings"
             referencedColumns: ["user_id", "id"]
           },
+          {
+            foreignKeyName: "holding_contributions_user_id_import_batch_id_fkey"
+            columns: ["user_id", "import_batch_id"]
+            isOneToOne: false
+            referencedRelation: "import_batches"
+            referencedColumns: ["user_id", "id"]
+          },
         ]
       }
       holding_snapshots: {
@@ -474,6 +484,7 @@ export type Database = {
           created_at: string
           holding_id: string
           id: string
+          import_batch_id: string | null
           on_date: string
           updated_at: string
           user_id: string
@@ -483,6 +494,7 @@ export type Database = {
           created_at?: string
           holding_id: string
           id?: string
+          import_batch_id?: string | null
           on_date: string
           updated_at?: string
           user_id?: string
@@ -492,6 +504,7 @@ export type Database = {
           created_at?: string
           holding_id?: string
           id?: string
+          import_batch_id?: string | null
           on_date?: string
           updated_at?: string
           user_id?: string
@@ -504,6 +517,13 @@ export type Database = {
             referencedRelation: "holdings"
             referencedColumns: ["user_id", "id"]
           },
+          {
+            foreignKeyName: "holding_snapshots_user_id_import_batch_id_fkey"
+            columns: ["user_id", "import_batch_id"]
+            isOneToOne: false
+            referencedRelation: "import_batches"
+            referencedColumns: ["user_id", "id"]
+          },
         ]
       }
       holding_transfers: {
@@ -512,6 +532,7 @@ export type Database = {
           created_at: string
           from_holding_id: string
           id: string
+          import_batch_id: string | null
           on_date: string
           to_holding_id: string
           updated_at: string
@@ -522,6 +543,7 @@ export type Database = {
           created_at?: string
           from_holding_id: string
           id?: string
+          import_batch_id?: string | null
           on_date: string
           to_holding_id: string
           updated_at?: string
@@ -532,6 +554,7 @@ export type Database = {
           created_at?: string
           from_holding_id?: string
           id?: string
+          import_batch_id?: string | null
           on_date?: string
           to_holding_id?: string
           updated_at?: string
@@ -543,6 +566,13 @@ export type Database = {
             columns: ["user_id", "from_holding_id"]
             isOneToOne: false
             referencedRelation: "holdings"
+            referencedColumns: ["user_id", "id"]
+          },
+          {
+            foreignKeyName: "holding_transfers_user_id_import_batch_id_fkey"
+            columns: ["user_id", "import_batch_id"]
+            isOneToOne: false
+            referencedRelation: "import_batches"
             referencedColumns: ["user_id", "id"]
           },
           {
@@ -585,6 +615,7 @@ export type Database = {
           created_at: string
           currency: string
           id: string
+          import_batch_id: string | null
           institution_id: string | null
           kind: string
           name: string | null
@@ -600,6 +631,7 @@ export type Database = {
           created_at?: string
           currency: string
           id?: string
+          import_batch_id?: string | null
           institution_id?: string | null
           kind: string
           name?: string | null
@@ -615,6 +647,7 @@ export type Database = {
           created_at?: string
           currency?: string
           id?: string
+          import_batch_id?: string | null
           institution_id?: string | null
           kind?: string
           name?: string | null
@@ -638,6 +671,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "user_currencies"
             referencedColumns: ["user_id", "code"]
+          },
+          {
+            foreignKeyName: "holdings_user_id_import_batch_id_fkey"
+            columns: ["user_id", "import_batch_id"]
+            isOneToOne: false
+            referencedRelation: "import_batches"
+            referencedColumns: ["user_id", "id"]
           },
           {
             foreignKeyName: "holdings_user_id_institution_id_fkey"
@@ -1488,6 +1528,10 @@ export type Database = {
       fold_name: { Args: { name: string }; Returns: string }
       import_batch: {
         Args: { dry_run?: boolean; payload: Json }
+        Returns: Json
+      }
+      import_holdings: {
+        Args: { batch?: string; payload: Json }
         Returns: Json
       }
       import_undo: { Args: { batch: string }; Returns: Json }

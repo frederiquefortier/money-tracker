@@ -15,6 +15,9 @@ export function FeedbackSection() {
           <FormAlert>The change was not saved.</FormAlert>
           <FormAlert tone="warning">3 transactions need a look.</FormAlert>
           <FormAlert tone="success">Saved.</FormAlert>
+          <FormAlert tone="warning" size="tag">
+            3 lines already in, skipped
+          </FormAlert>
         </div>
       </Specimen>
       <Specimen name="Toast" source="feedback/toaster.tsx">

@@ -8,6 +8,10 @@ export const IMPORT_FILES = [
   'splits',
   'people',
   'aliases',
+  'holdings',
+  'snapshots',
+  'contributions',
+  'holding_transfers',
 ] as const
 export type ImportFileName = (typeof IMPORT_FILES)[number]
 
@@ -21,13 +25,17 @@ const rowSchema = z.partialRecord(z.string(), z.string().max(2000))
 
 /** What `import_batch` takes: the rows of each file, as read in the browser. */
 export const importInputSchema = z.object({
-  files: z.array(z.string().max(100)).max(8),
+  files: z.array(z.string().max(100)).max(12),
   accounts: z.array(rowSchema).max(1000),
   transactions: z.array(rowSchema).max(20000),
   splits: z.array(rowSchema).max(60000),
   people: z.array(rowSchema).max(60000),
   aliases: z.array(rowSchema).max(2000),
   counterparties: z.array(rowSchema).max(2000),
+  holdings: z.array(rowSchema).max(200),
+  snapshots: z.array(rowSchema).max(20000),
+  contributions: z.array(rowSchema).max(20000),
+  holding_transfers: z.array(rowSchema).max(1000),
 })
 export type ImportInput = {
   files: Array<string>
@@ -38,6 +46,10 @@ export type ImportInput = {
   aliases: Array<ImportRow>
   /** Merchant texts the author marked as a person: `name` (ADR-038). */
   counterparties: Array<ImportRow>
+  holdings: Array<ImportRow>
+  snapshots: Array<ImportRow>
+  contributions: Array<ImportRow>
+  holding_transfers: Array<ImportRow>
 }
 
 /** What the author can merge a new item into (IMP-06); the others are created as written. */
@@ -118,6 +130,23 @@ export const IMPORT_ERROR_CODES = [
   'alias_duplicate',
   'alias_target_unknown',
   'alias_taken',
+  'holding_key_required',
+  'holding_duplicate',
+  'holding_type_unknown',
+  'holding_currency_unknown',
+  'holding_country_required',
+  'holding_dates',
+  'holding_ambiguous',
+  'holding_currency_differs',
+  'holding_unknown',
+  'amount_negative',
+  'amount_not_positive',
+  'snapshot_duplicate',
+  'after_holding_closed',
+  'label_too_long',
+  'transfer_same_holding',
+  'holding_transfer_kind',
+  'holding_transfer_currency',
 ] as const
 export type ImportErrorCode = (typeof IMPORT_ERROR_CODES)[number]
 
@@ -141,6 +170,13 @@ export type ImportCounts = {
   transfers: number
   reimbursements: number
   aliases: number
+  holdings: number
+  holdingsMatched: number
+  snapshots: number
+  contributions: number
+  holdingTransfers: number
+  /** Values, contributions and transfers already in the app. */
+  holdingRowsSkipped: number
 }
 
 export type ImportWillCreate = {
@@ -155,6 +191,11 @@ export type ImportWillCreate = {
   counterparties: Array<string>
   people: Array<string>
   events: Array<string>
+  holdings: Array<{
+    type: string
+    institution: string | null
+    name: string | null
+  }>
 }
 
 export const EMPTY_WILL_CREATE: ImportWillCreate = {
@@ -167,6 +208,7 @@ export const EMPTY_WILL_CREATE: ImportWillCreate = {
   counterparties: [],
   people: [],
   events: [],
+  holdings: [],
 }
 
 export type ImportCheck =

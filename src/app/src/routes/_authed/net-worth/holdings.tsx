@@ -1,6 +1,5 @@
 import { Link, Outlet, createFileRoute } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
-import { Icon } from '#/components/display/icon'
 import { FormAlert } from '#/components/forms/form-field'
 import { focusRing } from '#/components/styles'
 import { cn } from '#/lib/utils'
@@ -89,6 +88,23 @@ function Holdings() {
     <ListPage
       title={t('holdings.title')}
       back={<NetWorthBackLink />}
+      titleNote={
+        page.unlinkedCount > 0 && (
+          <Link
+            to="/transactions"
+            search={{ category: page.investmentCategoryIds }}
+            className={cn('block w-fit max-w-full rounded-full', focusRing)}
+          >
+            <FormAlert
+              tone="warning"
+              size="tag"
+              className="w-fit max-w-full hover:bg-warning/25"
+            >
+              {t('holdings.unlinked', { count: page.unlinkedCount })}
+            </FormAlert>
+          </Link>
+        )
+      }
       actions={
         <>
           {keys.length > 0 && (
@@ -106,21 +122,6 @@ function Holdings() {
         </>
       }
     >
-      {page.unlinkedCount > 0 && (
-        <Link
-          to="/transactions"
-          search={{ category: page.investmentCategoryIds }}
-          className={cn('block w-fit max-w-full rounded-lg', focusRing)}
-        >
-          <FormAlert
-            tone="warning"
-            className="w-fit max-w-full items-center font-semibold hover:bg-warning/25"
-          >
-            {t('holdings.unlinked', { count: page.unlinkedCount })}
-            <Icon name="chevron-right" className="size-4" />
-          </FormAlert>
-        </Link>
-      )}
       {page.holdings.length === 0 && (
         <EmptyState>{t('holdings.empty')}</EmptyState>
       )}

@@ -4,6 +4,15 @@ Document new concepts, techniques, and knowledge gained. Reference this file to 
 
 <!-- Newest first: a new entry goes directly below this line. Template at the bottom. -->
 
+### 2026-11-12 - pg_safeupdate and execute rights on what a trigger calls
+
+**What Was New:**
+- Supabase's API role has pg_safeupdate loaded: an UPDATE or DELETE without a WHERE clause fails with error 21000, whatever the table, a temporary one included. `where true` satisfies it. A SQL console run as the owner does not show it, so a function only tried there can still fail from the app.
+- A trigger function needs no execute right to be fired, but a function it calls runs with the caller's rights, so that one needs the right (or the trigger function must be security definer).
+
+**Applied In:**
+- `import_holdings` (ADR-050) and `check_transaction_holding`, see bugs.md.
+
 ### 2026-11-09 - A bottom calendar inside a Radix sheet with react-aria
 
 **What Was New:**

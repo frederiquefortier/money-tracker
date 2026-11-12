@@ -19,6 +19,12 @@ const countsSchema = z.object({
   transfers: z.number(),
   reimbursements: z.number(),
   aliases: z.number(),
+  holdings: z.number().default(0),
+  holdings_matched: z.number().default(0),
+  snapshots: z.number().default(0),
+  contributions: z.number().default(0),
+  holding_transfers: z.number().default(0),
+  holding_rows_skipped: z.number().default(0),
 })
 
 const namedAccount = z.object({
@@ -36,6 +42,15 @@ const willCreateSchema = z.object({
   counterparties: z.array(z.string()),
   people: z.array(z.string()),
   events: z.array(z.string()),
+  holdings: z
+    .array(
+      z.object({
+        type: z.string(),
+        institution: z.string().nullable(),
+        name: z.string().nullable(),
+      }),
+    )
+    .default([]),
 })
 
 const refusedSchema = z.object({
@@ -67,6 +82,12 @@ function countsOf(c: z.infer<typeof countsSchema>): ImportCounts {
     transfers: c.transfers,
     reimbursements: c.reimbursements,
     aliases: c.aliases,
+    holdings: c.holdings,
+    holdingsMatched: c.holdings_matched,
+    snapshots: c.snapshots,
+    contributions: c.contributions,
+    holdingTransfers: c.holding_transfers,
+    holdingRowsSkipped: c.holding_rows_skipped,
   }
 }
 
@@ -100,6 +121,7 @@ export function parseImportCheck(json: unknown): ImportCheck | null {
           counterparties: w.counterparties,
           people: w.people,
           events: w.events,
+          holdings: w.holdings,
         }
       : EMPTY_WILL_CREATE,
   }

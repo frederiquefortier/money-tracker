@@ -63,7 +63,7 @@ The form has no lists. Values, external contributions and transfers have their o
 
 ## Not in this screen
 
-Debt payments do not link to a debt holding; a debt has values only. Import and export do not carry the link (ADR-045).
+Debt payments do not link to a debt holding; a debt has values only. The import carries holdings, values, external contributions and transfers (ADR-050); import and export do not carry the transaction link (ADR-045).
 
 ## Open questions for the author
 

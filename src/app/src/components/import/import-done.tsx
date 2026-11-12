@@ -16,6 +16,17 @@ const CREATED = [
   'people',
   'events',
   'aliases',
+  'holdings',
+  'snapshots',
+  'contributions',
+  'holding_transfers',
+] as const
+
+const HOLDING_KINDS = [
+  'holdings',
+  'snapshots',
+  'contributions',
+  'holding_transfers',
 ] as const
 
 /** How it ended: what was written, line by line, and where to look. */
@@ -32,6 +43,10 @@ export function ImportDone({
     const count = done.created[kind] ?? 0
     return count > 0 ? [{ kind, count }] : []
   })
+  const withTransactions = done.counts.transactions > 0
+  const withHoldings = HOLDING_KINDS.some(
+    (kind) => (done.created[kind] ?? 0) > 0,
+  )
   return (
     <section
       className={cn(
@@ -42,9 +57,11 @@ export function ImportDone({
       <IconBubble icon="check" tone="income" size="lg" />
       <div className="flex flex-col items-center gap-1 text-center">
         <h2 className="text-lg font-semibold">{t('import.doneTitle')}</h2>
-        <p className="text-muted-foreground">
-          {t('import.doneCount', { count: done.counts.transactions })}
-        </p>
+        {withTransactions && (
+          <p className="text-muted-foreground">
+            {t('import.doneCount', { count: done.counts.transactions })}
+          </p>
+        )}
       </div>
       {lines.length > 0 && (
         <dl className="w-full divide-y border-y">
@@ -65,9 +82,18 @@ export function ImportDone({
         <Button variant="ghost" onClick={onAnother}>
           {t('import.anotherImport')}
         </Button>
-        <Button asChild>
-          <Link to="/transactions">{t('import.viewTransactions')}</Link>
-        </Button>
+        {withTransactions && (
+          <Button asChild>
+            <Link to="/transactions">{t('import.viewTransactions')}</Link>
+          </Button>
+        )}
+        {withHoldings && (
+          <Button asChild variant={withTransactions ? 'outline' : 'default'}>
+            <Link to="/net-worth/holdings">
+              {t('import.holdings.viewHoldings')}
+            </Link>
+          </Button>
+        )}
       </div>
     </section>
   )

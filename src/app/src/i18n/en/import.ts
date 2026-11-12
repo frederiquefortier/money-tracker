@@ -1,4 +1,6 @@
 import type { importFr } from '../fr/import'
+import { importHoldingsEn } from './import-holdings'
+import { importTilesEn } from './import-tiles'
 
 export const importEn: typeof importFr = {
   import: {
@@ -9,7 +11,7 @@ export const importEn: typeof importFr = {
     chooseFiles: 'Choose files',
     templates: 'Templates',
     unknownFile: 'File not recognised: {{name}}',
-    missingTransactions: 'The file transactions.csv is missing.',
+    missingTransactions: 'Add transactions.csv, or a holdings file.',
     rows_one: '{{count, number}} row',
     rows_other: '{{count, number}} rows',
     upload: 'Extract',
@@ -18,13 +20,7 @@ export const importEn: typeof importFr = {
     changeFiles_one: 'Change the file',
     changeFiles_other: 'Change the {{count, number}} files',
     similarTo: 'Merge with {{name}}?',
-    tiles: {
-      transactions: 'Transactions',
-      expenses: 'Expenses',
-      incomes: 'Incomes',
-      transfers: 'Transfers',
-      adjustments: 'Adjustments',
-    },
+    tiles: importTilesEn,
     checkFailed: 'The check failed. Try again.',
     errorsHeading: 'The import cannot go on',
     errorsTitle_one: '{{count, number}} error',
@@ -89,8 +85,8 @@ export const importEn: typeof importFr = {
       renamedNote: '→ “{{name}}”, with a note',
     },
     mergedInto: 'Merged into “{{target}}”',
-    importNow_one: 'Import {{count, number}} transaction',
-    importNow_other: 'Import {{count, number}} transactions',
+    importNow: 'Import',
+    holdings: importHoldingsEn.summary,
     doneTitle: 'Import finished',
     doneCount_one: '{{count, number}} transaction imported',
     doneCount_other: '{{count, number}} transactions imported',
@@ -102,6 +98,10 @@ export const importEn: typeof importFr = {
       people: 'People',
       events: 'Events',
       aliases: 'Aliases',
+      holdings: 'Holdings',
+      snapshots: 'Holding values',
+      contributions: 'Contributions',
+      holding_transfers: 'Transfers between holdings',
     },
     viewTransactions: 'View the transactions',
     anotherImport: 'Import other files',
@@ -122,6 +122,14 @@ export const importEn: typeof importFr = {
       events_other: '{{count, number}} events',
       aliases_one: '{{count, number}} alias',
       aliases_other: '{{count, number}} aliases',
+      holdings_one: '{{count, number}} holding',
+      holdings_other: '{{count, number}} holdings',
+      snapshots_one: '{{count, number}} holding value',
+      snapshots_other: '{{count, number}} holding values',
+      contributions_one: '{{count, number}} contribution',
+      contributions_other: '{{count, number}} contributions',
+      holding_transfers_one: '{{count, number}} transfer between holdings',
+      holding_transfers_other: '{{count, number}} transfers between holdings',
     },
     history: {
       title: 'History',
@@ -139,6 +147,7 @@ export const importEn: typeof importFr = {
       undoFailed: 'The import was not undone.',
     },
     errors: {
+      ...importHoldingsEn.errors,
       unknown: 'Unknown error ({{code}}).',
       file_empty: 'The file is empty.',
       csv_unterminated: 'A quote is never closed.',

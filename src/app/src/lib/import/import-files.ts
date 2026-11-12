@@ -61,6 +61,33 @@ export const IMPORT_COLUMNS: Record<ImportFileName, ReadonlyArray<Column>> = {
     column('reimburses'),
   ],
   aliases: [column('kind', true), column('name', true), column('alias', true)],
+  holdings: [
+    column('holding', true),
+    column('type', true),
+    column('institution'),
+    column('name'),
+    column('country'),
+    column('currency', true),
+    column('opened_on', false, 'date'),
+    column('closed_on', false, 'date'),
+  ],
+  snapshots: [
+    column('holding', true),
+    column('date', true, 'date'),
+    column('amount', true, 'decimal'),
+  ],
+  contributions: [
+    column('holding', true),
+    column('date', true, 'date'),
+    column('amount', true, 'decimal'),
+    column('label'),
+  ],
+  holding_transfers: [
+    column('from_holding', true),
+    column('to_holding', true),
+    column('date', true, 'date'),
+    column('amount', true, 'decimal'),
+  ],
 }
 
 /** `transactions` for `transactions.csv`, whatever the case; null for any other name. */
@@ -189,5 +216,9 @@ export function importInputOf(
     people: rowsOf('people'),
     aliases: rowsOf('aliases'),
     counterparties: [],
+    holdings: rowsOf('holdings'),
+    snapshots: rowsOf('snapshots'),
+    contributions: rowsOf('contributions'),
+    holding_transfers: rowsOf('holding_transfers'),
   }
 }

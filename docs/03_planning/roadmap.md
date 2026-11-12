@@ -44,6 +44,7 @@ Everything the owner can set on a transaction exists before the import, so eight
 The milestone: eight years of history in the app. It comes before the dashboard so the dashboard and budgets are built and tried on real history.
 
 - [x] Fixed-format CSV import with check, summary, merges, commit and undo. IMP-01, 05, 06 (ADR-010, ADR-033 to ADR-037).
+- [x] Net-worth history through the same format: holdings, values, external contributions and transfers. IMP-02 (ADR-050).
 - [ ] Export in the same format. IMP-04, SEC-04 ([spec](../00_briefing/designs/18-export.md)).
 - [x] The first real import, done by the author.
 

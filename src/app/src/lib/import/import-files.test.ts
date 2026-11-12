@@ -9,6 +9,7 @@ describe('importFileName', () => {
     expect(importFileName('transactions.csv')).toBe('transactions')
     expect(importFileName(' People.CSV ')).toBe('people')
     expect(importFileName('Aliases.csv')).toBe('aliases')
+    expect(importFileName('Holding_Transfers.csv')).toBe('holding_transfers')
     expect(importFileName('events.csv')).toBeNull()
     expect(importFileName('transactions.xlsx')).toBeNull()
   })
@@ -127,5 +128,29 @@ describe('the aliases file', () => {
       readImportFile('aliases', 'kind,name,alias\nmerchant,Coop,Coop QC\n')
         .errors,
     ).toEqual([])
+  })
+})
+
+describe('the holdings files', () => {
+  it('reads a transfer and checks its amount and date', () => {
+    const file = readImportFile(
+      'holding_transfers',
+      'from_holding,to_holding,date,amount\nA,B,2023-01-01,100.00\nA,B,01/02/2023,1,5\n',
+    )
+    expect(file.rows).toHaveLength(2)
+    expect(file.errors.map((e) => e.code)).toEqual([
+      'row_length',
+      'date_format',
+    ])
+  })
+
+  it('goes into the payload with the other files', () => {
+    const file = readImportFile(
+      'snapshots',
+      'holding,date,amount\nTFSA,2023-01-01,10.00\n',
+    )
+    const input = importInputOf([file])
+    expect(input.snapshots).toHaveLength(1)
+    expect(input.files).toEqual(['snapshots.csv'])
   })
 })

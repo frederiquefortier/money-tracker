@@ -34,7 +34,11 @@ function BatchRow({
           : day(batch.committedAt)}
       </span>
       <span className="min-w-0 flex-1 truncate text-right text-sm text-muted-foreground">
-        {t('import.transactions', { count: batch.transactions })}
+        {batch.transactions > 0
+          ? t('import.transactions', { count: batch.transactions })
+          : t('import.holdings.values', {
+              count: batch.created.snapshots ?? 0,
+            })}
       </span>
       {!undone && (
         <IconButton
@@ -80,9 +84,11 @@ export function ImportHistory({
         description={
           asking
             ? [
-                t('import.history.undoDescription', {
-                  count: asking.transactions,
-                }),
+                asking.transactions > 0
+                  ? t('import.history.undoDescription', {
+                      count: asking.transactions,
+                    })
+                  : t('import.holdings.undoHoldings'),
                 asking.edited > 0 &&
                   t('import.history.edited', { count: asking.edited }),
               ]

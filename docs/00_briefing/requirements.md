@@ -203,7 +203,7 @@ The "Canada" section, generalised because the data already spans Canada and Swit
 | ID | Requirement | Source | Phase |
 |---|---|---|---|
 | IMP-01 | Import from one fixed, documented CSV format: accounts, transactions, splits, and optionally people lines (roles, head counts, reimbursement links) and aliases. The user prepares their data beforehand. See [import.md](../01_building/import.md). | sheet, ADR-010, ADR-033 | 3 |
-| IMP-02 | Net-worth history through the same format (optional holdings and snapshots files). | net-worth data | 5 |
+| IMP-02 | Net-worth history through the same format: optional files for holdings, their values, external contributions and transfers between holdings, checked and undone with the rest of the batch. | net-worth data, author (2026-11-12) | 3 |
 | IMP-03 | Import from a source in its own format (a bank CSV), with column mapping and saved source profiles. The author's own import is the fixed format (IMP-01), with the conversion done outside the app; what the "wizard" was meant to add for the first import (alias matching, merges, suggested pairs) is IMP-06 and MER-02, so this is only for other sources. | v1 misc ("Csv importer visual"), author 2026-11-10 | later |
 | IMP-04 | Export my data in the import format; export then import reproduces it. This is the export half of SEC-04. | ADR-010, SEC-04 | 3 |
 | IMP-05 | Each import is one all-or-nothing batch that can be undone in one action. Re-importing a row with a known `ref` is skipped. | ADR-010 | 3 |

@@ -50,7 +50,7 @@ function Import() {
   }, [stage, run.refusal, check])
 
   function upload() {
-    if (files.hasTransactions) void run.runCheck()
+    if (files.hasContent) void run.runCheck()
     else toast({ text: t('import.missingTransactions') })
   }
 

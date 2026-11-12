@@ -15,6 +15,7 @@ const good: ImportCheck = {
     counterparties: [],
     people: [],
     events: [],
+    holdings: [],
   },
   counts: {
     transactions: 1,
@@ -24,6 +25,12 @@ const good: ImportCheck = {
     transfers: 0,
     reimbursements: 0,
     aliases: 0,
+    holdings: 0,
+    holdingsMatched: 0,
+    snapshots: 0,
+    contributions: 0,
+    holdingTransfers: 0,
+    holdingRowsSkipped: 0,
   },
 }
 const bad: ImportCheck = { ok: false, errors: [], errorCount: 1 }

@@ -1,12 +1,13 @@
 import { useTranslation } from 'react-i18next'
 import { NewItemSections } from '#/components/import/new-item-sections'
+import { FormAlert } from '#/components/forms/form-field'
 import { Button } from '#/components/ui/button'
 import { cardSurface } from '#/components/styles'
 import { useLocale } from '#/hooks/app/use-locale'
 import { formatCount, formatDate } from '#/lib/shared/format'
 import type { Edit } from '#/lib/import/import-edits'
 import type { Decisions } from '#/lib/import/import-merges'
-import { summariseRows } from '#/lib/import/import-summary'
+import { holdingsRange, summariseRows } from '#/lib/import/import-summary'
 import type {
   ImportCheck,
   ImportInput,
@@ -44,26 +45,41 @@ function Tile({
   )
 }
 
+function BigNumber({ value, label }: { value: number; label: string }) {
+  const locale = useLocale()
+  return (
+    <div
+      className={cn(cardSurface, 'flex flex-col items-center gap-1 px-4 py-5')}
+    >
+      <span className="font-mono text-4xl font-bold">
+        {formatCount(value, locale)}
+      </span>
+      <span className="text-muted-foreground">{label}</span>
+    </div>
+  )
+}
+
 /** The file's figures first, then the lines that qualify them. */
 function Figures({ input, check }: { input: ImportInput; check: Checked }) {
   const { t } = useTranslation()
   const locale = useLocale()
   const rows = summariseRows(input.transactions)
   return (
-    <>
-      <div
-        className={cn(
-          cardSurface,
-          'flex flex-col items-center gap-1 px-4 py-5',
-        )}
-      >
-        <span className="font-mono text-4xl font-bold">
-          {formatCount(input.transactions.length, locale)}
-        </span>
-        <span className="text-muted-foreground">
+    <div className="flex flex-col gap-3">
+      <div className="flex flex-wrap items-center gap-2">
+        <h2 className="text-lg font-semibold">
           {t('import.tiles.transactions')}
-        </span>
+        </h2>
+        {check.counts.skipped > 0 && (
+          <FormAlert tone="warning" size="tag">
+            {t('import.skipped', { count: check.counts.skipped })}
+          </FormAlert>
+        )}
       </div>
+      <BigNumber
+        value={input.transactions.length}
+        label={t('import.tiles.transactions')}
+      />
       <div className="grid grid-cols-2 gap-3 sm:grid-flow-col sm:auto-cols-fr">
         <Tile value={rows.expenses} label={t('import.tiles.expenses')} />
         <Tile value={rows.incomes} label={t('import.tiles.incomes')} />
@@ -85,11 +101,79 @@ function Figures({ input, check }: { input: ImportInput; check: Checked }) {
             })}
           </p>
         )}
-        {check.counts.skipped > 0 && (
-          <p>{t('import.skipped', { count: check.counts.skipped })}</p>
+      </div>
+    </div>
+  )
+}
+
+/** What the holdings files bring, in the same cards as the transactions. */
+function HoldingsFigures({
+  check,
+  input,
+}: {
+  check: Checked
+  input: ImportInput
+}) {
+  const { t } = useTranslation()
+  const locale = useLocale()
+  const { counts, willCreate } = check
+  const range = holdingsRange(input)
+  const tiles = [
+    {
+      value: counts.holdings + counts.holdingsMatched,
+      label: t('import.tiles.holdingsCount'),
+    },
+    {
+      value: input.contributions.length,
+      label: t('import.tiles.contributions'),
+    },
+    {
+      value: input.holding_transfers.length,
+      label: t('import.tiles.holdingTransfers'),
+    },
+  ].filter((tile) => tile.value > 0)
+  const values = input.snapshots.length
+  if (values + tiles.length === 0) return null
+  return (
+    <div className="flex flex-col gap-3">
+      <div className="flex flex-wrap items-center gap-2">
+        <h2 className="text-lg font-semibold">{t('import.tiles.holdings')}</h2>
+        {counts.holdingRowsSkipped > 0 && (
+          <FormAlert tone="warning" size="tag">
+            {t('import.skipped', { count: counts.holdingRowsSkipped })}
+          </FormAlert>
         )}
       </div>
-    </>
+      {values > 0 && (
+        <BigNumber value={values} label={t('import.tiles.snapshots')} />
+      )}
+      {tiles.length > 0 && (
+        <div className="grid grid-cols-2 gap-3 sm:grid-flow-col sm:auto-cols-fr">
+          {tiles.map((tile) => (
+            <Tile key={tile.label} value={tile.value} label={tile.label} />
+          ))}
+        </div>
+      )}
+      <div className="flex flex-col items-center gap-1 text-center text-muted-foreground">
+        {range.from && range.to && (
+          <p>
+            {t('import.range', {
+              from: formatDate(range.from, locale, 'medium'),
+              to: formatDate(range.to, locale, 'medium'),
+            })}
+          </p>
+        )}
+        {willCreate.holdings.length > 0 && (
+          <p>
+            {willCreate.holdings
+              .map((h) =>
+                [h.name ?? h.type, h.institution].filter(Boolean).join(' · '),
+              )
+              .join(', ')}
+          </p>
+        )}
+      </div>
+    </div>
   )
 }
 
@@ -122,7 +206,8 @@ export function ImportSummary({
   const { t } = useTranslation()
   return (
     <section className="flex flex-col gap-6">
-      <Figures input={input} check={check} />
+      {input.transactions.length > 0 && <Figures input={input} check={check} />}
+      <HoldingsFigures check={check} input={input} />
       {check.nothingToImport && (
         <p className="text-center font-semibold">
           {t('import.nothingToImport')}
@@ -146,7 +231,7 @@ export function ImportSummary({
           onClick={onImport}
         >
           {importing && <Spinner />}
-          {t('import.importNow', { count: check.counts.transactions })}
+          {t('import.importNow')}
         </Button>
       )}
       <Button

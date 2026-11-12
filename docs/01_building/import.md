@@ -26,7 +26,7 @@ Zod, and passes them to the `import_batch` SQL function, which commits or rolls 
 whole (ADR-012, ADR-036). One invalid row blocks the batch.
 
 `import_batch(payload, dry_run)` does steps 2 to 4 in the database. The payload is
-`{files, accounts, transactions, splits, people, aliases}`, each an array of the rows of the CSV of
+`{files, accounts, transactions, splits, people, aliases, holdings, snapshots, contributions, holding_transfers}`, each an array of the rows of the CSV of
 that name, every value a string (amounts too, ADR-004) with an optional `line` for the
 messages. Step 3 is `dry_run = true`: it returns `{ok, will_create, counts}` and writes
 nothing, or `{ok: false, errors}` where each error has its file, line and a code the
@@ -53,6 +53,7 @@ created when missing. Nothing is ever overwritten: a match keeps the app's versi
 | `merchant` | merchants, then their aliases | created |
 | `person` | people, then their aliases | created |
 | `event` | events | created by name with no dates; the rows that name it are linked by hand |
+| `holding` (holdings.csv) | holdings, by type, institution and name | created from holdings.csv. The institution is created when missing. |
 
 A category that is archived still matches, for the transactions dated up to and including
 the day it was archived (ADR-035). One dated after that is an error in the check, listed by
@@ -165,6 +166,40 @@ Another spelling of a merchant or a person, so an import finds them by it.
 
 An alias already stored is kept as it is.
 
+## holdings.csv (optional)
+
+The net-worth history (IMP-02, ADR-050). Four files, each optional, in this order of use.
+A holding is named by a key in `holding`, which the other three files repeat. The key means
+nothing to the app; it only ties the rows together.
+
+| Column | Required | Meaning |
+|---|---|---|
+| `holding` | yes | The key the other files use |
+| `type` | yes | A code from `holding-types.csv` |
+| `institution` | no | Created when missing |
+| `name` | no | Most holdings have none; type and institution name them |
+| `country` | when needed | `CA`, `CH`. Taken from the type when the type has one. |
+| `currency` | yes | Fixed once the holding has entries |
+| `opened_on` | for a new holding | |
+| `closed_on` | no | Nothing may be dated after it |
+
+A holding is matched to one in the app by type, institution and name (a missing one matches
+a missing one). The app's version is kept; a different currency is an error, and several
+matches ask for a name that tells them apart. Anything not matched is created.
+
+`snapshots.csv`: `holding`, `date`, `amount` (not negative; one per holding per date).
+`contributions.csv`: `holding`, `date`, `amount` (above zero), `label` (optional). Only money
+that never passes through an account: an employer's share, and a payroll deduction.
+`holding_transfers.csv`: `from_holding`, `to_holding`, `date`, `amount`. Two investments in
+one currency. Amounts are no finer than the currency's minor unit, in the holding's currency.
+
+A value, contribution or transfer already in the app (same holding and date, and the same
+amount and label for the last two) is skipped, so a file can be sent again. An undo removes
+what the batch wrote, and a holding it created when nothing else points at it.
+
+Linking existing transactions to a holding (a `holding` column on transactions.csv) is not
+part of the format yet; a transaction already imported is skipped by its `ref`.
+
 ## Export
 
 The app exports a user's data in this same format (IMP-04, SEC-04). Export then import
@@ -172,7 +207,7 @@ reproduces the data, which is also how the format is tested.
 
 ## Later
 
-Net-worth holdings and snapshots (IMP-02), event dates and types (an `events.csv`), parts
+Event dates and types (an `events.csv`), parts
 set by amount on an expense, and recurring rules join as optional files and columns; a file
 in this format stays valid. Reading a source in its own format, with column mapping and
 saved profiles (IMP-03), is the only thing a "wizard" would still add: the author's own
@@ -182,8 +217,8 @@ import is this one.
 
 | Table | Columns |
 |---|---|
-| `import_batches` | `file_names`, `row_count`, `created_counts` (jsonb, per kind: transactions, currencies, institutions, accounts, categories, merchants, people, events), `restored` (the opening balances and dates it replaced, for the undo), `committed_at`, `undone_at` |
+| `import_batches` | `file_names`, `row_count`, `created_counts` (jsonb, per kind: transactions, currencies, institutions, accounts, categories, merchants, people, events, holdings, snapshots, contributions, holding transfers), `restored` (the opening balances and dates it replaced, for the undo), `committed_at`, `undone_at` |
 
-`transactions.import_batch_id` and `transactions.import_ref` (unique per user) complete it.
+`transactions.import_batch_id` and `transactions.import_ref` (unique per user) complete it. So do `import_batch_id` on holdings, snapshots, contributions and holding transfers.
 Every institution, account, category, merchant, person and event a batch creates carries its
 id, so the undo removes them when nothing else uses them. Added currencies are kept.

@@ -26,6 +26,10 @@ export const FILE_ICON: Record<ImportFileName, IconName> = {
   splits: 'split',
   people: 'users',
   aliases: 'tags',
+  holdings: 'bank',
+  snapshots: 'chart-line',
+  contributions: 'coins',
+  holding_transfers: 'arrow-left-right',
 }
 
 function FileRow({
