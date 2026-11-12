@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { useToast } from '#/hooks/app/use-toast'
 import { getCategories } from '#/server/categories'
 import { getEvents } from '#/server/events'
+import { getFormHoldings } from '#/server/holdings'
 import { getMerchants } from '#/server/merchants'
 import { getPeople } from '#/server/people'
 import { getFormAccounts } from '#/server/transactions'
@@ -28,8 +29,9 @@ export function useFilterOptions(
       has('merchants') ? getMerchants() : [],
       has('people') ? getPeople() : { people: [], groups: [] },
       has('events') ? getEvents() : { events: [], types: [] },
+      has('holdings') ? getFormHoldings() : [],
     ])
-      .then(([accounts, categories, merchants, people, events]) =>
+      .then(([accounts, categories, merchants, people, events, holdings]) =>
         setOptions({
           accounts,
           categories,
@@ -37,6 +39,7 @@ export function useFilterOptions(
           ...people,
           events: events.events,
           eventTypes: events.types,
+          holdings,
         }),
       )
       .catch(() => toast({ text: t('common.genericError') }))

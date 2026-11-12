@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import type { FormHolding } from '#/lib/holdings/holding'
 import { noteSchema } from '#/lib/shared/validation'
 import type { Category } from '#/lib/categories/category'
 import { currencyCodeSchema } from '#/lib/currencies/currency'
@@ -48,6 +49,7 @@ export type TransactionFormData = {
   frequentPeople: Array<string>
   events: Array<EventItem>
   eventTypes: Array<EventType>
+  holdings: Array<FormHolding>
 }
 
 /** A saved expense or income as the form loads it; amounts signed, as stored. */

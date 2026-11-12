@@ -110,6 +110,7 @@ type NullableListed =
   | 'received_value'
   | 'conversion_cost'
   | 'event'
+  | 'holding'
 type ListTransactionsRow = Omit<ListedRow, NullableListed> & {
   [K in NullableListed]: ListedRow[K] | null
 }

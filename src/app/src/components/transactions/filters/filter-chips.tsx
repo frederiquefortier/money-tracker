@@ -3,6 +3,7 @@ import { CategoryBadge } from '#/components/categories/category-badge'
 import { Icon } from '#/components/display/icon'
 import { focusRing } from '#/components/styles'
 import { accountLabel } from '#/lib/accounts/account'
+import { NO_HOLDING } from '#/lib/transactions/transaction-list'
 import type {
   ListFilters,
   PeriodChoice,
@@ -21,7 +22,11 @@ import { cn } from '#/lib/utils'
 
 type Picked = { id: string; name: string; icon?: React.ReactNode }
 
-function namedIn(tab: FilterTab, names: ListFilters): Array<Picked> {
+function namedIn(
+  tab: FilterTab,
+  names: ListFilters,
+  noHolding: string,
+): Array<Picked> {
   if (tab === 'accounts')
     return names.accounts.map((a) => ({ id: a.id, name: accountLabel(a) }))
   if (tab === 'categories')
@@ -37,18 +42,27 @@ function namedIn(tab: FilterTab, names: ListFilters): Array<Picked> {
         />
       ),
     }))
+  if (tab === 'holdings')
+    return [{ id: NO_HOLDING, name: noHolding }, ...names.holdings]
   return names[tab]
 }
 
 /** What is ticked in a filter, by name, as far as the list has named it. */
-export function pickedOf(
-  tab: FilterTab,
-  names: ListFilters | null,
-  values: FilterValues,
-): Array<Picked> {
+export function pickedOf({
+  tab,
+  names,
+  values,
+  noHolding,
+}: {
+  tab: FilterTab
+  names: ListFilters | null
+  values: FilterValues
+  /** The name of the "no holding" choice. */
+  noHolding: string
+}): Array<Picked> {
   if (!names) return []
   const ticked = new Set(values[FILTER_KEYS[tab]])
-  return namedIn(tab, names).filter((one) => ticked.has(one.id))
+  return namedIn(tab, names, noHolding).filter((one) => ticked.has(one.id))
 }
 
 function Chip({
@@ -115,7 +129,12 @@ export function FilterChips({
   })
   const chips = FILTER_TABS.flatMap((tab) => {
     const key = FILTER_KEYS[tab]
-    const picked = pickedOf(tab, names, values)
+    const picked = pickedOf({
+      tab,
+      names,
+      values,
+      noHolding: t('holdings.none'),
+    })
     const without = (ids: ReadonlyArray<string>) =>
       onChange({
         ...values,

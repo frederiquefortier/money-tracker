@@ -1,4 +1,5 @@
 import type { Category } from '#/lib/categories/category'
+import type { FormHolding } from '#/lib/holdings/holding'
 import type { EventItem, EventType } from '#/lib/events/event'
 import type { Merchant } from '#/lib/merchants/merchant'
 import type { Person, PersonGroup } from '#/lib/people/person'
@@ -12,6 +13,7 @@ export type FilterValues = {
   merchantIds: Array<string>
   personIds: Array<string>
   eventIds: Array<string>
+  holdingIds: Array<string>
 }
 
 export const NO_FILTERS: FilterValues = {
@@ -20,6 +22,7 @@ export const NO_FILTERS: FilterValues = {
   merchantIds: [],
   personIds: [],
   eventIds: [],
+  holdingIds: [],
 }
 
 export const FILTER_TABS = [
@@ -28,6 +31,7 @@ export const FILTER_TABS = [
   'merchants',
   'people',
   'events',
+  'holdings',
 ] as const
 export type FilterTab = (typeof FILTER_TABS)[number]
 
@@ -40,6 +44,7 @@ export const FILTER_KEYS = {
   merchants: 'merchantIds',
   people: 'personIds',
   events: 'eventIds',
+  holdings: 'holdingIds',
 } as const satisfies Record<FilterTab, keyof FilterValues>
 
 /** What each filter can offer. */
@@ -51,4 +56,22 @@ export type FilterOptions = {
   groups: Array<PersonGroup>
   events: Array<EventItem>
   eventTypes: Array<EventType>
+  holdings: Array<FormHolding>
 }
+
+type IdSearch = Partial<
+  Record<
+    'account' | 'category' | 'merchant' | 'person' | 'event' | 'holding',
+    Array<string>
+  >
+>
+
+/** The ticked ids of each filter, none when the filter is not in the address. */
+export const idFilters = (search: IdSearch) => ({
+  accountIds: search.account ?? [],
+  categoryIds: search.category ?? [],
+  merchantIds: search.merchant ?? [],
+  personIds: search.person ?? [],
+  eventIds: search.event ?? [],
+  holdingIds: search.holding ?? [],
+})

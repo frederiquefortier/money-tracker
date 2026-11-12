@@ -1,4 +1,4 @@
-import { Outlet, createFileRoute } from '@tanstack/react-router'
+import { Link, Outlet, createFileRoute } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { ClosedHoldings } from '#/components/holdings/list/closed-holdings'
 import { HoldingGroup } from '#/components/holdings/list/holding-group'
@@ -14,6 +14,7 @@ import { useStoredIds } from '#/hooks/app/use-stored-state'
 import { compareNames } from '#/lib/shared/collections'
 import { FORMAT_LOCALE } from '#/i18n/locales'
 import type { Locale } from '#/i18n/locales'
+import { NO_HOLDING } from '#/lib/transactions/transaction-list'
 import { getHoldings } from '#/server/holdings'
 
 export const Route = createFileRoute('/_authed/net-worth/holdings')({
@@ -65,6 +66,15 @@ function Holdings() {
         )
       }
     >
+      {page.unlinkedCount > 0 && (
+        <Link
+          to="/transactions"
+          search={{ holding: [NO_HOLDING] }}
+          className="w-fit rounded-lg text-sm font-semibold text-primary"
+        >
+          {t('holdings.unlinked', { count: page.unlinkedCount })}
+        </Link>
+      )}
       {page.holdings.length === 0 && (
         <EmptyState>{t('holdings.empty')}</EmptyState>
       )}

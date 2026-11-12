@@ -1446,6 +1446,7 @@ export type Database = {
           category_ids?: string[]
           event_ids?: string[]
           from_date?: string
+          holding_ids?: string[]
           max_rows?: number
           merchant_ids?: string[]
           owed_only?: boolean
@@ -1454,6 +1455,7 @@ export type Database = {
           search?: string
           to_date?: string
           without_event?: boolean
+          without_holding?: boolean
         }
         Returns: {
           account_name: string
@@ -1468,6 +1470,7 @@ export type Database = {
           fee_category: string
           from_account: string
           from_institution: string
+          holding: string
           id: string
           institution: string
           kind: string

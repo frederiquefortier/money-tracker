@@ -7,6 +7,7 @@ import { ReceiptAmount } from '#/components/transactions/receipt/receipt-amount'
 import { PeopleScreen } from '#/components/transactions/form/people-screen'
 import { TransactionDetails } from '#/components/transactions/form/transaction-details'
 import type { FieldErrors } from '#/lib/forms/form-state'
+import { withHoldingRule } from '#/lib/holdings/holding-link'
 import { validateDraft, withPicked } from '#/lib/transactions/transaction-draft'
 import { peopleForKind } from '#/lib/transactions/transaction-source'
 import type {
@@ -32,6 +33,7 @@ type State = { errors: FieldErrors; failed: boolean; submitted: boolean }
 function useDraft(
   initial: TransactionDraft,
   accounts: ReadonlyArray<FormAccount>,
+  categories: TransactionFormData['categories'],
 ) {
   const markChanged = useMarkChanged()
   const [draft, setDraft] = useState(initial)
@@ -40,7 +42,7 @@ function useDraft(
   const rate = useRate(draft.currency, accountCurrency ?? '', draft.occurredOn)
   function update(changes: Partial<TransactionDraft>) {
     markChanged()
-    setDraft((d) => ({ ...d, ...changes }))
+    setDraft((d) => withHoldingRule({ ...d, ...changes }, categories))
   }
   // The rule's answer is not an edit: it must not mark the form changed.
   const setEvent = (eventId: string | null) =>
@@ -153,6 +155,7 @@ export function TransactionForm({
   const { draft, update, setEvent, accountCurrency, rate } = useDraft(
     initial,
     data.accounts,
+    data.categories,
   )
   useMatchedEvent(draft, id, setEvent)
   const check = () =>

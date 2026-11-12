@@ -6,6 +6,7 @@ import { getSupabase } from '#/lib/server/supabase.server'
 import {
   LISTED_KINDS,
   NO_EVENT,
+  NO_HOLDING,
   groupByDay,
 } from '#/lib/transactions/transaction-list'
 import type {
@@ -26,6 +27,10 @@ const listInput = z.object({
   personIds: z.array(z.uuid()).max(100).optional(),
   eventIds: z
     .array(z.union([z.uuid(), z.literal(NO_EVENT)]))
+    .max(100)
+    .optional(),
+  holdingIds: z
+    .array(z.union([z.uuid(), z.literal(NO_HOLDING)]))
     .max(100)
     .optional(),
   search: z.string().trim().max(200).optional(),
@@ -88,6 +93,7 @@ function toPageRow(r: ListRow): Array<PageRow> {
         people: peopleSchema.safeParse(r.people).data ?? [],
         reimburses: reimbursesSchema.safeParse(r.reimburses).data ?? [],
         event: eventSchema.safeParse(r.event).data ?? null,
+        holding: r.holding,
         amount: r.amount,
         currency: r.currency,
         displayAmount: r.display_amount,
@@ -137,9 +143,11 @@ async function filterNames(
     merchantIds = [],
     personIds = [],
     eventIds = [],
+    holdingIds = [],
   } = data
   const named = eventIds.filter((id) => id !== NO_EVENT)
-  const [accounts, categories, merchants, people, events] = loaded(
+  const heldIds = holdingIds.filter((id) => id !== NO_HOLDING)
+  const [accounts, categories, merchants, people, events, holdings] = loaded(
     'Filters',
     ...(await Promise.all([
       accountIds.length
@@ -163,6 +171,9 @@ async function filterNames(
       named.length
         ? supabase.from('events').select('id, name').in('id', named)
         : none,
+      heldIds.length
+        ? supabase.from('holdings').select('id, name').in('id', heldIds)
+        : none,
     ])),
   )
   return {
@@ -175,6 +186,7 @@ async function filterNames(
     merchants,
     people,
     events,
+    holdings,
   }
 }
 
@@ -206,6 +218,8 @@ export const listTransactions = createServerFn({ method: 'GET' })
           person_ids: data.personIds,
           event_ids: data.eventIds?.filter((id) => id !== NO_EVENT),
           without_event: data.eventIds?.includes(NO_EVENT),
+          holding_ids: data.holdingIds?.filter((id) => id !== NO_HOLDING),
+          without_holding: data.holdingIds?.includes(NO_HOLDING),
           search: data.search || undefined,
           pending_only: data.pendingOnly,
           owed_only: data.owedOnly,

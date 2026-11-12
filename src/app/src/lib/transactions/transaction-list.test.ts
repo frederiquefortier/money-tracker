@@ -82,6 +82,7 @@ const row = (id: string, occurredOn: string): ListedTransaction => ({
   people: [],
   reimburses: [],
   event: null,
+  holding: null,
   amount: '-1.0000',
   currency: 'CAD',
   displayAmount: '-1.00',

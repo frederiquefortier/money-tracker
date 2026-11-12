@@ -138,6 +138,7 @@ export const transactionsEn: typeof transactionsFr = {
       merchants: 'Merchants',
       people: 'People',
       events: 'Events',
+      holdings: 'Holdings',
       pastEvents: 'Past events',
       noGroup: 'No group',
       search: {
@@ -146,6 +147,7 @@ export const transactionsEn: typeof transactionsFr = {
         merchants: 'Search merchants',
         people: 'Search people',
         events: 'Search events',
+        holdings: 'Search holdings',
       },
       all: 'All',
       none: 'None',

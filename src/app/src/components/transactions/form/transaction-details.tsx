@@ -4,6 +4,8 @@ import { FieldLabel } from '#/components/ui/field'
 import { ToggleGroup, ToggleGroupItem } from '#/components/ui/toggle-group'
 import { LinkedFields } from '#/components/forms/linked-fields'
 import { EventPicker } from '#/components/events/event-picker'
+import { HoldingPicker } from '#/components/holdings/holding-picker'
+import { isInvestmentDraft } from '#/lib/holdings/holding-link'
 import { MerchantPicker } from '#/components/merchants/merchant-picker'
 import { PersonPicker } from '#/components/people/person-picker'
 import { ReimbursesField } from '#/components/transactions/form/reimburses-field'
@@ -182,6 +184,14 @@ export function TransactionDetails({
         error={error('occurredOn')}
         onChange={(occurredOn) => onChange({ occurredOn })}
       />
+      {isInvestmentDraft(draft, data.categories) && (
+        <HoldingPicker
+          holdings={data.holdings}
+          value={draft.holdingId}
+          date={draft.occurredOn}
+          onChange={(holdingId) => onChange({ holdingId })}
+        />
+      )}
       <EventPicker
         events={data.events}
         types={data.eventTypes}

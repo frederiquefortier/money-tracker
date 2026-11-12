@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import { CategoryBadge } from '#/components/categories/category-badge'
 import { EventTag } from '#/components/display/event-tag'
+import { Tag } from '#/components/display/tag'
 import { AvatarStack } from '#/components/people/avatars'
 import type { IconName } from '#/components/display/icon'
 import { MissingRate, Money } from '#/components/display/money'
@@ -129,6 +130,23 @@ function RowAmount({
   )
 }
 
+/** The event's and the holding's tags, beside the name as labels do. */
+function RowTags({ row }: { row: ListedTransaction }) {
+  return (
+    <>
+      {row.event && (
+        <EventTag
+          name={row.event.name}
+          color={row.event.color}
+          auto={row.event.source === 'auto'}
+          className="max-w-[45%] shrink-0"
+        />
+      )}
+      {row.holding && <Tag className="max-w-[45%] truncate">{row.holding}</Tag>}
+    </>
+  )
+}
+
 function RowContent({
   row,
   displayCurrency,
@@ -161,14 +179,7 @@ function RowContent({
           {/* The event's tag sits beside the name, as a label does. */}
           <span className="flex min-w-0 items-center gap-2">
             <span className="min-w-0 truncate font-semibold">{title}</span>
-            {row.event && (
-              <EventTag
-                name={row.event.name}
-                color={row.event.color}
-                auto={row.event.source === 'auto'}
-                className="max-w-[45%] shrink-0"
-              />
-            )}
+            <RowTags row={row} />
           </span>
           {(details || row.people.length > 0) && (
             <span className="flex min-w-0 items-center gap-2 text-sm text-muted-foreground">

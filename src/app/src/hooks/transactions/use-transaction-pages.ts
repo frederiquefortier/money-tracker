@@ -24,19 +24,6 @@ export function useTransactionPages(first: TransactionPage, query: ListQuery) {
 
   const pages = state.first === first ? [first, ...state.older] : [first]
   const cursor = pages.at(-1)?.cursor ?? null
-  const {
-    from,
-    to,
-    accountIds,
-    categoryIds,
-    merchantIds,
-    personIds,
-    eventIds,
-    search,
-    pendingOnly,
-    owedOnly,
-  } = query
-
   useEffect(() => {
     const target = sentinel.current
     if (!target || cursor === null || loading) return
@@ -45,19 +32,7 @@ export function useTransactionPages(first: TransactionPage, query: ListQuery) {
       observer.disconnect()
       setLoading(true)
       listTransactions({
-        data: {
-          from,
-          to,
-          accountIds,
-          categoryIds,
-          merchantIds,
-          personIds,
-          eventIds,
-          search,
-          pendingOnly,
-          owedOnly,
-          before: cursor,
-        },
+        data: { ...query, before: cursor },
       })
         .then((page) =>
           setState((s) =>
@@ -69,23 +44,7 @@ export function useTransactionPages(first: TransactionPage, query: ListQuery) {
     })
     observer.observe(target)
     return () => observer.disconnect()
-  }, [
-    cursor,
-    loading,
-    first,
-    from,
-    to,
-    accountIds,
-    categoryIds,
-    merchantIds,
-    personIds,
-    eventIds,
-    search,
-    pendingOnly,
-    owedOnly,
-    toast,
-    t,
-  ])
+  }, [cursor, loading, first, query, toast, t])
 
   return {
     days: pages.flatMap((p) => p.days),

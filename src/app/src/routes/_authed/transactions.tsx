@@ -16,6 +16,7 @@ import { useTransactionPages } from '#/hooks/transactions/use-transaction-pages'
 import { formatDate, formatMonth, todayIso } from '#/lib/shared/format'
 import {
   NO_EVENT,
+  NO_HOLDING,
   PERIOD_UNITS,
   lastThirtyDays,
   monthOf,
@@ -27,6 +28,7 @@ import { useLocale } from '#/hooks/app/use-locale'
 import { useMyCurrencies } from '#/hooks/currencies/use-my-currencies'
 import { listTransactions } from '#/server/transaction-list'
 import { getFeeCategory } from '#/server/transfers'
+import { idFilters } from '#/lib/transactions/transaction-filters'
 import type { FilterValues } from '#/lib/transactions/transaction-filters'
 import type { PeriodChoice } from '#/lib/transactions/transaction-list'
 import { Spinner } from '#/components/feedback/spinner'
@@ -42,17 +44,20 @@ const KEPT = [
   'merchant',
   'person',
   'event',
+  'holding',
   'q',
   'pending',
   'owed',
 ] as const
 
 const ids = z.array(z.uuid()).max(100).optional().catch(undefined)
-const eventChoices = z
-  .array(z.union([z.uuid(), z.literal(NO_EVENT)]))
-  .max(100)
-  .optional()
-  .catch(undefined)
+// Ids, or the one choice of "none" (no event, no holding).
+const orNone = (none: string) =>
+  z
+    .array(z.union([z.uuid(), z.literal(none)]))
+    .max(100)
+    .optional()
+    .catch(undefined)
 
 export const Route = createFileRoute('/_authed/transactions')({
   validateSearch: z.object({
@@ -65,7 +70,8 @@ export const Route = createFileRoute('/_authed/transactions')({
     category: ids,
     merchant: ids,
     person: ids,
-    event: eventChoices,
+    event: orNone(NO_EVENT),
+    holding: orNone(NO_HOLDING),
     q: z.string().max(200).optional().catch(undefined),
     pending: z.boolean().optional().catch(undefined),
     owed: z.boolean().optional().catch(undefined),
@@ -88,11 +94,7 @@ export const Route = createFileRoute('/_authed/transactions')({
       year,
       start,
       end,
-      accountIds: search.account ?? [],
-      categoryIds: search.category ?? [],
-      merchantIds: search.merchant ?? [],
-      personIds: search.person ?? [],
-      eventIds: search.event ?? [],
+      ...idFilters(search),
       search: search.q?.trim() || undefined,
       pendingOnly,
       owedOnly,
@@ -122,7 +124,8 @@ function useEmptyText() {
     deps.categoryIds.length +
     deps.merchantIds.length +
     deps.personIds.length +
-    deps.eventIds.length
+    deps.eventIds.length +
+    deps.holdingIds.length
   if (deps.search || filtered || deps.pendingOnly || deps.owedOnly)
     return t('common.noMatch')
   if (period === 'month')
@@ -185,6 +188,7 @@ function useListNavigation() {
           merchant: f.merchantIds.length ? f.merchantIds : undefined,
           person: f.personIds.length ? f.personIds : undefined,
           event: f.eventIds.length ? f.eventIds : undefined,
+          holding: f.holdingIds.length ? f.holdingIds : undefined,
         }),
       }),
     search: (text: string) =>

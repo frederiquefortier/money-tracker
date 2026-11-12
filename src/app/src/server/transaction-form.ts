@@ -1,6 +1,7 @@
 import type { TransactionFormData } from '#/lib/transactions/transaction'
 import { getCategories } from '#/server/categories'
 import { getEvents } from '#/server/events'
+import { getFormHoldings } from '#/server/holdings'
 import { getMerchants } from '#/server/merchants'
 import { getPeople } from '#/server/people'
 import {
@@ -19,6 +20,7 @@ export async function loadTransactionForm(): Promise<TransactionFormData> {
     people,
     frequentPeople,
     events,
+    holdings,
   ] = await Promise.all([
     getFormAccounts(),
     getCategories(),
@@ -27,6 +29,7 @@ export async function loadTransactionForm(): Promise<TransactionFormData> {
     getPeople(),
     getFrequentPeople(),
     getEvents(),
+    getFormHoldings(),
   ])
   return {
     accounts,
@@ -37,5 +40,6 @@ export async function loadTransactionForm(): Promise<TransactionFormData> {
     frequentPeople,
     events: events.events,
     eventTypes: events.types,
+    holdings,
   }
 }
