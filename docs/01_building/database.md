@@ -66,7 +66,9 @@ Category kind does not constrain transaction kind: a refund is an income on an e
 
 **Merchants.** `merge_merchants(source, target)` moves transactions, aliases and the source's
 name (as an alias) to the target. A name or an alias points to one merchant only (triggers);
-the same rule holds for people. `save_merchant` replaces the alias list.
+the same rule holds for people. `save_merchant` replaces the alias list. View
+`merchant_suggested_category` gives each merchant the category with the most of its
+transactions, the last used on a tie (MER-08); the list offers it when there is no default.
 
 **Transactions.**
 - `occurred_on` is a `date`, with no time, so no time zone can shift it.
@@ -88,7 +90,7 @@ the same rule holds for people. `save_merchant` replaces the alias list.
 - `list_transactions` returns whole days (about 150 rows a page), every amount converted at
   the rate of its date, as text. A transfer is one row without an account filter and one row
   per chosen account's leg with it; the fee rides on the departure row. `total` counts rows
-  before paging. Usage views (`merchant_usage`, `frequent_categories`) count in SQL because
+  before paging. Usage views (`merchant_usage`, `merchant_suggested_category`, `frequent_categories`) count in SQL because
   PostgREST returns at most 1,000 rows.
 - `reimbursements` link an income to `owes` lines of an expense, each taking at most what it
   is owed; written by `save_transaction`, deleted with either side. Views `owed_lines` and

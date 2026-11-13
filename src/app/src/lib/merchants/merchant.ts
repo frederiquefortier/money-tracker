@@ -9,6 +9,8 @@ export type Merchant = {
   id: string
   name: string
   defaultCategoryId: string | null
+  /** MER-08: the category its transactions use most; null when it has none. */
+  suggestedCategoryId: string | null
   aliases: Array<string>
   transactionCount: number
 }

@@ -11,7 +11,10 @@ import type { Merchant } from '#/lib/merchants/merchant'
 import { nameFormSchema } from '#/lib/shared/validation'
 import { saveMerchant } from '#/server/merchants'
 
-/** A new default category applies to new transactions only (MER-01). */
+/**
+ * A new default category applies to new transactions only (MER-01). A merchant with none
+ * opens with the suggested one (MER-08), which Save keeps.
+ */
 export function MerchantForm({
   merchant,
   merchants,
@@ -25,7 +28,7 @@ export function MerchantForm({
 }) {
   const { t } = useTranslation()
   const [categoryId, setCategoryId] = useState(
-    merchant?.defaultCategoryId ?? null,
+    merchant?.defaultCategoryId ?? merchant?.suggestedCategoryId ?? null,
   )
   const [aliases, setAliases] = useState<Array<string>>([
     ...(merchant?.aliases ?? []),

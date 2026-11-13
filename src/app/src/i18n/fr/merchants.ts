@@ -25,6 +25,8 @@ export const merchantsFr = {
     mergeInto: 'Fusionner avec',
     mergeEffect:
       'Les transactions de “{{source}}” passeront à “{{target}}”, puis “{{source}}” sera supprimé.',
+    suggested: 'Suggérée',
+    confirmSuggestion: 'Confirmer “{{category}}” comme catégorie par défaut',
     mergeAlone: 'Il faut au moins un autre magasin.',
   },
 }

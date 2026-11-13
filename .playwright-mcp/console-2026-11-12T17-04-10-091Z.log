@@ -729,3 +729,96 @@
 [14349445ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; 10:03:19 PM [vite] (client) hmr update /src/styles.css?direct (x3) @ http://localhost:3000/src/hooks/app/use-keyboard-focus.ts:257
 [14349445ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; @ http://localhost:3000/src/hooks/app/use-keyboard-focus.ts:257
 [14349446ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; 10:03:19 PM [vite] (client) hmr update /src/styles.css?direct (x4) @ http://localhost:3000/src/hooks/app/use-keyboard-focus.ts:257
+[19508529ms] [ERROR] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; {name: Error, message: aborted, stack: Error: aborted
+    at abortIncoming (node:_http_se…:526:24)
+    at TCP.<anonymous> (node:net:362:12)} @ http://localhost:3000/src/hooks/app/use-keyboard-focus.ts:257
+[22960799ms] [LOG] [vite] server connection lost. Polling for restart... @ http://localhost:3000/src/hooks/app/use-keyboard-focus.ts:191
+[22960866ms] [ERROR] Failed to load resource: net::ERR_NETWORK_IO_SUSPENDED @ http://localhost:3000/__tsd/console-pipe/sse:0
+[22963093ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/node_modules/.vite/deps/react-dom_client.js?v=a64abfc3:15802
+[58363429ms] [LOG] [vite] server connection lost. Polling for restart... @ http://localhost:3000/src/hooks/app/use-keyboard-focus.ts:191
+[58363448ms] [ERROR] Failed to load resource: net::ERR_NETWORK_IO_SUSPENDED @ http://localhost:3000/__tsd/console-pipe/sse:0
+[58367600ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/node_modules/.vite/deps/react-dom_client.js?v=a64abfc3:15802
+[59146411ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; @ http://localhost:3000/src/hooks/app/use-keyboard-focus.ts:257
+[59146411ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; 10:29:56 AM [vite] (client) hmr update /src/styles.css?direct (x5) @ http://localhost:3000/src/hooks/app/use-keyboard-focus.ts:257
+[59151536ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; @ http://localhost:3000/src/hooks/app/use-keyboard-focus.ts:257
+[59151536ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; 10:30:01 AM [vite] (client) hmr update /src/styles.css?direct (x6) @ http://localhost:3000/src/hooks/app/use-keyboard-focus.ts:257
+[59159243ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; @ http://localhost:3000/src/hooks/app/use-keyboard-focus.ts:257
+[59159243ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; 10:30:08 AM [vite] (client) hmr update /src/styles.css?direct, /src/components/transactions/filters/filter-lists.tsx, /src/components/transactions/form/people-screen.tsx, /src/components/events/form/event-fields.tsx, /src/routes/_authed/settings/merchants.tsx?tsr-split=component, /src/components/merchants/merchant-form.tsx, /src/components/merchants/merchant-picker.tsx @ http://localhost:3000/src/hooks/app/use-keyboard-focus.ts:257
+[59159243ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; @ http://localhost:3000/src/hooks/app/use-keyboard-focus.ts:257
+[59159243ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; 10:30:08 AM [vite] (ssr) page reload src/lib/merchants/merchant.ts @ http://localhost:3000/src/hooks/app/use-keyboard-focus.ts:257
+[59159243ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; 10:30:08 AM [vite] (ssr) program reload @ http://localhost:3000/src/hooks/app/use-keyboard-focus.ts:257
+[59159243ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; @ http://localhost:3000/src/hooks/app/use-keyboard-focus.ts:257
+[59159243ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; 10:30:08 AM [vite] (client) hmr update /src/styles.css?direct, /src/components/merchants/merchant-picker.tsx @ http://localhost:3000/src/hooks/app/use-keyboard-focus.ts:257
+[59159244ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; @ http://localhost:3000/src/hooks/app/use-keyboard-focus.ts:257
+[59159244ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; 10:30:08 AM [vite] (ssr) page reload src/components/merchants/merchant-picker.tsx @ http://localhost:3000/src/hooks/app/use-keyboard-focus.ts:257
+[59159244ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; @ http://localhost:3000/src/hooks/app/use-keyboard-focus.ts:257
+[59159244ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; 10:30:08 AM [vite] (client) hmr update /src/styles.css?direct @ http://localhost:3000/src/hooks/app/use-keyboard-focus.ts:257
+[59159244ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; @ http://localhost:3000/src/hooks/app/use-keyboard-focus.ts:257
+[59159244ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; 10:30:08 AM [vite] (client) hmr update /src/styles.css?direct, /src/routes/__root.tsx @ http://localhost:3000/src/hooks/app/use-keyboard-focus.ts:257
+[59159244ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; @ http://localhost:3000/src/hooks/app/use-keyboard-focus.ts:257
+[59159244ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; 10:30:08 AM [vite] (ssr) page reload src/i18n/fr/merchants.ts @ http://localhost:3000/src/hooks/app/use-keyboard-focus.ts:257
+[59159244ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; @ http://localhost:3000/src/hooks/app/use-keyboard-focus.ts:257
+[59159244ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; 10:30:08 AM [vite] (client) hmr update /src/styles.css?direct, /src/routes/__root.tsx @ http://localhost:3000/src/hooks/app/use-keyboard-focus.ts:257
+[59159244ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; @ http://localhost:3000/src/hooks/app/use-keyboard-focus.ts:257
+[59159244ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; 10:30:08 AM [vite] (ssr) page reload src/i18n/en/merchants.ts @ http://localhost:3000/src/hooks/app/use-keyboard-focus.ts:257
+[59159394ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; @ http://localhost:3000/src/hooks/app/use-keyboard-focus.ts:257
+[59159395ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; 10:30:09 AM [vite] (client) hmr update /src/styles.css?direct, /src/routes/_authed/settings/merchants.tsx, /src/routes/_authed/transactions/_form.tsx, /src/components/transactions/filters/filter-sheet.tsx, /src/components/merchants/merchant-actions.tsx, /src/components/merchants/merchant-form.tsx, /src/components/merchants/merchant-picker.tsx @ http://localhost:3000/src/hooks/app/use-keyboard-focus.ts:257
+[59159395ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; @ http://localhost:3000/src/hooks/app/use-keyboard-focus.ts:257
+[59159395ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; 10:30:09 AM [vite] (ssr) page reload src/server/merchants.ts @ http://localhost:3000/src/hooks/app/use-keyboard-focus.ts:257
+[59183378ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; @ http://localhost:3000/src/hooks/app/use-keyboard-focus.ts:257
+[59183378ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; 10:30:31 AM [vite] (client) hmr update /src/styles.css?direct, /src/components/merchants/merchant-row.tsx @ http://localhost:3000/src/hooks/app/use-keyboard-focus.ts:257
+[59183378ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; @ http://localhost:3000/src/hooks/app/use-keyboard-focus.ts:257
+[59183378ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; 10:30:31 AM [vite] (ssr) page reload src/components/merchants/merchant-row.tsx @ http://localhost:3000/src/hooks/app/use-keyboard-focus.ts:257
+[59183885ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; @ http://localhost:3000/src/hooks/app/use-keyboard-focus.ts:257
+[59183887ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; 10:30:33 AM [vite] (client) hmr update /src/styles.css?direct, /src/routes/_authed/settings/merchants.tsx, /src/routes/_authed/settings/merchants.tsx?tsr-split=component @ http://localhost:3000/src/hooks/app/use-keyboard-focus.ts:257
+[59183890ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; @ http://localhost:3000/src/hooks/app/use-keyboard-focus.ts:257
+[59183892ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; 10:30:33 AM [vite] (ssr) page reload src/routes/_authed/settings/merchants.tsx @ http://localhost:3000/src/hooks/app/use-keyboard-focus.ts:257
+[59183892ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; 10:30:33 AM [vite] (ssr) program reload @ http://localhost:3000/src/hooks/app/use-keyboard-focus.ts:257
+[59289977ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; @ http://localhost:3000/src/hooks/app/use-keyboard-focus.ts:257
+[59289977ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; 10:32:19 AM [vite] (client) hmr update /src/styles.css?direct, /src/components/merchants/merchant-row.tsx @ http://localhost:3000/src/hooks/app/use-keyboard-focus.ts:257
+[59289977ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; @ http://localhost:3000/src/hooks/app/use-keyboard-focus.ts:257
+[59289977ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; 10:32:19 AM [vite] (ssr) page reload src/components/merchants/merchant-row.tsx @ http://localhost:3000/src/hooks/app/use-keyboard-focus.ts:257
+[60044233ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; @ http://localhost:3000/src/hooks/app/use-keyboard-focus.ts:257
+[60044233ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; 10:44:54 AM [vite] (client) hmr update /src/styles.css?direct, /src/components/merchants/merchant-actions.tsx @ http://localhost:3000/src/hooks/app/use-keyboard-focus.ts:257
+[60044233ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; @ http://localhost:3000/src/hooks/app/use-keyboard-focus.ts:257
+[60044233ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; 10:44:54 AM [vite] (ssr) page reload src/components/merchants/merchant-actions.tsx @ http://localhost:3000/src/hooks/app/use-keyboard-focus.ts:257
+[60044233ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; @ http://localhost:3000/src/hooks/app/use-keyboard-focus.ts:257
+[60044233ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; 10:44:54 AM [vite] (client) hmr update /src/styles.css?direct, /src/components/merchants/merchant-row.tsx @ http://localhost:3000/src/hooks/app/use-keyboard-focus.ts:257
+[60044234ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; @ http://localhost:3000/src/hooks/app/use-keyboard-focus.ts:257
+[60044234ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; 10:44:54 AM [vite] (ssr) page reload src/components/merchants/merchant-row.tsx @ http://localhost:3000/src/hooks/app/use-keyboard-focus.ts:257
+[60052646ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; @ http://localhost:3000/src/hooks/app/use-keyboard-focus.ts:257
+[60052646ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; 10:45:02 AM [vite] (client) hmr update /src/styles.css?direct, /src/components/merchants/merchant-row.tsx @ http://localhost:3000/src/hooks/app/use-keyboard-focus.ts:257
+[60052646ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; @ http://localhost:3000/src/hooks/app/use-keyboard-focus.ts:257
+[60052646ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; 10:45:02 AM [vite] (ssr) page reload src/components/merchants/merchant-row.tsx @ http://localhost:3000/src/hooks/app/use-keyboard-focus.ts:257
+[60052646ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; @ http://localhost:3000/src/hooks/app/use-keyboard-focus.ts:257
+[60052646ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; 10:45:02 AM [vite] (client) hmr update /src/styles.css?direct, /src/routes/__root.tsx @ http://localhost:3000/src/hooks/app/use-keyboard-focus.ts:257
+[60052646ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; @ http://localhost:3000/src/hooks/app/use-keyboard-focus.ts:257
+[60052646ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; 10:45:02 AM [vite] (ssr) page reload src/i18n/fr/merchants.ts @ http://localhost:3000/src/hooks/app/use-keyboard-focus.ts:257
+[60052646ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; 10:45:02 AM [vite] (ssr) program reload @ http://localhost:3000/src/hooks/app/use-keyboard-focus.ts:257
+[60052646ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; @ http://localhost:3000/src/hooks/app/use-keyboard-focus.ts:257
+[60052647ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; 10:45:02 AM [vite] (client) hmr update /src/styles.css?direct, /src/routes/__root.tsx @ http://localhost:3000/src/hooks/app/use-keyboard-focus.ts:257
+[60052647ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; @ http://localhost:3000/src/hooks/app/use-keyboard-focus.ts:257
+[60052647ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; 10:45:02 AM [vite] (ssr) page reload src/i18n/en/merchants.ts @ http://localhost:3000/src/hooks/app/use-keyboard-focus.ts:257
+[60052647ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; @ http://localhost:3000/src/hooks/app/use-keyboard-focus.ts:257
+[60052647ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; 10:45:02 AM [vite] (client) hmr update /src/styles.css?direct, /src/components/merchants/merchant-form.tsx @ http://localhost:3000/src/hooks/app/use-keyboard-focus.ts:257
+[60052647ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; @ http://localhost:3000/src/hooks/app/use-keyboard-focus.ts:257
+[60052647ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; 10:45:02 AM [vite] (ssr) page reload src/components/merchants/merchant-form.tsx @ http://localhost:3000/src/hooks/app/use-keyboard-focus.ts:257
+[60455760ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; @ http://localhost:3000/src/hooks/app/use-keyboard-focus.ts:257
+[60455761ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; 10:51:45 AM [vite] (client) hmr update /src/styles.css?direct, /src/components/lists/list-row.tsx @ http://localhost:3000/src/hooks/app/use-keyboard-focus.ts:257
+[60455761ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; @ http://localhost:3000/src/hooks/app/use-keyboard-focus.ts:257
+[60455761ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; 10:51:45 AM [vite] (ssr) page reload src/components/lists/list-row.tsx @ http://localhost:3000/src/hooks/app/use-keyboard-focus.ts:257
+[60455761ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; @ http://localhost:3000/src/hooks/app/use-keyboard-focus.ts:257
+[60455761ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; 10:51:45 AM [vite] (client) hmr update /src/styles.css?direct, /src/components/merchants/merchant-row.tsx @ http://localhost:3000/src/hooks/app/use-keyboard-focus.ts:257
+[60455761ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; @ http://localhost:3000/src/hooks/app/use-keyboard-focus.ts:257
+[60455761ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; 10:51:45 AM [vite] (ssr) page reload src/components/merchants/merchant-row.tsx @ http://localhost:3000/src/hooks/app/use-keyboard-focus.ts:257
+[60507721ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; @ http://localhost:3000/src/hooks/app/use-keyboard-focus.ts:257
+[60507721ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; 10:52:37 AM [vite] (client) hmr update /src/styles.css?direct, /src/routes/__root.tsx @ http://localhost:3000/src/hooks/app/use-keyboard-focus.ts:257
+[60507721ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; @ http://localhost:3000/src/hooks/app/use-keyboard-focus.ts:257
+[60507721ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; 10:52:37 AM [vite] (ssr) page reload src/i18n/fr/merchants.ts @ http://localhost:3000/src/hooks/app/use-keyboard-focus.ts:257
+[60507721ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; 10:52:37 AM [vite] (ssr) program reload @ http://localhost:3000/src/hooks/app/use-keyboard-focus.ts:257
+[60507721ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; @ http://localhost:3000/src/hooks/app/use-keyboard-focus.ts:257
+[60507721ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; 10:52:37 AM [vite] (client) hmr update /src/styles.css?direct, /src/routes/__root.tsx @ http://localhost:3000/src/hooks/app/use-keyboard-focus.ts:257
+[60507723ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; @ http://localhost:3000/src/hooks/app/use-keyboard-focus.ts:257
+[60507724ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; 10:52:37 AM [vite] (ssr) page reload src/i18n/en/merchants.ts @ http://localhost:3000/src/hooks/app/use-keyboard-focus.ts:257
+[60596872ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; @ http://localhost:3000/src/hooks/app/use-keyboard-focus.ts:257
+[60596873ms] [LOG] %c[Server]%c color: #9333ea; font-weight: bold; color: inherit; 10:54:06 AM [vite] (client) hmr update /src/styles.css?direct, /src/components/merchants/suggestion-tag.tsx @ http://localhost:3000/src/hooks/app/use-keyboard-focus.ts:257

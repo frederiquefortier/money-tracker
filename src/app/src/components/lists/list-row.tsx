@@ -5,16 +5,19 @@ import { cn } from '#/lib/utils'
 
 /**
  * A list row: the whole row opens `link` (the entity's sheet), and `actions` stays
- * outside the link, on the right.
+ * outside the link, on the right. `trailing` is a control of its own between the two (a
+ * button cannot sit inside the link).
  */
 export function ListRow({
   link,
   actions,
+  trailing,
   alignTop = false,
   children,
 }: {
   link: LinkOptions
   actions: React.ReactNode
+  trailing?: React.ReactNode
   /** Sets the content and the actions level with the first line. */
   alignTop?: boolean
   children: React.ReactNode
@@ -28,6 +31,7 @@ export function ListRow({
       >
         {children}
       </Link>
+      {trailing}
       {actions}
     </li>
   )

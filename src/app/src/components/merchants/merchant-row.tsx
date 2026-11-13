@@ -1,7 +1,9 @@
 import { CategoryBadge } from '#/components/categories/category-badge'
 import { ListRow } from '#/components/lists/list-row'
 import { MerchantActions } from '#/components/merchants/merchant-actions'
+import { SuggestionTag } from '#/components/merchants/suggestion-tag'
 import type { Merchant } from '#/lib/merchants/merchant'
+import { cn } from '#/lib/utils'
 
 /**
  * The default category's icon (MER-01) as tall as the two lines beside it: the name, then
@@ -11,11 +13,15 @@ export function MerchantRow({
   merchant,
   merchants,
   category,
+  suggestion,
 }: {
   merchant: Merchant
   merchants: ReadonlyArray<Merchant>
   category: { path: string; icon: string; color: string } | undefined
+  /** MER-08: shown in place of a default category the merchant does not have. */
+  suggestion: { path: string; icon: string; color: string } | undefined
 }) {
+  const shown = category ?? suggestion
   return (
     <ListRow
       link={{
@@ -23,12 +29,17 @@ export function MerchantRow({
         params: { merchantId: merchant.id },
       }}
       actions={<MerchantActions merchant={merchant} merchants={merchants} />}
+      trailing={
+        !category && suggestion ? (
+          <SuggestionTag merchant={merchant} path={suggestion.path} />
+        ) : undefined
+      }
     >
-      {category ? (
+      {shown ? (
         <CategoryBadge
-          icon={category.icon}
-          color={category.color}
-          className="size-11 [&_svg]:size-6"
+          icon={shown.icon}
+          color={shown.color}
+          className={cn('size-11 [&_svg]:size-6', !category && 'opacity-50')}
         />
       ) : (
         <span
@@ -38,9 +49,14 @@ export function MerchantRow({
       )}
       <span className="flex min-w-0 flex-col">
         <span className="truncate font-semibold">{merchant.name}</span>
-        {category && (
-          <span className="truncate text-sm text-muted-foreground">
-            {category.path}
+        {shown && (
+          <span
+            className={cn(
+              'truncate text-sm text-muted-foreground',
+              !category && 'italic',
+            )}
+          >
+            {shown.path}
           </span>
         )}
       </span>

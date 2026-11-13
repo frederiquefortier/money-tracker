@@ -21,6 +21,7 @@ const merchant = (
   name,
   defaultCategoryId,
   aliases: [],
+  suggestedCategoryId: null,
   transactionCount: 0,
 })
 const merchants = [

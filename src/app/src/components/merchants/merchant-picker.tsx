@@ -34,6 +34,7 @@ export function MerchantPicker({
             name,
             defaultCategoryId: null,
             aliases: [],
+            suggestedCategoryId: null,
             transactionCount: 0,
           }
         : null

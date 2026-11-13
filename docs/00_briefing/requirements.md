@@ -100,6 +100,7 @@ English; this file is in English like every other meta-doc.
 | MER-03 | A merchant has a country of origin. | v1 | later |
 | MER-04 | For one merchant, see how the bill has changed over time, in percent. | v1, ai | 4 |
 | MER-06 | The merchant list sorts by name (A–Z, Z–A) or by category, kept per browser, and filters by default category (a parent keeps its branch) or none. | author | 1 |
+| MER-08 | On the merchants list, a merchant with no default category shows the category its own transactions use most (ties go to the one used last) in a faded badge and italic path, with a "Suggérée" tag and a sparkle, the mark the app uses for what it did by itself (as for an event link made by the rule). Clicking the tag makes the suggestion the default category. The merchant's sheet also opens with it filled in. Built 2026-11-13. | author | 1 |
 | MER-05 | Merge two merchants: the transactions of one move to the other, which keeps its name and default category; the source's name becomes an alias (MER-02). | author | 1 |
 
 ## 7. Tags (`TAG`)

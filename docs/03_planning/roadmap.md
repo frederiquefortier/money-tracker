@@ -25,7 +25,7 @@ Deployed; sign-in, MFA, invitations, reset and FR/EN work. Backups run nightly a
 - [x] Currencies, HexaRate validation, rates job with backfill to 2018, converted-amount markers. CUR-01..09 (ADR-009).
 - [x] Institutions and accounts. ACC-01..07.
 - [x] Categories with archive history, icons, sort, search. CAT-01..07, 09, 10.
-- [x] Merchants with default category and merging. MER-01, 05.
+- [x] Merchants with default category and merging. MER-01, 05, 08.
 - [x] Transactions: expense, income, adjustment, transfer with fee across currencies, splits, status, notes. TRX-01..06, 09..11.
 - [x] The list over a chosen period with search and filters. TRX-12..14.
 - [x] Gate before retiring the spreadsheet: backup workflow, tested restore, offline copy, private key in the password manager and on paper (met 2026-11-02, security.md).

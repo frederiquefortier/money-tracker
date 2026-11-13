@@ -27,6 +27,8 @@ export const merchantsEn: typeof merchantsFr = {
     mergeInto: 'Merge into',
     mergeEffect:
       'The transactions of “{{source}}” will move to “{{target}}”, then “{{source}}” will be deleted.',
+    suggested: 'Suggested',
+    confirmSuggestion: 'Confirm “{{category}}” as the default category',
     mergeAlone: 'You need at least one other merchant.',
   },
 }

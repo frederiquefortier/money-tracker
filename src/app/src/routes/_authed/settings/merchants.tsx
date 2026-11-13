@@ -129,6 +129,11 @@ function MerchantList({
               ? tree.rows.get(merchant.defaultCategoryId)
               : undefined
           }
+          suggestion={
+            merchant.suggestedCategoryId
+              ? tree.rows.get(merchant.suggestedCategoryId)
+              : undefined
+          }
         />
       ))}
     </ListCard>

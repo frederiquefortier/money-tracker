@@ -1399,6 +1399,13 @@ export type Database = {
         }
         Relationships: []
       }
+      merchant_suggested_category: {
+        Row: {
+          category_id: string | null
+          merchant_id: string | null
+        }
+        Relationships: []
+      }
       merchant_usage: {
         Row: {
           merchant_id: string | null

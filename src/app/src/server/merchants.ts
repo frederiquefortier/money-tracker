@@ -24,7 +24,7 @@ const failure = failureFor('merchants', KNOWN)
 export const getMerchants = createServerFn({ method: 'GET' }).handler(
   async (): Promise<Array<Merchant>> => {
     const supabase = getSupabase()
-    const [merchants, aliases, usage] = loaded(
+    const [merchants, aliases, usage, suggested] = loaded(
       'Merchants',
       ...(await Promise.all([
         supabase.from('merchants').select('id, name, default_category_id'),
@@ -32,15 +32,22 @@ export const getMerchants = createServerFn({ method: 'GET' }).handler(
         supabase
           .from('merchant_usage')
           .select('merchant_id, transaction_count'),
+        supabase
+          .from('merchant_suggested_category')
+          .select('merchant_id, category_id'),
       ])),
     )
     const counts = new Map(
       usage.map((u) => [u.merchant_id, u.transaction_count ?? 0]),
     )
+    const suggestions = new Map(
+      suggested.map((s) => [s.merchant_id, s.category_id]),
+    )
     return merchants.map((m) => ({
       id: m.id,
       name: m.name,
       defaultCategoryId: m.default_category_id,
+      suggestedCategoryId: suggestions.get(m.id) ?? null,
       aliases: aliases
         .filter((a) => a.merchant_id === m.id)
         .map((a) => a.alias),
