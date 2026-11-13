@@ -45,7 +45,7 @@ const isNecessity = isOneOf(NECESSITIES)
 export const getCategories = createServerFn({ method: 'GET' }).handler(
   async (): Promise<Array<Category>> => {
     const supabase = getSupabase()
-    const [results, feeId] = await Promise.all([
+    const [results, feeId, used] = await Promise.all([
       Promise.all([
         supabase
           .from('categories')
@@ -62,19 +62,9 @@ export const getCategories = createServerFn({ method: 'GET' }).handler(
           .select('category_id, active_from, active_to'),
       ]),
       loadFeeCategoryId(),
+      inUseIds('used_category_ids'),
     ])
     const [categories, events, periods] = loaded('Categories', ...results)
-    // A category with sub-categories is already blocked, so only the others are probed.
-    const parents = new Set(categories.map((c) => c.parent_id))
-    const used = await inUseIds(
-      categories.filter((c) => !parents.has(c.id)).map((c) => c.id),
-      (id) =>
-        supabase
-          .from('transaction_splits')
-          .select('id')
-          .eq('category_id', id)
-          .limit(1),
-    )
 
     const history = new Map<string, Array<CategoryEvent>>()
     for (const e of events) {

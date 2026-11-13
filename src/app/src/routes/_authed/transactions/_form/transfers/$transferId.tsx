@@ -7,6 +7,7 @@ import { draftFromTransfer } from '#/lib/transfers/transfer-draft'
 import { useTransactionFormData } from '#/hooks/app/use-page-data'
 import { useLocale } from '#/hooks/app/use-locale'
 import { getTransfer, getTransferFeeCategory } from '#/server/transfers'
+import { SHEET_PENDING } from '#/components/sheet/pending-sheet'
 
 export const Route = createFileRoute(
   '/_authed/transactions/_form/transfers/$transferId',
@@ -19,6 +20,7 @@ export const Route = createFileRoute(
     return { transfer, feeCategoryId }
   },
   staticData: { sheet: true },
+  ...SHEET_PENDING,
   component: EditTransfer,
 })
 

@@ -13,6 +13,7 @@ import { pageColumn } from '#/components/styles'
 import { ListHeader } from '#/components/transactions/list/list-header'
 import { TransactionDayGroup } from '#/components/transactions/list/transaction-day'
 import { useTransactionPages } from '#/hooks/transactions/use-transaction-pages'
+import { usePreloadForm } from '#/hooks/transactions/use-preload-form'
 import { formatDate, formatMonth, todayIso } from '#/lib/shared/format'
 import {
   NO_EVENT,
@@ -202,6 +203,7 @@ function Transactions() {
   const { displayCurrency } = useMyCurrencies()
   const go = useListNavigation()
   const switching = useRouterState({ select: (s) => s.isLoading })
+  usePreloadForm()
   const { days, more, loading, sentinel } = useTransactionPages(data, deps)
   const [text, setText] = useSearchText(deps.search ?? '', go.search)
   const empty = useEmptyText()

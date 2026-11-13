@@ -87,16 +87,15 @@ export const deleteTransfer = createServerFn({ method: 'POST' })
 /** The fee category's name and look, for the fee lines of the list. */
 export const getFeeCategory = createServerFn({ method: 'GET' }).handler(
   async (): Promise<ListedCategory | null> => {
-    const feeId = await loadFeeCategoryId()
-    if (!feeId) return null
-    const [category] = loaded(
+    const [profile] = loaded(
       'Fee category',
       await getSupabase()
-        .from('categories')
-        .select('name, icon, color')
-        .eq('id', feeId)
-        .maybeSingle(),
+        .from('profiles')
+        .select(
+          'fee:categories!profiles_user_id_transfer_fee_category_id_fkey(name, icon, color)',
+        )
+        .single(),
     )
-    return category
+    return profile.fee
   },
 )

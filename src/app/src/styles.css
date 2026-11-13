@@ -256,12 +256,14 @@
 @layer components {
   .sheet-overlay[data-state='open'] {
     animation: sheet-fade-in 200ms ease-out;
+    animation-delay: var(--sheet-enter-delay, 0ms);
   }
   .sheet-overlay[data-state='closed'] {
     animation: sheet-fade-out 200ms ease-in;
   }
   .sheet-panel[data-state='open'] {
     animation: sheet-in-right 300ms cubic-bezier(0.32, 0.72, 0, 1);
+    animation-delay: var(--sheet-enter-delay, 0ms);
   }
   .sheet-panel[data-state='closed'] {
     animation: sheet-out-right 200ms ease-in;

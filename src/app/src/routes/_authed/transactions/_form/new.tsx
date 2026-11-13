@@ -17,12 +17,14 @@ import { useTransactionFormData } from '#/hooks/app/use-page-data'
 import { useStoredState } from '#/hooks/app/use-stored-state'
 import { getTransferFeeCategory } from '#/server/transfers'
 import type { TransactionDraft } from '#/lib/transactions/transaction-draft-types'
+import { SHEET_PENDING } from '#/components/sheet/pending-sheet'
 
 export const Route = createFileRoute('/_authed/transactions/_form/new')({
   loader: async () => {
     return { feeCategoryId: await getTransferFeeCategory() }
   },
   staticData: { sheet: true },
+  ...SHEET_PENDING,
   component: NewTransaction,
 })
 

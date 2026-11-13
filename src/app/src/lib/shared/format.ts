@@ -1,12 +1,37 @@
 import { FORMAT_LOCALE } from '#/i18n/locales'
 import type { Locale } from '#/i18n/locales'
 
+// A list formats several amounts and dates per row; building an Intl formatter is the
+// slow part, so each locale and options pair is built once.
+const numberFormats = new Map<string, Intl.NumberFormat>()
+const dateFormats = new Map<string, Intl.DateTimeFormat>()
+
+function numberFormat(locale: Locale, options: Intl.NumberFormatOptions = {}) {
+  const key = locale + JSON.stringify(options)
+  let format = numberFormats.get(key)
+  if (!format) {
+    format = new Intl.NumberFormat(FORMAT_LOCALE[locale], options)
+    numberFormats.set(key, format)
+  }
+  return format
+}
+
+function dateFormat(locale: Locale, options: Intl.DateTimeFormatOptions) {
+  const key = locale + JSON.stringify(options)
+  let format = dateFormats.get(key)
+  if (!format) {
+    format = new Intl.DateTimeFormat(FORMAT_LOCALE[locale], options)
+    dateFormats.set(key, format)
+  }
+  return format
+}
+
 export function moneyFormat(
   currency: string,
   locale: Locale,
   signDisplay: 'auto' | 'exceptZero' = 'auto',
 ) {
-  return new Intl.NumberFormat(FORMAT_LOCALE[locale], {
+  return numberFormat(locale, {
     style: 'currency',
     currency,
     signDisplay,
@@ -25,7 +50,7 @@ export function formatMoney(
 }
 
 export function percentFormat(locale: Locale, maximumFractionDigits: number) {
-  return new Intl.NumberFormat(FORMAT_LOCALE[locale], {
+  return numberFormat(locale, {
     style: 'percent',
     maximumFractionDigits,
   })
@@ -33,14 +58,14 @@ export function percentFormat(locale: Locale, maximumFractionDigits: number) {
 
 /** An exchange rate, a decimal string, to four decimals. */
 export function formatRate(rate: string, locale: Locale): string {
-  return new Intl.NumberFormat(FORMAT_LOCALE[locale], {
+  return numberFormat(locale, {
     maximumFractionDigits: 4,
   }).format(rate as Intl.StringNumericLiteral)
 }
 
 /** A moment (a timestamp), shown as the date it fell on in the browser's time zone. */
 export function formatInstant(timestamp: string, locale: Locale): string {
-  return new Intl.DateTimeFormat(FORMAT_LOCALE[locale], {
+  return dateFormat(locale, {
     dateStyle: 'medium',
   }).format(new Date(timestamp))
 }
@@ -64,7 +89,7 @@ export function formatDate(
   locale: Locale,
   style: 'long' | 'medium' | 'short' = 'long',
 ): string {
-  return new Intl.DateTimeFormat(FORMAT_LOCALE[locale], {
+  return dateFormat(locale, {
     dateStyle: style,
     timeZone: 'UTC',
   }).format(utcDate(isoDate))
@@ -72,7 +97,7 @@ export function formatDate(
 
 /** "lundi 3 novembre 2026", a day header in the list; a period can span years. */
 export function formatDay(isoDate: string, locale: Locale): string {
-  return new Intl.DateTimeFormat(FORMAT_LOCALE[locale], {
+  return dateFormat(locale, {
     weekday: 'long',
     day: 'numeric',
     month: 'long',
@@ -87,7 +112,7 @@ export function formatMonth(
   locale: Locale,
   style: 'long' | 'short' = 'long',
 ): string {
-  return new Intl.DateTimeFormat(FORMAT_LOCALE[locale], {
+  return dateFormat(locale, {
     month: style,
     year: style === 'long' ? 'numeric' : undefined,
     timeZone: 'UTC',
@@ -109,5 +134,5 @@ export function formatQuotedList(
 }
 
 export function formatCount(count: number, locale: Locale): string {
-  return new Intl.NumberFormat(FORMAT_LOCALE[locale]).format(count)
+  return numberFormat(locale).format(count)
 }

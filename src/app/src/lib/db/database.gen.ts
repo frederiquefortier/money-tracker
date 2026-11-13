@@ -1533,6 +1533,7 @@ export type Database = {
         Returns: string
       }
       fold_name: { Args: { name: string }; Returns: string }
+      holdings_with_history: { Args: never; Returns: string[] }
       import_batch: {
         Args: { dry_run?: boolean; payload: Json }
         Returns: Json
@@ -1711,6 +1712,8 @@ export type Database = {
         Returns: undefined
       }
       split_category_path: { Args: { path: string }; Returns: string[] }
+      used_account_ids: { Args: never; Returns: string[] }
+      used_category_ids: { Args: never; Returns: string[] }
     }
     Enums: {
       [_ in never]: never

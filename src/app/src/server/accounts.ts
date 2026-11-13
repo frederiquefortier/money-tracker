@@ -74,7 +74,7 @@ async function getInstitutions(): Promise<Array<Institution>> {
 export const getAccounts = createServerFn({ method: 'GET' }).handler(
   async (): Promise<AccountsPage> => {
     const supabase = getSupabase()
-    const [results, institutions, types] = await Promise.all([
+    const [results, institutions, types, used] = await Promise.all([
       Promise.all([
         supabase.from('accounts').select(ACCOUNT_COLUMNS),
         supabase
@@ -88,17 +88,9 @@ export const getAccounts = createServerFn({ method: 'GET' }).handler(
       ]),
       getInstitutions(),
       getTypes(),
+      inUseIds('used_account_ids'),
     ])
     const [accounts, balances, totals] = loaded('Accounts', ...results)
-    const used = await inUseIds(
-      accounts.map((a) => a.id),
-      (id) =>
-        supabase
-          .from('transactions')
-          .select('id')
-          .eq('account_id', id)
-          .limit(1),
-    )
 
     const byAccount = new Map(balances.map((b) => [b.account_id, b]))
     return {

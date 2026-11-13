@@ -7,11 +7,16 @@ import type {
   HoldingError,
   HoldingsPage,
 } from '#/lib/holdings/holding'
-import { deleteRow, loaded, saveRow, updateRow } from '#/lib/server/db.server'
+import {
+  deleteRow,
+  inUseIds,
+  loaded,
+  saveRow,
+  updateRow,
+} from '#/lib/server/db.server'
 import {
   HOLDING_COLUMNS,
   TOTALS_COLUMNS,
-  historyIds,
   holdingFailure as failure,
   loadHoldingTypes,
   toHolding,
@@ -26,18 +31,29 @@ type HoldingResult<T = object> = Result<HoldingError, T>
 export const getHoldings = createServerFn({ method: 'GET' }).handler(
   async (): Promise<HoldingsPage> => {
     const supabase = getSupabase()
-    const [results, types, institutions, investments] = await Promise.all([
-      Promise.all([
-        supabase.from('holdings').select(HOLDING_COLUMNS),
-        supabase.from('holding_totals').select(TOTALS_COLUMNS),
-      ]),
-      loadHoldingTypes(),
-      supabase
-        .from('institutions')
-        .select('id, name, website_url')
-        .order('name'),
-      supabase.from('categories').select('id').eq('kind', 'investment'),
-    ])
+    const [results, types, institutions, investments, used, unlinked] =
+      await Promise.all([
+        Promise.all([
+          supabase.from('holdings').select(HOLDING_COLUMNS),
+          supabase.from('holding_totals').select(TOTALS_COLUMNS),
+        ]),
+        loadHoldingTypes(),
+        supabase
+          .from('institutions')
+          .select('id, name, website_url')
+          .order('name'),
+        supabase.from('categories').select('id').eq('kind', 'investment'),
+        inUseIds('holdings_with_history'),
+        supabase
+          .from('transactions')
+          .select('id, transaction_splits!inner(categories!inner(kind))', {
+            count: 'exact',
+            head: true,
+          })
+          .is('holding_id', null)
+          .in('kind', ['expense', 'income'])
+          .eq('transaction_splits.categories.kind', 'investment'),
+      ])
     const [rows, totals] = loaded('Holdings', ...results)
     const [institutionRows, investmentRows] = loaded(
       'Institutions',
@@ -45,16 +61,6 @@ export const getHoldings = createServerFn({ method: 'GET' }).handler(
       investments,
     )
 
-    const used = await historyIds(rows.map((r) => r.id))
-    const unlinked = await supabase
-      .from('transactions')
-      .select('id, transaction_splits!inner(categories!inner(kind))', {
-        count: 'exact',
-        head: true,
-      })
-      .is('holding_id', null)
-      .in('kind', ['expense', 'income'])
-      .eq('transaction_splits.categories.kind', 'investment')
     if (unlinked.error)
       throw new Error(
         `Unlinked investments could not be counted (${unlinked.error.code})`,
@@ -116,7 +122,7 @@ export const getHolding = createServerFn({ method: 'GET' })
           .or(`from_holding_id.eq.${data.id},to_holding_id.eq.${data.id}`)
           .order('on_date', { ascending: false }),
         loadHoldingTypes(),
-        historyIds([data.id]),
+        inUseIds('holdings_with_history'),
       ])
     const failed = [row, totals, snapshots, contributions, transfers].find(
       (r) => r.error,
@@ -218,7 +224,7 @@ export const reopenHolding = createServerFn({ method: 'POST' })
 export const deleteHolding = createServerFn({ method: 'POST' })
   .validator(idInput)
   .handler(async ({ data }): Promise<HoldingResult> => {
-    if ((await historyIds([data.id])).has(data.id))
+    if ((await inUseIds('holdings_with_history')).has(data.id))
       return { ok: false, error: 'inUse' }
     const error = await deleteRow('holdings', data.id)
     return error ? failure('delete', error) : { ok: true }

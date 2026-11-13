@@ -6,7 +6,7 @@ import type {
   HoldingKind,
   HoldingType,
 } from '#/lib/holdings/holding'
-import { inUseIds, loaded } from '#/lib/server/db.server'
+import { loaded } from '#/lib/server/db.server'
 import { isOneOf } from '#/lib/shared/collections'
 import { failureFor } from '#/lib/shared/result'
 import { getSupabase } from '#/lib/server/supabase.server'
@@ -126,38 +126,4 @@ function figuresOf(totals: TotalsRow | undefined) {
     profit: totals?.profit ?? null,
     profitPercent: totals?.profit_percent ?? null,
   }
-}
-
-/** The holdings with a history, which can only be archived: a transaction, a value, a contribution or a transfer. */
-export async function historyIds(
-  ids: ReadonlyArray<string>,
-): Promise<Set<string>> {
-  const supabase = getSupabase()
-  const found = await Promise.all([
-    inUseIds(ids, (id) =>
-      supabase.from('transactions').select('id').eq('holding_id', id).limit(1),
-    ),
-    inUseIds(ids, (id) =>
-      supabase
-        .from('holding_snapshots')
-        .select('id')
-        .eq('holding_id', id)
-        .limit(1),
-    ),
-    inUseIds(ids, (id) =>
-      supabase
-        .from('holding_contributions')
-        .select('id')
-        .eq('holding_id', id)
-        .limit(1),
-    ),
-    inUseIds(ids, (id) =>
-      supabase
-        .from('holding_transfers')
-        .select('id')
-        .or(`from_holding_id.eq.${id},to_holding_id.eq.${id}`)
-        .limit(1),
-    ),
-  ])
-  return new Set(found.flatMap((set) => [...set]))
 }

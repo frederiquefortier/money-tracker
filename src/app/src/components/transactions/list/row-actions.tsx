@@ -7,10 +7,13 @@ import type { ListedTransaction } from '#/lib/transactions/transaction-list'
 
 // What a list row opens and deletes, by kind.
 
+const PRELOAD_DELAY_MS = 100
+
 /**
  * Where a tap goes: the transaction's form, the transfer's for a leg or its fee, or the
- * adjustment's. Not preloaded on hover: each sheet loads the data of every picker, and
- * sweeping the mouse down a list started one such load per row.
+ * adjustment's. Preloaded once the pointer rests on a row (or a finger touches it): the
+ * pickers' data is shared by every sheet (the _form route), so a row only costs its own
+ * entry, and the short delay keeps a sweep down the list from loading each row.
  */
 export function RowLink({
   row,
@@ -24,7 +27,7 @@ export function RowLink({
   if (row.transferId)
     return (
       <Link
-        preload={false}
+        preloadDelay={PRELOAD_DELAY_MS}
         to="/transactions/transfers/$transferId"
         params={{ transferId: row.transferId }}
         className={className}
@@ -35,7 +38,7 @@ export function RowLink({
   if (row.kind === 'adjustment')
     return (
       <Link
-        preload={false}
+        preloadDelay={PRELOAD_DELAY_MS}
         to="/transactions/adjustments/$adjustmentId"
         params={{ adjustmentId: row.id }}
         className={className}
@@ -45,7 +48,7 @@ export function RowLink({
     )
   return (
     <Link
-      preload={false}
+      preloadDelay={PRELOAD_DELAY_MS}
       to="/transactions/$transactionId"
       params={{ transactionId: row.id }}
       className={className}

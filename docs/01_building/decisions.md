@@ -4,6 +4,35 @@ Technical and structural choices, with the alternatives that were rejected. Chec
 
 <!-- Newest first: a new ADR goes directly below this line. Template at the bottom. -->
 
+### ADR-053: Fewer round trips per page (2026-11-13)
+
+**Context:**
+- Every page and every save felt slow, locally and on Netlify. Each server function call is its own request from the browser to Ohio, then to Supabase in Montreal (ADR-016), so the time went into hops and one slow function, not into the data.
+- The root's `beforeLoad` asked `getSession` before every page and every `router.invalidate`, and every loader waited on it.
+- Pages that offer a delete asked PostgREST once per row whether something pointed at it: about 100 requests for the categories (also on the transaction form, the merchants page and the filter panel), one per account, four per holding.
+- `list_transactions` took about 470 ms a page in the database, 50 ms when its body ran as a plain query.
+
+**Decision:**
+- The browser keeps an `aal2` session for 5 minutes (`keptSession` in `lib/auth/session.ts`); sign-out and a language change forget it. Sign-in, MFA and password screens always ask the server.
+- `defaultStaleTime: 30_000` on the router: a page seen in the last 30 s shows again without loading. Every save still calls `router.invalidate`.
+- `used_category_ids`, `used_account_ids` and `holdings_with_history` answer "in use" in one query each (`inUseIds` in `db.server.ts`).
+- `list_transactions` is plpgsql with `plan_cache_mode = force_custom_plan`, same body and result.
+- Smaller: `getHoldings` runs its queries in one batch, `getFeeCategory` is one query, Intl formatters are cached, a day of the list is memoized.
+- A sheet route with a loader opens at the tap: `SHEET_PENDING` (`components/sheet/pending-sheet.tsx`) shows a loading sheet with no delay, and the real sheet takes over part way through the same slide (a negative `animation-delay`). Before, nothing moved until every loader answered. `getTransaction` reads its reimbursements in the same query.
+- Measured in the browser (production build, laptop to Montreal), opening a transaction still froze the page for about a second: `useLocale` read the whole root context, a new object at each navigation, so every amount of the list re-rendered. It now selects the locale string. Days of the list have `content-visibility: auto`, so the style and layout work of a sheet skips the days off screen.
+- Rows preload their sheet again, after 100 ms on a row (`preloadDelay`); a fast sweep over 20 rows sent no request. The list preloads `/transactions/new` once shown (`usePreloadForm`), so the first sheet does not wait on the pickers' 8 calls.
+
+**Alternatives Considered:**
+- Merging the transaction form's 8 calls into one server function -> Proposed by the assistant; the author chose to fix the per-row queries first and measure, since parallel calls only save function starts.
+- Scoping `router.invalidate` to the page -> Little left to save once the session is kept.
+- Keeping the form's picker data across saves -> Not needed: the router reloads data it already has in the background (`staleReloadMode` default), so only the first opening waits on it.
+- Leaving row preloading off -> Its reason (each hover loaded every picker) went away with the shared `_form` route; a row now preloads one call.
+- Moving Netlify functions out of Ohio -> A plan decision (ADR-016's trigger), left for the measured numbers.
+
+**Consequences:**
+- A session revoked elsewhere keeps the screens for up to 5 minutes, with no data (RLS).
+- The first call of `list_transactions` on a new database connection still costs about 0.9 s (plpgsql compile and caches).
+
 ### ADR-052: An invited person carries no amount of their own (2026-11-12)
 
 **Context:**

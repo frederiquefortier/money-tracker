@@ -4,6 +4,24 @@ Document new concepts, techniques, and knowledge gained. Reference this file to 
 
 <!-- Newest first: a new entry goes directly below this line. Template at the bottom. -->
 
+### 2026-11-13 - A sql function with set search_path is planned blind
+
+**What Was New:**
+- A `language sql` function with a `set` clause (such as `set search_path = ''`) is never inlined. Its body is planned with every argument unknown, so `coalesce(cardinality($1), 0) = 0 or ...` branches for unused filters stay in the plan. `list_transactions` ran in 450 ms as a function and 80 ms as the same query with literal values.
+- plpgsql with `set plan_cache_mode = force_custom_plan` plans each call with its real arguments (about 30 ms of planning). `#variable_conflict use_column` keeps `returns table` column names from clashing with the query's columns.
+- From the browser, each server function call is its own HTTP request (and Netlify function run). A server function called from another one on the server is a plain call.
+- TanStack Router blocks a navigation only on a loader with no data yet. Data that is stale or invalidated, but loaded, reloads in the background. A new param (a transaction never opened) always blocks, and with no `pendingComponent` the screen shows nothing new until it answers.
+
+- A router hook without `select` (`useRouteContext`, `useRouterState`) re-renders its component whenever what it returns changes identity. The root context is a new object at each navigation, so a hook used by every row re-rendered the whole list; selecting a string stops it.
+- `content-visibility: auto` with `contain-intrinsic-size: auto <height>` lets the browser skip style and layout for sections off screen. On a list of 150 rows it halved the work of opening a sheet.
+
+**Key Points:**
+- Time a function against its inlined body before rewriting the query: the gap is the planner, not the SQL.
+- In the browser, a long task after the click (PerformanceObserver `longtask`) and a CPU profile per component find what a network panel cannot. Measure a production build: dev React and the devtools add hundreds of milliseconds.
+
+**Applied In:**
+- ADR-053, migration `20261113130000_list_transactions_custom_plan.sql`.
+
 ### 2026-11-12 - pg_safeupdate and execute rights on what a trigger calls
 
 **What Was New:**

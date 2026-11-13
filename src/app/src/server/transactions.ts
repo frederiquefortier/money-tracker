@@ -90,27 +90,6 @@ export const getFrequentPeople = createServerFn({ method: 'GET' }).handler(
   },
 )
 
-/** What came back for each of these owed lines, with the reimbursing income's date. */
-async function reimbursedLines(lineIds: ReadonlyArray<string>) {
-  const back = new Map<string, Array<{ amount: string; date: string }>>()
-  if (lineIds.length === 0) return back
-  const [rows] = loaded(
-    'Reimbursements',
-    await getSupabase()
-      .from('reimbursements')
-      .select(
-        'owed_line_id, amount::text, transactions!reimbursements_user_id_income_id_fkey(occurred_on)',
-      )
-      .in('owed_line_id', [...lineIds]),
-  )
-  for (const r of rows)
-    back.set(r.owed_line_id, [
-      ...(back.get(r.owed_line_id) ?? []),
-      { amount: r.amount, date: r.transactions.occurred_on },
-    ])
-  return back
-}
-
 /** An expense or income with its splits; null for anything else, such as a transfer. */
 export const getTransaction = createServerFn({ method: 'GET' })
   .validator(idInput)
@@ -118,7 +97,7 @@ export const getTransaction = createServerFn({ method: 'GET' })
     const { data: row, error } = await getSupabase()
       .from('transactions')
       .select(
-        'id, account_id, kind, occurred_on, amount::text, original_amount::text, original_currency, status, merchant_id, seller_person_id, holding_id, note, transfer_id, event_id, event_source, transaction_splits(category_id, input_mode, input_value::text, amount::text), transaction_people(id, position, role, person_id, head_count, input_mode, input_value::text, amount_unknown, fills_rest), reimbursements!reimbursements_user_id_income_id_fkey(owed_line_id)',
+        'id, account_id, kind, occurred_on, amount::text, original_amount::text, original_currency, status, merchant_id, seller_person_id, holding_id, note, transfer_id, event_id, event_source, transaction_splits(category_id, input_mode, input_value::text, amount::text), transaction_people(id, position, role, person_id, head_count, input_mode, input_value::text, amount_unknown, fills_rest, back:reimbursements!reimbursements_user_id_owed_line_id_fkey(amount::text, income:transactions!reimbursements_user_id_income_id_fkey(occurred_on))), reimbursements!reimbursements_user_id_income_id_fkey(owed_line_id)',
       )
       .eq('id', data.id)
       .maybeSingle()
@@ -131,7 +110,6 @@ export const getTransaction = createServerFn({ method: 'GET' })
       (a, b) => a.position - b.position,
     )
     const peopleMode = people[0]?.input_mode ?? 'share'
-    const back = await reimbursedLines(people.map((p) => p.id))
     return {
       id: row.id,
       accountId: row.account_id,
@@ -163,7 +141,10 @@ export const getTransaction = createServerFn({ method: 'GET' })
                 value: p.input_value,
                 amountUnknown: p.amount_unknown,
                 fillsRest: p.fills_rest,
-                back: back.get(p.id) ?? [],
+                back: p.back.map((r) => ({
+                  amount: r.amount,
+                  date: r.income.occurred_on,
+                })),
               },
             ]
           : [],

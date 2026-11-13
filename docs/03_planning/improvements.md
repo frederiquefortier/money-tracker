@@ -4,6 +4,33 @@ Ideas not built and not decided against. Review during planning to pick the next
 
 <!-- Newest first: a new idea goes directly below this line. Template at the bottom. -->
 
+### 2026-11-13 - Speed: what is left after ADR-053
+
+**Description:**
+- Things that could still make the app faster, measured or seen during the speed work of 2026-11-13.
+
+**Motivation:**
+- The transactions list grows by 150 rows a page with no virtualization; search over all rows takes about 250 ms in the database; Netlify functions run in Ohio.
+
+**Potential Approach:**
+- Virtualize the transactions list if scrolling lags after many pages.
+- Measure a page from Switzerland and Canada, then decide on a Netlify region (ADR-016's trigger).
+- Merge the transaction form's 8 calls, or load each picker on open, if opening a transaction stays slow.
+
+**Priority:**
+- [ ] High - Critical improvement
+- [x] Medium - Nice to have
+- [ ] Low - Future consideration
+
+**Dependencies:**
+- Timings in the deployed app.
+
+**Status:**
+- [x] Proposed
+- [ ] In Progress
+- [ ] Completed
+- [ ] Deferred
+
 ### 2026-11-12 - Import: invited people with no part
 
 **Description:**

@@ -5,6 +5,7 @@ import type { Locale } from '#/i18n/locales'
 import { useLocale } from '#/hooks/app/use-locale'
 import { cn } from '#/lib/utils'
 import { setLocale } from '#/server/session'
+import { forgetSession } from '#/lib/auth/session'
 import { focusRing } from '#/components/styles'
 
 // Each language named in itself.
@@ -19,7 +20,12 @@ export function LocaleSwitcher() {
   const { run } = useServerAction()
 
   function change(locale: Locale) {
-    if (locale !== current) run(() => setLocale({ data: { locale } }))
+    if (locale === current) return
+    run(async () => {
+      const result = await setLocale({ data: { locale } })
+      forgetSession()
+      return result
+    })
   }
 
   return (

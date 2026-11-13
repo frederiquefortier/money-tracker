@@ -9,6 +9,7 @@ import { amountForInput } from '#/lib/shared/money'
 import { useLocale } from '#/hooks/app/use-locale'
 import { getAdjustment, getAdjustmentBalance } from '#/server/adjustments'
 import { getFormAccounts } from '#/server/transactions'
+import { SHEET_PENDING } from '#/components/sheet/pending-sheet'
 
 export const Route = createFileRoute(
   '/_authed/transactions/adjustments/$adjustmentId',
@@ -30,6 +31,7 @@ export const Route = createFileRoute(
     return { accounts, adjustment, base }
   },
   staticData: { sheet: true },
+  ...SHEET_PENDING,
   component: EditAdjustment,
 })
 

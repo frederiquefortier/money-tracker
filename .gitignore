@@ -27,6 +27,8 @@ coverage/
 src/app/e2e/.auth/
 src/app/playwright-report/
 src/app/test-results/
+# Playwright MCP snapshots and console logs: page text, so real data
+.playwright-mcp/
 
 # Netlify
 .netlify/

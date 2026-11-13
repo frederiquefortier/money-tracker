@@ -7,6 +7,7 @@ import { draftFromTransaction } from '#/lib/transactions/transaction-draft'
 import { useTransactionFormData } from '#/hooks/app/use-page-data'
 import { useLocale } from '#/hooks/app/use-locale'
 import { getTransaction } from '#/server/transactions'
+import { SHEET_PENDING } from '#/components/sheet/pending-sheet'
 
 export const Route = createFileRoute(
   '/_authed/transactions/_form/$transactionId',
@@ -17,6 +18,7 @@ export const Route = createFileRoute(
     }
   },
   staticData: { sheet: true },
+  ...SHEET_PENDING,
   component: EditTransaction,
 })
 

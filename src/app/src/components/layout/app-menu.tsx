@@ -8,6 +8,7 @@ import { ListCard } from '#/components/lists/list-card'
 import { Sheet, SheetBody, SheetContent } from '#/components/ui/sheet'
 import { cn } from '#/lib/utils'
 import { signOut } from '#/server/session'
+import { forgetSession } from '#/lib/auth/session'
 import { cardSurface, rowHover, focusRing } from '#/components/styles'
 
 // The lists set up once and rarely opened; a row appears once its screen exists.
@@ -41,6 +42,7 @@ export function AppMenu() {
 
   async function leave() {
     await signOut()
+    forgetSession()
     await router.invalidate()
     await router.navigate({ to: '/sign-in' })
   }

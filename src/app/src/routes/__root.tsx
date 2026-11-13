@@ -7,11 +7,18 @@ import { RouteProgress } from '#/components/layout/route-progress'
 import { createI18n } from '#/i18n'
 import { useKeyboardFocus } from '#/hooks/app/use-keyboard-focus'
 import { getSession } from '#/server/session'
+import { keepSession, keptSession } from '#/lib/auth/session'
 
 import appCss from '../styles.css?url'
 
 export const Route = createRootRoute({
-  beforeLoad: async () => ({ session: await getSession() }),
+  beforeLoad: async () => {
+    const kept = keptSession()
+    if (kept) return { session: kept }
+    const session = await getSession()
+    keepSession(session)
+    return { session }
+  },
   head: () => ({
     meta: [
       { charSet: 'utf-8' },

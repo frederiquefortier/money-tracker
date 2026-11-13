@@ -22,6 +22,9 @@ export function getRouter() {
     scrollRestoration: ({ location }) => !opensSheet(location),
     // Data preloaded on hover is reused by the click (default preload stale time, 30 s).
     defaultPreload: 'intent',
+    // Going back to a page seen in the last 30 s shows it without loading again. Every
+    // save calls router.invalidate, so a change never waits for this.
+    defaultStaleTime: 30_000,
     // Translated, instead of the router's built-in English screens (ADR-008).
     defaultErrorComponent: RouteError,
     defaultNotFoundComponent: RouteNotFound,

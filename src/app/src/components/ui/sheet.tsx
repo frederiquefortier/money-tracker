@@ -28,6 +28,7 @@ function SheetContent({
   children,
   onCloseAutoFocus,
   onEscapeKeyDown,
+  enterDelay = 0,
 }: {
   title: string
   closeLabel: string
@@ -37,14 +38,23 @@ function SheetContent({
   /** Runs once the closing animation has finished. */
   onCloseAutoFocus?: (event: Event) => void
   onEscapeKeyDown?: (event: KeyboardEvent) => void
+  /** A negative delay starts the slide part way, to take over from a loading sheet. */
+  enterDelay?: number
 }) {
   const [panel, setPanel] = React.useState<HTMLElement | null>(null)
   useVisualViewport(panel)
+  const enter = {
+    '--sheet-enter-delay': `${enterDelay}ms`,
+  } as React.CSSProperties
   return (
     <SheetPrimitive.Portal>
-      <SheetPrimitive.Overlay className="sheet-overlay fixed inset-0 z-50 bg-black/40" />
+      <SheetPrimitive.Overlay
+        className="sheet-overlay fixed inset-0 z-50 bg-black/40"
+        style={enter}
+      />
       <SheetPrimitive.Content
         ref={setPanel}
+        style={enter}
         aria-describedby={undefined}
         onOpenAutoFocus={(event) => {
           // The first field takes the focus, so typing starts at once. Not on a phone: Safari

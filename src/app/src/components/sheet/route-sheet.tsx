@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next'
 import { ConfirmDialog } from '#/components/feedback/confirm-dialog'
 import { CloseSheet, EscapeTo, MarkChanged } from '#/hooks/forms/use-sheet'
 import { Sheet, SheetContent } from '#/components/ui/sheet'
+import { takeOverDelay } from '#/components/sheet/pending-sheet'
 
 /**
  * A form's sheet: closing plays the animation, then runs `onClosed`. Once something was
@@ -26,6 +27,7 @@ export function FormSheet({
   const { t } = useTranslation()
   const [open, setOpen] = useState(true)
   const [changed, setChanged] = useState(false)
+  const [enterDelay] = useState(takeOverDelay)
   const [asking, setAsking] = useState(false)
   // Stable: a field that reads it (a Combobox) is not re-rendered by the first keystroke,
   // which would put back the text before its own change is applied.
@@ -53,6 +55,7 @@ export function FormSheet({
               title={title}
               closeLabel={t('common.close')}
               actions={actions}
+              enterDelay={enterDelay}
               onEscapeKeyDown={(event) => {
                 const handler = escapes.current.at(-1)
                 if (!handler) return
