@@ -4,26 +4,17 @@ Document new concepts, techniques, and knowledge gained. Reference this file to 
 
 <!-- Newest first: a new entry goes directly below this line. Template at the bottom. -->
 
-### 2026-11-13 - A sql function with set search_path is planned blind
+### 2026-11-13 - Planning, transitions and hydration
 
 **What Was New:**
-- A `language sql` function with a `set` clause (such as `set search_path = ''`) is never inlined. Its body is planned with every argument unknown, so `coalesce(cardinality($1), 0) = 0 or ...` branches for unused filters stay in the plan. `list_transactions` ran in 450 ms as a function and 80 ms as the same query with literal values.
-- plpgsql with `set plan_cache_mode = force_custom_plan` plans each call with its real arguments (about 30 ms of planning). `#variable_conflict use_column` keeps `returns table` column names from clashing with the query's columns.
-- From the browser, each server function call is its own HTTP request (and Netlify function run). A server function called from another one on the server is a plain call.
-- TanStack Router blocks a navigation only on a loader with no data yet. Data that is stale or invalidated, but loaded, reloads in the background. A new param (a transaction never opened) always blocks, and with no `pendingComponent` the screen shows nothing new until it answers.
-
-- A router hook without `select` (`useRouteContext`, `useRouterState`) re-renders its component whenever what it returns changes identity. The root context is a new object at each navigation, so a hook used by every row re-rendered the whole list; selecting a string stops it.
-- TanStack Router commits navigations in `React.startTransition`, and a match still loading throws its promise. React never swaps a Suspense boundary already on screen for its fallback during a transition, so a `pendingComponent` only shows when its boundary is new: a sheet's (nothing was there), not a page's under a shared `Outlet`. A `key` on the `Outlet` per page route makes each page's boundary new.
-- TanStack Start does not run `beforeLoad` or loaders again when it hydrates: it restores their results from the server. Anything a first render needs in the browser that is not dehydrated (a lazily loaded translation) has to be loaded in the client entry before `hydrateRoot`.
-- A Supabase request through PostgREST costs 160 to 240 ms from the server here (warm connection, trivial query), against about 45 ms for the health endpoint. Page speed depends on how many rounds of requests a page waits on, not on the queries.
-- `content-visibility: auto` with `contain-intrinsic-size: auto <height>` lets the browser skip style and layout for sections off screen. On a list of 150 rows it halved the work of opening a sheet.
-
-**Key Points:**
-- Time a function against its inlined body before rewriting the query: the gap is the planner, not the SQL.
-- In the browser, a long task after the click (PerformanceObserver `longtask`) and a CPU profile per component find what a network panel cannot. Measure a production build: dev React and the devtools add hundreds of milliseconds.
+- A `language sql` function with a `set` clause is never inlined and is planned with unknown arguments; plpgsql with `plan_cache_mode = force_custom_plan` plans each call with real ones.
+- TanStack Router navigates in a React transition: a pending component shows only in a new Suspense boundary.
+- Hydration does not rerun `beforeLoad`: what the first render needs must be loaded in the client entry.
+- A router hook without `select` re-renders on every navigation.
+- Each Supabase request costs about 200 ms here, however small.
 
 **Applied In:**
-- ADR-053, migration `20261113130000_list_transactions_custom_plan.sql`.
+- ADR-053, ADR-054.
 
 ### 2026-11-12 - pg_safeupdate and execute rights on what a trigger calls
 

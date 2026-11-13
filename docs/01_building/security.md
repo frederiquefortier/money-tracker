@@ -53,9 +53,8 @@ encrypted dump is the only backup.
 ### App and server
 
 1. **The browser never talks to the database.** Server functions call Supabase with the
-   user's session, so RLS applies (ADR-006). The browser keeps a signed-in (`aal2`) session
-   for 5 minutes between pages (ADR-053). It only decides which screens show; a session
-   revoked meanwhile gets no data, since every server function still sends the cookie.
+   user's session, so RLS applies (ADR-006). The browser's 5-minute session cache (ADR-053)
+   only decides which screens show.
 2. **Every server function validates input with Zod** and takes the user from the session,
    never from the payload.
 3. **The secret key** (`SUPABASE_SECRET_KEY`) is only for scheduled jobs (rates, recurring

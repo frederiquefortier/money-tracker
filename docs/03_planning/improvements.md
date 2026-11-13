@@ -4,20 +4,17 @@ Ideas not built and not decided against. Review during planning to pick the next
 
 <!-- Newest first: a new idea goes directly below this line. Template at the bottom. -->
 
-### 2026-11-13 - Speed: what is left after ADR-053
+### 2026-11-13 - Speed: what is left
 
 **Description:**
-- Things that could still make the app faster, measured or seen during the speed work of 2026-11-13.
+- Speed left after ADR-053 and ADR-054.
 
 **Motivation:**
-- The transactions list grows by 150 rows a page with no virtualization; search over all rows takes about 250 ms in the database; Netlify functions run in Ohio.
+- Each Supabase request costs about 200 ms; Netlify functions run in Ohio.
 
 **Potential Approach:**
-- Virtualize the transactions list if scrolling lags after many pages.
-- Fewer requests per page, or a faster Supabase plan: each request costs about 200 ms however small, which is what a page not preloaded (Import) still waits.
-- Show the static parts of a page's header (search, add button) in its loading frame too; today the frame has the title and back link only.
-- Measure a page from Switzerland and Canada, then decide on a Netlify region (ADR-016's trigger).
-- Merge the transaction form's 8 calls, or load each picker on open, if opening a transaction stays slow.
+- Measure from the deployed app, then decide on a Netlify region or plan (ADR-016).
+- Fewer requests on pages not preloaded (Import).
 
 **Priority:**
 - [ ] High - Critical improvement

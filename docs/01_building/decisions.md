@@ -7,56 +7,41 @@ Technical and structural choices, with the alternatives that were rejected. Chec
 ### ADR-054: Pages change at the click, lists build what is on screen (2026-11-13)
 
 **Context:**
-- After ADR-053 a page change still waited for the new page's data: the old page stayed, then the new one appeared whole. The author asked for the page to change at once, with only what needs data loading ("a page title has no business loading").
-- Measured per page on a production build: every request to Supabase costs 160 to 240 ms whatever the query, so a first visit waited 300 to 600 ms. Rendering was slow on two lists only: Marchands (674 rows, 600 to 900 ms) and Transactions (150 rows, 200 to 380 ms).
+- A page change waited for the new page's data. Each Supabase request costs about 200 ms whatever the query, and two lists were slow to render (674 merchants, 150 transactions).
 
 **Decision:**
-- Each list page has `listPagePending` (`components/layout/page-pending.tsx`): its title and back link, a spinner below, shown with no delay. `_authed` keys its `Outlet` by the page's route, so a new page gets a new Suspense boundary (React holds a boundary already on screen during the router's transition).
-- `/transactions` has no `loaderDeps`: one match, `shouldReload` when the query changes. A filter or a search reloads in the background, the search keeps its focus, and the list carries the query it shows (`lib/transactions/transaction-search.ts`).
-- The list pages are preloaded in the background a second after the app shows (`usePreloadPages`), so a first visit shows at once and refreshes when stale, like a revisit.
-- Long lists build their rows as they near the screen (`useRevealed`): 60 merchants, then 60 more; 12 days of transactions, then 12 more before the next page is fetched. Every list that grows with the user's data goes through it (`components/lists/revealed.tsx`): people, events and their types, institutions, accounts, holdings and their entries, the category tree, the filters' check lists, the pickers' options (the keyboard's position always built and scrolled into view) and the import's new items. Another user may have far more of any of these than the author.
-- `ConfirmDialog` and `DeleteDialog` render nothing until first opened (`useMountedWhileOpen`): a closed dialog on each of 674 merchant rows cost about a second.
-- Each language is its own chunk (`loadTranslations` in `i18n/index.ts`): the main chunk went from 95 to 72 KB gzipped, and the browser downloads only its language (8 to 9 KB). The root's `beforeLoad` loads it on the server and on a language switch. Hydration does not run `beforeLoad` again, so `src/client.tsx` (Start's default client entry plus this step) loads the language named in `<html lang>` before hydrating.
+- List pages show their title at once and load their content in place (`listPagePending`). `_authed` keys its `Outlet` per page, since a transition never shows the fallback of a boundary already on screen.
+- `/transactions` has one match (no `loaderDeps`): filters and search reload in the background.
+- List pages preload in the background once the app shows (`usePreloadPages`).
+- Every list that grows with the user's data builds its rows as they near the screen (`Revealed`, `useRevealed`). Dialogs mount only when opened.
+- Each language is its own chunk; `src/client.tsx` loads it before hydration.
 
 **Alternatives Considered:**
-- A router-wide `defaultPendingComponent` -> The root's session check would blank the whole app.
-- Deferred loader data with `use()` -> The router's store updates are not held by the transition, so a filter change would blank the page.
-- Virtualizing the lists (a dependency) -> Revealing rows as they near the screen got Marchands to 91 ms with no dependency.
-- One RPC per page -> Saves little: the requests of a page already run together, and one request costs the same 200 ms.
+- A router-wide pending component -> The root's session check would blank the app.
+- Virtualizing lists -> A dependency, for what revealing on scroll already does.
 
 **Consequences:**
-- Every list page measured 10 to 91 ms from the click to its content once preloaded (Marchands was 1.4 s, Comptes 0.57 s).
-- About ten server calls run in the background when the app opens.
-- A browser search (Ctrl+F) does not find merchants not yet built; the page's own search covers them.
+- List pages show their content 10 to 90 ms after the click; about ten calls run in the background at start.
+- Ctrl+F does not find rows not yet built; each page's search does.
 
 ### ADR-053: Fewer round trips per page (2026-11-13)
 
 **Context:**
-- Every page and every save felt slow, locally and on Netlify. Each server function call is its own request from the browser to Ohio, then to Supabase in Montreal (ADR-016), so the time went into hops and one slow function, not into the data.
-- The root's `beforeLoad` asked `getSession` before every page and every `router.invalidate`, and every loader waited on it.
-- Pages that offer a delete asked PostgREST once per row whether something pointed at it: about 100 requests for the categories (also on the transaction form, the merchants page and the filter panel), one per account, four per holding.
-- `list_transactions` took about 470 ms a page in the database, 50 ms when its body ran as a plain query.
+- Every page and save was slow: a session check before every page, one request per row to know what could be deleted, and `list_transactions` at about 470 ms a page.
 
 **Decision:**
-- The browser keeps an `aal2` session for 5 minutes (`keptSession` in `lib/auth/session.ts`); sign-out and a language change forget it. Sign-in, MFA and password screens always ask the server.
-- `defaultStaleTime: 30_000` on the router: a page seen in the last 30 s shows again without loading. Every save still calls `router.invalidate`.
-- `used_category_ids`, `used_account_ids` and `holdings_with_history` answer "in use" in one query each (`inUseIds` in `db.server.ts`).
-- `list_transactions` is plpgsql with `plan_cache_mode = force_custom_plan`, same body and result.
-- Smaller: `getHoldings` runs its queries in one batch, `getFeeCategory` is one query, Intl formatters are cached, a day of the list is memoized.
-- A sheet route with a loader opens at the tap: `SHEET_PENDING` (`components/sheet/pending-sheet.tsx`) shows a loading sheet with no delay, and the real sheet takes over part way through the same slide (a negative `animation-delay`). Before, nothing moved until every loader answered. `getTransaction` reads its reimbursements in the same query.
-- Measured in the browser (production build, laptop to Montreal), opening a transaction still froze the page for about a second: `useLocale` read the whole root context, a new object at each navigation, so every amount of the list re-rendered. It now selects the locale string. Days of the list have `content-visibility: auto`, so the style and layout work of a sheet skips the days off screen.
-- Rows preload their sheet again, after 100 ms on a row (`preloadDelay`); a fast sweep over 20 rows sent no request. The list preloads `/transactions/new` once shown (`usePreloadForm`), so the first sheet does not wait on the pickers' 8 calls.
+- The browser keeps an `aal2` session 5 minutes; pages stay fresh 30 s (`defaultStaleTime`).
+- "In use" is one query per table (`used_category_ids`, `used_account_ids`, `holdings_with_history`).
+- `list_transactions` is plpgsql planned per call (`force_custom_plan`): about 60 ms.
+- A sheet opens at the tap with a loading sheet; rows preload their sheet after 100 ms.
+- `useLocale` selects the locale, so a navigation no longer re-renders every amount.
 
 **Alternatives Considered:**
-- Merging the transaction form's 8 calls into one server function -> Proposed by the assistant; the author chose to fix the per-row queries first and measure, since parallel calls only save function starts.
-- Scoping `router.invalidate` to the page -> Little left to save once the session is kept.
-- Keeping the form's picker data across saves -> Not needed: the router reloads data it already has in the background (`staleReloadMode` default), so only the first opening waits on it.
-- Leaving row preloading off -> Its reason (each hover loaded every picker) went away with the shared `_form` route; a row now preloads one call.
-- Moving Netlify functions out of Ohio -> A plan decision (ADR-016's trigger), left for the measured numbers.
+- Merging the form's 8 calls -> Saves little, the calls run in parallel (author's choice: measure first).
+- Moving Netlify out of Ohio -> A plan decision (ADR-016).
 
 **Consequences:**
-- A session revoked elsewhere keeps the screens for up to 5 minutes, with no data (RLS).
-- The first call of `list_transactions` on a new database connection still costs about 0.9 s (plpgsql compile and caches).
+- A session revoked elsewhere keeps the screens up to 5 minutes, with no data (RLS).
 
 ### ADR-052: An invited person carries no amount of their own (2026-11-12)
 
