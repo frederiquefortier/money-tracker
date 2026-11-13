@@ -6,7 +6,6 @@ import {
 } from '@tanstack/react-router'
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { z } from 'zod'
 import { FloatingAddLink } from '#/components/layout/floating-add-button'
 import { EmptyState } from '#/components/lists/list-card'
 import { pageColumn } from '#/components/styles'
@@ -14,108 +13,55 @@ import { ListHeader } from '#/components/transactions/list/list-header'
 import { TransactionDayGroup } from '#/components/transactions/list/transaction-day'
 import { useTransactionPages } from '#/hooks/transactions/use-transaction-pages'
 import { usePreloadForm } from '#/hooks/transactions/use-preload-form'
-import { formatDate, formatMonth, todayIso } from '#/lib/shared/format'
+import { formatDate, formatMonth } from '#/lib/shared/format'
 import {
-  NO_EVENT,
-  PERIOD_UNITS,
-  lastThirtyDays,
-  monthOf,
-  monthSchema,
-  periodRange,
-  yearSchema,
-} from '#/lib/transactions/transaction-list'
+  KEPT,
+  listQuery,
+  queryKey,
+  searchSchema,
+} from '#/lib/transactions/transaction-search'
+import type { Query } from '#/lib/transactions/transaction-search'
 import { useLocale } from '#/hooks/app/use-locale'
 import { useMyCurrencies } from '#/hooks/currencies/use-my-currencies'
 import { listTransactions } from '#/server/transaction-list'
 import { getFeeCategory } from '#/server/transfers'
-import { idFilters } from '#/lib/transactions/transaction-filters'
 import type { FilterValues } from '#/lib/transactions/transaction-filters'
 import type { PeriodChoice } from '#/lib/transactions/transaction-list'
 import { Spinner } from '#/components/feedback/spinner'
+import { PagePending } from '#/components/layout/page-pending'
+import { useRevealed } from '#/hooks/app/use-revealed'
 
-const KEPT = [
-  'period',
-  'month',
-  'year',
-  'start',
-  'end',
-  'account',
-  'category',
-  'merchant',
-  'person',
-  'event',
-  'q',
-  'pending',
-  'owed',
-] as const
-
-const ids = z.array(z.uuid()).max(100).optional().catch(undefined)
-// Ids, or the one choice of "none" (no event, no holding).
-const orNone = (none: string) =>
-  z
-    .array(z.union([z.uuid(), z.literal(none)]))
-    .max(100)
-    .optional()
-    .catch(undefined)
+// The query the loader last asked for, in the browser only.
+let requested: string | null = null
 
 export const Route = createFileRoute('/_authed/transactions')({
-  validateSearch: z.object({
-    period: z.enum(PERIOD_UNITS).optional().catch(undefined),
-    month: monthSchema.optional().catch(undefined),
-    year: yearSchema.optional().catch(undefined),
-    start: z.iso.date().optional().catch(undefined),
-    end: z.iso.date().optional().catch(undefined),
-    account: ids,
-    category: ids,
-    merchant: ids,
-    person: ids,
-    event: orNone(NO_EVENT),
-    q: z.string().max(200).optional().catch(undefined),
-    pending: z.boolean().optional().catch(undefined),
-    owed: z.boolean().optional().catch(undefined),
-  }),
+  validateSearch: searchSchema,
   // The forms open over the list and close back to the same period, filters and search.
   search: { middlewares: [retainSearchParams([...KEPT])] },
-  loaderDeps: ({ search }) => {
-    const today = todayIso()
-    const month = search.month ?? monthOf(today)
-    const year = search.year ?? month.slice(0, 4)
-    const recent = lastThirtyDays(today)
-    const start = search.start ?? recent.start
-    const end = search.end ?? recent.end
-    const period = search.period ?? 'all'
-    const pendingOnly = search.pending === true
-    const owedOnly = search.owed === true
-    return {
-      period,
-      month,
-      year,
-      start,
-      end,
-      ...idFilters(search),
-      search: search.q?.trim() || undefined,
-      pendingOnly,
-      owedOnly,
-      // What is pending or owed shows at any date, as its bubble counts.
-      ...(pendingOnly || owedOnly
-        ? { from: null, to: null }
-        : periodRange(period, { month, year, start, end })),
-    }
-  },
-  loader: async ({ deps }) => {
+  pendingComponent: PagePending,
+  pendingMs: 0,
+  pendingMinMs: 0,
+  // No loaderDeps: a filter or a search would make a new match, which loads blocking (the
+  // page, its search field included, gave way to the loading one). One match reloads in
+  // the background instead, and the list says which query it shows.
+  shouldReload: ({ location }) =>
+    queryKey(listQuery(searchSchema.parse(location.search))) !== requested ||
+    undefined,
+  loader: async ({ location }) => {
+    const query = listQuery(searchSchema.parse(location.search))
+    if (typeof window !== 'undefined') requested = queryKey(query)
     const [page, feeCategory] = await Promise.all([
-      listTransactions({ data: deps }),
+      listTransactions({ data: query }),
       getFeeCategory(),
     ])
-    return { ...page, feeCategory }
+    return { ...page, feeCategory, query }
   },
   component: Transactions,
 })
 
-function useEmptyText() {
+function useEmptyText(deps: Query) {
   const { t } = useTranslation()
   const locale = useLocale()
-  const deps = Route.useLoaderDeps()
   const { period } = deps
   const filtered =
     deps.accountIds.length +
@@ -197,16 +143,23 @@ function useListNavigation() {
 
 function Transactions() {
   const { t } = useTranslation()
-  const deps = Route.useLoaderDeps()
   // The loader's object itself: the pages hook knows a reload by its identity.
   const data = Route.useLoaderData()
+  // What the list shows; the address may already ask for another query.
+  const deps = data.query
+  const asked = Route.useSearch({
+    select: (search) => queryKey(listQuery(search)),
+  })
   const { displayCurrency } = useMyCurrencies()
   const go = useListNavigation()
-  const switching = useRouterState({ select: (s) => s.isLoading })
+  const loadingRoute = useRouterState({ select: (s) => s.isLoading })
+  const switching = loadingRoute || asked !== queryKey(deps)
   usePreloadForm()
   const { days, more, loading, sentinel } = useTransactionPages(data, deps)
+  // Days are built as they near the screen; older pages load once all are shown.
+  const revealed = useRevealed(days, 12)
   const [text, setText] = useSearchText(deps.search ?? '', go.search)
-  const empty = useEmptyText()
+  const empty = useEmptyText(deps)
 
   return (
     <div className={pageColumn}>
@@ -229,7 +182,7 @@ function Transactions() {
         {days.length === 0 ? (
           <EmptyState>{empty}</EmptyState>
         ) : (
-          days.map((day) => (
+          revealed.shown.map((day) => (
             <TransactionDayGroup
               key={day.date}
               day={day}
@@ -239,7 +192,8 @@ function Transactions() {
             />
           ))
         )}
-        {more && (
+        {revealed.more && <div ref={revealed.sentinel} aria-hidden="true" />}
+        {!revealed.more && more && (
           <div
             ref={sentinel}
             className="py-4 text-center text-muted-foreground"

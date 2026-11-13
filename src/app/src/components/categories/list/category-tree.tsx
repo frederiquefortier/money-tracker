@@ -7,6 +7,7 @@ import { isArchived } from '#/lib/categories/category'
 import type { Category } from '#/lib/categories/category'
 import { cn } from '#/lib/utils'
 import { cardSurface } from '#/components/styles'
+import { Revealed } from '#/components/lists/revealed'
 
 type TreeProps = {
   childrenOf: ReadonlyMap<string | null, ReadonlyArray<Category>>
@@ -69,55 +70,59 @@ function CategoryList({
 }: TreeProps & { categories: ReadonlyArray<Category>; depth: number }) {
   return (
     <ul className="divide-y">
-      {categories.map((category, i) => {
-        const children = tree.childrenOf.get(category.id) ?? []
-        const open = tree.expanded.has(category.id)
-        return (
-          <li key={category.id} className="relative">
-            {depth > 0 && (
-              <Connector
-                depth={depth}
-                first={i === 0}
-                last={i === categories.length - 1}
-                leaf={children.length === 0}
-              />
-            )}
-            <CategoryRow
-              category={category}
-              label={tree.labelOf?.(category) ?? category.name}
-              aside={tree.asideOf?.(category)}
-              depth={depth}
-              context={
-                tree.contextOf && {
-                  ...tree.contextOf(category),
-                  // The new child shows once saved. Archived rows take no child.
-                  onAddChild: isArchived(category)
-                    ? undefined
-                    : () => tree.onExpand?.(category.id),
-                }
-              }
-              onPick={tree.onPick}
-              toggle={
-                children.length > 0
-                  ? {
-                      expanded: open,
-                      onToggle: () => tree.onToggle(category.id),
+      <Revealed items={categories}>
+        {(shown) =>
+          shown.map((category, i) => {
+            const children = tree.childrenOf.get(category.id) ?? []
+            const open = tree.expanded.has(category.id)
+            return (
+              <li key={category.id} className="relative">
+                {depth > 0 && (
+                  <Connector
+                    depth={depth}
+                    first={i === 0}
+                    last={i === categories.length - 1}
+                    leaf={children.length === 0}
+                  />
+                )}
+                <CategoryRow
+                  category={category}
+                  label={tree.labelOf?.(category) ?? category.name}
+                  aside={tree.asideOf?.(category)}
+                  depth={depth}
+                  context={
+                    tree.contextOf && {
+                      ...tree.contextOf(category),
+                      // The new child shows once saved. Archived rows take no child.
+                      onAddChild: isArchived(category)
+                        ? undefined
+                        : () => tree.onExpand?.(category.id),
                     }
-                  : undefined
-              }
-            />
-            {open && children.length > 0 && (
-              <div className="border-t">
-                <CategoryList
-                  categories={children}
-                  depth={depth + 1}
-                  {...tree}
+                  }
+                  onPick={tree.onPick}
+                  toggle={
+                    children.length > 0
+                      ? {
+                          expanded: open,
+                          onToggle: () => tree.onToggle(category.id),
+                        }
+                      : undefined
+                  }
                 />
-              </div>
-            )}
-          </li>
-        )
-      })}
+                {open && children.length > 0 && (
+                  <div className="border-t">
+                    <CategoryList
+                      categories={children}
+                      depth={depth + 1}
+                      {...tree}
+                    />
+                  </div>
+                )}
+              </li>
+            )
+          })
+        }
+      </Revealed>
     </ul>
   )
 }

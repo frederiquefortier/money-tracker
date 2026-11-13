@@ -13,6 +13,9 @@ Document new concepts, techniques, and knowledge gained. Reference this file to 
 - TanStack Router blocks a navigation only on a loader with no data yet. Data that is stale or invalidated, but loaded, reloads in the background. A new param (a transaction never opened) always blocks, and with no `pendingComponent` the screen shows nothing new until it answers.
 
 - A router hook without `select` (`useRouteContext`, `useRouterState`) re-renders its component whenever what it returns changes identity. The root context is a new object at each navigation, so a hook used by every row re-rendered the whole list; selecting a string stops it.
+- TanStack Router commits navigations in `React.startTransition`, and a match still loading throws its promise. React never swaps a Suspense boundary already on screen for its fallback during a transition, so a `pendingComponent` only shows when its boundary is new: a sheet's (nothing was there), not a page's under a shared `Outlet`. A `key` on the `Outlet` per page route makes each page's boundary new.
+- TanStack Start does not run `beforeLoad` or loaders again when it hydrates: it restores their results from the server. Anything a first render needs in the browser that is not dehydrated (a lazily loaded translation) has to be loaded in the client entry before `hydrateRoot`.
+- A Supabase request through PostgREST costs 160 to 240 ms from the server here (warm connection, trivial query), against about 45 ms for the health endpoint. Page speed depends on how many rounds of requests a page waits on, not on the queries.
 - `content-visibility: auto` with `contain-intrinsic-size: auto <height>` lets the browser skip style and layout for sections off screen. On a list of 150 rows it halved the work of opening a sheet.
 
 **Key Points:**

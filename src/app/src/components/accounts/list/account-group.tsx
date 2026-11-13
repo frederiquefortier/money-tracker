@@ -9,6 +9,7 @@ import { useLocale } from '#/hooks/app/use-locale'
 import type { GroupTotal } from '#/lib/accounts/account'
 import type { Institution } from '#/lib/institutions/institution'
 import { cardSurface } from '#/components/styles'
+import { Revealed } from '#/components/lists/revealed'
 
 function Balance({ account }: { account: ListedAccount }) {
   const { t } = useTranslation()
@@ -81,14 +82,18 @@ export function AccountGroup({
       </DrawerHeader>
       {!collapsed && accounts.length > 0 && (
         <ul className="divide-y border-t">
-          {accounts.map((account) => (
-            <AccountRow
-              key={account.id}
-              account={account}
-              details={account.typeLabel}
-              aside={<Balance account={account} />}
-            />
-          ))}
+          <Revealed items={accounts}>
+            {(shown) =>
+              shown.map((account) => (
+                <AccountRow
+                  key={account.id}
+                  account={account}
+                  details={account.typeLabel}
+                  aside={<Balance account={account} />}
+                />
+              ))
+            }
+          </Revealed>
         </ul>
       )}
     </section>

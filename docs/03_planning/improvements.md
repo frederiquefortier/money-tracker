@@ -14,6 +14,8 @@ Ideas not built and not decided against. Review during planning to pick the next
 
 **Potential Approach:**
 - Virtualize the transactions list if scrolling lags after many pages.
+- Fewer requests per page, or a faster Supabase plan: each request costs about 200 ms however small, which is what a page not preloaded (Import) still waits.
+- Show the static parts of a page's header (search, add button) in its loading frame too; today the frame has the title and back link only.
 - Measure a page from Switzerland and Canada, then decide on a Netlify region (ADR-016's trigger).
 - Merge the transaction form's 8 calls, or load each picker on open, if opening a transaction stays slow.
 

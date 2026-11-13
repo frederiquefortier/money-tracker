@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import type {
   ListQuery,
@@ -19,13 +19,13 @@ export function useTransactionPages(first: TransactionPage, query: ListQuery) {
     older: [] as Array<TransactionPage>,
   })
   const [loading, setLoading] = useState(false)
-  const sentinel = useRef<HTMLDivElement>(null)
+  // A callback ref: the sentinel can appear after the first render (once every day shows).
+  const [target, sentinel] = useState<HTMLDivElement | null>(null)
   if (state.first !== first) setState({ first, older: [] })
 
   const pages = state.first === first ? [first, ...state.older] : [first]
   const cursor = pages.at(-1)?.cursor ?? null
   useEffect(() => {
-    const target = sentinel.current
     if (!target || cursor === null || loading) return
     const observer = new IntersectionObserver((entries) => {
       if (!entries.some((entry) => entry.isIntersecting)) return
@@ -44,7 +44,7 @@ export function useTransactionPages(first: TransactionPage, query: ListQuery) {
     })
     observer.observe(target)
     return () => observer.disconnect()
-  }, [cursor, loading, first, query, toast, t])
+  }, [target, cursor, loading, first, query, toast, t])
 
   return {
     days: pages.flatMap((p) => p.days),

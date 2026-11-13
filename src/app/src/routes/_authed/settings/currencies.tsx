@@ -6,8 +6,10 @@ import {
 } from '#/components/currencies/currency-manager'
 import { ListPage } from '#/components/layout/list-page'
 import { getCurrencySettings } from '#/server/currencies'
+import { listPagePending } from '#/components/layout/page-pending'
 
 export const Route = createFileRoute('/_authed/settings/currencies')({
+  ...listPagePending((t) => t('currencies.title')),
   loader: () => getCurrencySettings(),
   component: Currencies,
 })

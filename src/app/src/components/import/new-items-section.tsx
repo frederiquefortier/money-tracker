@@ -16,6 +16,7 @@ import type { Section, SectionItem } from '#/lib/import/import-sections'
 import { RowButtons } from '#/components/import/row-buttons'
 import type { Actions } from '#/components/import/row-buttons'
 import { cn } from '#/lib/utils'
+import { Revealed } from '#/components/lists/revealed'
 
 // What the import writes for a category: its parent's colour, or this grey (import.sql).
 const NEW_CATEGORY_COLOR = '#6b7280' // Tailwind's gray-500, the import's default grey
@@ -165,22 +166,26 @@ export function NewItemsSection({
       </header>
       {!collapsed && (
         <ul className="divide-y border-t">
-          {section.items.map((item) => (
-            <ItemRow
-              key={item.key}
-              item={item}
-              actions={{
-                onMerge: onMerge && (() => onMerge(item)),
-                onEdit: onEdit && (() => onEdit(item)),
-                onRemove: onRemove && (() => onRemove(item)),
-                onRestore: onRestore && (() => onRestore(item)),
-                onPerson: onPerson && (() => onPerson(item)),
-                badge: section.key === 'categories',
-                renamed: renamedOf?.(item),
-                similar: similarOf?.(item),
-              }}
-            />
-          ))}
+          <Revealed items={section.items}>
+            {(shown) =>
+              shown.map((item) => (
+                <ItemRow
+                  key={item.key}
+                  item={item}
+                  actions={{
+                    onMerge: onMerge && (() => onMerge(item)),
+                    onEdit: onEdit && (() => onEdit(item)),
+                    onRemove: onRemove && (() => onRemove(item)),
+                    onRestore: onRestore && (() => onRestore(item)),
+                    onPerson: onPerson && (() => onPerson(item)),
+                    badge: section.key === 'categories',
+                    renamed: renamedOf?.(item),
+                    similar: similarOf?.(item),
+                  }}
+                />
+              ))
+            }
+          </Revealed>
         </ul>
       )}
     </section>

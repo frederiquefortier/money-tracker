@@ -7,8 +7,10 @@ import { formatDate } from '#/lib/shared/format'
 import { useLocale } from '#/hooks/app/use-locale'
 import { getNetWorth } from '#/server/net-worth'
 import type { NetWorth } from '#/lib/net-worth/net-worth'
+import { listPagePending } from '#/components/layout/page-pending'
 
 export const Route = createFileRoute('/_authed/net-worth/')({
+  ...listPagePending((t) => t('netWorth.title'), { wide: true }),
   loader: () => getNetWorth(),
   component: NetWorthHub,
 })

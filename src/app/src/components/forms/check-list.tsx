@@ -5,6 +5,7 @@ import { Button } from '#/components/ui/button'
 import { Checkbox } from '#/components/ui/checkbox'
 import { cn } from '#/lib/utils'
 import { fieldCard, focusRing } from '#/components/styles'
+import { Revealed } from '#/components/lists/revealed'
 
 export type CheckNode = {
   id: string
@@ -80,20 +81,24 @@ function CheckRows({
 }) {
   return (
     <ul className="divide-y">
-      {nodes.map((node) => (
-        <li key={node.id}>
-          <CheckRow
-            node={node}
-            state={ticks.stateOf(node)}
-            onToggle={() => ticks.onToggle(node)}
-          />
-          {node.children && (
-            <div className="ml-6 border-t border-l-2 border-l-primary/30">
-              <CheckRows nodes={node.children} ticks={ticks} />
-            </div>
-          )}
-        </li>
-      ))}
+      <Revealed items={nodes}>
+        {(shown) =>
+          shown.map((node) => (
+            <li key={node.id}>
+              <CheckRow
+                node={node}
+                state={ticks.stateOf(node)}
+                onToggle={() => ticks.onToggle(node)}
+              />
+              {node.children && (
+                <div className="ml-6 border-t border-l-2 border-l-primary/30">
+                  <CheckRows nodes={node.children} ticks={ticks} />
+                </div>
+              )}
+            </li>
+          ))
+        }
+      </Revealed>
     </ul>
   )
 }
@@ -188,14 +193,18 @@ export function CheckList({
   if (nodes.length > 0 && nodes.every((n) => n.children !== undefined))
     return (
       <div className="flex flex-col gap-2">
-        {nodes.map((group, i) => (
-          <GroupCard
-            key={group.id}
-            group={group}
-            ticks={ticks}
-            defaultOpen={i < openCount}
-          />
-        ))}
+        <Revealed items={nodes} as="div">
+          {(shown) =>
+            shown.map((group, i) => (
+              <GroupCard
+                key={group.id}
+                group={group}
+                ticks={ticks}
+                defaultOpen={i < openCount}
+              />
+            ))
+          }
+        </Revealed>
       </div>
     )
   return (

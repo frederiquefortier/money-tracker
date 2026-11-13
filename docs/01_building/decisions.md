@@ -4,6 +4,31 @@ Technical and structural choices, with the alternatives that were rejected. Chec
 
 <!-- Newest first: a new ADR goes directly below this line. Template at the bottom. -->
 
+### ADR-054: Pages change at the click, lists build what is on screen (2026-11-13)
+
+**Context:**
+- After ADR-053 a page change still waited for the new page's data: the old page stayed, then the new one appeared whole. The author asked for the page to change at once, with only what needs data loading ("a page title has no business loading").
+- Measured per page on a production build: every request to Supabase costs 160 to 240 ms whatever the query, so a first visit waited 300 to 600 ms. Rendering was slow on two lists only: Marchands (674 rows, 600 to 900 ms) and Transactions (150 rows, 200 to 380 ms).
+
+**Decision:**
+- Each list page has `listPagePending` (`components/layout/page-pending.tsx`): its title and back link, a spinner below, shown with no delay. `_authed` keys its `Outlet` by the page's route, so a new page gets a new Suspense boundary (React holds a boundary already on screen during the router's transition).
+- `/transactions` has no `loaderDeps`: one match, `shouldReload` when the query changes. A filter or a search reloads in the background, the search keeps its focus, and the list carries the query it shows (`lib/transactions/transaction-search.ts`).
+- The list pages are preloaded in the background a second after the app shows (`usePreloadPages`), so a first visit shows at once and refreshes when stale, like a revisit.
+- Long lists build their rows as they near the screen (`useRevealed`): 60 merchants, then 60 more; 12 days of transactions, then 12 more before the next page is fetched. Every list that grows with the user's data goes through it (`components/lists/revealed.tsx`): people, events and their types, institutions, accounts, holdings and their entries, the category tree, the filters' check lists, the pickers' options (the keyboard's position always built and scrolled into view) and the import's new items. Another user may have far more of any of these than the author.
+- `ConfirmDialog` and `DeleteDialog` render nothing until first opened (`useMountedWhileOpen`): a closed dialog on each of 674 merchant rows cost about a second.
+- Each language is its own chunk (`loadTranslations` in `i18n/index.ts`): the main chunk went from 95 to 72 KB gzipped, and the browser downloads only its language (8 to 9 KB). The root's `beforeLoad` loads it on the server and on a language switch. Hydration does not run `beforeLoad` again, so `src/client.tsx` (Start's default client entry plus this step) loads the language named in `<html lang>` before hydrating.
+
+**Alternatives Considered:**
+- A router-wide `defaultPendingComponent` -> The root's session check would blank the whole app.
+- Deferred loader data with `use()` -> The router's store updates are not held by the transition, so a filter change would blank the page.
+- Virtualizing the lists (a dependency) -> Revealing rows as they near the screen got Marchands to 91 ms with no dependency.
+- One RPC per page -> Saves little: the requests of a page already run together, and one request costs the same 200 ms.
+
+**Consequences:**
+- Every list page measured 10 to 91 ms from the click to its content once preloaded (Marchands was 1.4 s, Comptes 0.57 s).
+- About ten server calls run in the background when the app opens.
+- A browser search (Ctrl+F) does not find merchants not yet built; the page's own search covers them.
+
 ### ADR-053: Fewer round trips per page (2026-11-13)
 
 **Context:**

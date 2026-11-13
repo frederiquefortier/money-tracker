@@ -29,8 +29,11 @@ import { getPeople } from '#/server/people'
 import { byName, oneOf } from '#/lib/shared/collections'
 import { todayIso } from '#/lib/shared/format'
 import { matcher } from '#/lib/shared/search'
+import { listPagePending } from '#/components/layout/page-pending'
+import { Revealed } from '#/components/lists/revealed'
 
 export const Route = createFileRoute('/_authed/settings/events')({
+  ...listPagePending((t) => t('events.title')),
   loader: async () => {
     const [events, people] = await Promise.all([getEvents(), getPeople()])
     return { ...events, people: people.people, groups: people.groups }
@@ -91,13 +94,17 @@ function EventList({ query, sort }: { query: string; sort: EventSort }) {
   const past = shown.filter((e) => isPast(e, today))
   return (
     <>
-      {current.length > 0 && <ListCard>{rows(current)}</ListCard>}
+      {current.length > 0 && (
+        <ListCard>
+          <Revealed items={current}>{rows}</Revealed>
+        </ListCard>
+      )}
       {past.length > 0 && (
         <CollapsedSection
           label={t('events.pastEvents', { count: past.length })}
           storageKey="events.pastExpanded"
         >
-          {rows(past)}
+          <Revealed items={past}>{rows}</Revealed>
         </CollapsedSection>
       )}
     </>
@@ -119,9 +126,11 @@ function TypeList({ query, sort }: { query: string; sort: TypeSort }) {
   if (shown.length === 0) return <EmptyState>{t('common.noMatch')}</EmptyState>
   return (
     <ListCard>
-      {shown.map((type) => (
-        <TypeRow key={type.id} type={type} />
-      ))}
+      <Revealed items={shown}>
+        {(revealed) =>
+          revealed.map((type) => <TypeRow key={type.id} type={type} />)
+        }
+      </Revealed>
     </ListCard>
   )
 }

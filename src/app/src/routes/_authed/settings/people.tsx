@@ -30,8 +30,11 @@ import { OwedTag } from '#/components/people/list/owed-summary'
 import { byName, oneOf } from '#/lib/shared/collections'
 import { matcher } from '#/lib/shared/search'
 import type { Balance } from '#/lib/people/owed'
+import { listPagePending } from '#/components/layout/page-pending'
+import { Revealed } from '#/components/lists/revealed'
 
 export const Route = createFileRoute('/_authed/settings/people')({
+  ...listPagePending((t) => t('people.title')),
   loader: async () => {
     const [people, balances] = await Promise.all([getPeople(), getBalances()])
     return { ...people, balances }
@@ -144,13 +147,17 @@ function TabPanel<T extends { name: string; archivedOn: string | null }>({
   if (shown.length === 0) return <EmptyState>{t('common.noMatch')}</EmptyState>
   return (
     <>
-      {active.length > 0 && <ListCard>{rows(active)}</ListCard>}
+      {active.length > 0 && (
+        <ListCard>
+          <Revealed items={active}>{rows}</Revealed>
+        </ListCard>
+      )}
       {archived.length > 0 && (
         <CollapsedSection
           label={archivedLabel(archived.length)}
           storageKey={storageKey}
         >
-          {rows(archived)}
+          <Revealed items={archived}>{rows}</Revealed>
         </CollapsedSection>
       )}
     </>

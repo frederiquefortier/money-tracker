@@ -4,7 +4,7 @@ import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { TanStackDevtools } from '@tanstack/react-devtools'
 import { I18nextProvider } from 'react-i18next'
 import { RouteProgress } from '#/components/layout/route-progress'
-import { createI18n } from '#/i18n'
+import { createI18n, loadTranslations } from '#/i18n'
 import { useKeyboardFocus } from '#/hooks/app/use-keyboard-focus'
 import { getSession } from '#/server/session'
 import { keepSession, keptSession } from '#/lib/auth/session'
@@ -13,10 +13,12 @@ import appCss from '../styles.css?url'
 
 export const Route = createRootRoute({
   beforeLoad: async () => {
-    const kept = keptSession()
-    if (kept) return { session: kept }
-    const session = await getSession()
-    keepSession(session)
+    let session = keptSession()
+    if (!session) {
+      session = await getSession()
+      keepSession(session)
+    }
+    await loadTranslations(session.locale)
     return { session }
   },
   head: () => ({

@@ -5,8 +5,11 @@ import { FloatingAddLink } from '#/components/layout/floating-add-button'
 import { ListPage } from '#/components/layout/list-page'
 import { EmptyState, ListCard } from '#/components/lists/list-card'
 import { getInstitutions } from '#/server/institutions'
+import { listPagePending } from '#/components/layout/page-pending'
+import { Revealed } from '#/components/lists/revealed'
 
 export const Route = createFileRoute('/_authed/settings/institutions')({
+  ...listPagePending((t) => t('settings.institutions')),
   loader: () => getInstitutions(),
   component: Institutions,
 })
@@ -21,12 +24,16 @@ function Institutions() {
         <EmptyState>{t('institutions.empty')}</EmptyState>
       ) : (
         <ListCard>
-          {institutions.map((institution) => (
-            <InstitutionRowView
-              key={institution.id}
-              institution={institution}
-            />
-          ))}
+          <Revealed items={institutions}>
+            {(shown) =>
+              shown.map((institution) => (
+                <InstitutionRowView
+                  key={institution.id}
+                  institution={institution}
+                />
+              ))
+            }
+          </Revealed>
         </ListCard>
       )}
       <FloatingAddLink

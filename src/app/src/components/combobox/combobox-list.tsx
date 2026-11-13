@@ -1,4 +1,4 @@
-import { Fragment } from 'react'
+import { Fragment, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Icon } from '#/components/display/icon'
 import type { ComboboxRow } from '#/hooks/forms/use-combobox'
@@ -10,6 +10,7 @@ import { PopoverContent } from '#/components/ui/popover'
 import { useOverlayContainer } from '#/components/ui/overlay-container'
 import { treeGuides } from '#/lib/shared/tree-layout'
 import { cn } from '#/lib/utils'
+import { useRevealed } from '#/hooks/app/use-revealed'
 import { fieldSurface } from '#/components/styles'
 
 // The chosen option is tinted, as in a native select; hover and the keyboard's position
@@ -46,13 +47,22 @@ export function ComboboxList({
   const guides = treeGuides(
     rows.map((row) => (row.kind === 'option' ? (row.option.depth ?? 0) : 0)),
   )
+  // Options build as the list scrolls; the keyboard's position is always built.
+  const revealed = useRevealed<ComboboxRow, HTMLLIElement>(rows, 60, active + 1)
+  // The keyboard's position stays in view as it moves down a long list.
+  useEffect(() => {
+    if (active < 0) return
+    document
+      .getElementById(`${id}-${active}`)
+      ?.scrollIntoView({ block: 'nearest' })
+  }, [id, active])
   return (
     <ul
       id={id}
       role="listbox"
       className="max-h-[min(18rem,calc(var(--radix-popper-available-height)-0.5rem))] overflow-y-auto"
     >
-      {rows.map((row, i) => {
+      {revealed.shown.map((row, i) => {
         const group = row.kind === 'option' ? row.option.group : undefined
         const previous = i > 0 ? rows[i - 1] : undefined
         const newGroup =
@@ -89,6 +99,7 @@ export function ComboboxList({
           </Fragment>
         )
       })}
+      {revealed.more && <li ref={revealed.sentinel} aria-hidden="true" />}
     </ul>
   )
 }

@@ -19,8 +19,10 @@ import {
   getImports,
   getImportTargets,
 } from '#/server/import'
+import { listPagePending } from '#/components/layout/page-pending'
 
 export const Route = createFileRoute('/_authed/data/import')({
+  ...listPagePending((t) => t('import.title')),
   loader: async () => {
     const [batches, targets, holdingTypes] = await Promise.all([
       getImports(),

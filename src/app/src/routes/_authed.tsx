@@ -1,4 +1,9 @@
-import { Outlet, createFileRoute, redirect } from '@tanstack/react-router'
+import {
+  Outlet,
+  createFileRoute,
+  redirect,
+  useChildMatches,
+} from '@tanstack/react-router'
 import { AppMenu } from '#/components/layout/app-menu'
 import { AppNav } from '#/components/layout/app-nav'
 import {
@@ -10,6 +15,7 @@ import { LocaleSwitcher } from '#/components/layout/locale-switcher'
 import { Logo } from '#/components/layout/logo'
 import { Toaster } from '#/components/feedback/toaster'
 import { getMyCurrencies } from '#/server/currencies'
+import { usePreloadPages } from '#/hooks/app/use-preload-pages'
 
 // UI guard only; RLS is the real one.
 export const Route = createFileRoute('/_authed')({
@@ -25,6 +31,12 @@ export const Route = createFileRoute('/_authed')({
 })
 
 function AuthedLayout() {
+  // A page per key: navigations run in a React transition, which never swaps a boundary
+  // already on screen for its fallback, so one shared boundary kept the old page until
+  // the new one had its data. A new page's boundary shows its loading frame at once.
+  // Sheets and filters stay on the same page, so they keep it.
+  const page = useChildMatches({ select: (matches) => matches[0]?.routeId })
+  usePreloadPages()
   return (
     <Toaster>
       <div className="min-h-dvh pb-[calc(4.5rem+env(safe-area-inset-bottom))] md:pb-0">
@@ -46,7 +58,7 @@ function AuthedLayout() {
           </header>
           <main className="px-4 py-6 md:px-6">
             <AddButtonTarget />
-            <Outlet />
+            <Outlet key={page} />
           </main>
           <div className="fixed inset-x-0 bottom-0 z-20 border-t bg-card/95 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden">
             <AppNav variant="bottom" />

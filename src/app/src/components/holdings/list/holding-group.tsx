@@ -4,6 +4,7 @@ import { MissingRate, Money } from '#/components/display/money'
 import { cardSurface } from '#/components/styles'
 import { summarizeHoldings } from '#/lib/net-worth/net-worth'
 import type { HoldingDrawer } from '#/lib/holdings/holding-list'
+import { Revealed } from '#/components/lists/revealed'
 
 /** An institution's drawer of holdings, with their total in the display currency. */
 export function HoldingGroup({
@@ -48,9 +49,13 @@ export function HoldingGroup({
       </DrawerHeader>
       {!collapsed && (
         <ul className="divide-y border-t">
-          {drawer.holdings.map((holding) => (
-            <HoldingRow key={holding.id} holding={holding} />
-          ))}
+          <Revealed items={drawer.holdings}>
+            {(shown) =>
+              shown.map((holding) => (
+                <HoldingRow key={holding.id} holding={holding} />
+              ))
+            }
+          </Revealed>
         </ul>
       )}
     </section>

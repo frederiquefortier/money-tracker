@@ -23,8 +23,12 @@ import { useMyCurrencies } from '#/hooks/currencies/use-my-currencies'
 import { useStoredIds, useStoredState } from '#/hooks/app/use-stored-state'
 import { getAccounts } from '#/server/accounts'
 import { oneOf } from '#/lib/shared/collections'
+import { listPagePending } from '#/components/layout/page-pending'
 
 export const Route = createFileRoute('/_authed/net-worth/accounts')({
+  ...listPagePending((t) => t('accounts.title'), {
+    back: <NetWorthBackLink />,
+  }),
   loader: () => getAccounts(),
   component: Accounts,
 })

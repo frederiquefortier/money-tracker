@@ -9,6 +9,7 @@ import { useLocale } from '#/hooks/app/use-locale'
 import { cn } from '#/lib/utils'
 import { fieldCard, focusRing, rowHover } from '#/components/styles'
 import type { Result } from '#/lib/shared/result'
+import { Revealed } from '#/components/lists/revealed'
 
 export type EntryKind = 'snapshot' | 'contribution'
 type Row = { id: string; onDate: string; amount: string; label?: string | null }
@@ -88,15 +89,19 @@ export function EntryList({
         <CreateButton label={addLabel} onClick={() => onOpen(null)} />
         {rows.length > 0 && (
           <ul className="divide-y border-t">
-            {rows.map((row) => (
-              <EntryRow
-                key={row.id}
-                row={row}
-                currency={currency}
-                onOpen={() => onOpen(row.id)}
-                onDelete={() => onDelete(row.id)}
-              />
-            ))}
+            <Revealed items={rows}>
+              {(shown) =>
+                shown.map((row) => (
+                  <EntryRow
+                    key={row.id}
+                    row={row}
+                    currency={currency}
+                    onOpen={() => onOpen(row.id)}
+                    onDelete={() => onDelete(row.id)}
+                  />
+                ))
+              }
+            </Revealed>
           </ul>
         )}
       </div>

@@ -26,8 +26,12 @@ import { SortMenu } from '#/components/lists/sort-menu'
 import { FORMAT_LOCALE, inLocale } from '#/i18n/locales'
 import type { Locale } from '#/i18n/locales'
 import { getHoldings } from '#/server/holdings'
+import { listPagePending } from '#/components/layout/page-pending'
 
 export const Route = createFileRoute('/_authed/net-worth/holdings')({
+  ...listPagePending((t) => t('holdings.title'), {
+    back: <NetWorthBackLink />,
+  }),
   loader: () => getHoldings(),
   component: Holdings,
 })

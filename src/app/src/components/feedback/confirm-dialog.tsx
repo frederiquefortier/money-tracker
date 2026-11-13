@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next'
+import { useMountedWhileOpen } from '#/hooks/app/use-mounted-while-open'
 import { Button } from '#/components/ui/button'
 import {
   Dialog,
@@ -7,24 +8,7 @@ import {
   DialogTitle,
 } from '#/components/ui/dialog'
 
-/**
- * Asks before an action. Destructive by default: "Supprimer {name}" in red, a red button,
- * Annuler. `description` says what is affected, before "Cette action est irréversible.";
- * `children` holds what the action needs, such as a date.
- */
-export function ConfirmDialog({
-  open,
-  title,
-  confirmLabel,
-  tone = 'destructive',
-  irreversible = tone === 'destructive',
-  description,
-  busy = false,
-  canConfirm = true,
-  onCancel,
-  onConfirm,
-  children,
-}: {
+type ConfirmDialogProps = {
   open: boolean
   title: string
   confirmLabel: string
@@ -36,14 +20,52 @@ export function ConfirmDialog({
   canConfirm?: boolean
   onCancel: () => void
   onConfirm: () => void
+  /** Runs once the closing animation has finished. */
+  onClosed?: () => void
   children?: React.ReactNode
-}) {
+}
+
+/**
+ * Asks before an action. Destructive by default: "Supprimer {name}" in red, a red button,
+ * Annuler. `description` says what is affected, before "Cette action est irréversible.";
+ * `children` holds what the action needs, such as a date. Nothing is rendered before it
+ * first opens.
+ */
+export function ConfirmDialog(props: ConfirmDialogProps) {
+  const { mounted, unmount } = useMountedWhileOpen(props.open)
+  if (!mounted) return null
+  return (
+    <MountedConfirmDialog
+      {...props}
+      onClosed={() => {
+        unmount()
+        props.onClosed?.()
+      }}
+    />
+  )
+}
+
+function MountedConfirmDialog({
+  open,
+  title,
+  confirmLabel,
+  tone = 'destructive',
+  irreversible = tone === 'destructive',
+  description,
+  busy = false,
+  canConfirm = true,
+  onCancel,
+  onConfirm,
+  onClosed,
+  children,
+}: ConfirmDialogProps) {
   const { t } = useTranslation()
   const destructive = tone === 'destructive'
   return (
     <Dialog open={open} onOpenChange={(next) => !next && onCancel()}>
       <DialogContent
         closeLabel={t('common.close')}
+        onCloseAutoFocus={onClosed}
         {...(irreversible || description
           ? {}
           : { 'aria-describedby': undefined })}

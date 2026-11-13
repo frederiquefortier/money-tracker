@@ -26,8 +26,11 @@ import { getCategories } from '#/server/categories'
 import { getMerchants } from '#/server/merchants'
 import { indexById, oneOf } from '#/lib/shared/collections'
 import { matcher } from '#/lib/shared/search'
+import { listPagePending } from '#/components/layout/page-pending'
+import { useRevealed } from '#/hooks/app/use-revealed'
 
 export const Route = createFileRoute('/_authed/settings/merchants')({
+  ...listPagePending((t) => t('merchants.title')),
   loader: async () => {
     const [merchants, categories] = await Promise.all([
       getMerchants(),
@@ -116,10 +119,11 @@ function MerchantList({
   tree: ReturnType<typeof categoryLookup>
 }) {
   const { t } = useTranslation()
+  const revealed = useRevealed<Merchant, HTMLLIElement>(shown)
   if (shown.length === 0) return <EmptyState>{t('common.noMatch')}</EmptyState>
   return (
     <ListCard>
-      {shown.map((merchant) => (
+      {revealed.shown.map((merchant) => (
         <MerchantRow
           key={merchant.id}
           merchant={merchant}
@@ -136,6 +140,7 @@ function MerchantList({
           }
         />
       ))}
+      {revealed.more && <li ref={revealed.sentinel} aria-hidden="true" />}
     </ListCard>
   )
 }
