@@ -132,6 +132,7 @@ export const transactionsEn: typeof transactionsFr = {
       remove: 'Remove {{name}}',
       clearAll: 'Clear all',
       backToFilters: 'Back to filters',
+      kinds: 'Types',
       accounts: 'Accounts',
       categories: 'Categories',
       merchants: 'Merchants',

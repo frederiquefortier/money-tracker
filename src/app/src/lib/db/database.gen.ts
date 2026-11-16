@@ -1613,6 +1613,7 @@ export type Database = {
           category_ids?: string[]
           event_ids?: string[]
           from_date?: string
+          kinds?: string[]
           max_rows?: number
           merchant_ids?: string[]
           owed_only?: boolean

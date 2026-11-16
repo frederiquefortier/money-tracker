@@ -59,7 +59,7 @@ English; this file is in English like every other meta-doc.
 | TRX-11 | A transfer between accounts in different currencies records what left one and what arrived in the other; the gap against that day's market rate shows as the conversion cost, which counts as spending. | net-worth data (CAD to CHF) | 1 |
 | TRX-12 | Search transactions by text in anything a row shows: merchant, note, categories, account and institution (both sides of a transfer), ignoring case and accents. | author | 1 |
 | TRX-13 | The transactions list shows a chosen period: everything (loaded as you scroll), a year, a month, or custom days from a start to an end. Each day shows its net. Totals by category belong to the dashboard. | author | 1 |
-| TRX-14 | Filter the transactions list by accounts, categories (sub-categories included, a split matching on any of its categories) and merchants, several of each at once. | author | 1 |
+| TRX-14 | Filter the transactions list by type (expense, income, transfer), accounts, categories (sub-categories included, a split matching on any of its categories) and merchants, several of each at once. A filter narrowed to one value is the default of a transaction added from the list (2026-11-16). | author | 1 |
 
 ## 4. Multi-currency (`CUR`)
 

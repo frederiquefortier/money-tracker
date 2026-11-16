@@ -21,7 +21,10 @@ import { cn } from '#/lib/utils'
 
 type Picked = { id: string; name: string; icon?: React.ReactNode }
 
-function namedIn(tab: FilterTab, names: ListFilters): Array<Picked> {
+function namedIn(
+  tab: Exclude<FilterTab, 'kinds'>,
+  names: ListFilters,
+): Array<Picked> {
   if (tab === 'accounts')
     return names.accounts.map((a) => ({ id: a.id, name: accountLabel(a) }))
   if (tab === 'categories')
@@ -40,15 +43,23 @@ function namedIn(tab: FilterTab, names: ListFilters): Array<Picked> {
   return names[tab]
 }
 
-/** What is ticked in a filter, by name, as far as the list has named it. */
-export function pickedOf(
-  tab: FilterTab,
-  names: ListFilters | null,
-  values: FilterValues,
-): Array<Picked> {
-  if (!names) return []
-  const ticked = new Set(values[FILTER_KEYS[tab]])
-  return namedIn(tab, names).filter((one) => ticked.has(one.id))
+/** What is ticked in a filter, by name, as far as the list has named it; a kind by its label. */
+export function usePickedOf() {
+  const { t } = useTranslation()
+  return (
+    tab: FilterTab,
+    names: ListFilters | null,
+    values: FilterValues,
+  ): Array<Picked> => {
+    if (tab === 'kinds')
+      return values.kinds.map((kind) => ({
+        id: kind,
+        name: t(`transactions.kinds.${kind}`),
+      }))
+    if (!names) return []
+    const ticked = new Set<string>(values[FILTER_KEYS[tab]])
+    return namedIn(tab, names).filter((one) => ticked.has(one.id))
+  }
 }
 
 function Chip({
@@ -109,6 +120,7 @@ export function FilterChips({
 }) {
   const { t } = useTranslation()
   const periodLabel = usePeriodLabel()
+  const pickedOf = usePickedOf()
   const toAll = (choice: PeriodChoice) => ({
     ...choice,
     period: 'all' as const,

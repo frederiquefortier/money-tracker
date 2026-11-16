@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link, createFileRoute } from '@tanstack/react-router'
+import { Link, createFileRoute, useSearch } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { RouteSheet } from '#/components/sheet/route-sheet'
 import { TransactionForm } from '#/components/transactions/form/transaction-form'
@@ -7,6 +7,9 @@ import { TransferForm } from '#/components/transactions/entry/transfer-form'
 import { SheetBody } from '#/components/ui/sheet'
 import { todayIso } from '#/lib/shared/format'
 import { emptyDraft } from '#/lib/transactions/transaction-draft'
+import { withFilters } from '#/lib/transactions/transaction-defaults'
+import { idFilters } from '#/lib/transactions/transaction-filters'
+import type { FilterValues } from '#/lib/transactions/transaction-filters'
 import { emptyTransfer } from '#/lib/transfers/transfer-draft'
 import type { TransferDraft } from '#/lib/transfers/transfer-draft'
 import type {
@@ -48,9 +51,21 @@ function NewTransaction() {
     '',
     parseId,
   )
+  // The list's filters: one account, kind, category... ticked is the new one's default.
+  const filters = useSearch({
+    from: '/_authed/transactions',
+    select: idFilters,
+  })
   const choosable = data.accounts.filter((a) => !a.closedOn && !a.hiddenForNew)
-  const account = choosable.find((a) => a.id === lastAccount) ?? choosable.at(0)
-  const [form, setForm] = useState<Entry['form']>('transaction')
+  const account =
+    (filters.accountIds.length === 1 &&
+      choosable.find((a) => a.id === filters.accountIds[0])) ||
+    choosable.find((a) => a.id === lastAccount) ||
+    choosable.at(0)
+  const transfer = filters.kinds.length === 1 && filters.kinds[0] === 'transfer'
+  const [form, setForm] = useState<Entry['form']>(
+    transfer ? 'transfer' : 'transaction',
+  )
 
   return (
     <RouteSheet
@@ -67,6 +82,8 @@ function NewTransaction() {
           key={account.id}
           account={account}
           data={data}
+          filters={filters}
+          transfer={transfer}
           feeCategoryId={feeCategoryId}
           onSaved={setLastAccount}
           onForm={setForm}
@@ -90,22 +107,29 @@ function NewTransaction() {
 function NewEntry({
   account,
   data,
+  filters,
+  transfer,
   feeCategoryId,
   onSaved,
   onForm,
 }: {
   account: FormAccount
   data: TransactionFormData
+  filters: FilterValues
+  /** The list shows only transfers: the transfer form comes first. */
+  transfer: boolean
   feeCategoryId: string | null
   onSaved: (accountId: string) => void
   /** For the sheet's title. */
   onForm: (form: Entry['form']) => void
 }) {
   const { t } = useTranslation()
-  const [entry, setEntry] = useState<Entry>(() => ({
-    form: 'transaction',
-    initial: emptyDraft(account, todayIso()),
-  }))
+  const [entry, setEntry] = useState<Entry>(() => {
+    const draft = emptyDraft(account, todayIso())
+    return transfer
+      ? { form: 'transfer', initial: emptyTransfer(draft) }
+      : { form: 'transaction', initial: withFilters(draft, filters, data) }
+  })
   // Each swap starts the other form afresh.
   const [swaps, setSwaps] = useState(0)
   function swap(next: Entry) {

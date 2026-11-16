@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import type { LinkedEvent } from '#/lib/events/event'
 import type { HoldingParts } from '#/lib/holdings/holding'
+import type { FilterKind } from '#/lib/transactions/transaction-filters'
 
 // The transactions list: a period, its days, a page at a time.
 
@@ -134,6 +135,7 @@ export type TransactionPage = {
 export type ListQuery = {
   from: string | null
   to: string | null
+  kinds?: Array<FilterKind>
   accountIds?: Array<string>
   categoryIds?: Array<string>
   merchantIds?: Array<string>

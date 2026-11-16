@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { todayIso } from '#/lib/shared/format'
-import { idFilters } from '#/lib/transactions/transaction-filters'
+import { FILTER_KINDS, idFilters } from '#/lib/transactions/transaction-filters'
 import {
   NO_EVENT,
   PERIOD_UNITS,
@@ -19,6 +19,7 @@ export const KEPT = [
   'year',
   'start',
   'end',
+  'kind',
   'account',
   'category',
   'merchant',
@@ -44,6 +45,7 @@ export const searchSchema = z.object({
   year: yearSchema.optional().catch(undefined),
   start: z.iso.date().optional().catch(undefined),
   end: z.iso.date().optional().catch(undefined),
+  kind: z.array(z.enum(FILTER_KINDS)).max(3).optional().catch(undefined),
   account: ids,
   category: ids,
   merchant: ids,

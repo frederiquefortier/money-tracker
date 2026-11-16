@@ -14,12 +14,14 @@ import type {
   TransactionPage,
 } from '#/lib/transactions/transaction-list'
 import { isOneOf } from '#/lib/shared/collections'
+import { FILTER_KINDS } from '#/lib/transactions/transaction-filters'
 
 const isListedKind = isOneOf(LISTED_KINDS)
 
 const listInput = z.object({
   from: z.iso.date().nullable(),
   to: z.iso.date().nullable(),
+  kinds: z.array(z.enum(FILTER_KINDS)).max(3).optional(),
   accountIds: z.array(z.uuid()).max(100).optional(),
   categoryIds: z.array(z.uuid()).max(100).optional(),
   merchantIds: z.array(z.uuid()).max(100).optional(),
@@ -209,6 +211,7 @@ export const listTransactions = createServerFn({ method: 'GET' })
         getSupabase().rpc('list_transactions', {
           from_date: data.from ?? undefined,
           to_date: data.to ?? undefined,
+          kinds: data.kinds,
           account_ids: data.accountIds,
           category_ids: data.categoryIds,
           merchant_ids: data.merchantIds,

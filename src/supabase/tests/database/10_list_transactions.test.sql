@@ -1,7 +1,7 @@
 begin;
 create extension if not exists pgtap with schema extensions;
 
-select plan(29);
+select plan(32);
 
 insert into auth.users (id, email) values
   ('11111111-1111-1111-1111-111111111111', 'alice@example.test'),
@@ -239,6 +239,24 @@ select results_eq(
   $$ select distinct pending_count from public.list_transactions('2026-12-01', '2026-12-31') $$,
   $$ values (1::bigint) $$,
   'the pending count looks past the period'
+);
+
+select results_eq(
+  $$ select id from public.list_transactions('2026-10-01', '2026-10-31', kinds => array['income'])
+     order by id $$,
+  $$ values ('a3000000-0000-0000-0000-000000000006'::uuid), ('a3000000-0000-0000-0000-000000000007'::uuid) $$,
+  'kinds keeps the incomes'
+);
+select results_eq(
+  $$ select id from public.list_transactions('2026-10-01', '2026-10-31', kinds => array['transfer']) $$,
+  $$ values ('a3000000-0000-0000-0000-000000000003'::uuid) $$,
+  'kinds keeps a transfer once, by its departure row'
+);
+select results_eq(
+  $$ select distinct total from public.list_transactions('2026-10-01', '2026-10-31',
+       kinds => array['expense', 'transfer']) $$,
+  $$ values (4::bigint) $$,
+  'several kinds add up, an adjustment in none of them'
 );
 
 -- Bruno sees only his own

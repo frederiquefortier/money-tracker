@@ -64,6 +64,7 @@ function useEmptyText(deps: Query) {
   const locale = useLocale()
   const { period } = deps
   const filtered =
+    deps.kinds.length +
     deps.accountIds.length +
     deps.categoryIds.length +
     deps.merchantIds.length +
@@ -126,6 +127,7 @@ function useListNavigation() {
       void navigate({
         search: (prev) => ({
           ...prev,
+          kind: f.kinds.length ? f.kinds : undefined,
           account: f.accountIds.length ? f.accountIds : undefined,
           category: f.categoryIds.length ? f.categoryIds : undefined,
           merchant: f.merchantIds.length ? f.merchantIds : undefined,

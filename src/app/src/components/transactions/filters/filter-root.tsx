@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { Icon } from '#/components/display/icon'
-import { pickedOf } from '#/components/transactions/filters/filter-chips'
+import { usePickedOf } from '#/components/transactions/filters/filter-chips'
 import { cardSurface, focusRing, rowHover } from '#/components/styles'
 import { usePeriodLabel } from '#/hooks/transactions/use-period-label'
 import { FILTER_KEYS } from '#/lib/transactions/transaction-filters'
@@ -22,6 +22,7 @@ function useSummary(
 ) {
   const { t } = useTranslation()
   const periodLabel = usePeriodLabel()
+  const pickedOf = usePickedOf()
   return (screen: FilterScreen) => {
     if (screen === 'period') return period ? periodLabel(period) : ''
     const count = values[FILTER_KEYS[screen]].length

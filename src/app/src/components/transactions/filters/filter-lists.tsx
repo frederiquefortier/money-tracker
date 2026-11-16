@@ -17,6 +17,8 @@ import {
   useEventTree,
   usePeopleTree,
 } from '#/hooks/transactions/use-check-trees'
+import { isOneOf } from '#/lib/shared/collections'
+import { FILTER_KINDS } from '#/lib/transactions/transaction-filters'
 import type {
   FilterOptions,
   FilterTab,
@@ -24,6 +26,8 @@ import type {
 } from '#/lib/transactions/transaction-filters'
 
 // The filter sheet's lists, one per tab.
+
+const isKind = isOneOf(FILTER_KINDS)
 
 function NoMatch() {
   const { t } = useTranslation()
@@ -113,8 +117,33 @@ function EventList({
   )
 }
 
+/** Dépense, Revenu, Transfert: an adjustment is in none of them. */
+function KindList({
+  values,
+  onChange,
+}: {
+  values: FilterValues
+  onChange: (values: FilterValues) => void
+}) {
+  const { t } = useTranslation()
+  const ticks = groupTicks(values.kinds)
+  const nodes = FILTER_KINDS.map((kind) => ({
+    id: kind,
+    label: t(`transactions.kinds.${kind}`),
+  }))
+  return (
+    <CheckList
+      nodes={nodes}
+      stateOf={ticks.stateOf}
+      onToggle={(node) =>
+        onChange({ ...values, kinds: ticks.toggle(node).filter(isKind) })
+      }
+    />
+  )
+}
+
 /**
- * The open tab's list: accounts by institution, the categories tree by type, merchants,
+ * The open tab's list: the kinds, accounts by institution, the categories tree by type, merchants,
  * people by group.
  */
 export function FilterList({
@@ -133,6 +162,7 @@ export function FilterList({
   const accounts = useAccountTree(options.accounts, query)
   const categories = useCategoryTree(options.categories, query)
   const people = usePeopleTree(options.people, options.groups, query)
+  if (tab === 'kinds') return <KindList values={values} onChange={onChange} />
   if (tab === 'accounts') {
     const ticks = groupTicks(values.accountIds)
     if (!accounts.length) return <NoMatch />

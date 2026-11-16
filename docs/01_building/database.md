@@ -90,7 +90,7 @@ transactions, the last used on a tie (MER-08); the list offers it when there is 
 - `list_transactions` returns whole days (about 150 rows a page), every amount converted at
   the rate of its date, as text. A transfer is one row without an account filter and one row
   per chosen account's leg with it; the fee rides on the departure row. `total` counts rows
-  before paging. Usage views (`merchant_usage`, `merchant_suggested_category`, `frequent_categories`) count in SQL because
+  before paging. `kinds` keeps expenses, incomes or transfers; an adjustment is in none. Usage views (`merchant_usage`, `merchant_suggested_category`, `frequent_categories`) count in SQL because
   PostgREST returns at most 1,000 rows. It is plpgsql planned per call (ADR-053).
 - `used_category_ids()`, `used_account_ids()` and `holdings_with_history()` return the ids
   in use (security invoker); those are archived, not deleted.

@@ -40,9 +40,11 @@ export function useRowText(row: ListedTransaction) {
         .join(', '),
     )
     .join('; ')
-  // A holding names the transaction as a store does.
+  // A holding, or the person an income came from, names the transaction as a store does.
+  const source = row.people.find((p) => p.role === 'from')?.name ?? null
   const name =
     row.merchant ??
+    source ??
     (row.holding
       ? holdingLabel(row.holding, locale, { currency: false })
       : null)

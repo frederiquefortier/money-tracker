@@ -130,6 +130,7 @@ export const transactionsFr = {
       remove: 'Retirer {{name}}',
       clearAll: 'Tout effacer',
       backToFilters: 'Retour aux filtres',
+      kinds: 'Types',
       accounts: 'Comptes',
       categories: 'Catégories',
       merchants: 'Magasins',

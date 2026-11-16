@@ -193,14 +193,19 @@ export function FilterDetail({
   const key = FILTER_KEYS[tab]
   return (
     <>
-      <SheetHead>
-        {canGoBack && <BackRow screen={tab} onBack={onBack} />}
-        <SearchField
-          value={query}
-          onChange={onQuery}
-          label={t(`transactions.list.search.${tab}`)}
-        />
-      </SheetHead>
+      {/* Three kinds need no search. */}
+      {(canGoBack || tab !== 'kinds') && (
+        <SheetHead>
+          {canGoBack && <BackRow screen={tab} onBack={onBack} />}
+          {tab !== 'kinds' && (
+            <SearchField
+              value={query}
+              onChange={onQuery}
+              label={t(`transactions.list.search.${tab}`)}
+            />
+          )}
+        </SheetHead>
+      )}
       <SheetBody>
         {options ? (
           <FilterList
