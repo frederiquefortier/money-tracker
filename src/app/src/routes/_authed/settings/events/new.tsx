@@ -11,7 +11,7 @@ export const Route = createFileRoute('/_authed/settings/events/new')({
 
 function NewEvent() {
   const { t } = useTranslation()
-  const { types, people, groups } = useEventsPage()
+  const { types, people, groups, categories, defaultSkipIds } = useEventsPage()
   return (
     <RouteSheet to="/settings/events" title={t('events.newEvent')}>
       <EventForm
@@ -19,6 +19,8 @@ function NewEvent() {
         types={types}
         people={people}
         groups={groups}
+        categories={categories}
+        defaultSkipIds={defaultSkipIds}
         savedText={t('events.eventCreated')}
       />
     </RouteSheet>

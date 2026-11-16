@@ -4,6 +4,39 @@ Technical and structural choices, with the alternatives that were rejected. Chec
 
 <!-- Newest first: a new ADR goes directly below this line. Template at the bottom. -->
 
+### ADR-056: An event's excluded categories may be its own empty list (2026-11-14)
+
+**Context:**
+- Under ADR-055 an emptied event list fell back to the default, so an event could not untick every default category. The author asked for the defaults to show ticked in the event and be deselectable, and for the default list to move to a tab.
+
+**Decision:**
+- `events.skips_own`: false follows the default list, true uses the event's `event_skips`, even empty. `save_event` takes null to follow the default.
+- In the event form the defaults show ticked and marked "Par défaut"; a change makes the list the event's own, and picking exactly the defaults follows them again.
+- The default list is the Événements page's Réglages tab, as a list; the explanation is a tooltip. The event field is a sub-field of the link checkbox, shaped like the other fields.
+
+**Alternatives Considered:**
+- Copy the defaults into the event when the link is ticked -> A later change to the default would not reach it; the author chose to follow the default.
+
+**Consequences:**
+- Supersedes ADR-055 where it says an emptied list follows the default and where the default list sits.
+
+### ADR-055: The link by date skips categories again, with a default list (2026-11-13)
+
+**Context:**
+- Since 2026-11-09 an event links every expense and income in its dates. Salaries, phone bills and insurance landed in trips and were removed one by one (bugs.md). The author asked for the Sauf field back, with a default.
+
+**Decision:**
+- `event_default_skips`: the categories every event skips. `event_skips`: an event's own list, which replaces the default when it has any category; emptied, the event follows the default again.
+- A skipped category takes its sub-categories. A transaction is skipped only when all its splits are in skipped categories.
+- `matching_event` takes the form's category ids, or reads the saved splits, so the form and the save agree. Saving the default list recomputes every automatic link. Manual links ignore the skips.
+- The default list sits above the events on the Événements page; an event's form shows it, marked "Par défaut", until the event has its own.
+
+**Alternatives Considered:**
+- Per event only -> The same salary and phone categories on every trip. A default only -> No trip-specific exception. A flag on categories -> Hides an event rule in the category form.
+
+**Consequences:**
+- An event cannot skip nothing while a default exists.
+
 ### ADR-054: Pages change at the click, lists build what is on screen (2026-11-13)
 
 **Context:**

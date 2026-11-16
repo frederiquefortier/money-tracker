@@ -117,7 +117,7 @@ English; this file is in English like every other meta-doc.
 |---|---|---|---|
 | PPL-01 | People have a name and, for now, its first letter as their icon; they can be grouped, and a group shows its members' avatars. | v1, ai, author | 2 |
 | PPL-02 | A person or a group can be archived and hidden. | ai | 2 |
-| PPL-03 | An expense can be linked to people or groups (a group adds its members), each in a role: invited (I paid for them, the default) or owes (they will pay me back), beside my own part. Their part is set by amount, share or percentage, and an invited person's part can be 0 (a gift: the whole amount on me, ADR-052). An income names the one person it came from. | v1, ai, author | 2 |
+| PPL-03 | An expense can be linked to people or groups (a group adds its members; searching a group's name lists it with its members, 2026-11-13), each in a role: invited (I paid for them, the default) or owes (they will pay me back), beside my own part. Their part is set by amount, share or percentage, and an invited person's part can be 0 (a gift: the whole amount on me, ADR-052). An income names the one person it came from. | v1, ai, author | 2 |
 | PPL-04 | Without naming anyone: tick "I treated someone" with an amount and a head count, or "I expect a reimbursement" with an amount. | v1 | 2 |
 | PPL-05 | What each person owes me, at a glance: on their row and in their sheet, and the owed bubble on Transactions. Money I owe others is out of scope. | misc, author | 2 |
 | PPL-06 | A person can have aliases, other spellings of their name, so the import finds them by name or alias, ignoring case and accents. A name or an alias points to one person only. | author | 2 |
@@ -135,7 +135,7 @@ English; this file is in English like every other meta-doc.
 | EVT-04 | Calendar view of events with the total spent on each. | v1, ai | 2 |
 | EVT-05 | Compare events of the same type. | ai | 2 |
 | EVT-06 | Give an event a budget and follow it live. Moved to phase 4 with the other budgets, built once on the shared `budgets` table (author, 2026-11-08). | ai, author | 4 |
-| EVT-07 | In its dates, an event attaches itself to every expense and income (no categories: removed 2026-11-09, the author prefers the tag taken off by hand). With no dates, only by hand. Automatic links are marked as such and can be removed or changed by hand; a removed one stays removed. An event can turn the automatic link off (2026-11-11, ADR-042): it then holds only the transactions linked by hand, and its automatic links are removed. | ai (was TAG-02), author | 2 |
+| EVT-07 | In its dates, an event attaches itself to every expense and income (categories skipped since 2026-11-13, ADR-055: a default list for every event in the Réglages tab, shown ticked in the event and deselectable there, ADR-056). With no dates, only by hand. Automatic links are marked as such and can be removed or changed by hand; a removed one stays removed. An event can turn the automatic link off (2026-11-11, ADR-042): it then holds only the transactions linked by hand, and its automatic links are removed. | ai (was TAG-02), author | 2 |
 
 ## 10. Dashboard and reports (`DSH`)
 

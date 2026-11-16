@@ -112,8 +112,12 @@ members, never a line. Deleting a person keeps their lines as lines without a na
 Automatic links are recomputed when an event's dates or `auto_link` change and when a
 transaction's date or kind changes; manual links are never touched. Two matching events: the
 narrower range wins, then the earlier created. `event_exclusions` remember an automatic link
-removed by hand so it never comes back. `matching_event` is the one function the form,
-`save_transaction`, the import and `relink_events` all call.
+removed by hand so it never comes back. `event_default_skips` and `event_skips` are the
+categories the link skips (an event with `skips_own` uses its own list, even empty, instead of the default, ADR-056; a category takes its
+sub-categories, a transaction is skipped only when all its splits are, ADR-055).
+`matching_event` links one transaction (the form, `save_transaction`); `relink_events`
+applies the same rules to a date range in one pass (the import, saving an event or the
+default list), since one call per transaction took 87 s over the whole history.
 
 **Holdings.** `holdings` are investments, assets and debts (bank accounts count through their
 balance). `holding_snapshots` are the dated values, one per holding per date, in the holding's

@@ -12,7 +12,8 @@ export const Route = createFileRoute('/_authed/settings/events/$eventId')({
 
 function EditEvent() {
   const { t } = useTranslation()
-  const { events, types, people, groups } = useEventsPage()
+  const { events, types, people, groups, categories, defaultSkipIds } =
+    useEventsPage()
   const { eventId } = Route.useParams()
   const event = events.find((e) => e.id === eventId)
   if (!event) return <Navigate to="/settings/events" resetScroll={false} />
@@ -39,6 +40,8 @@ function EditEvent() {
         types={types}
         people={people}
         groups={groups}
+        categories={categories}
+        defaultSkipIds={defaultSkipIds}
         savedText={t('events.eventUpdated')}
       />
     </RouteSheet>

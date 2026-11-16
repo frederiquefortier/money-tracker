@@ -2,13 +2,7 @@ import { UNSAFE_PortalProvider } from 'react-aria'
 import {
   Button,
   Calendar,
-  CalendarCell,
-  CalendarGrid,
-  CalendarGridBody,
-  CalendarGridHeader,
-  CalendarHeaderCell,
   Dialog,
-  Heading,
   I18nProvider,
   Label,
   Modal,
@@ -17,13 +11,8 @@ import {
 } from 'react-aria-components'
 import { useTranslation } from 'react-i18next'
 import { Icon } from '#/components/display/icon'
-import {
-  focusRing,
-  pickerHeader,
-  pickerHeading,
-  pickerNav,
-  pageWidth,
-} from '#/components/styles'
+import { CalendarMonthGrid } from '#/components/forms/calendar-month-grid'
+import { pageWidth, roundButton } from '#/components/styles'
 import { useOverlayContainer } from '#/components/ui/overlay-container'
 import { DATE_FIELD_LOCALE } from '#/i18n/locales'
 import { useLocale } from '#/hooks/app/use-locale'
@@ -31,11 +20,6 @@ import { cn } from '#/lib/utils'
 
 // The calendar every date field shares (ADR-027): up from the bottom over the sheet or
 // dialog the field is in, with a dim backdrop. The fields are DatePickerField and DateRangeField.
-
-export const roundButton = cn(
-  'grid size-8 shrink-0 place-items-center rounded-full text-muted-foreground hover:bg-secondary hover:text-foreground',
-  focusRing,
-)
 
 /** The "/" between a date's numbers has no padding, so it reads 12/11/2026. */
 export const literalClass = 'px-0'
@@ -80,108 +64,6 @@ export function FieldLabelRow({
       </Label>
       {addon}
     </div>
-  )
-}
-
-/** The band behind a day in a range: from the middle of the first, to the middle of the last. */
-function bandOf({
-  isSelected,
-  isSelectionStart,
-  isSelectionEnd,
-}: {
-  isSelected: boolean
-  isSelectionStart: boolean
-  isSelectionEnd: boolean
-}) {
-  if (!isSelected || (isSelectionStart && isSelectionEnd)) return ''
-  if (isSelectionStart)
-    return 'bg-linear-to-r from-transparent from-50% to-accent to-50%'
-  if (isSelectionEnd)
-    return 'bg-linear-to-r from-accent from-50% to-transparent to-50%'
-  return 'bg-accent'
-}
-
-/**
- * One day of the month grid. A range is one band across its days, with no gap between
- * them: the cell fills its column, the band starts at the middle of the first day and ends
- * at the middle of the last, and the days at both ends are round.
- */
-function Day({
-  date,
-  range,
-}: {
-  date: React.ComponentProps<typeof CalendarCell>['date']
-  range: boolean
-}) {
-  return (
-    <CalendarCell
-      date={date}
-      className={(state) =>
-        cn(
-          'group grid h-10 w-full cursor-pointer place-items-center text-sm outline-none',
-          state.isDisabled && 'pointer-events-none',
-          range && bandOf(state),
-        )
-      }
-    >
-      {({
-        formattedDate,
-        isSelected,
-        isSelectionStart,
-        isSelectionEnd,
-        isOutsideMonth,
-        isDisabled,
-        isFocusVisible,
-      }) => (
-        <span
-          className={cn(
-            'grid size-10 place-items-center rounded-full',
-            !isSelected && 'group-hover:bg-secondary',
-            (range ? isSelectionStart || isSelectionEnd : isSelected) &&
-              'bg-primary text-primary-foreground',
-            range &&
-              isSelected &&
-              !isSelectionStart &&
-              !isSelectionEnd &&
-              'text-accent-foreground',
-            isOutsideMonth && !isSelected && 'text-muted-foreground/50',
-            isDisabled && 'text-muted-foreground/40',
-            isFocusVisible && 'outline-2 outline-offset-1 outline-ring',
-          )}
-        >
-          {formattedDate}
-        </span>
-      )}
-    </CalendarCell>
-  )
-}
-
-/** The month grid with its arrows: Page Up and Down move by month, with Shift by year. */
-export function CalendarMonthGrid({ range }: { range: boolean }) {
-  return (
-    <>
-      <header className={pickerHeader}>
-        <Button slot="previous" className={pickerNav}>
-          <Icon name="chevron-left" />
-        </Button>
-        <Heading className={pickerHeading} />
-        <Button slot="next" className={pickerNav}>
-          <Icon name="chevron-right" />
-        </Button>
-      </header>
-      <CalendarGrid className="w-full table-fixed border-separate border-spacing-0">
-        <CalendarGridHeader>
-          {(day) => (
-            <CalendarHeaderCell className="pb-1 text-xs font-semibold text-muted-foreground">
-              {day}
-            </CalendarHeaderCell>
-          )}
-        </CalendarGridHeader>
-        <CalendarGridBody>
-          {(date) => <Day date={date} range={range} />}
-        </CalendarGridBody>
-      </CalendarGrid>
-    </>
   )
 }
 

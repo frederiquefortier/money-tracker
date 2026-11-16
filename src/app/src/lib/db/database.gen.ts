@@ -241,6 +241,29 @@ export type Database = {
         }
         Relationships: []
       }
+      event_default_skips: {
+        Row: {
+          category_id: string
+          user_id: string
+        }
+        Insert: {
+          category_id: string
+          user_id?: string
+        }
+        Update: {
+          category_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_default_skips_user_id_category_id_fkey"
+            columns: ["user_id", "category_id"]
+            isOneToOne: true
+            referencedRelation: "categories"
+            referencedColumns: ["user_id", "id"]
+          },
+        ]
+      }
       event_exclusions: {
         Row: {
           event_id: string
@@ -307,6 +330,39 @@ export type Database = {
           },
         ]
       }
+      event_skips: {
+        Row: {
+          category_id: string
+          event_id: string
+          user_id: string
+        }
+        Insert: {
+          category_id: string
+          event_id: string
+          user_id?: string
+        }
+        Update: {
+          category_id?: string
+          event_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_skips_user_id_category_id_fkey"
+            columns: ["user_id", "category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["user_id", "id"]
+          },
+          {
+            foreignKeyName: "event_skips_user_id_event_id_fkey"
+            columns: ["user_id", "event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["user_id", "id"]
+          },
+        ]
+      }
       event_types: {
         Row: {
           color: string
@@ -342,6 +398,7 @@ export type Database = {
           id: string
           import_batch_id: string | null
           name: string
+          skips_own: boolean
           starts_on: string | null
           type_id: string | null
           updated_at: string
@@ -354,6 +411,7 @@ export type Database = {
           id?: string
           import_batch_id?: string | null
           name: string
+          skips_own?: boolean
           starts_on?: string | null
           type_id?: string | null
           updated_at?: string
@@ -366,6 +424,7 @@ export type Database = {
           id?: string
           import_batch_id?: string | null
           name?: string
+          skips_own?: boolean
           starts_on?: string | null
           type_id?: string | null
           updated_at?: string
@@ -1524,6 +1583,10 @@ export type Database = {
         Args: { ends: string; starts: string }
         Returns: string
       }
+      event_skips_categories: {
+        Args: { category_ids: string[]; event: string }
+        Returns: boolean
+      }
       exchange_rate: {
         Args: { from_currency: string; on_date: string; to_currency: string }
         Returns: number
@@ -1597,6 +1660,7 @@ export type Database = {
       }
       matching_event: {
         Args: {
+          category_ids?: string[]
           for_transaction?: string
           ignore_exclusions?: boolean
           on_date: string
@@ -1639,10 +1703,15 @@ export type Database = {
           event_id: string
           name: string
           person_ids: string[]
+          skip_category_ids?: string[]
           starts_on: string
           type_id: string
         }
         Returns: string
+      }
+      save_event_default_skips: {
+        Args: { category_ids: string[] }
+        Returns: undefined
       }
       save_event_type: {
         Args: { color: string; name: string; type_id: string }

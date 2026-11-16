@@ -84,10 +84,15 @@ export const iconHover = {
     'relative isolate before:absolute before:-inset-1.5 before:-z-10 before:rounded-lg group-hover:before:bg-secondary',
 }
 
-// The calendar's header.
+// The calendar's header and its round buttons.
+export const roundButton = cn(
+  'grid size-8 shrink-0 place-items-center rounded-full text-muted-foreground hover:bg-secondary hover:text-foreground',
+  focusRing,
+)
+
 export const pickerHeader = 'flex items-center justify-between'
 export const pickerHeading = 'font-mono font-bold capitalize'
 export const pickerNav = cn(
-  'grid size-9 shrink-0 place-items-center rounded-full text-muted-foreground hover:bg-secondary hover:text-foreground disabled:pointer-events-none disabled:opacity-40',
+  'grid size-9 shrink-0 place-items-center rounded-full text-muted-foreground hover:bg-secondary hover:text-foreground disabled:pointer-events-none disabled:opacity-40 data-[disabled]:pointer-events-none data-[disabled]:opacity-40',
   focusRing,
 )

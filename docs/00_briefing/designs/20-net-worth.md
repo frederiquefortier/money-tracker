@@ -18,7 +18,7 @@ Route `/net-worth`, the "Net worth" tab (the name stays English in both language
 - Under it, a slot kept for the phase 5 chart. Nothing is drawn there yet.
 - Two link cards, side by side from `md` up and stacked on phones. Each has an icon bubble, a name, its total, one quiet line and a chevron. The whole card opens its subpage.
   - **Comptes** (Accounts): the sum of the open accounts' balances, and "n comptes".
-  - **Avoirs** (Holdings): investments plus assets minus debts, and "n placements, n actifs, n dettes" (kinds with none are left out), then "Mis à jour le {date}" with the most recent value date.
+  - **Avoirs** (Holdings): investments plus assets minus debts, and "n avoirs" (one count, every kind together, since 2026-11-13), then "Mis à jour le {date}" with the most recent value date, hidden on phones.
 
 ## What the total counts
 

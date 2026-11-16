@@ -1,5 +1,8 @@
 import { useTranslation } from 'react-i18next'
-import { CategoryBadge } from '#/components/categories/category-badge'
+import {
+  CategoryBadge,
+  EmptyCategoryBadge,
+} from '#/components/categories/category-badge'
 import { EditHint } from '#/components/forms/edit-hint'
 import { categoryPath } from '#/lib/categories/category'
 import type { Category } from '#/lib/categories/category'
@@ -68,15 +71,7 @@ export function CategoryButton({
             <EditHint size={hint} />
           </>
         ) : (
-          <span
-            className={cn(
-              'block rounded-full border-2 border-dashed transition-colors',
-              invalid
-                ? 'border-destructive'
-                : 'border-primary/40 group-hover:border-primary group-focus-visible:border-primary',
-              className,
-            )}
-          />
+          <EmptyCategoryBadge invalid={invalid} className={className} />
         )}
         {!category && <EditHint size={hint} icon="plus" />}
       </span>

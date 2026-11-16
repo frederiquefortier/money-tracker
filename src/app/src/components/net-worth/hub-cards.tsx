@@ -65,7 +65,7 @@ export function HubCard({
   to: '/net-worth/accounts' | '/net-worth/holdings'
   icon: IconName
   title: string
-  /** Quiet text beside the title. */
+  /** Quiet text beside the title, hidden on a phone. */
   titleNote?: string | null
   detail: React.ReactNode
   /** Undefined draws no amount: nothing in the subpage yet. */
@@ -88,7 +88,9 @@ export function HubCard({
         <span className="flex flex-wrap items-baseline gap-x-2">
           <span className="font-bold">{title}</span>
           {titleNote && (
-            <span className="text-xs text-muted-foreground">{titleNote}</span>
+            <span className="hidden text-xs text-muted-foreground sm:inline">
+              {titleNote}
+            </span>
           )}
         </span>
         <span className="block text-sm text-muted-foreground">{detail}</span>

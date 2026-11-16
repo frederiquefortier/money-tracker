@@ -11,8 +11,13 @@ const IMPORTS: Record<Locale, () => Promise<Messages>> = {
   en: () => import('./en').then((module) => module.en),
 }
 
-// Translations are the same for everyone, so the server keeps them across requests.
-const loaded: Partial<Record<Locale, Messages>> = {}
+// Translations are the same for everyone, so the server keeps them across requests. The
+// cache lives on globalThis: after a hot reload in dev, Vite serves a second copy of this
+// module (`index.ts?t=…`) to new importers, and a module-level cache would be empty there.
+const cache = globalThis as {
+  moneyTrackerTranslations?: Partial<Record<Locale, Messages>>
+}
+const loaded = (cache.moneyTrackerTranslations ??= {})
 
 export async function loadTranslations(locale: Locale) {
   loaded[locale] ??= await IMPORTS[locale]()

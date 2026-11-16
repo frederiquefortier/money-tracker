@@ -24,6 +24,8 @@ export type EventItem = {
   personIds: Array<string>
   /** False keeps the event out of the link by date (EVT-07): only links made by hand. */
   autoLink: boolean
+  /** Categories its link by date leaves out; null follows the default list (ADR-056). */
+  skipCategoryIds: Array<string> | null
   transactionCount: number
 }
 
@@ -38,7 +40,7 @@ export type LinkedEvent = {
 
 export type EventSource = 'manual' | 'auto'
 
-export const EVENT_TABS = ['events', 'types'] as const
+export const EVENT_TABS = ['events', 'types', 'settings'] as const
 export type EventTab = (typeof EVENT_TABS)[number]
 
 export const EVENT_SORTS = [
@@ -95,6 +97,7 @@ export const eventInputSchema = nameFormSchema
     endsOn: z.iso.date().nullable(),
     personIds: z.array(z.uuid()).max(200),
     autoLink: z.boolean(),
+    skipCategoryIds: z.array(z.uuid()).max(500).nullable(),
   })
   .refine(
     (e) => e.startsOn === null || e.endsOn === null || e.endsOn >= e.startsOn,

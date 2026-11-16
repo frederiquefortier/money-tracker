@@ -47,7 +47,8 @@ export function useAccountTree(
 /**
  * People under their groups, as accounts under their institution: a person in
  * several groups is in each, those in none under "Sans groupe". Searching lists the
- * matches flat, by name or alias. Archived people stay, for past transactions.
+ * groups whose name matches, with all their members, then the people who match by name
+ * or alias. Archived people stay, for past transactions.
  */
 export function usePeopleTree(
   people: ReadonlyArray<Person>,
@@ -59,15 +60,29 @@ export function usePeopleTree(
   const matches = matcher(query)
   const sorted = byName(people, locale)
   const leaf = (p: Person) => ({ id: p.id, label: p.name })
-  if (query.trim() || groups.length === 0)
-    return sorted.filter((p) => [p.name, ...p.aliases].some(matches)).map(leaf)
-  const cards = byName(groups, locale)
-    .map((g) => ({
-      id: `${GROUP}${g.id}`,
-      label: g.name,
-      children: sorted.filter((p) => g.memberIds.includes(p.id)).map(leaf),
-    }))
-    .filter((card) => card.children.length > 0)
+  const cardsOf = (list: ReadonlyArray<PersonGroup>) =>
+    byName(list, locale)
+      .map((g) => ({
+        id: `${GROUP}${g.id}`,
+        label: g.name,
+        children: sorted.filter((p) => g.memberIds.includes(p.id)).map(leaf),
+      }))
+      .filter((card) => card.children.length > 0)
+  if (query.trim()) {
+    const groupCards = cardsOf(groups.filter((g) => matches(g.name)))
+    const inCards = new Set(
+      groupCards.flatMap((c) => c.children.map((p) => p.id)),
+    )
+    return [
+      ...groupCards,
+      ...sorted
+        .filter((p) => !inCards.has(p.id))
+        .filter((p) => [p.name, ...p.aliases].some(matches))
+        .map(leaf),
+    ]
+  }
+  if (groups.length === 0) return sorted.map(leaf)
+  const cards = cardsOf(groups)
   const alone = sorted.filter((p) => p.groupIds.length === 0).map(leaf)
   return alone.length
     ? [

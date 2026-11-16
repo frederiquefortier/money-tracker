@@ -4,6 +4,25 @@ Ideas not built and not decided against. Review during planning to pick the next
 
 <!-- Newest first: a new idea goes directly below this line. Template at the bottom. -->
 
+### 2026-11-16 - Redesign the excluded categories tab
+
+**Description:**
+- The Réglages tab of Événements (the default excluded categories, ADR-056) works, but the author is not satisfied with its design and will come back to it.
+
+**Motivation:**
+- The author's call; no direction given yet.
+
+**Potential Approach:**
+- Start from the author's feedback when they pick it up; compare with the existing screens first.
+
+**Priority:**
+- [ ] High - Critical improvement
+- [x] Medium - Nice to have
+- [ ] Low - Future consideration
+
+**Dependencies:**
+- The author's direction.
+
 ### 2026-11-13 - Speed: what is left
 
 **Description:**

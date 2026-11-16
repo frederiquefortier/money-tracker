@@ -57,3 +57,25 @@ export function CategoryBadge({
     </span>
   )
 }
+
+/** No category yet: a dashed circle, the receipt's way to add one (with an EditHint plus). */
+export function EmptyCategoryBadge({
+  invalid = false,
+  className,
+}: {
+  invalid?: boolean
+  /** The circle's size. */
+  className: string
+}) {
+  return (
+    <span
+      className={cn(
+        'block rounded-full border-2 border-dashed transition-colors',
+        invalid
+          ? 'border-destructive'
+          : 'border-primary/40 group-hover:border-primary group-focus-visible:border-primary',
+        className,
+      )}
+    />
+  )
+}

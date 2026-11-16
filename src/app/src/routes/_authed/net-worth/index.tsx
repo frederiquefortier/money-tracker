@@ -6,7 +6,6 @@ import { HOLDING_KINDS } from '#/lib/holdings/holding'
 import { formatDate } from '#/lib/shared/format'
 import { useLocale } from '#/hooks/app/use-locale'
 import { getNetWorth } from '#/server/net-worth'
-import type { NetWorth } from '#/lib/net-worth/net-worth'
 import { listPagePending } from '#/components/layout/page-pending'
 
 export const Route = createFileRoute('/_authed/net-worth/')({
@@ -15,26 +14,11 @@ export const Route = createFileRoute('/_authed/net-worth/')({
   component: NetWorthHub,
 })
 
-const COUNT_KEYS = {
-  investment: 'netWorth.investments',
-  asset: 'netWorth.assets',
-  debt: 'netWorth.debts',
-} as const
-
-/** "2 placements, 1 actif". */
-function useHoldingsDetail(holdings: NetWorth['holdings']) {
-  const { t } = useTranslation()
-  return HOLDING_KINDS.filter((kind) => holdings.counts[kind] > 0)
-    .map((kind) => t(COUNT_KEYS[kind], { count: holdings.counts[kind] }))
-    .join(', ')
-}
-
 function NetWorthHub() {
   const { t } = useTranslation()
   const { displayCurrency, accounts, holdings, total, converted } =
     Route.useLoaderData()
   const locale = useLocale()
-  const holdingsDetail = useHoldingsDetail(holdings)
   const holdingsCount = HOLDING_KINDS.reduce(
     (sum, kind) => sum + holdings.counts[kind],
     0,
@@ -69,7 +53,11 @@ function NetWorthHub() {
                 })
               : null
           }
-          detail={holdingsCount > 0 ? holdingsDetail : t('holdings.empty')}
+          detail={
+            holdingsCount > 0
+              ? t('netWorth.holdingsCount', { count: holdingsCount })
+              : t('holdings.empty')
+          }
           total={holdingsCount > 0 ? holdings.total : undefined}
           currency={displayCurrency}
           converted={holdings.converted}

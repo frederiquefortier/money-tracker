@@ -48,6 +48,75 @@ function AddCircle({
   )
 }
 
+/** What is chosen, each with its icon and a ✕. */
+function PickedList({
+  picked,
+  onRemove,
+}: {
+  picked: ReadonlyArray<Picked>
+  onRemove: (id: string) => void
+}) {
+  const { t } = useTranslation()
+  if (picked.length === 0) return null
+  return (
+    <ul className="flex flex-col gap-1">
+      {picked.map((item) => (
+        <li key={item.id} className="flex items-center gap-2 text-sm">
+          {item.icon}
+          <span className="min-w-0 flex-1 truncate">{item.name}</span>
+          <IconButton
+            icon="close"
+            label={t('common.removeName', { name: item.name })}
+            onClick={() => onRemove(item.id)}
+          />
+        </li>
+      ))}
+    </ul>
+  )
+}
+
+/** The choices over the form, with a search; Terminé or a close gives the form back. */
+export function PickSheet({
+  open,
+  title,
+  searchLabel,
+  canClear,
+  onClear,
+  onClose,
+  children,
+}: {
+  open: boolean
+  title: string
+  searchLabel?: string
+  canClear: boolean
+  onClear: () => void
+  onClose: () => void
+  children: (query: string) => React.ReactNode
+}) {
+  const { t } = useTranslation()
+  const [query, setQuery] = useState('')
+  const close = () => {
+    setQuery('')
+    onClose()
+  }
+  return (
+    <Sheet open={open} onOpenChange={(next) => !next && close()}>
+      <SheetContent title={title} closeLabel={t('common.close')}>
+        <SheetHead>
+          <SearchField value={query} onChange={setQuery} label={searchLabel} />
+        </SheetHead>
+        <SheetBody>{children(query)}</SheetBody>
+        <SheetFooter className="justify-between">
+          <Button variant="ghost" disabled={!canClear} onClick={onClear}>
+            {t('common.clear')}
+          </Button>
+          <Button onClick={close}>{t('common.done')}</Button>
+        </SheetFooter>
+      </SheetContent>
+    </Sheet>
+  )
+}
+
 /**
  * Several choices in a form, drawn as on the receipt: what is chosen listed with
  * its icon and a ✕, then a round add button. The button opens the choices in a sheet over
@@ -74,52 +143,21 @@ export function PickField({
   /** The choices for what is typed in the search. */
   children: (query: string) => React.ReactNode
 }) {
-  const { t } = useTranslation()
   const [open, setOpen] = useState(false)
-  const [query, setQuery] = useState('')
   return (
     <div role="group" aria-label={label} className="flex flex-col gap-2">
       <FieldLabel>{label}</FieldLabel>
-      {picked.length > 0 && (
-        <ul className="flex flex-col gap-1">
-          {picked.map((item) => (
-            <li key={item.id} className="flex items-center gap-2 text-sm">
-              {item.icon}
-              <span className="min-w-0 flex-1 truncate">{item.name}</span>
-              <IconButton
-                icon="close"
-                label={t('common.removeName', { name: item.name })}
-                onClick={() => onRemove(item.id)}
-              />
-            </li>
-          ))}
-        </ul>
-      )}
+      <PickedList picked={picked} onRemove={onRemove} />
       <AddCircle icon={addIcon} label={addLabel} onOpen={() => setOpen(true)} />
-      <Sheet
+      <PickSheet
         open={open}
-        onOpenChange={(next) => {
-          setOpen(next)
-          if (!next) setQuery('')
-        }}
+        title={title}
+        canClear={picked.length > 0}
+        onClear={onClear}
+        onClose={() => setOpen(false)}
       >
-        <SheetContent title={title} closeLabel={t('common.close')}>
-          <SheetHead>
-            <SearchField value={query} onChange={setQuery} />
-          </SheetHead>
-          <SheetBody>{children(query)}</SheetBody>
-          <SheetFooter className="justify-between">
-            <Button
-              variant="ghost"
-              disabled={picked.length === 0}
-              onClick={onClear}
-            >
-              {t('common.clear')}
-            </Button>
-            <Button onClick={() => setOpen(false)}>{t('common.done')}</Button>
-          </SheetFooter>
-        </SheetContent>
-      </Sheet>
+        {children}
+      </PickSheet>
     </div>
   )
 }

@@ -20,19 +20,27 @@ const KNOWN: Partial<Record<string, EventError>> = {
 
 const failure = failureFor('events', KNOWN)
 
-/** Events and types with their people and counts. */
+/** Events and types with their people, skipped categories and counts. */
 export const getEvents = createServerFn({ method: 'GET' }).handler(
-  async (): Promise<{ events: Array<EventItem>; types: Array<EventType> }> => {
+  async (): Promise<{
+    events: Array<EventItem>
+    types: Array<EventType>
+    defaultSkipIds: Array<string>
+  }> => {
     const supabase = getSupabase()
-    const [events, types, people, usage] = loaded(
+    const [events, types, people, usage, skips, defaultSkips] = loaded(
       'Events',
       ...(await Promise.all([
         supabase
           .from('events')
-          .select('id, name, type_id, starts_on, ends_on, auto_link'),
+          .select(
+            'id, name, type_id, starts_on, ends_on, auto_link, skips_own',
+          ),
         supabase.from('event_types').select('id, name, color'),
         supabase.from('event_people').select('event_id, person_id'),
         supabase.from('event_usage').select('event_id, transaction_count'),
+        supabase.from('event_skips').select('event_id, category_id'),
+        supabase.from('event_default_skips').select('category_id'),
       ])),
     )
     return {
@@ -46,6 +54,9 @@ export const getEvents = createServerFn({ method: 'GET' }).handler(
         personIds: people
           .filter((p) => p.event_id === e.id)
           .map((p) => p.person_id),
+        skipCategoryIds: e.skips_own
+          ? skips.filter((k) => k.event_id === e.id).map((k) => k.category_id)
+          : null,
         transactionCount:
           usage.find((u) => u.event_id === e.id)?.transaction_count ?? 0,
       })),
@@ -53,6 +64,7 @@ export const getEvents = createServerFn({ method: 'GET' }).handler(
         ...type,
         eventCount: events.filter((e) => e.type_id === type.id).length,
       })),
+      defaultSkipIds: defaultSkips.map((d) => d.category_id),
     }
   },
 )
@@ -69,8 +81,20 @@ export const saveEvent = createServerFn({ method: 'POST' })
       ends_on: data.endsOn,
       person_ids: data.personIds,
       auto_link: data.autoLink,
+      // Undefined is the SQL default, null: the event follows the default list.
+      skip_category_ids: data.skipCategoryIds ?? undefined,
     })
     return error ? failure('save event', error) : { ok: true, id }
+  })
+
+/** The categories every event skips unless it has its own list; links are recomputed. */
+export const saveEventDefaultSkips = createServerFn({ method: 'POST' })
+  .validator(z.object({ categoryIds: z.array(z.uuid()).max(500) }))
+  .handler(async ({ data }): Promise<EventResult> => {
+    const { error } = await getSupabase().rpc('save_event_default_skips', {
+      category_ids: data.categoryIds,
+    })
+    return error ? failure('save default skips', error) : { ok: true }
   })
 
 export const saveEventType = createServerFn({ method: 'POST' })
@@ -106,6 +130,7 @@ const matchInput = z.object({
   occurredOn: z.iso.date(),
   kind: z.enum(['expense', 'income']),
   transactionId: z.uuid().optional(),
+  categoryIds: z.array(z.uuid()).max(100),
 })
 
 /**
@@ -119,6 +144,7 @@ export const getMatchingEvent = createServerFn({ method: 'GET' })
       on_date: data.occurredOn,
       tx_kind: data.kind,
       for_transaction: data.transactionId,
+      category_ids: data.categoryIds,
     })
     if (error) throw new Error(`The event could not be matched (${error.code})`)
     return id
