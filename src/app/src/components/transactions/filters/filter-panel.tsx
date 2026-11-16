@@ -1,9 +1,10 @@
-import { useEffect, useRef, useState } from 'react'
+import { useState } from 'react'
 import {
   FilterDetail,
   FilterListScreen,
   PeriodScreen,
 } from '#/components/transactions/filters/filter-screens'
+import { useLocalFilters } from '#/hooks/transactions/use-local-filters'
 import { NO_FILTERS } from '#/lib/transactions/transaction-filters'
 import type {
   FilterOptions,
@@ -15,36 +16,6 @@ import type {
   ListFilters,
   PeriodChoice,
 } from '#/lib/transactions/transaction-list'
-
-/**
- * The ticks as the sheet shows them: at once, while the list behind is told once the
- * ticking pauses, and again on closing, so a tick never waits for the list to reload.
- */
-function useLocalValues(
-  values: FilterValues,
-  send: (values: FilterValues) => void,
-) {
-  const [local, setLocal] = useState(values)
-  const pending = useRef<FilterValues | null>(null)
-  const latest = useRef(send)
-  latest.current = send
-  const timer = useRef<ReturnType<typeof setTimeout>>(undefined)
-  const flush = () => {
-    clearTimeout(timer.current)
-    if (pending.current) latest.current(pending.current)
-    pending.current = null
-  }
-  useEffect(() => flush, [])
-  return [
-    local,
-    (next: FilterValues) => {
-      setLocal(next)
-      pending.current = next
-      clearTimeout(timer.current)
-      timer.current = setTimeout(flush, 400)
-    },
-  ] as const
-}
 
 /**
  * Mounted while the sheet is open, so the search starts empty each time. One screen at a
@@ -83,7 +54,7 @@ export function FilterPanel({
   onClose: () => void
 }) {
   const [query, setQuery] = useState('')
-  const [local, setLocal] = useLocalValues(values, onChange)
+  const [local, setLocal] = useLocalFilters(values, onChange)
   const go = (next: FilterScreen | null) => {
     setQuery('')
     onTab(next)

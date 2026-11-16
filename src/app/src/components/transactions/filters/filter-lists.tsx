@@ -38,9 +38,6 @@ function NoMatch() {
 const MERCHANTS_FIRST = 8
 const MERCHANTS_MORE = 50
 
-// Institutions open at first while they all fit on a phone.
-const ACCOUNT_GROUPS_OPEN = 4
-
 /** Merchants can run to thousands: a few at a time, the search reaching all of them. */
 function MerchantList({
   merchants,
@@ -107,14 +104,7 @@ function EventList({
   const toggle = (node: CheckNode) =>
     onChange({ ...values, eventIds: ticks.toggle(node) })
   if (events.length === 0) return <NoMatch />
-  return (
-    <CheckList
-      nodes={events}
-      openCount={1}
-      stateOf={ticks.stateOf}
-      onToggle={toggle}
-    />
-  )
+  return <CheckList nodes={events} stateOf={ticks.stateOf} onToggle={toggle} />
 }
 
 /** Dépense, Revenu, Transfert: an adjustment is in none of them. */
@@ -169,7 +159,6 @@ export function FilterList({
     return (
       <CheckList
         nodes={accounts}
-        openCount={accounts.length <= ACCOUNT_GROUPS_OPEN ? accounts.length : 0}
         stateOf={ticks.stateOf}
         onToggle={(node) =>
           onChange({ ...values, accountIds: ticks.toggle(node) })
@@ -183,7 +172,6 @@ export function FilterList({
     return (
       <CheckList
         nodes={categories}
-        openCount={1}
         stateOf={ticks.stateOf}
         onToggle={(node) =>
           onChange({ ...values, categoryIds: ticks.toggle(node) })
@@ -197,7 +185,6 @@ export function FilterList({
     return (
       <CheckList
         nodes={people}
-        openCount={people.length}
         stateOf={ticks.stateOf}
         onToggle={(node) =>
           onChange({ ...values, personIds: ticks.toggle(node) })

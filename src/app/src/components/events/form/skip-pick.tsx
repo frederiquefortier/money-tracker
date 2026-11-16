@@ -45,7 +45,6 @@ export function SkipChoices({
   return (
     <CheckList
       nodes={nodes}
-      openCount={1}
       stateOf={ticks.stateOf}
       onToggle={(node) => onChange(ticks.toggle(node))}
     />

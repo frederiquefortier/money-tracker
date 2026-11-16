@@ -9,6 +9,7 @@ import { useTranslation } from 'react-i18next'
 import { FloatingAddLink } from '#/components/layout/floating-add-button'
 import { EmptyState } from '#/components/lists/list-card'
 import { pageColumn } from '#/components/styles'
+import { FilterSidebar } from '#/components/transactions/filters/filter-sidebar'
 import { ListHeader } from '#/components/transactions/list/list-header'
 import { TransactionDayGroup } from '#/components/transactions/list/transaction-day'
 import { useTransactionPages } from '#/hooks/transactions/use-transaction-pages'
@@ -164,51 +165,63 @@ function Transactions() {
   const empty = useEmptyText(deps)
 
   return (
-    <div className={pageColumn}>
-      <ListHeader
-        choice={deps}
-        filters={deps}
+    // From `lg` up the filters sit beside the list, staying in view as it scrolls.
+    <div className="lg:grid lg:grid-cols-[15rem_minmax(0,48rem)] lg:items-start lg:justify-center lg:gap-12">
+      <FilterSidebar
+        values={deps}
         names={data.filters}
-        total={data.total}
-        pending={{ count: data.pendingCount, on: deps.pendingOnly }}
-        owed={{ count: data.owedCount, on: deps.owedOnly }}
-        search={text}
-        loading={switching}
+        period={deps}
+        total={switching ? null : data.total}
+        onChange={go.filters}
         onPeriod={go.period}
-        onFilters={go.filters}
-        onPending={go.pending}
-        onOwed={go.owed}
-        onSearch={setText}
+        className="hidden lg:sticky lg:top-20 lg:flex"
       />
-      <div className="mt-2 flex flex-col gap-4">
-        {days.length === 0 ? (
-          <EmptyState>{empty}</EmptyState>
-        ) : (
-          revealed.shown.map((day) => (
-            <TransactionDayGroup
-              key={day.date}
-              day={day}
-              displayCurrency={displayCurrency}
-              filtered={deps.accountIds.length > 0}
-              feeCategory={data.feeCategory}
-            />
-          ))
-        )}
-        {revealed.more && <div ref={revealed.sentinel} aria-hidden="true" />}
-        {!revealed.more && more && (
-          <div
-            ref={sentinel}
-            className="py-4 text-center text-muted-foreground"
-          >
-            {loading && (
-              <Spinner label={t('common.loading')} className="mx-auto" />
-            )}
-          </div>
-        )}
+      <div className={pageColumn}>
+        <ListHeader
+          choice={deps}
+          filters={deps}
+          names={data.filters}
+          total={data.total}
+          pending={{ count: data.pendingCount, on: deps.pendingOnly }}
+          owed={{ count: data.owedCount, on: deps.owedOnly }}
+          search={text}
+          loading={switching}
+          onPeriod={go.period}
+          onFilters={go.filters}
+          onPending={go.pending}
+          onOwed={go.owed}
+          onSearch={setText}
+        />
+        <div className="mt-2 flex flex-col gap-4">
+          {days.length === 0 ? (
+            <EmptyState>{empty}</EmptyState>
+          ) : (
+            revealed.shown.map((day) => (
+              <TransactionDayGroup
+                key={day.date}
+                day={day}
+                displayCurrency={displayCurrency}
+                filtered={deps.accountIds.length > 0}
+                feeCategory={data.feeCategory}
+              />
+            ))
+          )}
+          {revealed.more && <div ref={revealed.sentinel} aria-hidden="true" />}
+          {!revealed.more && more && (
+            <div
+              ref={sentinel}
+              className="py-4 text-center text-muted-foreground"
+            >
+              {loading && (
+                <Spinner label={t('common.loading')} className="mx-auto" />
+              )}
+            </div>
+          )}
+        </div>
+        <FloatingAddLink to="/transactions/new" label={t('transactions.add')} />
+        {/* The transaction forms open here as sheets. */}
+        <Outlet />
       </div>
-      <FloatingAddLink to="/transactions/new" label={t('transactions.add')} />
-      {/* The transaction forms open here as sheets. */}
-      <Outlet />
     </div>
   )
 }

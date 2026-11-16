@@ -115,7 +115,6 @@ export function PeopleScreen({
         )}
         <CheckList
           nodes={tree}
-          openCount={tree.length}
           stateOf={ticks.stateOf}
           onToggle={(node) => {
             const next = ticks.toggle(node)

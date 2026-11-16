@@ -20,6 +20,7 @@ import type {
  */
 export function FilterSheet({
   open,
+  side = 'right',
   tabs = FILTER_TABS,
   tab,
   canGoBack = tabs.length > 1,
@@ -34,6 +35,8 @@ export function FilterSheet({
   onPeriod = () => {},
 }: {
   open: boolean
+  /** From the left beside the desktop sidebar. */
+  side?: 'right' | 'left'
   tabs?: ReadonlyArray<FilterTab>
   /** The open screen; null shows the list of `tabs`, and the period when there is one. */
   tab: FilterScreen | null
@@ -60,6 +63,7 @@ export function FilterSheet({
       <SheetContent
         title={t('transactions.list.filters')}
         closeLabel={t('common.close')}
+        side={side}
       >
         <FilterPanel
           tabs={tabs}

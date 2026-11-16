@@ -171,7 +171,7 @@ function GroupCard({
 }
 
 /**
- * One filter's list: groups as cards that fold, the first `openCount` open, or plain
+ * One filter's list: groups as cards that fold, all closed in a sheet (2026-11-16), or plain
  * rows in one card (merchants, a search's matches).
  */
 export function CheckList({

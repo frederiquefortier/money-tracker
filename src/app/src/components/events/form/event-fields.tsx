@@ -119,7 +119,6 @@ function PeopleChoices({
   return (
     <CheckList
       nodes={nodes}
-      openCount={nodes.length}
       stateOf={ticks.stateOf}
       onToggle={(node) => onChange(ticks.toggle(node))}
     />

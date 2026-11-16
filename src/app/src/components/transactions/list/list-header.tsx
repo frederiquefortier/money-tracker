@@ -10,10 +10,7 @@ import type {
   PeriodChoice,
 } from '#/lib/transactions/transaction-list'
 import { chipSurface } from '#/components/styles'
-import {
-  FilterBubble,
-  inUse,
-} from '#/components/transactions/filters/filter-bubble'
+import { inUse } from '#/components/transactions/filters/filter-bubble'
 import { cn } from '#/lib/utils'
 import {
   FILTER_KEYS,
@@ -21,41 +18,11 @@ import {
 } from '#/lib/transactions/transaction-filters'
 import type {
   FilterScreen,
-  FilterTab,
   FilterValues,
 } from '#/lib/transactions/transaction-filters'
 import { useEmptyFilters } from '#/hooks/transactions/use-empty-filters'
-import { useFilterLabel } from '#/hooks/transactions/use-filter-label'
 
-/**
- * A filter's button: "Comptes", or "Catégories · 2" with some ticked, filled while in
- * use. It opens the sheet on that filter.
- */
-function FilterButton({
-  tab,
-  values,
-  empty,
-  onOpen,
-}: {
-  tab: FilterTab
-  values: FilterValues
-  /** Nothing to choose from, so it cannot open (unless something is still ticked). */
-  empty: boolean
-  onOpen: () => void
-}) {
-  const labelOf = useFilterLabel(values)
-  const count = values[FILTER_KEYS[tab]].length
-  return (
-    <FilterBubble
-      label={labelOf(tab)}
-      count={count}
-      disabled={empty && count === 0}
-      onOpen={onOpen}
-    />
-  )
-}
-
-/** On phones, one button for the five filters, "Filtres · 3", opening their list. */
+/** Below `lg`, one button for the filters, "Filtres · 3", opening their list; the sidebar shows them from `lg` up. */
 function AllFiltersButton({
   values,
   onOpen,
@@ -77,7 +44,7 @@ function AllFiltersButton({
       type="button"
       aria-haspopup="dialog"
       onClick={onOpen}
-      className={cn(chipSurface, count > 0 && inUse, 'md:hidden')}
+      className={cn(chipSurface, count > 0 && inUse, 'lg:hidden')}
     >
       <Icon name="filter" className="size-4" />
       {label}
@@ -127,23 +94,17 @@ function StatusButton({
 }
 
 type BubblesProps = {
-  choice: PeriodChoice
   filters: FilterValues
-  names: ListFilters | null
   pending: { count: number | null; on: boolean }
   owed: { count: number | null; on: boolean }
-  loading: boolean
-  onPeriod: (choice: PeriodChoice) => void
   onPending: (on: boolean) => void
   onOwed: (on: boolean) => void
-  empty: ReadonlySet<FilterTab>
-  onOpen: (tab: FilterScreen | null) => void
+  onOpen: () => void
 }
 
-/** Pending, owed, the period and the filters, as bubbles wrapping onto more lines. */
+/** What is pending or owed, and below `lg` the Filtres button, wrapping onto more lines. */
 function Bubbles(props: BubblesProps) {
-  const { t } = useTranslation()
-  const { choice, filters, pending, owed, loading } = props
+  const { filters, pending, owed } = props
   return (
     <div className="flex flex-wrap items-center gap-2">
       <StatusButton
@@ -158,32 +119,14 @@ function Bubbles(props: BubblesProps) {
         on={owed.on}
         onToggle={props.onOwed}
       />
-      <span className="hidden md:contents">
-        <FilterBubble
-          label={t('transactions.list.dates')}
-          count={choice.period === 'all' ? 0 : 1}
-          disabled={loading}
-          onOpen={() => props.onOpen('period')}
-        />
-      </span>
-      <AllFiltersButton values={filters} onOpen={() => props.onOpen(null)} />
-      {FILTER_TABS.map((tab) => (
-        <span key={tab} className="hidden md:contents">
-          <FilterButton
-            tab={tab}
-            values={filters}
-            empty={props.empty.has(tab)}
-            onOpen={() => props.onOpen(tab)}
-          />
-        </span>
-      ))}
+      <AllFiltersButton values={filters} onOpen={props.onOpen} />
     </div>
   )
 }
 
 /**
- * The title, the search, then the bubbles: what is pending or owed, the period with its
- * arrows and a button per filter, or on phones a single Filtres button.
+ * The title, the search, then the bubbles: what is pending or owed, and below `lg` a
+ * single Filtres button opening the sheet (the sidebar holds the filters from `lg` up).
  */
 export function ListHeader({
   choice,
@@ -217,20 +160,17 @@ export function ListHeader({
 }) {
   const { t } = useTranslation()
   const empty = useEmptyFilters()
-  // `list`: the sheet came from a phone's Filtres button, so a filter has a way back to it.
   const [sheet, setSheet] = useState<{
     open: boolean
     tab: FilterScreen | null
-    list: boolean
-  }>({ open: false, tab: null, list: true })
+  }>({ open: false, tab: null })
   return (
     <>
       <PageTitle>{t('nav.transactions')}</PageTitle>
       <SearchField value={search} onChange={onSearch} />
       <Bubbles
-        {...{ choice, filters, names, pending, owed, loading, empty }}
-        {...{ onPeriod, onPending, onOwed }}
-        onOpen={(tab) => setSheet({ open: true, tab, list: tab === null })}
+        {...{ filters, pending, owed, onPending, onOwed }}
+        onOpen={() => setSheet({ open: true, tab: null })}
       />
       <FilterChips
         values={filters}
@@ -241,7 +181,6 @@ export function ListHeader({
       <FilterSheet
         open={sheet.open}
         tab={sheet.tab}
-        canGoBack={sheet.list}
         names={names}
         period={choice}
         empty={empty}
