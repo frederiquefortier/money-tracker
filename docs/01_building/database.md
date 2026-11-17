@@ -129,6 +129,12 @@ takes nothing dated after. `holding_totals` gives placed (money in, never down),
 null (never zero or partial) when a rate or a value is missing (ADR-045). A category with
 linked transactions stays an investment. The four holding tables carry `import_batch_id`, so an import is undone (ADR-050).
 
+**Net worth series.** `net_worth_series()` gives the hub's chart one row per month end (then
+today) per account and per holding with a value: the account's balance, pending included, or the
+holding's last value on or before the date (debts negative), as text in the display currency at
+that date's rate, null when a rate is missing. An item counts until the day it closes. The
+browser leaves items out and sums (ADR-057).
+
 ## Not built yet
 
 | Table | Notes |

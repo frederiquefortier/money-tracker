@@ -4,6 +4,54 @@ Technical and structural choices, with the alternatives that were rejected. Chec
 
 <!-- Newest first: a new ADR goes directly below this line. Template at the bottom. -->
 
+### ADR-059: No complete total under the hub's net worth (2026-11-17)
+
+**Context:**
+- ADR-058 showed "X $ (total)" under the net worth while items were hidden. After the hub's redesign the author asked to remove it.
+
+**Decision:**
+- The hub shows only the net worth without the hidden items. The eye beside the title, eye-off while some are hidden, is the one sign that something is left out.
+- The Comptes and Avoirs cards stay complete.
+
+**Alternatives Considered:**
+- Keeping the line -> The author found it clutter under the headline.
+
+**Consequences:**
+- Supersedes ADR-058 where it adds the complete figure under the net worth. The rest of ADR-058 stands.
+
+### ADR-058: The hub's net worth leaves out the hidden items (2026-11-17)
+
+**Context:**
+- ADR-048 kept every hub total complete and made leaving items out a chart view. With the total now in the sidebar beside the chart, the author asked for it to follow what is hidden, with the complete figure under it.
+
+**Decision:**
+- Hidden items (the eye beside the page title, per browser) leave the chart, the sidebar's net worth, assets, debts and their changes, and the Détail list. While any are hidden, a line under the net worth reads "X $ (total)", X counting everything open.
+- The Comptes and Avoirs cards stay complete: they total their subpages.
+- Still no flag on the account or holding; the choice stays in the browser.
+
+**Alternatives Considered:**
+- The full total large and the visible one under it (as built on 2026-11-16) -> The author wanted the large figure to match the chart.
+
+**Consequences:**
+- Supersedes ADR-048 where the hub's total always counts everything. The rest of ADR-048 stands.
+
+### ADR-057: The net worth series is per item in SQL, summed in the browser (2026-11-16)
+
+**Context:**
+- The hub's chart (NW-04) needs the net worth at every month end since the first data, and NW-05 lets the browser leave out chosen accounts and holdings, remembered per browser.
+
+**Decision:**
+- One SQL function, `net_worth_series()`, returns a row per month end (and today) per open account and per holding with a value: its figure in the display currency at that date's rate, debts negative, NULL when a rate is missing. Holdings carry their last value forward.
+- The hub loader fetches the whole history once. The browser leaves out items, cuts the range and sums with the existing bigint helper, so a missing rate empties that point, never a partial sum.
+
+**Alternatives Considered:**
+- Totals summed in SQL, with the left-out ids as an argument -> A round trip for each tick in the filter.
+- Every point at today's rate -> The past would move whenever rates move; transactions already use their own date (CUR-07).
+
+**Consequences:**
+- A few thousand rows for eight years; fine at one user, revisit if it grows.
+- Recharts gets numbers only to draw; every figure shown is the string amount.
+
 ### ADR-056: An event's excluded categories may be its own empty list (2026-11-14)
 
 **Context:**

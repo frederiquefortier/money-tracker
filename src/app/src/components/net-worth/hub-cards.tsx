@@ -7,7 +7,7 @@ import { cardSurface, focusRing, rowHover } from '#/components/styles'
 import { cn } from '#/lib/utils'
 
 /** The amount at the foot of a card: a missing rate is an error, never a partial sum. */
-function Total({
+export function Total({
   total,
   currency,
   converted,
@@ -29,34 +29,11 @@ function Total({
   )
 }
 
-/** The net worth, large, at the top of the hub. */
-export function TotalCard({
-  total,
-  currency,
-  converted,
-}: {
-  total: string | null
-  currency: string
-  converted: boolean
-}) {
-  return (
-    <section className={cn(cardSurface, 'px-5 py-6')}>
-      <Total
-        total={total}
-        currency={currency}
-        converted={converted}
-        className="text-3xl font-bold"
-      />
-    </section>
-  )
-}
-
 /** A subpage's card on the hub: its own total, one quiet line, the whole card a link. */
 export function HubCard({
   to,
   icon,
   title,
-  titleNote,
   detail,
   total,
   currency,
@@ -65,8 +42,6 @@ export function HubCard({
   to: '/net-worth/accounts' | '/net-worth/holdings'
   icon: IconName
   title: string
-  /** Quiet text beside the title, hidden on a phone. */
-  titleNote?: string | null
   detail: React.ReactNode
   /** Undefined draws no amount: nothing in the subpage yet. */
   total: string | null | undefined
@@ -85,14 +60,7 @@ export function HubCard({
     >
       <IconBubble icon={icon} tone="primary" />
       <span className="min-w-0 flex-1">
-        <span className="flex flex-wrap items-baseline gap-x-2">
-          <span className="font-bold">{title}</span>
-          {titleNote && (
-            <span className="hidden text-xs text-muted-foreground sm:inline">
-              {titleNote}
-            </span>
-          )}
-        </span>
+        <span className="block font-bold">{title}</span>
         <span className="block text-sm text-muted-foreground">{detail}</span>
       </span>
       {total !== undefined && (

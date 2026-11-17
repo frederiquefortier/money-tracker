@@ -95,12 +95,12 @@ English; this file is in English like every other meta-doc.
 | ID | Requirement | Source | Phase |
 |---|---|---|---|
 | MER-01 | A merchant can have a default category, prefilled on new transactions. | v1, ai | 1 |
-| MER-02 | A merchant has aliases, other spellings of its name, so an import finds it by name or alias. A merge (MER-05) and an import merge keep the source's name and aliases as aliases of the target. Built 2026-11-10; the merchant form edits them (2026-11-11). The list does not show them. | v1, ai | 3 |
+| MER-02 | A merchant has aliases, other spellings of its name, so an import finds it by name or alias. A merge (MER-05) and an import merge keep the source's name and aliases as aliases of the target. The merchant form edits them. The list does not show them. | v1, ai | 3 |
 | MER-07 | ~~A merchant can be a person.~~ Replaced on 2026-11-11 by PPL-09: the seller is a person field on the transaction, and the merchant has no person (ADR-040, which supersedes ADR-038). | author | 3 |
 | MER-03 | A merchant has a country of origin. | v1 | later |
 | MER-04 | For one merchant, see how the bill has changed over time, in percent. | v1, ai | 4 |
 | MER-06 | The merchant list sorts by name (A–Z, Z–A) or by category, kept per browser, and filters by default category (a parent keeps its branch) or none. | author | 1 |
-| MER-08 | On the merchants list, a merchant with no default category shows the category its own transactions use most (ties go to the one used last) in a faded badge and italic path, with a "Suggérée" tag and a sparkle, the mark the app uses for what it did by itself (as for an event link made by the rule). Clicking the tag makes the suggestion the default category. The merchant's sheet also opens with it filled in. Built 2026-11-13. | author | 1 |
+| MER-08 | On the merchants list, a merchant with no default category shows the category its own transactions use most (ties go to the one used last) in a faded badge and italic path, with a "Suggérée" tag and a sparkle, the mark the app uses for what it did by itself (as for an event link made by the rule). Clicking the tag makes the suggestion the default category. The merchant's sheet also opens with it filled in. | author | 1 |
 | MER-05 | Merge two merchants: the transactions of one move to the other, which keeps its name and default category; the source's name becomes an alias (MER-02). | author | 1 |
 
 ## 7. Tags (`TAG`)
@@ -121,9 +121,9 @@ English; this file is in English like every other meta-doc.
 | PPL-04 | Without naming anyone: tick "I treated someone" with an amount and a head count, or "I expect a reimbursement" with an amount. | v1 | 2 |
 | PPL-05 | What each person owes me, at a glance: on their row and in their sheet, and the owed bubble on Transactions. Money I owe others is out of scope. | misc, author | 2 |
 | PPL-06 | A person can have aliases, other spellings of their name, so the import finds them by name or alias, ignoring case and accents. A name or an alias points to one person only. | author | 2 |
-| PPL-07 | Merge two people: the source's transaction lines, group memberships and event links move to the other, which keeps its name; the source's name and aliases become aliases of it (PPL-06). Refused when both are on one transaction. Built 2026-11-11. | author | 2 |
-| PPL-08 | A person can be with me on an expense without sharing its cost: a third role, "With me" (Avec moi), beside invited and owes. It has no part and no amount, never changes the others' parts, shows on the transaction, in the Proches filter and on the person's page. Not on an income, and not on a line without a name. Built 2026-11-11 (ADR-040). | author | 2 |
-| PPL-09 | An expense can name who it was bought from, a person field beside the merchant ("Acheté chez"), alone or together with a shop ("Maman, via Amazon"). Expenses only. Searched and filtered like the people on it. The import sets it from a merchant text that is a person's name or alias. Built 2026-11-11 (ADR-040). | author | 2 |
+| PPL-07 | Merge two people: the source's transaction lines, group memberships and event links move to the other, which keeps its name; the source's name and aliases become aliases of it (PPL-06). Refused when both are on one transaction. | author | 2 |
+| PPL-08 | A person can be with me on an expense without sharing its cost: a third role, "With me" (Avec moi), beside invited and owes. It has no part and no amount, never changes the others' parts, shows on the transaction, in the Proches filter and on the person's page. Not on an income, and not on a line without a name (ADR-040). | author | 2 |
+| PPL-09 | An expense can name who it was bought from, a person field beside the merchant ("Acheté chez"), alone or together with a shop ("Maman, via Amazon"). Expenses only. Searched and filtered like the people on it. The import sets it from a merchant text that is a person's name or alias (ADR-040). | author | 2 |
 
 ## 9. Events (`EVT`)
 
@@ -168,10 +168,10 @@ English; this file is in English like every other meta-doc.
 | ID | Requirement | Source | Phase |
 |---|---|---|---|
 | NW-01 | Holdings: investment accounts, debts and other assets. Each has a country, a type (predefined by country, or typed with a kind), an optional name (otherwise type, institution and currency name it), an institution and a currency. | v1, ai, author (2026-11-12) | 2 |
-| NW-02 | Dated value snapshots per holding. Months with no snapshot can be hidden in charts. | v1, ai | 2 |
+| NW-02 | Dated value snapshots per holding. A month with no snapshot keeps the last value in the chart (author, 2026-11-16). | v1, ai | 2 |
 | NW-03 | Contributions per holding, split between my money (transactions linked to the holding) and external money (employer, government; entered on the holding). Money can be transferred from one holding to another on a date. Holdings sort as accounts do (ACC-07). Shows amount placed (never reduced by a withdrawal), amount withdrawn, and profit in amount and percent. | v1, ai, net-worth data, author (2026-11-12) | 2 |
-| NW-04 | Net worth chart (total, investments, debts) and percent change over any range; default is account start to today. | v1, ai | 5 |
-| NW-05 | The net worth chart can leave out chosen holdings and accounts, to simulate (the life insurance "with/without" line). The choice is remembered per browser; the totals on the hub always list everything open. | net-worth data, author (2026-11-12) | 5 |
+| NW-04 | Net worth chart (total, investments, debts) and percent change over a range of 1, 3, 5, 7 or 10 years or everything; default is account start to today. The chart draws the net worth alone, with bars of what moved it by year (by month on a short range) split by group; assets count accounts, debts count credit cards. A list gives every account and holding with its own trend, each opening its own chart, as the spreadsheet did. Net worth, assets, debts and each item show their change over the same range, per year on everything, which also takes 1, 3 or 6 months (author, 2026-11-16 and 17). | v1, ai, author | 5 |
+| NW-05 | Chosen holdings and accounts can be hidden, to simulate (the life insurance "with/without" line): they leave the chart and the hub's net worth (ADR-058, ADR-059). The choice is remembered per browser; the Comptes and Avoirs cards always list everything open. | net-worth data, author (2026-11-12) | 5 |
 | NW-06 | Projections at fixed growth rates (5, 7, 10 %) or custom inputs. | v1, ai | later |
 | NW-07 | Goal solver: "to reach X in N years at r %, invest Y per year", with r defaulting to my actual return. | v1, ai | later |
 | NW-08 | "If this continues, in N years I'll have X." | v1, ai | later |

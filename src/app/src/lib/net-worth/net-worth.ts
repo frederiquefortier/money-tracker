@@ -1,6 +1,7 @@
 import { fromMinor, toMinor } from '#/lib/shared/money'
 import { HOLDING_KINDS } from '#/lib/holdings/holding'
 import type { HoldingKind } from '#/lib/holdings/holding'
+import type { ChartItem, SeriesRow } from '#/lib/net-worth/net-worth-series'
 
 // The hub's figures (NW-10, spec 20). Converted amounts come from the database with four
 // decimals whatever the currency, so sums are made at four.
@@ -71,4 +72,7 @@ export type NetWorth = {
   /** Null when either part has a missing rate. */
   total: string | null
   converted: boolean
+  /** The chart's figures per item per date (ADR-057) and the items it can leave out. */
+  series: Array<SeriesRow>
+  items: Array<ChartItem>
 }

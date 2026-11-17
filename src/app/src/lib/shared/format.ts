@@ -49,6 +49,20 @@ export function formatMoney(
   )
 }
 
+/** A chart axis: "48 k$". A number, for the drawing only; figures shown in text stay strings. */
+export function formatAxisMoney(
+  value: number,
+  currency: string,
+  locale: Locale,
+): string {
+  return numberFormat(locale, {
+    style: 'currency',
+    currency,
+    notation: 'compact',
+    maximumFractionDigits: 1,
+  }).format(value)
+}
+
 export function percentFormat(locale: Locale, maximumFractionDigits: number) {
   return numberFormat(locale, {
     style: 'percent',

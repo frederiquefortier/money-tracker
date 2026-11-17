@@ -41,6 +41,7 @@
     "react-aria-components": "1.22.1",
     "react-dom": "^19.2.0",
     "react-i18next": "^17.1.9",
+    "recharts": "^3.8.0",
     "tailwind-merge": "^3.0.2",
     "tailwindcss": "^4.1.18",
     "tw-animate-css": "^1.3.6",

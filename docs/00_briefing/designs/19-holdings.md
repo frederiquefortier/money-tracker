@@ -1,6 +1,6 @@
 # Holdings
 
-**Status:** built, being reworked (ADR-048). Shared rules: [02-screens.md](02-screens.md). Decisions: [ADR-045](../../01_building/decisions.md), [ADR-048](../../01_building/decisions.md).
+**Status:** built. Shared rules: [02-screens.md](02-screens.md). Decisions: [ADR-045](../../01_building/decisions.md), [ADR-048](../../01_building/decisions.md).
 
 ## Purpose
 

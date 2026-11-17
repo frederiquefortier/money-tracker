@@ -1,6 +1,6 @@
 # Institutions
 
-**Status:** not built. Shared rules: [02-screens.md](02-screens.md). Decision: [ADR-047](../../01_building/decisions.md).
+**Status:** built. Shared rules: [02-screens.md](02-screens.md). Decision: [ADR-047](../../01_building/decisions.md).
 
 ## Purpose
 

@@ -1677,6 +1677,15 @@ export type Database = {
         Args: { source: string; target: string }
         Returns: undefined
       }
+      net_worth_series: {
+        Args: never
+        Returns: {
+          display_value: string
+          item_id: string
+          kind: string
+          on_date: string
+        }[]
+      }
       reactivate_category: {
         Args: { active_from: string; category: string }
         Returns: number
