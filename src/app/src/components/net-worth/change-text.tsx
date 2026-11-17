@@ -56,12 +56,15 @@ export function ChangeText({
   currency,
   lowerIsBetter = false,
   percentOnly = false,
+  className,
 }: {
   change: Change
   currency: string
   /** A debt: down is good. */
   lowerIsBetter?: boolean
   percentOnly?: boolean
+  /** Its size where it sits under an amount larger than the default. */
+  className?: string
 }) {
   const { t } = useTranslation()
   const zero = /^-?0(\.0+)?$/.test(change.amount)
@@ -75,6 +78,7 @@ export function ChangeText({
         'text-xs font-semibold whitespace-nowrap',
         zero && 'text-muted-foreground',
         !zero && (good ? 'text-income' : 'text-destructive'),
+        className,
       )}
     >
       {!zero && (

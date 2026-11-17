@@ -17,10 +17,9 @@ import {
 } from '#/components/styles'
 import { cn } from '#/lib/utils'
 
-// The calendar's month and year, as in the M3 docked date picker: each steps with its
-// arrows, and its name opens a list to pick from in place of the grid.
-
-export type CalendarMenu = 'month' | 'year' | null
+// The calendar's month and year: arrows step month by month, and "novembre 2026" between
+// them opens the months and the years side by side in place of the grid, as iOS's date
+// input does (author, 2026-11-17, replacing one list each).
 
 /** The calendar's state, whichever kind of calendar this grid is in. */
 function useCalendarState() {
@@ -42,7 +41,7 @@ function within(
   return date
 }
 
-/** The month or the year, whose name opens the list to pick from. */
+/** "novembre 2026", which opens the lists. */
 function MenuButton({
   label,
   name,
@@ -50,7 +49,7 @@ function MenuButton({
   onOpen,
 }: {
   label: string
-  /** What the label opens, read aloud: "Mois : novembre". */
+  /** What the label opens, read aloud: "Mois et année : novembre 2026". */
   name: string
   open: boolean
   onOpen: () => void
@@ -105,7 +104,7 @@ function ChoiceList({
     <ul
       ref={list}
       aria-label={label}
-      className="relative h-72 overflow-y-auto py-1"
+      className="relative h-72 min-w-0 overflow-y-auto py-1"
     >
       {choices.map((choice) => (
         <li key={choice.value}>
@@ -116,7 +115,7 @@ function ChoiceList({
             aria-current={choice.current || undefined}
             onClick={() => onPick(choice.value)}
             className={cn(
-              'flex h-12 w-full items-center gap-3 px-4 text-left capitalize hover:bg-secondary disabled:pointer-events-none disabled:opacity-40',
+              'flex h-12 w-full items-center gap-2 rounded-lg px-3 text-left capitalize hover:bg-secondary disabled:pointer-events-none disabled:opacity-40',
               choice.current && 'bg-secondary font-semibold',
               focusRing,
             )}
@@ -137,7 +136,6 @@ function ChoiceList({
 function useMonthYear() {
   const state = useCalendarState()
   const { timeZone, minValue, maxValue } = state
-  const shortMonth = useDateFormatter({ month: 'short', timeZone })
   const longMonth = useDateFormatter({ month: 'long', timeZone })
   const focused = state.focusedDate
   const nameOf = (month: number) =>
@@ -152,7 +150,6 @@ function useMonthYear() {
   const lastYear = maxValue?.year ?? thisYear + 10
   return {
     focused,
-    shortName: shortMonth.format(focused.toDate(timeZone)),
     nameOf,
     go: (date: CalendarDate) =>
       state.setFocusedDate(within(date, minValue, maxValue)),
@@ -174,40 +171,33 @@ function useMonthYear() {
   }
 }
 
-/** One pair of arrows steps month by month; the names between them open their lists. */
+/** One pair of arrows steps month by month; the month and year between them open the lists. */
 export function MonthYearHeader({
-  menu,
-  onMenu,
+  open,
+  onToggle,
 }: {
-  menu: CalendarMenu
-  onMenu: (menu: CalendarMenu) => void
+  open: boolean
+  onToggle: () => void
 }) {
   const { t } = useTranslation()
-  const { focused, shortName, nameOf } = useMonthYear()
-  // Hidden, not removed, while a list is open, so the names stay in place.
-  const arrow = cn(pickerNav, menu && 'invisible')
-  // Only set while a list is open: a false here would override the calendar's own limit
-  // (no month past maxValue).
-  const blocked = menu ? true : undefined
+  const { focused, nameOf } = useMonthYear()
+  const name = `${nameOf(focused.month)} ${focused.year}`
+  // Hidden, not removed, while the lists are open, so the name stays in place.
+  const arrow = cn(pickerNav, open && 'invisible')
+  // Only set while the lists are open: a false here would override the calendar's own
+  // limit (no month past maxValue).
+  const blocked = open ? true : undefined
   return (
     <header className={pickerHeader}>
       <Button slot="previous" className={arrow} isDisabled={blocked}>
         <Icon name="chevron-left" />
       </Button>
-      <div className="flex items-center gap-1">
-        <MenuButton
-          label={shortName}
-          name={t('common.monthName', { name: nameOf(focused.month) })}
-          open={menu === 'month'}
-          onOpen={() => onMenu(menu === 'month' ? null : 'month')}
-        />
-        <MenuButton
-          label={String(focused.year)}
-          name={t('common.yearName', { name: focused.year })}
-          open={menu === 'year'}
-          onOpen={() => onMenu(menu === 'year' ? null : 'year')}
-        />
-      </div>
+      <MenuButton
+        label={name}
+        name={t('common.monthAndYear', { name })}
+        open={open}
+        onOpen={onToggle}
+      />
       <Button slot="next" className={arrow} isDisabled={blocked}>
         <Icon name="chevron-right" />
       </Button>
@@ -215,25 +205,22 @@ export function MonthYearHeader({
   )
 }
 
-/** The open list: a pick moves the calendar there and closes it. */
-export function MonthYearList({
-  menu,
-  onPicked,
-}: {
-  menu: 'month' | 'year'
-  onPicked: () => void
-}) {
+/** The months and the years side by side; a pick moves the calendar there at once. */
+export function MonthYearLists() {
   const { t } = useTranslation()
   const { focused, go, months, years } = useMonthYear()
   return (
-    <ChoiceList
-      key={menu}
-      label={t(menu === 'month' ? 'common.month' : 'common.year')}
-      choices={menu === 'month' ? months : years}
-      onPick={(value) => {
-        go(focused.set(menu === 'month' ? { month: value } : { year: value }))
-        onPicked()
-      }}
-    />
+    <div className="grid grid-cols-2 gap-2">
+      <ChoiceList
+        label={t('common.month')}
+        choices={months}
+        onPick={(month) => go(focused.set({ month }))}
+      />
+      <ChoiceList
+        label={t('common.year')}
+        choices={years}
+        onPick={(year) => go(focused.set({ year }))}
+      />
+    </div>
   )
 }

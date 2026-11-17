@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Icon } from '#/components/display/icon'
 import { SearchField } from '#/components/forms/search-field'
-import { PageTitle } from '#/components/layout/list-page'
+import { PeriodTabs } from '#/components/transactions/period/period-tabs'
 import { FilterChips } from '#/components/transactions/filters/filter-chips'
 import { FilterSheet } from '#/components/transactions/filters/filter-sheet'
 import type {
@@ -125,18 +125,16 @@ function Bubbles(props: BubblesProps) {
 }
 
 /**
- * The title, the search, then the bubbles: what is pending or owed, and below `lg` a
- * single Filtres button opening the sheet (the sidebar holds the filters from `lg` up).
+ * Over the list: the period tabs with the search at their end, the bubbles under them (what is pending or owed, and below `lg` a single Filtres button
+ * opening the sheet; the sidebar holds the filters from `lg` up), then the chips.
  */
 export function ListHeader({
   choice,
   filters,
   names,
-  total,
   pending,
   owed,
   search,
-  loading,
   onPeriod,
   onFilters,
   onPending,
@@ -146,19 +144,15 @@ export function ListHeader({
   choice: PeriodChoice
   filters: FilterValues
   names: ListFilters | null
-  /** How many rows the list matches, for the sheet's button. */
-  total: number | null
   pending: { count: number | null; on: boolean }
   owed: { count: number | null; on: boolean }
   search: string
-  loading: boolean
   onPeriod: (choice: PeriodChoice) => void
   onFilters: (values: FilterValues) => void
   onPending: (on: boolean) => void
   onOwed: (on: boolean) => void
   onSearch: (text: string) => void
 }) {
-  const { t } = useTranslation()
   const empty = useEmptyFilters()
   const [sheet, setSheet] = useState<{
     open: boolean
@@ -166,18 +160,26 @@ export function ListHeader({
   }>({ open: false, tab: null })
   return (
     <>
-      <PageTitle>{t('nav.transactions')}</PageTitle>
-      <SearchField value={search} onChange={onSearch} />
-      <Bubbles
-        {...{ filters, pending, owed, onPending, onOwed }}
-        onOpen={() => setSheet({ open: true, tab: null })}
-      />
-      <FilterChips
-        values={filters}
-        names={names}
-        period={{ choice, onChange: onPeriod }}
-        onChange={onFilters}
-      />
+      {/* The tabs with the search at their end (under them on phones), then what is
+          pending or owed under the tabs at every width (author, 2026-11-17). */}
+      <div className="flex flex-wrap items-center gap-3">
+        <PeriodTabs
+          choice={choice}
+          onChange={onPeriod}
+          onPickDates={() => setSheet({ open: true, tab: 'period' })}
+        />
+        {/* A word or two is what people type; a full-width box suggests more. */}
+        <div className="w-full sm:ml-auto sm:max-w-72">
+          <SearchField value={search} onChange={onSearch} />
+        </div>
+        <div className="w-full">
+          <Bubbles
+            {...{ filters, pending, owed, onPending, onOwed }}
+            onOpen={() => setSheet({ open: true, tab: null })}
+          />
+        </div>
+      </div>
+      <FilterChips values={filters} names={names} onChange={onFilters} />
       <FilterSheet
         open={sheet.open}
         tab={sheet.tab}
@@ -185,7 +187,6 @@ export function ListHeader({
         period={choice}
         empty={empty}
         values={filters}
-        total={loading ? null : total}
         onOpenChange={(open) => setSheet({ ...sheet, open })}
         onTab={(tab) => setSheet({ ...sheet, tab })}
         onChange={onFilters}

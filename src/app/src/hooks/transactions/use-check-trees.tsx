@@ -17,7 +17,7 @@ import { matcher } from '#/lib/shared/search'
 
 // The trees the check lists show: accounts, people and categories as nodes.
 
-/** Accounts under their institution: ticking one ticks all its accounts. */
+/** Accounts under their institution, by name, those with none last: ticking one ticks all its accounts. */
 export function useAccountTree(
   accounts: ReadonlyArray<FormAccount>,
   query: string,
@@ -30,18 +30,21 @@ export function useAccountTree(
     return sorted
       .filter((a) => matches(accountLabel(a)))
       .map((a) => ({ id: a.id, label: accountLabel(a) }))
-  const groups = new Map<string, Array<CheckNode>>()
+  // Keyed by the institution itself, so "Sans institution" never sorts among the names.
+  const groups = new Map<string | null, Array<CheckNode>>()
   for (const a of sorted) {
-    const name = a.institution ?? t('transactions.noInstitution')
-    groups.set(name, [...(groups.get(name) ?? []), { id: a.id, label: a.name }])
+    const key = a.institution ?? null
+    groups.set(key, [...(groups.get(key) ?? []), { id: a.id, label: a.name }])
   }
   return [...groups]
-    .sort(([a], [b]) => a.localeCompare(b, locale))
-    .map(([name, children]) => ({
-      id: `${GROUP}${name}`,
-      label: name,
-      children,
-    }))
+    .sort(([a], [b]) => {
+      if (a === null || b === null) return a === null ? 1 : -1
+      return a.localeCompare(b, locale)
+    })
+    .map(([key, children]) => {
+      const name = key ?? t('transactions.noInstitution')
+      return { id: `${GROUP}${name}`, label: name, children }
+    })
 }
 
 /**

@@ -64,12 +64,10 @@ const CATEGORY_TABS = ['categories'] as const
 function CategoryFilter({
   categories,
   picked,
-  total,
   onChange,
 }: {
   categories: ReadonlyArray<Category>
   picked: ReadonlyArray<string>
-  total: number
   onChange: (ids: Array<string>) => void
 }) {
   const labelOf = useFilterLabel({ ...NO_FILTERS, categoryIds: [...picked] })
@@ -100,7 +98,6 @@ function CategoryFilter({
         tabs={CATEGORY_TABS}
         tab="categories"
         values={values}
-        total={total}
         onOpenChange={setOpen}
         onTab={() => {}}
         onChange={(next) => onChange(next.categoryIds)}
@@ -190,7 +187,6 @@ function Merchants() {
           <CategoryFilter
             categories={categories}
             picked={picked}
-            total={shown.length}
             onChange={setPicked}
           />
           <MerchantList merchants={merchants} shown={shown} tree={tree} />

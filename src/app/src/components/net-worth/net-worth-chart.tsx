@@ -120,7 +120,9 @@ export function NetWorthChart({
             formatAxisMoney(value, currency, locale)
           }
         />
-        <ChartTooltip content={tooltipFor({ points, dataKey, currency, locale })} />
+        <ChartTooltip
+          content={tooltipFor({ points, dataKey, currency, locale })}
+        />
         <Area
           dataKey={dataKey}
           type="monotone"

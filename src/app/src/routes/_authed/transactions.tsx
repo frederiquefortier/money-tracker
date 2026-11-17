@@ -2,13 +2,12 @@ import {
   Outlet,
   createFileRoute,
   retainSearchParams,
-  useRouterState,
 } from '@tanstack/react-router'
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { FloatingAddLink } from '#/components/layout/floating-add-button'
 import { EmptyState } from '#/components/lists/list-card'
-import { pageColumn } from '#/components/styles'
+import { ListPage } from '#/components/layout/list-page'
 import { FilterSidebar } from '#/components/transactions/filters/filter-sidebar'
 import { ListHeader } from '#/components/transactions/list/list-header'
 import { TransactionDayGroup } from '#/components/transactions/list/transaction-day'
@@ -144,19 +143,41 @@ function useListNavigation() {
   }
 }
 
+/** The marks at the list's end: the next days to build, then the next page to load. */
+function OlderDays({
+  revealed,
+  pages,
+}: {
+  revealed: { more: boolean; sentinel: React.Ref<HTMLDivElement> }
+  pages: {
+    more: boolean
+    loading: boolean
+    sentinel: React.Ref<HTMLDivElement>
+  }
+}) {
+  const { t } = useTranslation()
+  if (revealed.more) return <div ref={revealed.sentinel} aria-hidden="true" />
+  if (!pages.more) return null
+  return (
+    <div
+      ref={pages.sentinel}
+      className="py-4 text-center text-muted-foreground"
+    >
+      {pages.loading && (
+        <Spinner label={t('common.loading')} className="mx-auto" />
+      )}
+    </div>
+  )
+}
+
 function Transactions() {
   const { t } = useTranslation()
   // The loader's object itself: the pages hook knows a reload by its identity.
   const data = Route.useLoaderData()
-  // What the list shows; the address may already ask for another query.
+  // What the list shows (the loader's query, which may trail the address).
   const deps = data.query
-  const asked = Route.useSearch({
-    select: (search) => queryKey(listQuery(search)),
-  })
   const { displayCurrency } = useMyCurrencies()
   const go = useListNavigation()
-  const loadingRoute = useRouterState({ select: (s) => s.isLoading })
-  const switching = loadingRoute || asked !== queryKey(deps)
   usePreloadForm()
   const { days, more, loading, sentinel } = useTransactionPages(data, deps)
   // Days are built as they near the screen; older pages load once all are shown.
@@ -165,63 +186,60 @@ function Transactions() {
   const empty = useEmptyText(deps)
 
   return (
-    // From `lg` up the filters sit beside the list, staying in view as it scrolls.
-    <div className="lg:grid lg:grid-cols-[15rem_minmax(0,48rem)] lg:items-start lg:justify-center lg:gap-12">
-      <FilterSidebar
-        values={deps}
-        names={data.filters}
-        period={deps}
-        total={switching ? null : data.total}
-        onChange={go.filters}
-        onPeriod={go.period}
-        className="hidden lg:sticky lg:top-20 lg:flex"
-      />
-      <div className={pageColumn}>
-        <ListHeader
-          choice={deps}
-          filters={deps}
+    // The net worth hub's grid (2026-11-17): the title at the far left, and from `lg` the
+    // filters on 3 of 12 columns, staying in view as the list scrolls on 7, an empty
+    // column on each side of it (author).
+    <ListPage title={t('nav.transactions')} wide>
+      <div className="grid items-start gap-3 lg:grid-cols-12">
+        <FilterSidebar
+          values={deps}
           names={data.filters}
-          total={data.total}
-          pending={{ count: data.pendingCount, on: deps.pendingOnly }}
-          owed={{ count: data.owedCount, on: deps.owedOnly }}
-          search={text}
-          loading={switching}
+          period={deps}
+          onChange={go.filters}
           onPeriod={go.period}
-          onFilters={go.filters}
-          onPending={go.pending}
-          onOwed={go.owed}
-          onSearch={setText}
+          className="hidden lg:sticky lg:top-20 lg:col-span-3 lg:flex"
         />
-        <div className="mt-2 flex flex-col gap-4">
-          {days.length === 0 ? (
-            <EmptyState>{empty}</EmptyState>
-          ) : (
-            revealed.shown.map((day) => (
-              <TransactionDayGroup
-                key={day.date}
-                day={day}
-                displayCurrency={displayCurrency}
-                filtered={deps.accountIds.length > 0}
-                feeCategory={data.feeCategory}
-              />
-            ))
-          )}
-          {revealed.more && <div ref={revealed.sentinel} aria-hidden="true" />}
-          {!revealed.more && more && (
-            <div
-              ref={sentinel}
-              className="py-4 text-center text-muted-foreground"
-            >
-              {loading && (
-                <Spinner label={t('common.loading')} className="mx-auto" />
-              )}
-            </div>
-          )}
+        <div className="flex min-w-0 flex-col gap-4 lg:col-span-7 lg:col-start-5">
+          <ListHeader
+            choice={deps}
+            filters={deps}
+            names={data.filters}
+            pending={{ count: data.pendingCount, on: deps.pendingOnly }}
+            owed={{ count: data.owedCount, on: deps.owedOnly }}
+            search={text}
+              onPeriod={go.period}
+            onFilters={go.filters}
+            onPending={go.pending}
+            onOwed={go.owed}
+            onSearch={setText}
+          />
+          <div className="mt-2 flex flex-col gap-4">
+            {days.length === 0 ? (
+              <EmptyState>{empty}</EmptyState>
+            ) : (
+              revealed.shown.map((day) => (
+                <TransactionDayGroup
+                  key={day.date}
+                  day={day}
+                  displayCurrency={displayCurrency}
+                  filtered={deps.accountIds.length > 0}
+                  feeCategory={data.feeCategory}
+                />
+              ))
+            )}
+            <OlderDays
+              revealed={revealed}
+              pages={{ more, loading, sentinel }}
+            />
+          </div>
+          <FloatingAddLink
+            to="/transactions/new"
+            label={t('transactions.add')}
+          />
+          {/* The transaction forms open here as sheets. */}
+          <Outlet />
         </div>
-        <FloatingAddLink to="/transactions/new" label={t('transactions.add')} />
-        {/* The transaction forms open here as sheets. */}
-        <Outlet />
       </div>
-    </div>
+    </ListPage>
   )
 }

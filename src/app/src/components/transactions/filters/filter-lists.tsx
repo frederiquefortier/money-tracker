@@ -7,7 +7,7 @@ import {
   categoryTicks,
   merchantNodes,
 } from '#/components/forms/check-ticks'
-import { Button } from '#/components/ui/button'
+import { useRevealed } from '#/hooks/app/use-revealed'
 import { todayIso } from '#/lib/shared/format'
 import type { Merchant } from '#/lib/merchants/merchant'
 import { useFormatLocale } from '#/hooks/app/use-locale'
@@ -34,11 +34,10 @@ function NoMatch() {
   return <p className="text-muted-foreground">{t('common.noMatch')}</p>
 }
 
-// The few most used first; the search reaches all of them.
-const MERCHANTS_FIRST = 8
-const MERCHANTS_MORE = 50
+// Enough to fill the sheet; more build as the list nears the end, as every long list does.
+const MERCHANTS_STEP = 40
 
-/** Merchants can run to thousands: a few at a time, the search reaching all of them. */
+/** Merchants can run to thousands: the most used first, built as they near the screen. */
 function MerchantList({
   merchants,
   query,
@@ -50,35 +49,24 @@ function MerchantList({
   picked: ReadonlyArray<string>
   onChange: (ids: Array<string>) => void
 }) {
-  const { t } = useTranslation()
   const locale = useFormatLocale()
-  const [shown, setShown] = useState(MERCHANTS_FIRST)
   // Ticked first as the tab opened: a tick never moves its row under the finger.
   const [pickedAtOpen] = useState(picked)
-  const { nodes, more } = merchantNodes(merchants, {
+  const nodes = merchantNodes(merchants, {
     query,
     picked: pickedAtOpen,
-    shown,
     locale,
   })
+  const { shown, more, sentinel } = useRevealed(nodes, MERCHANTS_STEP)
   const ticks = groupTicks(picked)
   if (!nodes.length) return <NoMatch />
   return (
     <CheckList
-      nodes={nodes}
+      nodes={shown}
       stateOf={ticks.stateOf}
       onToggle={(node) => onChange(ticks.toggle(node))}
     >
-      {more && (
-        <div className="border-t px-1 py-1">
-          <Button
-            variant="ghost"
-            onClick={() => setShown(shown + MERCHANTS_MORE)}
-          >
-            {t('transactions.list.showMore')}
-          </Button>
-        </div>
-      )}
+      {more && <div ref={sentinel} aria-hidden="true" />}
     </CheckList>
   )
 }

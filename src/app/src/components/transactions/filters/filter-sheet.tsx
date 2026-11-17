@@ -28,7 +28,6 @@ export function FilterSheet({
   period = null,
   empty = null,
   values,
-  total,
   onOpenChange,
   onTab,
   onChange,
@@ -49,8 +48,6 @@ export function FilterSheet({
   /** The filters with nothing to choose from; their rows cannot open. */
   empty?: ReadonlySet<FilterTab> | null
   values: FilterValues
-  /** How many rows the list matches; null while the next one loads. */
-  total: number | null
   onOpenChange: (open: boolean) => void
   onTab: (tab: FilterScreen | null) => void
   onChange: (values: FilterValues) => void
@@ -74,7 +71,6 @@ export function FilterSheet({
           period={period}
           empty={empty}
           values={values}
-          total={total}
           onTab={onTab}
           onChange={onChange}
           onPeriod={onPeriod}

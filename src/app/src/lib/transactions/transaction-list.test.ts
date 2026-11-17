@@ -6,6 +6,9 @@ import {
   lastThirtyDays,
   periodRange,
   shiftMonth,
+  monthsStart,
+  presetChoice,
+  presetOf,
 } from '#/lib/transactions/transaction-list'
 import type {
   ListedTransaction,
@@ -121,5 +124,43 @@ describe('groupByDay', () => {
     expect(groupByDay(rows, true).cursor).toBe('2026-11-01')
     expect(groupByDay(rows, false).cursor).toBeNull()
     expect(groupByDay([], false)).toEqual({ days: [], cursor: null })
+  })
+})
+
+describe('period presets', () => {
+  const base = {
+    period: 'all' as const,
+    month: '2026-11',
+    year: '2026',
+    start: '2026-10-19',
+    end: '2026-11-17',
+  }
+
+  it('starts the last N months the day after the same date N months back', () => {
+    expect(monthsStart('2026-11-17', 1)).toBe('2026-10-18')
+    expect(monthsStart('2026-11-17', 12)).toBe('2025-11-18')
+    expect(monthsStart('2026-01-10', 3)).toBe('2025-10-11')
+    // A short month takes its last day: 31 March, one month back, is 29 February.
+    expect(monthsStart('2024-03-31', 1)).toBe('2024-03-01')
+  })
+
+  it('gives each tab its range, which reads back as the same tab', () => {
+    const today = '2026-11-17'
+    for (const preset of ['m1', 'm3', 'm6', 'm12', 'all'] as const)
+      expect(presetOf(presetChoice(preset, base, today), today)).toBe(preset)
+    expect(presetChoice('m3', base, today)).toMatchObject({
+      period: 'custom',
+      start: '2026-08-18',
+      end: today,
+    })
+  })
+
+  it('names no tab for a month, a year, or a range that no longer ends today', () => {
+    const today = '2026-11-18'
+    expect(presetOf({ ...base, period: 'month' }, today)).toBeNull()
+    expect(presetOf({ ...base, period: 'year' }, today)).toBeNull()
+    expect(
+      presetOf({ ...base, period: 'custom', start: '2026-10-18', end: '2026-11-17' }, today),
+    ).toBeNull()
   })
 })

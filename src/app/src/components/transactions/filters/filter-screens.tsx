@@ -5,8 +5,6 @@ import { FilterList } from '#/components/transactions/filters/filter-lists'
 import { PeriodPanel } from '#/components/transactions/period/period-panel'
 import { Button } from '#/components/ui/button'
 import { SheetBody, SheetFooter, SheetHead } from '#/components/ui/sheet'
-import { formatCount } from '#/lib/shared/format'
-import { useLocale } from '#/hooks/app/use-locale'
 import { FilterRoot } from '#/components/transactions/filters/filter-root'
 import {
   FILTER_KEYS,
@@ -24,26 +22,12 @@ import type {
 } from '#/lib/transactions/transaction-list'
 import { Spinner } from '#/components/feedback/spinner'
 
-/** "Voir 128 résultats", or "Voir les résultats" while the count loads. */
-function ResultCount({ total }: { total: number | null }) {
-  const { t } = useTranslation()
-  const locale = useLocale()
-  if (total === null) return t('transactions.list.showResults')
-  if (total === 0) return t('transactions.list.noResults')
-  return t('transactions.list.showCount', {
-    count: total,
-    shown: formatCount(total, locale),
-  })
-}
-
 export function FilterFooter({
   cleared,
-  total,
   onClear,
   onClose,
 }: {
   cleared?: boolean
-  total: number | null
   /** Left out where there is nothing to clear (the period). */
   onClear?: () => void
   onClose: () => void
@@ -62,7 +46,7 @@ export function FilterFooter({
         </Button>
       )}
       <Button onClick={onClose}>
-        <ResultCount total={total} />
+        {t('transactions.list.showResults')}
       </Button>
     </SheetFooter>
   )
@@ -92,32 +76,20 @@ function BackRow({
 /** The period in the sheet (ADR-032): a pick applies and stays; Effacer goes back to Tout. */
 export function PeriodScreen({
   choice,
-  canGoBack,
-  total,
   onPeriod,
-  onBack,
   onClose,
 }: {
   choice: PeriodChoice
-  canGoBack: boolean
-  total: number | null
   onPeriod: (choice: PeriodChoice) => void
-  onBack: () => void
   onClose: () => void
 }) {
   return (
     <>
-      {canGoBack && (
-        <SheetHead>
-          <BackRow screen="period" onBack={onBack} />
-        </SheetHead>
-      )}
       <SheetBody>
         <PeriodPanel choice={choice} onChange={onPeriod} />
       </SheetBody>
       <FilterFooter
         cleared={choice.period === 'all'}
-        total={total}
         onClear={() => onPeriod({ ...choice, period: 'all' })}
         onClose={onClose}
       />
@@ -125,14 +97,13 @@ export function PeriodScreen({
   )
 }
 
-/** The first level: the period and the filters with what is chosen; Effacer clears them all. */
+/** The first level: the filters with what is chosen; Effacer clears them all. */
 export function FilterListScreen({
   screens,
   values,
   names,
   period,
   empty,
-  total,
   onTab,
   onClear,
   onClose,
@@ -142,7 +113,6 @@ export function FilterListScreen({
   names: ListFilters | null
   period: PeriodChoice | null
   empty: ReadonlySet<FilterTab> | null
-  total: number | null
   onTab: (screen: FilterScreen) => void
   onClear: () => void
   onClose: () => void
@@ -153,11 +123,9 @@ export function FilterListScreen({
         <FilterRoot {...{ screens, values, names, period, empty, onTab }} />
       </SheetBody>
       <FilterFooter
-        cleared={
-          (period?.period ?? 'all') === 'all' &&
-          FILTER_TABS.every((one) => values[FILTER_KEYS[one]].length === 0)
-        }
-        total={total}
+        cleared={FILTER_TABS.every(
+          (one) => values[FILTER_KEYS[one]].length === 0,
+        )}
         onClear={onClear}
         onClose={onClose}
       />
@@ -172,7 +140,6 @@ export function FilterDetail({
   options,
   query,
   values,
-  total,
   onQuery,
   onChange,
   onBack,
@@ -183,7 +150,6 @@ export function FilterDetail({
   options: FilterOptions | null
   query: string
   values: FilterValues
-  total: number | null
   onQuery: (query: string) => void
   onChange: (values: FilterValues) => void
   onBack: () => void
@@ -225,7 +191,6 @@ export function FilterDetail({
       </SheetBody>
       <FilterFooter
         cleared={values[key].length === 0}
-        total={total}
         onClear={() => onChange({ ...values, [key]: [] })}
         onClose={onClose}
       />

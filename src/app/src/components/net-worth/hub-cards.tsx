@@ -68,7 +68,7 @@ export function HubCard({
           total={total}
           currency={currency}
           converted={converted}
-          className="font-bold"
+          className="text-lg font-semibold"
         />
       )}
       <Icon name="chevron-right" className="text-muted-foreground" />

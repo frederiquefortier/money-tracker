@@ -58,7 +58,7 @@ English; this file is in English like every other meta-doc.
 | TRX-10 | A transaction can carry a free-text note (the memo). | sheet | 1 |
 | TRX-11 | A transfer between accounts in different currencies records what left one and what arrived in the other; the gap against that day's market rate shows as the conversion cost, which counts as spending. | net-worth data (CAD to CHF) | 1 |
 | TRX-12 | Search transactions by text in anything a row shows: merchant, note, categories, account and institution (both sides of a transfer), ignoring case and accents. | author | 1 |
-| TRX-13 | The transactions list shows a chosen period: everything (loaded as you scroll), a year, a month, or custom days from a start to an end. Each day shows its net. Totals by category belong to the dashboard. | author | 1 |
+| TRX-13 | The transactions list shows a chosen period: everything (loaded as you scroll), a year, a month, or custom days from a start to an end, picked as tabs (the last 1, 3 or 6 months, the last year, Tout) or a calendar (2026-11-17). Each day shows its net. Totals by category belong to the dashboard. | author | 1 |
 | TRX-14 | Filter the transactions list by type (expense, income, transfer), accounts, categories (sub-categories included, a split matching on any of its categories) and merchants, several of each at once. A filter narrowed to one value is the default of a transaction added from the list (2026-11-16). | author | 1 |
 
 ## 4. Multi-currency (`CUR`)

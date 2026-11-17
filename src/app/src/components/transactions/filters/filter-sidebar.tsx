@@ -19,18 +19,16 @@ import type {
 } from '#/lib/transactions/transaction-list'
 import { cn } from '#/lib/utils'
 
-const SCREENS: ReadonlyArray<FilterScreen> = ['period', ...FILTER_TABS]
-
 /**
- * The filters beside the list from `lg` up (2026-11-16): the phone's first level, each
- * filter with what is chosen, always in view. A row opens the sheet from the left on that
- * filter alone, where the long lists have their search.
+ * The filters beside the list from `lg` up (2026-11-16): each filter by name, with how
+ * many are chosen (the chips name them), always in view, without a heading of its own
+ * (2026-11-17). A row opens the sheet from the left on that filter alone, where the long
+ * lists have their search. The period is on the list's tabs.
  */
 export function FilterSidebar({
   values,
   names,
   period,
-  total,
   onChange,
   onPeriod,
   className,
@@ -38,8 +36,6 @@ export function FilterSidebar({
   values: FilterValues
   names: ListFilters | null
   period: PeriodChoice
-  /** How many rows the list matches, for the sheet's button; null while it loads. */
-  total: number | null
   onChange: (values: FilterValues) => void
   onPeriod: (choice: PeriodChoice) => void
   className?: string
@@ -48,35 +44,35 @@ export function FilterSidebar({
   const empty = useEmptyFilters()
   const [sheet, setSheet] = useState<{ open: boolean; tab: FilterScreen }>({
     open: false,
-    tab: 'period',
+    tab: 'kinds',
   })
-  const nothing =
-    period.period === 'all' &&
-    FILTER_TABS.every((tab) => values[FILTER_KEYS[tab]].length === 0)
+  const chosen = FILTER_TABS.some(
+    (tab) => values[FILTER_KEYS[tab]].length > 0,
+  )
   return (
-    <aside className={cn('flex flex-col gap-2', className)}>
-      <div className="flex min-h-9 items-center justify-between gap-2">
-        <h2 className="font-semibold">{t('transactions.list.filters')}</h2>
-        <Button
-          variant="ghost"
-          size="sm"
-          disabled={nothing}
-          onClick={() => {
-            onChange(NO_FILTERS)
-            onPeriod({ ...period, period: 'all' })
-          }}
-        >
-          {t('transactions.list.clearAll')}
-        </Button>
-      </div>
+    <aside
+      aria-label={t('transactions.list.filters')}
+      className={cn('flex flex-col gap-2', className)}
+    >
       <FilterRoot
-        screens={SCREENS}
+        screens={FILTER_TABS}
         values={values}
         names={names}
         period={period}
         empty={empty}
+        countOnly
         onTab={(tab) => setSheet({ open: true, tab })}
       />
+      {chosen && (
+        <Button
+          variant="ghost"
+          size="sm"
+          className="self-end"
+          onClick={() => onChange(NO_FILTERS)}
+        >
+          {t('transactions.list.clearAll')}
+        </Button>
+      )}
       <FilterSheet
         open={sheet.open}
         side="left"
@@ -86,7 +82,6 @@ export function FilterSidebar({
         period={period}
         empty={empty}
         values={values}
-        total={total}
         onOpenChange={(open) => setSheet({ ...sheet, open })}
         onTab={(tab) => tab && setSheet({ ...sheet, tab })}
         onChange={onChange}

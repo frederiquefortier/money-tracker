@@ -180,3 +180,59 @@ export type PeriodChoice = {
   start: string
   end: string
 }
+
+/**
+ * The period tabs above the list (author, 2026-11-17): the last 1, 3, 6 or 12 months to
+ * today, and everything. Each is a custom range, so the calendar shows it; any other
+ * range is the calendar's.
+ */
+export const PERIOD_PRESETS = ['m1', 'm3', 'm6', 'm12', 'all'] as const
+export type PeriodPreset = (typeof PERIOD_PRESETS)[number]
+
+export function presetMonths(preset: Exclude<PeriodPreset, 'all'>): number {
+  return Number(preset.slice(1))
+}
+
+/**
+ * The first day of the last `months` months to `today`: the day after the same date that
+ * many months back, a short month taking its last day.
+ */
+export function monthsStart(today: string, months: number): string {
+  const [year = 0, month = 1, day = 1] = today.split('-').map(Number)
+  const back = new Date(Date.UTC(year, month - 1 - months, 1))
+  const last = new Date(
+    Date.UTC(back.getUTCFullYear(), back.getUTCMonth() + 1, 0),
+  ).getUTCDate()
+  back.setUTCDate(Math.min(day, last) + 1)
+  return isoDay(back)
+}
+
+/** The tab a period is, or null for one only the calendar names. */
+export function presetOf(
+  choice: PeriodChoice,
+  today: string,
+): PeriodPreset | null {
+  if (choice.period === 'all') return 'all'
+  if (choice.period !== 'custom' || choice.end !== today) return null
+  return (
+    PERIOD_PRESETS.find(
+      (one) =>
+        one !== 'all' && choice.start === monthsStart(today, presetMonths(one)),
+    ) ?? null
+  )
+}
+
+/** The period a tab stands for, keeping the rest of the choice. */
+export function presetChoice(
+  preset: PeriodPreset,
+  choice: PeriodChoice,
+  today: string,
+): PeriodChoice {
+  if (preset === 'all') return { ...choice, period: 'all' }
+  return {
+    ...choice,
+    period: 'custom',
+    start: monthsStart(today, presetMonths(preset)),
+    end: today,
+  }
+}

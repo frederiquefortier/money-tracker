@@ -19,8 +19,8 @@ import type {
 
 /**
  * Mounted while the sheet is open, so the search starts empty each time. One screen at a
- * time (ADR-029, ADR-030): `tab` null is the list of filters (and the period, where there
- * is one), a filter has its search over its list, and either has a back arrow to the list
+ * time (ADR-029, ADR-030): `tab` null is the list of filters, the period being on the
+ * page's tabs (2026-11-17) and opened here only from their calendar; a filter has its search over its list, and either has a back arrow to the list
  * when the sheet came from it. The footer clears what is shown (the open filter, or all
  * of them in the list) or closes, saying how many rows the list now shows.
  */
@@ -33,7 +33,6 @@ export function FilterPanel({
   values,
   period,
   empty,
-  total,
   onTab,
   onChange,
   onPeriod,
@@ -47,7 +46,6 @@ export function FilterPanel({
   values: FilterValues
   period: PeriodChoice | null
   empty: ReadonlySet<FilterTab> | null
-  total: number | null
   onTab: (tab: FilterScreen | null) => void
   onChange: (values: FilterValues) => void
   onPeriod: (choice: PeriodChoice) => void
@@ -62,29 +60,22 @@ export function FilterPanel({
   const back = () => go(null)
   if (tab === 'period' && period)
     return (
-      <PeriodScreen
-        {...{ canGoBack, total, onClose }}
-        choice={period}
-        onPeriod={onPeriod}
-        onBack={back}
-      />
+      // Opened from the period tabs' calendar only, so it has no way back to the filters.
+      <PeriodScreen choice={period} onPeriod={onPeriod} onClose={onClose} />
     )
   if (tab === null || tab === 'period')
     return (
       <FilterListScreen
-        {...{ names, period, empty, total, onClose }}
-        screens={period ? ['period', ...tabs] : tabs}
+        {...{ names, period, empty, onClose }}
+        screens={tabs}
         values={local}
         onTab={go}
-        onClear={() => {
-          setLocal(NO_FILTERS)
-          if (period) onPeriod({ ...period, period: 'all' })
-        }}
+        onClear={() => setLocal(NO_FILTERS)}
       />
     )
   return (
     <FilterDetail
-      {...{ tab, canGoBack, options, total, onClose }}
+      {...{ tab, canGoBack, options, onClose }}
       query={query}
       values={local}
       onQuery={setQuery}

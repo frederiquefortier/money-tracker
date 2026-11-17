@@ -212,7 +212,8 @@ export function ChangeBars({
   ]
 
   return (
-    <section className="flex flex-col gap-3">
+    // Clear of the line's axis above it, so the two charts read apart.
+    <section className="mt-6 flex flex-col gap-3">
       <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2">
         <h3 className="text-sm font-semibold">
           {t(byYear ? 'netWorth.changes.byYear' : 'netWorth.changes.byMonth')}

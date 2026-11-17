@@ -104,18 +104,17 @@ export function categoryTicks(
 }
 
 /**
- * Merchants can run to thousands: the ticked ones first, then the most used, `shown` at
- * a time; a search looks through all of them.
+ * Merchants can run to thousands: the ticked ones first, then the most used; the list
+ * builds them as they near the screen, and a search looks through all of them.
  */
 export function merchantNodes(
   merchants: ReadonlyArray<Merchant>,
   {
     query,
     picked,
-    shown,
     locale,
-  }: { query: string; picked: Picked; shown: number; locale: string },
-) {
+  }: { query: string; picked: Picked; locale: string },
+): Array<CheckNode> {
   const matches = matcher(query)
   const byUse = compareByUse(locale)
   const matching = merchants
@@ -125,8 +124,5 @@ export function merchantNodes(
         Number(picked.includes(b.id)) - Number(picked.includes(a.id)) ||
         byUse(a, b),
     )
-  return {
-    nodes: matching.slice(0, shown).map((m) => ({ id: m.id, label: m.name })),
-    more: matching.length > shown,
-  }
+  return matching.map((m) => ({ id: m.id, label: m.name }))
 }

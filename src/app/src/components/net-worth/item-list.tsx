@@ -6,7 +6,9 @@ import { Sparkline } from '#/components/display/sparkline'
 import { GROUP_COLORS } from '#/components/net-worth/chart-lines'
 import { ChangeText } from '#/components/net-worth/change-text'
 import { NetWorthChart } from '#/components/net-worth/net-worth-chart'
-import { cardSurface, focusRing, rowHover } from '#/components/styles'
+import { GroupHeader } from '#/components/lists/group-header'
+import { ListCard } from '#/components/lists/list-card'
+import { focusRing, rowHover } from '#/components/styles'
 import { useLocale } from '#/hooks/app/use-locale'
 import { rangeChange } from '#/lib/net-worth/net-worth-range'
 import {
@@ -31,13 +33,14 @@ function ItemChange({
 }) {
   const change = rangeChange(chart.itemPoints, item.id, chart.range)
   if (change?.percent == null)
-    return <span className="text-xs text-muted-foreground">—</span>
+    return <span className="text-sm text-muted-foreground">—</span>
   return (
     <ChangeText
       change={change}
       currency={currency}
       lowerIsBetter={item.group === 'debts'}
       percentOnly
+      className="text-sm"
     />
   )
 }
@@ -66,12 +69,12 @@ function ItemRow({
         aria-controls={panel}
         onClick={() => setOpen(!open)}
         className={cn(
-          'flex w-full items-center gap-3 px-3 py-2 text-left',
+          'flex w-full items-center gap-3 px-4 py-3 text-left',
           rowHover,
           focusRing,
         )}
       >
-        <span className="min-w-0 flex-1 truncate text-sm">{label}</span>
+        <span className="min-w-0 flex-1 truncate font-semibold">{label}</span>
         <span className="hidden sm:block">
           <Sparkline
             values={values.map((v) =>
@@ -80,12 +83,18 @@ function ItemRow({
             color={color}
           />
         </span>
-        <span className="flex w-28 shrink-0 flex-col items-end">
+        {/* One width for every value, so the sparklines line up in one column; seven figures
+            fit. Phones hide the sparkline and give the room to the name. */}
+        <span className="flex shrink-0 flex-col items-end font-mono sm:w-40">
           {last === null ? (
             <MissingRate />
           ) : (
             last !== undefined && (
-              <Money amount={last} currency={currency} className="text-sm" />
+              <Money
+                amount={last}
+                currency={currency}
+                className="text-lg font-semibold"
+              />
             )
           )}
           <ItemChange item={item} chart={chart} currency={currency} />
@@ -99,7 +108,8 @@ function ItemRow({
         />
       </button>
       {open && (
-        <div id={panel} className="px-3 pb-3">
+        // Room above, so the chart's tooltip and cursor never touch the row's name.
+        <div id={panel} className="px-4 pt-4 pb-4">
           <NetWorthChart
             points={chart.itemPoints}
             dataKey={item.id}
@@ -114,8 +124,8 @@ function ItemRow({
   )
 }
 
-/** A group's name in its colour, with what it adds up to today (debts owed). */
-function GroupHeader({
+/** What a group adds up to today, debts owed. */
+function Subtotal({
   group,
   chart,
   currency,
@@ -124,32 +134,20 @@ function GroupHeader({
   chart: NetWorthChartState
   currency: string
 }) {
-  const { t } = useTranslation()
   const subtotal = chart.totals.at(-1)?.values[STACK_KEYS[group]]
+  if (subtotal === null) return <MissingRate />
+  if (subtotal === undefined) return null
   return (
-    <div className="flex items-center gap-2 px-3 pt-3 pb-2">
-      <span
-        aria-hidden="true"
-        className="size-2 shrink-0 rounded-full"
-        style={{ background: GROUP_COLORS[group] }}
-      />
-      <h3 className="flex-1 text-xs font-bold text-muted-foreground uppercase">
-        {t(`netWorth.chart.groups.${group}`)}
-      </h3>
-      {subtotal === null && <MissingRate />}
-      {typeof subtotal === 'string' && (
-        <Money
-          amount={group === 'debts' ? absDecimal(subtotal) : subtotal}
-          currency={currency}
-          className="text-xs font-semibold"
-        />
-      )}
-    </div>
+    <Money
+      amount={group === 'debts' ? absDecimal(subtotal) : subtotal}
+      currency={currency}
+    />
   )
 }
 
 /**
- * The counted items by group, as the spreadsheet's table: each with its line over the
+ * The counted items by group, each group's header over its own card as the transactions'
+ * days (author, 2026-11-17), as the spreadsheet's table: each with its line over the
  * range, its value and its change over the range. A row opens its own chart, at its own
  * scale (author, 2026-11-17).
  */
@@ -160,6 +158,7 @@ export function ItemList({
   chart: NetWorthChartState
   currency: string
 }) {
+  const { t } = useTranslation()
   const locale = useLocale()
   // Only items with a figure in the range.
   const shown = chart.counted.filter((i) =>
@@ -167,7 +166,7 @@ export function ItemList({
   )
   if (shown.length === 0) return null
   return (
-    <section className={cn(cardSurface, 'flex flex-col gap-6 px-2 pt-2 pb-2')}>
+    <div className="flex flex-col gap-4">
       {ITEM_GROUPS.map((group) => {
         const rows = shown
           .filter((i) => i.group === group)
@@ -179,9 +178,16 @@ export function ItemList({
           )
         if (rows.length === 0) return null
         return (
-          <section key={group}>
-            <GroupHeader group={group} chart={chart} currency={currency} />
-            <ul className="divide-y">
+          <section key={group} className="flex flex-col gap-2">
+            <GroupHeader
+              color={GROUP_COLORS[group]}
+              aside={
+                <Subtotal group={group} chart={chart} currency={currency} />
+              }
+            >
+              {t(`netWorth.chart.groups.${group}`)}
+            </GroupHeader>
+            <ListCard>
               {rows.map((item) => (
                 <ItemRow
                   key={item.id}
@@ -190,10 +196,10 @@ export function ItemList({
                   currency={currency}
                 />
               ))}
-            </ul>
+            </ListCard>
           </section>
         )
       })}
-    </section>
+    </div>
   )
 }

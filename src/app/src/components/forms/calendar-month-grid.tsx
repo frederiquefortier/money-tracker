@@ -8,9 +8,8 @@ import {
 } from 'react-aria-components'
 import {
   MonthYearHeader,
-  MonthYearList,
+  MonthYearLists,
 } from '#/components/forms/calendar-month-year'
-import type { CalendarMenu } from '#/components/forms/calendar-month-year'
 import { cn } from '#/lib/utils'
 
 /** The band behind a day in a range: from the middle of the first, to the middle of the last. */
@@ -88,15 +87,15 @@ function Day({
 
 /**
  * The month grid under its month and year (calendar-month-year.tsx), the grid giving way
- * to a list while one is open. Page Up and Down move by month, with Shift by year.
+ * to the month and year lists while they are open. Page Up and Down move by month, with Shift by year.
  */
 export function CalendarMonthGrid({ range }: { range: boolean }) {
-  const [menu, setMenu] = useState<CalendarMenu>(null)
+  const [open, setOpen] = useState(false)
   return (
     <>
-      <MonthYearHeader menu={menu} onMenu={setMenu} />
-      {menu ? (
-        <MonthYearList menu={menu} onPicked={() => setMenu(null)} />
+      <MonthYearHeader open={open} onToggle={() => setOpen(!open)} />
+      {open ? (
+        <MonthYearLists />
       ) : (
         <CalendarGrid className="w-full table-fixed border-separate border-spacing-0">
           <CalendarGridHeader>

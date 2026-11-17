@@ -13,6 +13,7 @@ import type {
   PeriodChoice,
 } from '#/lib/transactions/transaction-list'
 import { cn } from '#/lib/utils'
+import { useToast } from '#/hooks/app/use-toast'
 
 /** What each screen holds: "Tout", the names, or the count while they are unnamed. */
 function useSummary(
@@ -34,13 +35,18 @@ function useSummary(
   }
 }
 
-/** A phone's first level: the period and each filter with what is chosen; a row opens it. */
+/**
+ * The filters, each with what is chosen; a row opens it. The sidebar shows a count only,
+ * the chips naming the values (author, 2026-11-17). A filter with nothing to choose from
+ * looks disabled and says why when tapped.
+ */
 export function FilterRoot({
   screens,
   values,
   names,
   period,
   empty,
+  countOnly = false,
   onTab,
 }: {
   screens: ReadonlyArray<FilterScreen>
@@ -49,10 +55,17 @@ export function FilterRoot({
   period: PeriodChoice | null
   /** Filters with nothing to choose from; they cannot open while nothing is ticked. */
   empty: ReadonlySet<FilterScreen> | null
+  /** The number chosen in place of their names, and nothing while none is. */
+  countOnly?: boolean
   onTab: (screen: FilterScreen) => void
 }) {
   const { t } = useTranslation()
+  const toast = useToast()
   const summaryOf = useSummary(values, names, period)
+  const shown = (tab: FilterScreen, active: boolean) => {
+    if (!countOnly || tab === 'period') return summaryOf(tab)
+    return active ? String(values[FILTER_KEYS[tab]].length) : ''
+  }
   return (
     <ul className={cardSurface}>
       {screens.map((tab) => {
@@ -65,13 +78,17 @@ export function FilterRoot({
           <li key={tab} className="border-b last:border-b-0">
             <button
               type="button"
-              disabled={off}
-              onClick={() => onTab(tab)}
+              aria-disabled={off || undefined}
+              onClick={() =>
+                off
+                  ? toast({ text: t(`transactions.list.nothingIn.${tab}`) })
+                  : onTab(tab)
+              }
               className={cn(
                 'flex min-h-12 w-full items-center gap-3 px-4 py-2 text-left',
                 rowHover,
                 focusRing,
-                off && 'pointer-events-none opacity-50',
+                off && 'opacity-50',
               )}
             >
               <span className="font-semibold">
@@ -83,7 +100,7 @@ export function FilterRoot({
                   active ? 'text-primary' : 'text-muted-foreground',
                 )}
               >
-                {off ? '' : summaryOf(tab)}
+                {off ? '' : shown(tab, active)}
               </span>
               {!off && (
                 <Icon name="chevron-right" className="text-muted-foreground" />

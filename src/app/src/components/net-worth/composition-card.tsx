@@ -62,7 +62,7 @@ function Side({
         <span className="text-sm text-muted-foreground">
           {t(`netWorth.chart.lines.${line}`)}
         </span>
-        <span className="flex flex-col items-end">
+        <span className="flex flex-col items-end font-mono">
           {value === null ? (
             <MissingRate />
           ) : (
@@ -70,7 +70,7 @@ function Side({
               amount={value}
               currency={currency}
               className={cn(
-                'font-semibold',
+                'text-lg font-semibold',
                 line === 'debts' && 'text-destructive',
               )}
             />
@@ -80,13 +80,14 @@ function Side({
               change={change}
               currency={currency}
               lowerIsBetter={line === 'debts'}
+              className="text-sm"
             />
           )}
         </span>
       </div>
       {value !== null && <Bar segments={segments} scale={scale} />}
       {segments.length > 1 && (
-        <ul className="flex flex-col gap-0.5 text-xs">
+        <ul className="flex flex-col gap-1 text-sm">
           {segments.map(({ group, amount }) => (
             <li key={group} className="flex items-center gap-2">
               <span
