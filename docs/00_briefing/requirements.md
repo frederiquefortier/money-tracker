@@ -175,7 +175,7 @@ English; this file is in English like every other meta-doc.
 | NW-06 | Projections at fixed growth rates (5, 7, 10 %) or custom inputs. | v1, ai | later |
 | NW-07 | Goal solver: "to reach X in N years at r %, invest Y per year", with r defaulting to my actual return. | v1, ai | later |
 | NW-08 | "If this continues, in N years I'll have X." | v1, ai | later |
-| NW-10 | One net worth page with the total, the chart and every account and holding with their actions; the accounts and holdings subpages merged into it (ADR-061). Missing rates give "—", never a partial sum. | author (2026-11-12, 2026-11-17) | 2 |
+| NW-10 | One net worth page with the total, the chart and every account and holding with their actions; the accounts and holdings subpages merged into it (ADR-061). Missing rates give a dash, never a partial sum. | author (2026-11-12, 2026-11-17) | 2 |
 | NW-09 | Income by job: salary per employer per year, with a total. | misc ("Séparé par emploi..."), net-worth data | 5 |
 
 ## 13. Yearly review (`YR`)

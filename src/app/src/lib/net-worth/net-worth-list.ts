@@ -217,7 +217,7 @@ export function groupEntries(
     : named
 }
 
-/** What a group adds to the net worth, without the hidden items; "—" on a missing rate. */
+/** What a group adds to the net worth, without the hidden items; `NO_FIGURE` on a missing rate. */
 export function groupWorth(
   entries: ReadonlyArray<NetWorthEntry>,
   hidden: ReadonlySet<string>,

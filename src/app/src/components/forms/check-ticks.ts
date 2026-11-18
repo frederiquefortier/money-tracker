@@ -109,11 +109,7 @@ export function categoryTicks(
  */
 export function merchantNodes(
   merchants: ReadonlyArray<Merchant>,
-  {
-    query,
-    picked,
-    locale,
-  }: { query: string; picked: Picked; locale: string },
+  { query, picked, locale }: { query: string; picked: Picked; locale: string },
 ): Array<CheckNode> {
   const matches = matcher(query)
   const byUse = compareByUse(locale)

@@ -24,6 +24,7 @@ import {
 import type { FormAccount } from '#/lib/transactions/transaction'
 import { cn } from '#/lib/utils'
 import { getAdjustmentBalance, saveAdjustment } from '#/server/adjustments'
+import { NO_FIGURE } from '#/lib/shared/format'
 
 export type AdjustmentValues = {
   accountId: string
@@ -68,7 +69,7 @@ function SlipAmount({
   signed?: boolean
 }) {
   if (amount === null || amount === undefined || currency === null)
-    return <span className="text-muted-foreground">—</span>
+    return <span className="text-muted-foreground">{NO_FIGURE}</span>
   return <Money amount={amount} currency={currency} signed={signed} />
 }
 

@@ -3,6 +3,7 @@ import { Money } from '#/components/display/money'
 import { ChangeText } from '#/components/net-worth/change-text'
 import { compareDecimal } from '#/lib/shared/money'
 import type { Holding } from '#/lib/holdings/holding'
+import { NO_FIGURE } from '#/lib/shared/format'
 
 function Figure({
   label,
@@ -30,7 +31,11 @@ export function HoldingFigures({ holding }: { holding: Holding }) {
   return (
     <dl className="mb-4 flex flex-wrap justify-end gap-x-8 gap-y-2">
       <Figure label={t('holdings.placed')}>
-        {placed === null ? '—' : <Money amount={placed} currency={currency} />}
+        {placed === null ? (
+          NO_FIGURE
+        ) : (
+          <Money amount={placed} currency={currency} />
+        )}
       </Figure>
       {withdrawn !== null && compareDecimal(withdrawn, '0') > 0 && (
         <Figure label={t('holdings.withdrawn')}>
@@ -39,7 +44,7 @@ export function HoldingFigures({ holding }: { holding: Holding }) {
       )}
       <Figure label={t('holdings.profit')}>
         {profit === null ? (
-          '—'
+          NO_FIGURE
         ) : (
           <ChangeText
             change={{ amount: profit, percent: profitPercent }}

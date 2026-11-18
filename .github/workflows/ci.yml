@@ -87,9 +87,12 @@ jobs:
           version: 2.122.0
       - name: Start the local stack
         working-directory: src
+        # Its summary prints the stack's keys; they are throwaway local ones, kept out of
+        # the log all the same. Errors still show on stderr.
         run: >-
           supabase start -x
           studio,imgproxy,edge-runtime,realtime,storage-api,logflare,vector,mailpit,postgres-meta,supavisor
+          > /dev/null
       - name: Read the local keys
         working-directory: src
         run: |

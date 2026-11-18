@@ -9,7 +9,7 @@ import { HoldingFigures } from '#/components/net-worth/holding-figures'
 import { NetWorthChart } from '#/components/net-worth/net-worth-chart'
 import { OwedMoney } from '#/components/net-worth/owed-money'
 import { focusRing } from '#/components/styles'
-import { formatDate } from '#/lib/shared/format'
+import { NO_FIGURE, formatDate } from '#/lib/shared/format'
 import { useLocale } from '#/hooks/app/use-locale'
 import { rangeChange, returnOver } from '#/lib/net-worth/net-worth-range'
 import { cn } from '#/lib/utils'
@@ -37,7 +37,7 @@ function ItemChange({
         })
       : rangeChange(chart.itemPoints, entry.id, chart.range)
   if (change?.percent == null)
-    return <span className="text-sm text-muted-foreground">—</span>
+    return <span className="text-sm text-muted-foreground">{NO_FIGURE}</span>
   return (
     <ChangeText
       change={change}

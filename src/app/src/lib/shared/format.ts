@@ -3,6 +3,9 @@ import type { Locale } from '#/i18n/locales'
 
 // A list formats several amounts and dates per row; building an Intl formatter is the
 // slow part, so each locale and options pair is built once.
+/** What a figure that cannot be worked out shows (a missing rate, ADR-004): an em dash, escaped for the no-em-dash check. */
+export const NO_FIGURE = '\u2014'
+
 const numberFormats = new Map<string, Intl.NumberFormat>()
 const dateFormats = new Map<string, Intl.DateTimeFormat>()
 

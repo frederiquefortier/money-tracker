@@ -46,9 +46,7 @@ export function FilterSidebar({
     open: false,
     tab: 'kinds',
   })
-  const chosen = FILTER_TABS.some(
-    (tab) => values[FILTER_KEYS[tab]].length > 0,
-  )
+  const chosen = FILTER_TABS.some((tab) => values[FILTER_KEYS[tab]].length > 0)
   return (
     <aside
       aria-label={t('transactions.list.filters')}

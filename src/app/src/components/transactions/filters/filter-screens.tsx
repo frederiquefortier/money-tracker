@@ -45,9 +45,7 @@ export function FilterFooter({
           {t('common.clear')}
         </Button>
       )}
-      <Button onClick={onClose}>
-        {t('transactions.list.showResults')}
-      </Button>
+      <Button onClick={onClose}>{t('transactions.list.showResults')}</Button>
     </SheetFooter>
   )
 }

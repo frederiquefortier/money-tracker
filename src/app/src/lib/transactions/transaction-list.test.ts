@@ -160,7 +160,10 @@ describe('period presets', () => {
     expect(presetOf({ ...base, period: 'month' }, today)).toBeNull()
     expect(presetOf({ ...base, period: 'year' }, today)).toBeNull()
     expect(
-      presetOf({ ...base, period: 'custom', start: '2026-10-18', end: '2026-11-17' }, today),
+      presetOf(
+        { ...base, period: 'custom', start: '2026-10-18', end: '2026-11-17' },
+        today,
+      ),
     ).toBeNull()
   })
 })

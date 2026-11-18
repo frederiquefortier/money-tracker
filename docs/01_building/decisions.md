@@ -323,7 +323,7 @@ Technical and structural choices, with the alternatives that were rejected. Chec
 **Decision:**
 - The Comptes tab becomes "Net worth" (English in both languages). `/net-worth` is a hub: a total card, a slot for the phase 5 chart and a link card for each subpage with its own total. `/net-worth/accounts` is the accounts page moved, `/net-worth/holdings` is the new holdings page. Their sheets keep their own URLs below the page.
 - The tab stays active on all three paths. Each subpage has a back link to the hub (the rule of no back link had no use case before this).
-- The total counts open accounts and the open holdings not left out of net worth; a missing rate gives "—" per figure (ADR-004). The hub has no schema of its own.
+- The total counts open accounts and the open holdings not left out of net worth; a missing rate gives a dash per figure (ADR-004). The hub has no schema of its own.
 - `/accounts` has no redirect (one user, ADR-021).
 
 **Alternatives Considered:**

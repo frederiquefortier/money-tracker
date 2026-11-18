@@ -14,7 +14,7 @@ test('a signed-out visitor is sent to sign in', async ({ page }) => {
 test('a wrong password says so and stays on the page', async ({ page }) => {
   await page.goto('/sign-in')
   await page.getByLabel('Email').fill(EMAIL)
-  await page.getByLabel('Password').fill('not-the-Password-1')
+  await page.getByLabel('Password', { exact: true }).fill('not-the-Password-1')
   await page.getByRole('button', { name: 'Sign in' }).click()
   await expect(page.getByText('Invalid email or password.')).toBeVisible()
   await expect(page).toHaveURL(/\/sign-in/)
@@ -23,7 +23,7 @@ test('a wrong password says so and stays on the page', async ({ page }) => {
 test('the password alone does not open the app', async ({ page }) => {
   await page.goto('/sign-in')
   await page.getByLabel('Email').fill(EMAIL)
-  await page.getByLabel('Password').fill(PASSWORD)
+  await page.getByLabel('Password', { exact: true }).fill(PASSWORD)
   await page.getByRole('button', { name: 'Sign in' }).click()
   await expect(page).toHaveURL(/\/mfa/)
   await page.goto('/transactions')
@@ -33,7 +33,7 @@ test('the password alone does not open the app', async ({ page }) => {
 test('the password and a code open the app', async ({ page }) => {
   await page.goto('/sign-in')
   await page.getByLabel('Email').fill(EMAIL)
-  await page.getByLabel('Password').fill(PASSWORD)
+  await page.getByLabel('Password', { exact: true }).fill(PASSWORD)
   await page.getByRole('button', { name: 'Sign in' }).click()
   const secret = readFileSync(TOTP_SECRET_FILE, 'utf8')
   await page.getByLabel('Code').fill(await freshCode(secret))

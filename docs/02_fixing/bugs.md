@@ -4,6 +4,12 @@ Track bugs with dates, solutions, and prevention notes. Search this file before 
 
 <!-- Newest first: a new bug goes directly below this line. Template at the bottom. -->
 
+### 2026-11-18 - CI red after the history rewrite push
+- **Issue**: The first push in a while failed three jobs: docs (em dashes), app (`npm run verify`) and e2e (sign-in setup).
+- **Root Cause**: The "no figure" mark was a literal em dash in four components and three docs; four files had drifted from Prettier and an import was duplicated; the show-password button's name contains "Password", so `getByLabel('Password')` matched two elements.
+- **Solution**: One `NO_FIGURE` constant written as `'\u2014'`, the docs say "a dash"; the files reformatted and the import merged; the e2e selectors use `exact: true`. The e2e job no longer prints the local stack's throwaway keys from `supabase start`.
+- **Prevention**: Run `npm run verify` and the em dash check before pushing; a label that is a substring of another control's name needs `exact: true`.
+
 ### 2026-11-18 - pgTAP 32 (event skips) failed 5 of 10
 - **Issue**: Every check expecting a transaction linked to the event got NULL.
 - **Root Cause**: The test's helper `pg_temp.event_on(day, amount)` filtered on `t.amount = -amount`. In a SQL function a column wins over a parameter of the same name, so it compared the column with itself and matched nothing. The linking itself was right, checked step by step in a rolled-back transaction.
