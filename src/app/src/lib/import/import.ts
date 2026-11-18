@@ -187,7 +187,7 @@ export type ImportWillCreate = {
   accountChanges: Array<{ name: string; institution: string | null }>
   categories: Array<string>
   merchants: Array<string>
-  /** People a merchant text names: the merchant is theirs ("bought from Maman"). */
+  /** People a merchant text names: the merchant is theirs ("bought from Julie"). */
   counterparties: Array<string>
   people: Array<string>
   events: Array<string>

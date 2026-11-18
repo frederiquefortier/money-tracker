@@ -1,7 +1,7 @@
 -- Two more things a person can be on a transaction (PPL-03, PPL-08, ADR-040):
 --  * with: "someone was with me", no money; a line like the others, so the list, the
 --    Proches filter and the person's page find it, but it never changes a part.
---  * seller: "I bought it from them" (Maman, Juju). It replaces the merchant that was
+--  * seller: "I bought it from them" (Julie, Juju). It replaces the merchant that was
 --    a person (ADR-038), which made no sense: it is a person field on the transaction.
 
 -- With

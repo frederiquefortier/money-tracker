@@ -571,7 +571,7 @@ begin
 
   -- A merchant text that is a person's name or alias (existing, or given by the people and
   -- aliases files) is the person: the merchant is theirs (merchants.person_id), "I bought
-  -- something from Maman".
+  -- something from Julie".
   create temp table i_pk on commit drop as
   select distinct on (x.key) x.key, x.name from (
     select public.fold_name(q.name) as key, q.name from public.people q

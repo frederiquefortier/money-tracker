@@ -1,4 +1,4 @@
--- A merchant that is a person (TRX-05, PPL-01): "I bought something from Maman". The
+-- A merchant that is a person (TRX-05, PPL-01): "I bought something from Julie". The
 -- merchant keeps working everywhere a merchant does (list, filters, search); this links it
 -- to the person, who has it as their own. A person has at most one such merchant, and
 -- deleting the person leaves the merchant as it was.

@@ -18,7 +18,7 @@ insert into public.categories (id, user_id, parent_id, name, kind, color) values
 create function pg_temp.event_on(day date, amount numeric) returns text language sql as $$
   select e.name from public.transactions t
   left join public.events e on e.id = t.event_id
-  where t.occurred_on = day and t.amount = -amount
+  where t.occurred_on = day and t.amount = -event_on.amount
 $$;
 grant execute on function pg_temp.event_on(date, numeric) to authenticated;
 
