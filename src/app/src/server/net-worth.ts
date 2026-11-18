@@ -8,6 +8,7 @@ import type { HoldingKind } from '#/lib/holdings/holding'
 import type { NetWorth } from '#/lib/net-worth/net-worth'
 import type {
   ChartItem,
+  FlowRow,
   ItemGroup,
   SeriesRow,
 } from '#/lib/net-worth/net-worth-series'
@@ -90,9 +91,23 @@ function seriesRows(
   )
 }
 
+function flowRows(
+  rows: ReadonlyArray<{
+    on_date: string
+    holding_id: string
+    display_amount: string | null
+  }>,
+): Array<FlowRow> {
+  return rows.map((r) => ({
+    onDate: r.on_date,
+    holdingId: r.holding_id,
+    displayAmount: r.display_amount,
+  }))
+}
+
 /**
- * The hub's totals in the display currency: the open accounts, and the open holdings (spec 20),
- * then the chart's whole history and the items it can leave out. Amounts as text (ADR-004).
+ * The hub's net worth in the display currency, then the chart's whole history and the
+ * items it can leave out. Amounts as text (ADR-004).
  */
 export const getNetWorth = createServerFn({ method: 'GET' }).handler(
   async (): Promise<NetWorth> => {
@@ -114,11 +129,10 @@ export const getNetWorth = createServerFn({ method: 'GET' }).handler(
         .from('holding_totals')
         .select('holding_id, latest_on, display_value::text'),
       supabase.rpc('net_worth_series'),
+      supabase.rpc('holding_flows'),
     ])
-    const [profile, balances, accounts, holdings, totals, series] = loaded(
-      'Net worth',
-      ...results,
-    )
+    const [profile, balances, accounts, holdings, totals, series, flows] =
+      loaded('Net worth', ...results)
 
     const openAccounts = accounts.filter((a) => a.closed_on === null)
     const openHoldings = holdings.filter((h) => h.closed_on === null)
@@ -145,20 +159,15 @@ export const getNetWorth = createServerFn({ method: 'GET' }).handler(
     )
 
     const display = profile.display_currency
-    const accountsConverted = openAccounts.some((a) => a.currency !== display)
-    const holdingsConverted = openHoldings.some((h) => h.currency !== display)
     return {
       displayCurrency: display,
-      accounts: {
-        total: accountTotal,
-        count: open.size,
-        converted: accountsConverted,
-      },
-      holdings: { ...summary, converted: holdingsConverted },
       total: sumAmounts([accountTotal, summary.total]),
-      converted: accountsConverted || holdingsConverted,
+      converted: [...openAccounts, ...openHoldings].some(
+        (item) => item.currency !== display,
+      ),
       series: seriesRows(series),
       items: chartItems(accounts, holdings),
+      flows: flowRows(flows),
     }
   },
 )

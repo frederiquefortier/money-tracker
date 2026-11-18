@@ -3,18 +3,10 @@ import type { holdingsFr } from '../fr/holdings'
 export const holdingsEn: typeof holdingsFr = {
   holdings: {
     title: 'Holdings',
-    empty: 'No holdings yet.',
     kinds: {
       investment: 'Investments',
       asset: 'Assets',
       debt: 'Debts',
-    },
-    sort: {
-      name: 'Name (A to Z)',
-      type: 'Type',
-      currency: 'Currency',
-      valueAsc: 'Value (lowest)',
-      valueDesc: 'Value (highest)',
     },
     addHolding: 'Add a holding',
     newTitle: 'New holding',
@@ -36,10 +28,6 @@ export const holdingsEn: typeof holdingsFr = {
     currency: 'Currency',
     openedOn: 'Opening date',
     closedOnField: 'Archive date',
-    closedOn: 'Archived on {{date}}',
-    closed_zero: 'No archived holdings',
-    closed_one: 'Archived holding ({{count}})',
-    closed_other: 'Archived holdings ({{count}})',
     inUse: 'It has a history. Archive it instead.',
     currencyRemoved:
       'Add {{code}} to your currencies first to reactivate this holding.',
@@ -48,6 +36,8 @@ export const holdingsEn: typeof holdingsFr = {
     closedAtDate: 'The holding is archived at that date.',
     precision: 'The amount has too many decimals for this currency.',
     withdrawn: 'Withdrawn',
+    placed: 'Placed',
+    profit: 'Total profit',
     field: 'Holding',
     unlinked_one: '{{count}} transaction with no holding',
     unlinked_other: '{{count}} transactions with no holding',

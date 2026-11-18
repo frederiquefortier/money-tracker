@@ -18,11 +18,11 @@ function EditAccount() {
   const locale = useLocale()
   const { accountId } = Route.useParams()
   const account = accounts.find((a) => a.id === accountId)
-  if (!account) return <Navigate to="/net-worth/accounts" resetScroll={false} />
+  if (!account) return <Navigate to="/net-worth" resetScroll={false} />
 
   return (
     <RouteSheet
-      to="/net-worth/accounts"
+      to="/net-worth"
       title={t('accounts.editTitle')}
       actions={<AccountActions account={account} placement="sheet" />}
     >

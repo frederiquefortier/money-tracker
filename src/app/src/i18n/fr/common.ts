@@ -26,6 +26,7 @@ export const commonFr = {
     removeName: 'Retirer “{{name}}”',
     archive: 'Archiver',
     archiveName: 'Archiver “{{name}}”',
+    actionsOf: 'Actions sur “{{name}}”',
     reactivate: 'Réactiver',
     reactivateName: 'Réactiver “{{name}}”',
     delete: 'Supprimer',

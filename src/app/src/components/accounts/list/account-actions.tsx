@@ -14,7 +14,7 @@ type RowAccount = Pick<
   'id' | 'name' | 'currency' | 'closedOn' | 'inUse'
 >
 
-/** Close or reopen (ACC-03) and delete, as icons on the account's row or its sheet. */
+/** Close or reopen (ACC-03) and delete, on the account's row, in its menu or its sheet. */
 export function AccountActions({
   account,
   placement,
@@ -40,32 +40,42 @@ export function AccountActions({
   }
 
   return (
-    <IconActions slots={2} placement={placement} className={className}>
-      {account.closedOn ? (
+    <>
+      <IconActions
+        slots={2}
+        placement={placement}
+        menuLabel={t('common.actionsOf', { name })}
+        className={className}
+      >
+        {account.closedOn ? (
+          <IconButton
+            icon="undo"
+            label={t('common.reactivateName', { name })}
+            text={t('common.reactivate')}
+            onClick={() =>
+              run(() => reopenAccount({ data: { id } }), { failureText })
+            }
+          />
+        ) : (
+          <IconButton
+            icon="archive"
+            label={archiveLabel}
+            text={t('common.archive')}
+            onClick={() => setDialog('close')}
+          />
+        )}
         <IconButton
-          icon="undo"
-          label={t('common.reactivateName', { name })}
+          icon="trash-full"
+          text={t('common.delete')}
+          label={account.inUse ? t('accounts.inUse') : deleteLabel}
+          muted={account.inUse}
           onClick={() =>
-            run(() => reopenAccount({ data: { id } }), { failureText })
+            account.inUse
+              ? toast({ text: t('accounts.inUse') })
+              : setDialog('delete')
           }
         />
-      ) : (
-        <IconButton
-          icon="archive"
-          label={archiveLabel}
-          onClick={() => setDialog('close')}
-        />
-      )}
-      <IconButton
-        icon="trash-full"
-        label={account.inUse ? t('accounts.inUse') : deleteLabel}
-        muted={account.inUse}
-        onClick={() =>
-          account.inUse
-            ? toast({ text: t('accounts.inUse') })
-            : setDialog('delete')
-        }
-      />
+      </IconActions>
       {dialog === 'close' && (
         <ArchiveDialog
           title={archiveLabel}
@@ -82,6 +92,6 @@ export function AccountActions({
         onDelete={() => deleteAccount({ data: { id } })}
         onClose={close}
       />
-    </IconActions>
+    </>
   )
 }

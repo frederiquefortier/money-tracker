@@ -10,7 +10,6 @@ import {
 } from 'recharts'
 import { MissingRate, Money } from '#/components/display/money'
 import { ChartContainer, ChartTooltip } from '#/components/ui/chart'
-import { ChartLegend } from '#/components/net-worth/chart-legend'
 import { GROUP_COLORS } from '#/components/net-worth/chart-lines'
 import { MONTHLY_UP_TO, periodChanges } from '#/lib/net-worth/net-worth-range'
 import { STACK_KEYS, axisTicks } from '#/lib/net-worth/net-worth-series'
@@ -183,6 +182,7 @@ function BarsChart({
 /**
  * What moved the net worth: each month's or year's change split by group, gains above 0
  * and losses below, with a dot at the net change. A debt paid down is a gain (NW-04).
+ * The tooltip is the legend.
  */
 export function ChangeBars({
   points,
@@ -214,12 +214,11 @@ export function ChangeBars({
   return (
     // Clear of the line's axis above it, so the two charts read apart.
     <section className="mt-6 flex flex-col gap-3">
-      <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2">
-        <h3 className="text-sm font-semibold">
-          {t(byYear ? 'netWorth.changes.byYear' : 'netWorth.changes.byMonth')}
-        </h3>
-        <ChartLegend lines={lines} />
-      </div>
+      {/* No legend (author, 2026-11-18): the colours are the list's groups, and the
+          tooltip names each group with its change and the net. */}
+      <h3 className="text-sm font-semibold">
+        {t(byYear ? 'netWorth.changes.byYear' : 'netWorth.changes.byMonth')}
+      </h3>
       <BarsChart
         drawing={{ changes, lines, byYear, currency, locale }}
         groups={groups}

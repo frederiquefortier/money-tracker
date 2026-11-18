@@ -15,6 +15,6 @@ export const Route = createFileRoute(
 function Contributions() {
   const holding = Route.useLoaderData()
   if (!holding || holding.kind !== 'investment')
-    return <Navigate to="/net-worth/holdings" resetScroll={false} />
+    return <Navigate to="/net-worth" resetScroll={false} />
   return <EntriesSheet kind="contribution" holding={holding} />
 }

@@ -1,18 +1,10 @@
 export const holdingsFr = {
   holdings: {
     title: 'Avoirs',
-    empty: 'Aucun avoir pour l’instant.',
     kinds: {
       investment: 'Placements',
       asset: 'Actifs',
       debt: 'Dettes',
-    },
-    sort: {
-      name: 'Nom (A à Z)',
-      type: 'Type',
-      currency: 'Devise',
-      valueAsc: 'Valeur (plus faible)',
-      valueDesc: 'Valeur (plus élevée)',
     },
     addHolding: 'Ajouter un avoir',
     newTitle: 'Nouvel avoir',
@@ -34,10 +26,6 @@ export const holdingsFr = {
     currency: 'Devise',
     openedOn: 'Date d’ouverture',
     closedOnField: 'Date d’archivage',
-    closedOn: 'Archivé le {{date}}',
-    closed_zero: 'Aucun avoir archivé',
-    closed_one: 'Avoir archivé ({{count}})',
-    closed_other: 'Avoirs archivés ({{count}})',
     inUse: 'Il a un historique. Archivez-le plutôt.',
     currencyRemoved:
       'Ajoutez d’abord {{code}} à vos devises pour réactiver cet avoir.',
@@ -46,6 +34,8 @@ export const holdingsFr = {
     closedAtDate: 'L’avoir est archivé à cette date.',
     precision: 'Le montant a trop de décimales pour cette devise.',
     withdrawn: 'Retiré',
+    placed: 'Placé',
+    profit: 'Profit total',
     field: 'Avoir',
     unlinked_one: '{{count}} transaction sans avoir',
     unlinked_other: '{{count}} transactions sans avoir',

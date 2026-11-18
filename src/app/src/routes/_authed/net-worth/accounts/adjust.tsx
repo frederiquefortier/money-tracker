@@ -27,10 +27,7 @@ function AdjustBalance() {
   const open = choosable.filter((a) => !a.closedOn && !a.hiddenForNew)
 
   return (
-    <RouteSheet
-      to="/net-worth/accounts"
-      title={t('transactions.adjustment.newTitle')}
-    >
+    <RouteSheet to="/net-worth" title={t('transactions.adjustment.newTitle')}>
       <AdjustmentForm
         accounts={choosable}
         initial={{

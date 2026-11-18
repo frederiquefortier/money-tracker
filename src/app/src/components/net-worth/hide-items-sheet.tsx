@@ -4,47 +4,35 @@ import { CheckList } from '#/components/forms/check-list'
 import type { CheckNode, CheckState } from '#/components/forms/check-list'
 import { GROUP } from '#/components/forms/check-ticks'
 import { Sheet, SheetBody, SheetContent } from '#/components/ui/sheet'
-import { chartItemLabel } from '#/lib/net-worth/net-worth-series'
+import { ITEM_GROUPS, chartItemLabel } from '#/lib/net-worth/net-worth-series'
 import { useLocale } from '#/hooks/app/use-locale'
 import type { ChartItem } from '#/lib/net-worth/net-worth-series'
 import type { NetWorthChartState } from '#/hooks/net-worth/use-net-worth-chart'
 
-function institutionOf(item: ChartItem) {
-  return item.type === 'account' ? item.institution : item.parts.institution
-}
-
-/** Open items by institution, A to Z, then those with none, then the archived ones. */
+/** Open items in the item list's groups, A to Z, then the archived ones. */
 function useItemNodes(items: ReadonlyArray<ChartItem>): Array<CheckNode> {
   const { t } = useTranslation()
   const locale = useLocale()
-  const byLabel = (a: CheckNode, b: CheckNode) =>
-    a.label.localeCompare(b.label, locale)
-  const groups = new Map<string, Array<CheckNode>>()
-  const none: Array<CheckNode> = []
-  const archived: Array<CheckNode> = []
-  for (const item of items) {
-    const institution = institutionOf(item)
-    if (item.closed) {
-      archived.push({ id: item.id, label: chartItemLabel(item, locale) })
-      continue
-    }
-    const node = {
-      id: item.id,
-      label: chartItemLabel(item, locale, institution !== null),
-    }
-    if (institution === null) none.push(node)
-    else groups.set(institution, [...(groups.get(institution) ?? []), node])
-  }
-  const group = (id: string, label: string, children: Array<CheckNode>) => ({
+  const node = (item: ChartItem) => ({
+    id: item.id,
+    label: chartItemLabel(item, locale),
+  })
+  const group = (id: string, label: string, members: Array<ChartItem>) => ({
     id: `${GROUP}${id}`,
     label,
-    children: children.sort(byLabel),
+    children: members
+      .map(node)
+      .sort((a, b) => a.label.localeCompare(b.label, locale)),
   })
+  const open = items.filter((i) => !i.closed)
+  const archived = items.filter((i) => i.closed)
   return [
-    ...[...groups]
-      .sort(([a], [b]) => a.localeCompare(b, locale))
-      .map(([name, children]) => group(name, name, children)),
-    ...(none.length ? [group('none', t('accounts.noInstitution'), none)] : []),
+    ...ITEM_GROUPS.flatMap((g) => {
+      const members = open.filter((i) => i.group === g)
+      return members.length
+        ? [group(g, t(`netWorth.chart.groups.${g}`), members)]
+        : []
+    }),
     ...(archived.length
       ? [group('archived', t('netWorth.chart.archived'), archived)]
       : []),

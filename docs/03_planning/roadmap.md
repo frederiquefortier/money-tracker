@@ -36,7 +36,7 @@ Everything the owner can set on a transaction exists before the import, so eight
 - [x] People and groups, roles, aliases, merging. PPL-01..09.
 - [x] Reimbursement links. TRX-07, PPL-05.
 - [x] Events with types and automatic linking by date. EVT-01..03, 07.
-- [x] The Net worth tab: a hub with totals and two subpages, accounts moved under it. NW-10, ACC-06 ([spec](../00_briefing/designs/20-net-worth.md), ADR-046).
+- [x] The Net worth tab: a hub with totals and two subpages, accounts moved under it, merged into one page on 2026-11-17. NW-10, ACC-06 ([spec](../00_briefing/designs/20-net-worth.md), ADR-046, ADR-061).
 - [x] Holdings with their dated values, external contributions, transfers between holdings, and transactions linked to the holding they pay into, as the second subpage. NW-01, 02, 03 ([spec](../00_briefing/designs/19-holdings.md), ADR-045, ADR-048).
 
 ## Phase 3: The import
@@ -59,7 +59,7 @@ The milestone: eight years of history in the app. It comes before the dashboard 
 # v2
 
 ## Phase 5: Patrimoine (net worth)
-- [x] Net worth chart with what moved it, what it leaves out and its change over a period. NW-04, 05 ([spec](../00_briefing/designs/20-net-worth.md), ADR-057).
+- [x] Net worth chart with what moved it, what it leaves out and its change over a period. NW-04, 05 ([spec](../00_briefing/designs/20-net-worth.md), ADR-057; an investment's return without deposits, ADR-062).
 - [ ] Employers and salaries. NW-09.
 
 # v3

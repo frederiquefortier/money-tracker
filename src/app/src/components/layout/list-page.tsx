@@ -24,12 +24,18 @@ export function ListPage({
   /** A status beside the title, such as a warning tag. */
   titleNote?: React.ReactNode
   actions?: React.ReactNode
-  /** Fills the screen, for a page with charts. */
-  wide?: boolean
+  /** Fills the screen, for a page with charts; `xl` only from that width. */
+  wide?: boolean | 'xl'
   children: React.ReactNode
 }) {
   return (
-    <div className={cn(pageColumn, wide && 'max-w-none')}>
+    <div
+      className={cn(
+        pageColumn,
+        wide === true && 'max-w-none',
+        wide === 'xl' && 'xl:max-w-none',
+      )}
+    >
       {back}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex flex-wrap items-center gap-3">

@@ -21,7 +21,7 @@ function NewAccount() {
     : (types[0]?.code ?? '')
 
   return (
-    <RouteSheet to="/net-worth/accounts" title={t('accounts.newTitle')}>
+    <RouteSheet to="/net-worth" title={t('accounts.newTitle')}>
       <AccountForm
         initial={{
           name: '',

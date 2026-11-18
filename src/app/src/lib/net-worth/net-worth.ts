@@ -1,7 +1,11 @@
 import { fromMinor, toMinor } from '#/lib/shared/money'
 import { HOLDING_KINDS } from '#/lib/holdings/holding'
 import type { HoldingKind } from '#/lib/holdings/holding'
-import type { ChartItem, SeriesRow } from '#/lib/net-worth/net-worth-series'
+import type {
+  ChartItem,
+  FlowRow,
+  SeriesRow,
+} from '#/lib/net-worth/net-worth-series'
 
 // The hub's figures (NW-10, spec 20). Converted amounts come from the database with four
 // decimals whatever the currency, so sums are made at four.
@@ -66,13 +70,13 @@ export function summarizeHoldings(
 
 export type NetWorth = {
   displayCurrency: string
-  /** `converted`: some of it is in another currency (CUR-09). */
-  accounts: { total: string | null; count: number; converted: boolean }
-  holdings: HoldingsSummary & { converted: boolean }
-  /** Null when either part has a missing rate. */
+  /** Null when a rate is missing. */
   total: string | null
+  /** Some of it is in another currency (CUR-09). */
   converted: boolean
   /** The chart's figures per item per date (ADR-057) and the items it can leave out. */
   series: Array<SeriesRow>
   items: Array<ChartItem>
+  /** Each investment's deposits and withdrawals, for its return (ADR-062). */
+  flows: Array<FlowRow>
 }

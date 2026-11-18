@@ -1,6 +1,6 @@
 import { createServerFn } from '@tanstack/react-start'
 import { z } from 'zod'
-import { NO_INSTITUTION, accountInputSchema } from '#/lib/accounts/account'
+import { accountInputSchema } from '#/lib/accounts/account'
 import {
   deleteRow,
   inUseIds,
@@ -82,15 +82,12 @@ export const getAccounts = createServerFn({ method: 'GET' }).handler(
           .select(
             'account_id, balance::text, pending::text, display_balance::text',
           ),
-        supabase
-          .from('institution_totals')
-          .select('institution_id, total::text, converted'),
       ]),
       getInstitutions(),
       getTypes(),
       inUseIds('used_account_ids'),
     ])
-    const [accounts, balances, totals] = loaded('Accounts', ...results)
+    const [accounts, balances] = loaded('Accounts', ...results)
 
     const byAccount = new Map(balances.map((b) => [b.account_id, b]))
     return {
@@ -105,12 +102,6 @@ export const getAccounts = createServerFn({ method: 'GET' }).handler(
         }
       }),
       institutions,
-      totals: Object.fromEntries(
-        totals.map((t) => [
-          t.institution_id ?? NO_INSTITUTION,
-          { total: t.total, converted: t.converted ?? false },
-        ]),
-      ),
       types,
     }
   },

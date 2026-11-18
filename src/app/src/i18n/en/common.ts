@@ -28,6 +28,7 @@ export const commonEn: typeof commonFr = {
     removeName: 'Remove “{{name}}”',
     archive: 'Archive',
     archiveName: 'Archive “{{name}}”',
+    actionsOf: 'Actions for “{{name}}”',
     reactivate: 'Reactivate',
     reactivateName: 'Reactivate “{{name}}”',
     delete: 'Delete',

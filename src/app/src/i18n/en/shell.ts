@@ -7,7 +7,6 @@ export const shellEn: typeof shellFr = {
   nav: {
     label: 'Main navigation',
     transactions: 'Transactions',
-    accounts: 'Accounts',
     dashboard: 'Dashboard',
     budget: 'Budget',
   },

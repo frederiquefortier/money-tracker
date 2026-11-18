@@ -4,6 +4,15 @@ Document new concepts, techniques, and knowledge gained. Reference this file to 
 
 <!-- Newest first: a new entry goes directly below this line. Template at the bottom. -->
 
+### 2026-11-18 - Return without deposits (modified Dietz)
+
+**What Was New:**
+- A change in value counts deposits as growth. The return is the change less the net money put in, over the start value plus each flow weighted by the share of the period it was invested (modified Dietz).
+- A time-weighted return chains sub-period returns and needs a value at every flow; with values entered months apart it misreads each deposit as a loss until the next value.
+
+**Applied In:**
+- ADR-062, `returnOver` in `net-worth-range.ts`.
+
 ### 2026-11-13 - Planning, transitions and hydration
 
 **What Was New:**

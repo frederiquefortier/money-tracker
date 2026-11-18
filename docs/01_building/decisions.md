@@ -4,6 +4,66 @@ Technical and structural choices, with the alternatives that were rejected. Chec
 
 <!-- Newest first: a new ADR goes directly below this line. Template at the bottom. -->
 
+### ADR-062: An investment's row shows its return over the range, deposits left out (2026-11-18)
+
+**Context:**
+- An investment's row on the hub showed two look-alike figures: its lifetime profit ("+12 000 $ (30 %)") under the name, and its change in value over the range ("▲ 6,0 %/an") under the value. The first ignored the range tabs; the second counted every deposit as growth, so a plan fed monthly looked like a great investment.
+- The author asked for a senior designer's review of the row and approved one figure per row, following the range, measured as a return.
+
+**Decision:**
+- On an investment, the figure under the value is its return over the range: the gain is the change in value less the money put in (linked transactions, external contributions, transfers in) plus the money taken out, and the percent is over the start value plus each flow weighted by the share of the range it was in (modified Dietz). On Tout, past a year, both are per year and the percent is compounded, as for the other rows.
+- A holding with no value at the range's start begins at its first money in, earlier flows counting at the start.
+- `holding_flows()` gives each investment's flows by day in the display currency at that day's rate, null with a missing rate; the browser computes the return for whatever range is picked.
+- The lifetime profit leaves the row. Opening an investment's chart shows, over it and to the right, Placé, Retiré (when above 0) and Profit total in amount and percent, since it opened whatever the range (author, 2026-11-18); its subtitle no longer shows what was withdrawn. Accounts, other assets and debts keep their change in value.
+
+**Alternatives Considered:**
+- A time-weighted return chained month by month -> Values are entered by hand, often months apart; a deposit before the next value reads as a loss that month and a jump later.
+- The return computed in SQL per range -> Eight ranges per holding on every load, or a round trip per tab.
+- Keeping the lifetime profit in the subtitle with a label -> Two figures, two periods on one row; Tout already gives the return since the start.
+
+**Consequences:**
+- The return's percent is a float (weights and a root); it is shown only, never summed (ADR-004). The gain amount stays exact.
+- The lifetime figures need the chart opened; the row carries the range's return only.
+
+### ADR-061: One net worth page, the subpages merged into it (2026-11-17)
+
+**Context:**
+- ADR-046 kept the accounts and the holdings on two subpages because their rows, actions and grouping differed. Since ADR-060 the hub listed every item, and each row opened its form, so the subpages were a second list of the same things.
+- The author confirmed the monthly routine of updating values bank by bank, which the subpages' institution drawers served.
+
+**Decision:**
+- `/net-worth` holds the net worth, the charts and one list of every account and holding, with their row actions, the archived section, the sort and the + (account, holding, adjustment).
+- The list groups by type (default) or by institution, a choice beside the sort, remembered per browser. Group totals leave the hidden items out in both.
+- The forms stay route sheets at their URLs, now over the hub; `/net-worth/accounts` and `/net-worth/holdings` redirect to it. Their loaders' data comes from the hub's, which calls `getNetWorth`, `getAccounts` and `getHoldings` in parallel.
+- Rows show the value in the item's own currency, as the subpages did; totals are in the display currency.
+
+**Alternatives Considered:**
+- Keeping the subpages beside the hub list -> Two lists and two row patterns for the same items.
+- Grouping by type only, the institution on the row -> The author updates values bank by bank.
+- One server function for the three loads -> They run in parallel; ADR-053 kept such calls apart until measured.
+
+**Consequences:**
+- Supersedes ADR-046 where the accounts and holdings are separate subpages, and ADR-060's link cards, which are gone. The rest of both stands.
+- `institution_totals` is no longer read; group totals are summed in the browser from each item's display value.
+
+### ADR-060: The hub's subpage cards carry no total (2026-11-17)
+
+**Context:**
+- ADR-046 put each subpage's total on its hub card, and ADR-058 kept those totals complete while the rest of the hub leaves the hidden items out.
+- Since the hub groups items by type (credit cards with the debts), the card "Comptes" and the group "Comptes" beside it showed two figures under one name. The author asked to remove the repeat.
+
+**Decision:**
+- The Comptes and Avoirs cards show a name, a count and a chevron. `getNetWorth` returns the counts and the net worth, no per-subpage totals.
+- The net worth, the composition and the item list's group headers are the hub's only figures, all without the hidden items.
+
+**Alternatives Considered:**
+- Renaming the card totals ("Tous les comptes") -> Still two figures for overlapping sets, and the card's total ignored what is hidden.
+- Dropping the cards for links beside the title -> The cards are the hub's only way into the subpages on a phone; kept as links.
+
+**Consequences:**
+- Supersedes ADR-046 and ADR-058 where the hub cards carry a complete total. The rest of both stands.
+- A subpage's total is its drawers' totals; the hub shows no "accounts only" figure.
+
 ### ADR-059: No complete total under the hub's net worth (2026-11-17)
 
 **Context:**

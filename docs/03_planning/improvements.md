@@ -4,6 +4,25 @@ Ideas not built and not decided against. Review during planning to pick the next
 
 <!-- Newest first: a new idea goes directly below this line. Template at the bottom. -->
 
+### 2026-11-17 - Drop the unused institution_totals view
+
+**Description:**
+- Since ADR-061 nothing reads `institution_totals`; the net worth page sums each group in the browser.
+
+**Motivation:**
+- One less view to keep in step with the balances.
+
+**Potential Approach:**
+- A migration dropping the view, its pgTAP test updated, `npm run db:types`, database.md.
+
+**Priority:**
+- [ ] High - Critical improvement
+- [ ] Medium - Nice to have
+- [x] Low - Future consideration
+
+**Dependencies:**
+- None.
+
 ### 2026-11-16 - Redesign the excluded categories tab
 
 **Description:**

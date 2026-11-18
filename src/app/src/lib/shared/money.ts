@@ -142,6 +142,12 @@ export function compareDecimal(a: string, b: string): number {
   return negA ? -sign : sign
 }
 
+/** The sign flipped; zero stays unsigned. */
+export function negateDecimal(decimal: string): string {
+  if (decimal.startsWith('-')) return decimal.slice(1)
+  return compareDecimal(decimal, '0') === 0 ? decimal : `-${decimal}`
+}
+
 /** The sign dropped: the transaction form types amounts unsigned, the kind carries it. */
 export function absDecimal(decimal: string): string {
   return decimal.replace(/^-/, '')

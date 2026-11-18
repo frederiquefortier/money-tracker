@@ -27,7 +27,7 @@ export function PagePending() {
  */
 export function listPagePending(
   title: (t: TFunction) => string,
-  frame: { back?: React.ReactNode; wide?: boolean } = {},
+  frame: { back?: React.ReactNode; wide?: boolean | 'xl' } = {},
 ) {
   function ListPagePending() {
     const { t } = useTranslation()

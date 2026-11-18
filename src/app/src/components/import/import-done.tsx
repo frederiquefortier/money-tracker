@@ -89,9 +89,7 @@ export function ImportDone({
         )}
         {withHoldings && (
           <Button asChild variant={withTransactions ? 'outline' : 'default'}>
-            <Link to="/net-worth/holdings">
-              {t('import.holdings.viewHoldings')}
-            </Link>
+            <Link to="/net-worth">{t('import.holdings.viewHoldings')}</Link>
           </Button>
         )}
       </div>

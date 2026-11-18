@@ -135,6 +135,11 @@ holding's last value on or before the date (debts negative), as text in the disp
 that date's rate, null when a rate is missing. An item counts until the day it closes. The
 browser leaves items out and sums (ADR-057).
 
+**Holding flows.** `holding_flows()` gives each investment's money in (positive) and out
+(negative) per day: the moves `holding_totals` sums, as text in the display currency at that
+day's rate, null when a rate is missing, nothing dated after today. The hub computes each
+investment's return over the range from it and the series (ADR-062).
+
 ## Not built yet
 
 | Table | Notes |

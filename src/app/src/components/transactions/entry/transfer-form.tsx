@@ -83,8 +83,8 @@ function OneAccount() {
   return (
     <div className="flex flex-col gap-2">
       <p>{t('transactions.transfer.oneAccount')}</p>
-      <Link to="/net-worth/accounts" className="font-semibold text-primary">
-        {t('nav.accounts')}
+      <Link to="/net-worth/accounts/new" className="font-semibold text-primary">
+        {t('accounts.addAccount')}
       </Link>
     </div>
   )

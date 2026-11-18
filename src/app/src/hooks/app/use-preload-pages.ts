@@ -7,8 +7,6 @@ import { useRouter } from '@tanstack/react-router'
 const PAGES = [
   '/transactions',
   '/net-worth',
-  '/net-worth/accounts',
-  '/net-worth/holdings',
   '/settings/categories',
   '/settings/merchants',
   '/settings/people',

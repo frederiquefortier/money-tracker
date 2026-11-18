@@ -36,6 +36,13 @@ export type SeriesRow = {
   displayValue: string | null
 }
 
+/** Money into an investment on a date (out negative), converted (ADR-062). */
+export type FlowRow = {
+  onDate: string
+  holdingId: string
+  displayAmount: string | null
+}
+
 /** What the chart can leave out (NW-05), named as on its page. */
 export type ChartItem = { id: string; closed: boolean; group: ItemGroup } & (
   | { type: 'account'; name: string; institution: string | null }
@@ -204,7 +211,9 @@ export function axisTicks(min: number, max: number): Array<number> {
     Math.ceil(high / step) - Math.floor(low / step) + 1
   let step = 1
   for (let power = 1; count(step) > MAX_LINES; power *= 10)
-    step = STEPS.map((s) => s * power).find((s) => count(s) <= MAX_LINES) ?? 10 * power
+    step =
+      STEPS.map((s) => s * power).find((s) => count(s) <= MAX_LINES) ??
+      10 * power
   const first = Math.floor(low / step)
   return Array.from(
     { length: Math.ceil(high / step) - first + 1 },

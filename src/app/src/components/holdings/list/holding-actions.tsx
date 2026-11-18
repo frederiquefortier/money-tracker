@@ -30,6 +30,7 @@ function EntryLinks({ holding, name }: { holding: RowHolding; name: string }) {
       <IconLink
         icon="chart-line"
         label={t('holdings.valuesOf', { name })}
+        text={t('holdings.values')}
         to="/net-worth/holdings/$holdingId/values"
         params={{ holdingId: id }}
       />
@@ -38,12 +39,14 @@ function EntryLinks({ holding, name }: { holding: RowHolding; name: string }) {
           <IconLink
             icon="coins"
             label={t('holdings.contributionsOf', { name })}
+            text={t('holdings.contributions')}
             to="/net-worth/holdings/$holdingId/contributions"
             params={{ holdingId: id }}
           />
           <IconLink
             icon="arrow-left-right"
             label={t('holdings.transferOf', { name })}
+            text={t('holdings.transfers')}
             to="/net-worth/holdings/$holdingId/transfer"
             params={{ holdingId: id }}
           />
@@ -51,6 +54,18 @@ function EntryLinks({ holding, name }: { holding: RowHolding; name: string }) {
       )}
     </>
   )
+}
+
+/** The toast for a refused archive or delete. */
+function useFailureText(currency: string) {
+  const { t } = useTranslation()
+  return (error: string) => {
+    if (error === 'inUse') return t('holdings.inUse')
+    if (error === 'closedBeforeEntry') return t('holdings.closedBeforeEntry')
+    if (error === 'currencyRemoved')
+      return t('holdings.currencyRemoved', { code: currency })
+    return undefined
+  }
 }
 
 /**
@@ -74,42 +89,46 @@ export function HoldingActions({
   const close = () => setDialog(null)
   const archiveLabel = t('common.archiveName', { name })
   const deleteLabel = t('common.deleteName', { name })
-  const failureText = (error: string) => {
-    if (error === 'inUse') return t('holdings.inUse')
-    if (error === 'closedBeforeEntry') return t('holdings.closedBeforeEntry')
-    if (error === 'currencyRemoved')
-      return t('holdings.currencyRemoved', { code: holding.currency })
-    return undefined
-  }
+  const failureText = useFailureText(holding.currency)
 
   return (
-    <IconActions slots={5} placement={placement} className={className}>
-      <EntryLinks holding={holding} name={name} />
-      {holding.closedOn ? (
+    <>
+      <IconActions
+        slots={5}
+        placement={placement}
+        menuLabel={t('common.actionsOf', { name })}
+        className={className}
+      >
+        <EntryLinks holding={holding} name={name} />
+        {holding.closedOn ? (
+          <IconButton
+            icon="undo"
+            label={t('common.reactivateName', { name })}
+            text={t('common.reactivate')}
+            onClick={() =>
+              run(() => reopenHolding({ data: { id } }), { failureText })
+            }
+          />
+        ) : (
+          <IconButton
+            icon="archive"
+            label={archiveLabel}
+            text={t('common.archive')}
+            onClick={() => setDialog('close')}
+          />
+        )}
         <IconButton
-          icon="undo"
-          label={t('common.reactivateName', { name })}
+          icon="trash-full"
+          text={t('common.delete')}
+          label={holding.inUse ? t('holdings.inUse') : deleteLabel}
+          muted={holding.inUse}
           onClick={() =>
-            run(() => reopenHolding({ data: { id } }), { failureText })
+            holding.inUse
+              ? toast({ text: t('holdings.inUse') })
+              : setDialog('delete')
           }
         />
-      ) : (
-        <IconButton
-          icon="archive"
-          label={archiveLabel}
-          onClick={() => setDialog('close')}
-        />
-      )}
-      <IconButton
-        icon="trash-full"
-        label={holding.inUse ? t('holdings.inUse') : deleteLabel}
-        muted={holding.inUse}
-        onClick={() =>
-          holding.inUse
-            ? toast({ text: t('holdings.inUse') })
-            : setDialog('delete')
-        }
-      />
+      </IconActions>
       {dialog === 'close' && (
         <ArchiveDialog
           title={archiveLabel}
@@ -126,6 +145,6 @@ export function HoldingActions({
         onDelete={() => deleteHolding({ data: { id } })}
         onClose={close}
       />
-    </IconActions>
+    </>
   )
 }

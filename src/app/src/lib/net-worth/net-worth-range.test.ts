@@ -6,6 +6,7 @@ import {
   monthsBack,
   parseRange,
   pointsInRange,
+  returnOver,
 } from '#/lib/net-worth/net-worth-range'
 
 describe('monthsBack', () => {
@@ -140,5 +141,119 @@ describe('annualChangeOver', () => {
         'total',
       ),
     ).toEqual({ amount: '200.0000', percent: '25.000' })
+  })
+})
+
+describe('returnOver', () => {
+  const flow = (date: string, amount: string | null) => ({ date, amount })
+  const percent = (change: ReturnType<typeof returnOver>) =>
+    Number(change?.percent)
+
+  it('is the change in value when nothing went in or out', () => {
+    expect(
+      returnOver(
+        [point('2025-01-01', '1000'), point('2026-01-01', '1100')],
+        'total',
+        { flows: [], range: 'y1' },
+      ),
+    ).toEqual({ amount: '100.0000', percent: '10.000' })
+  })
+
+  it('leaves deposits out of the gain and weighs them by the time they were in', () => {
+    const change = returnOver(
+      [point('2025-01-01', '1000'), point('2026-01-01', '1600')],
+      'total',
+      { flows: [flow('2025-07-02', '500')], range: 'y1' },
+    )
+    expect(change?.amount).toBe('100.0000')
+    expect(percent(change)).toBeCloseTo(
+      (100 / (1000 + (500 * 183) / 365)) * 100,
+      2,
+    )
+  })
+
+  it('gives 0 when the value only grew by what was put in', () => {
+    const change = returnOver(
+      [point('2020-01-01', '10000'), point('2022-01-01', '20000')],
+      'total',
+      {
+        flows: [flow('2020-06-01', '5000'), flow('2021-06-01', '5000')],
+        range: 'all',
+      },
+    )
+    expect(change?.amount).toBe('0.0000')
+    expect(percent(change)).toBe(0)
+  })
+
+  it('does not read a withdrawal as a loss', () => {
+    expect(
+      returnOver(
+        [point('2025-01-01', '1000'), point('2025-12-01', '500')],
+        'total',
+        { flows: [flow('2025-06-01', '-500')], range: 'y1' },
+      )?.amount,
+    ).toBe('0.0000')
+  })
+
+  it('counts earlier flows from the start while the holding had no value', () => {
+    expect(
+      returnOver([point('2025-01-31'), point('2025-12-31', '1100')], 'total', {
+        flows: [flow('2025-01-10', '1000')],
+        range: 'y1',
+      }),
+    ).toEqual({ amount: '100.0000', percent: '10.000' })
+  })
+
+  it('ignores flows before the start once the holding had a value', () => {
+    expect(
+      returnOver(
+        [point('2025-01-31', '1000'), point('2025-12-31', '1100')],
+        'total',
+        { flows: [flow('2025-01-10', '1000')], range: 'y1' },
+      ),
+    ).toEqual({ amount: '100.0000', percent: '10.000' })
+  })
+})
+
+describe('returnOver on Tout and with a missing rate', () => {
+  const flow = (date: string, amount: string | null) => ({ date, amount })
+  const percent = (change: ReturnType<typeof returnOver>) =>
+    Number(change?.percent)
+
+  it('starts a holding opened in the range at its first money in', () => {
+    expect(
+      returnOver(
+        [point('2020-01-01'), point('2021-06-30'), point('2022-01-01', '1100')],
+        'total',
+        { flows: [flow('2021-01-01', '1000')], range: 'y3' },
+      ),
+    ).toEqual({ amount: '100.0000', percent: '10.000' })
+  })
+
+  it('is per year past a year, from the first money in', () => {
+    const change = returnOver(
+      [point('2020-01-01', '1000'), point('2022-01-01', '1210')],
+      'total',
+      { flows: [], range: 'all' },
+    )
+    expect(change?.perYearFrom).toBe('2020-01-01')
+    expect(percent(change)).toBeCloseTo(10, 1)
+    expect(Number(change?.amount)).toBeCloseTo(105, 0)
+  })
+
+  it('is null with a missing rate on a flow or at the end', () => {
+    const points = [point('2025-01-01', '1000'), point('2026-01-01', '1100')]
+    expect(
+      returnOver(points, 'total', {
+        flows: [flow('2025-06-01', null)],
+        range: 'y1',
+      }),
+    ).toBeNull()
+    expect(
+      returnOver([points[0], point('2026-01-01', null)], 'total', {
+        flows: [],
+        range: 'y1',
+      }),
+    ).toBeNull()
   })
 })

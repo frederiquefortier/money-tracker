@@ -2,12 +2,14 @@ import { useLoaderData } from '@tanstack/react-router'
 
 // The loader data of a list, for the sheets opened over it.
 
+/** The accounts, from the net worth hub (ADR-061). */
 export function useAccountsPage() {
-  return useLoaderData({ from: '/_authed/net-worth/accounts' })
+  return useLoaderData({ from: '/_authed/net-worth' }).accounts
 }
 
+/** The holdings, from the net worth hub (ADR-061). */
 export function useHoldingsPage() {
-  return useLoaderData({ from: '/_authed/net-worth/holdings' })
+  return useLoaderData({ from: '/_authed/net-worth' }).holdings
 }
 
 export function useInstitutionsPage() {

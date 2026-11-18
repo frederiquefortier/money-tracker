@@ -29,7 +29,7 @@ export function TransferSheet({
   const [adding, setAdding] = useState(false)
   return (
     <>
-      <RouteSheet to="/net-worth/holdings" title={t('holdings.transfers')}>
+      <RouteSheet to="/net-worth" title={t('holdings.transfers')}>
         <SheetBody>
           <TransferList
             transfers={transfers}

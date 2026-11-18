@@ -3,9 +3,9 @@ import type { TFunction } from 'i18next'
 import { ChangeBars } from '#/components/net-worth/change-bars'
 import { TOTAL_COLOR } from '#/components/net-worth/chart-lines'
 import { ChangeText } from '#/components/net-worth/change-text'
-import { Total } from '#/components/net-worth/hub-cards'
+import { MissingRate, Money } from '#/components/display/money'
+import { HideItemsButton } from '#/components/net-worth/hide-items-sheet'
 import { NetWorthChart } from '#/components/net-worth/net-worth-chart'
-import { RangeTabs } from '#/components/net-worth/range-tabs'
 import { cardSurface } from '#/components/styles'
 import { rangeChange, rangeMonths } from '#/lib/net-worth/net-worth-range'
 import { cn } from '#/lib/utils'
@@ -28,7 +28,10 @@ function rangeText(
   return t('netWorth.change.over', { period })
 }
 
-/** The net worth without the hidden items (ADR-058) and its change over the range. */
+/**
+ * The net worth without the hidden items (ADR-058) and its change over the range. The page
+ * title names it. A missing rate shows MissingRate, never a partial sum.
+ */
 function Headline({
   chart,
   total,
@@ -47,15 +50,16 @@ function Headline({
   const change = rangeChange(chart.points, 'total', chart.range)
   return (
     <div className="flex flex-col gap-1">
-      <h2 className="text-sm text-muted-foreground">
-        {t('netWorth.chart.lines.total')}
-      </h2>
-      <Total
-        total={shown}
-        currency={currency}
-        converted={converted}
-        className="text-3xl font-bold"
-      />
+      {shown === null ? (
+        <MissingRate />
+      ) : (
+        <Money
+          amount={shown}
+          currency={currency}
+          converted={converted}
+          className="text-3xl font-bold"
+        />
+      )}
       {change && (
         <p className="flex flex-wrap items-baseline gap-x-1.5">
           <ChangeText change={change} currency={currency} />
@@ -73,8 +77,9 @@ function Headline({
 }
 
 /**
- * The hub's main card (NW-04): the net worth and its change over the range, the range's
- * tabs, then its line on its own scale and what moved it, month by month or year by year.
+ * The hub's main card (NW-04): the net worth and its change over the range with the eye
+ * that hides items from it, then its line on its own scale and what moved it, month by
+ * month or year by year.
  */
 export function NetWorthCard({
   chart,
@@ -90,25 +95,27 @@ export function NetWorthCard({
   const { t } = useTranslation()
   return (
     <section className={cn(cardSurface, 'flex flex-col gap-5 px-5 py-5')}>
-      <Headline
-        chart={chart}
-        total={total}
-        currency={currency}
-        converted={converted}
-      />
+      <div className="flex items-start justify-between gap-3">
+        <Headline
+          chart={chart}
+          total={total}
+          currency={currency}
+          converted={converted}
+        />
+        {chart.counted.length + chart.leftOut > 0 && (
+          <HideItemsButton chart={chart} />
+        )}
+      </div>
       {chart.points.length > 1 && (
         <>
-          <div className="flex flex-col gap-3">
-            <RangeTabs range={chart.range} onChange={chart.setRange} />
-            <NetWorthChart
-              points={chart.points}
-              dataKey="total"
-              color={TOTAL_COLOR}
-              label={t('netWorth.chart.lines.total')}
-              currency={currency}
-              className="h-64"
-            />
-          </div>
+          <NetWorthChart
+            points={chart.points}
+            dataKey="total"
+            color={TOTAL_COLOR}
+            label={t('netWorth.chart.lines.total')}
+            currency={currency}
+            className="h-64"
+          />
           <ChangeBars
             points={chart.points}
             groups={chart.groups}

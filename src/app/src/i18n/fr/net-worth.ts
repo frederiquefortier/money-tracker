@@ -1,15 +1,27 @@
 export const netWorthFr = {
   netWorth: {
     title: 'Patrimoine',
-    back: 'Patrimoine',
-    accountsCount_one: '{{count}} compte',
-    accountsCount_other: '{{count}} comptes',
-    holdingsCount_one: '{{count}} avoir',
-    holdingsCount_other: '{{count}} avoirs',
+    empty: 'Aucun compte ni avoir pour l’instant.',
+    closed_one: 'Archivé ({{count}})',
+    closed_other: 'Archivés ({{count}})',
+    closedOn: 'Archivé le {{date}}',
+    groupByLabel: 'Grouper: {{groupBy}}',
+    groupBy: {
+      type: 'Par type',
+      institution: 'Par institution',
+    },
+    sort: {
+      name: 'Nom (A à Z)',
+      type: 'Type',
+      currency: 'Devise',
+      valueAsc: 'Valeur (plus faible)',
+      valueDesc: 'Valeur (plus élevée)',
+    },
     up: 'Hausse',
     down: 'Baisse',
     hide: {
       label: 'Masquer des éléments',
+      hidden: 'Masqué du patrimoine',
       labelCount_one: 'Masquer des éléments: {{count}} masqué',
       labelCount_other: 'Masquer des éléments: {{count}} masqués',
     },
@@ -19,7 +31,6 @@ export const netWorthFr = {
       over: 'sur {{period}}',
       since: 'depuis {{year}}',
     },
-    composition: 'Composition',
     changes: {
       byYear: 'Variation par année',
       byMonth: 'Variation par mois',
@@ -28,8 +39,6 @@ export const netWorthFr = {
     chart: {
       lines: {
         total: 'Patrimoine',
-        assets: 'Actifs',
-        debts: 'Dettes',
       },
       groups: {
         accounts: 'Comptes',

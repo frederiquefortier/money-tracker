@@ -1596,6 +1596,14 @@ export type Database = {
         Returns: string
       }
       fold_name: { Args: { name: string }; Returns: string }
+      holding_flows: {
+        Args: never
+        Returns: {
+          display_amount: string
+          holding_id: string
+          on_date: string
+        }[]
+      }
       holdings_with_history: { Args: never; Returns: string[] }
       import_batch: {
         Args: { dry_run?: boolean; payload: Json }

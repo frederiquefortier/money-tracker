@@ -21,7 +21,7 @@ function EditHolding() {
   const { institutions, types } = useHoldingsPage()
   const holding = Route.useLoaderData()
   const locale = useLocale()
-  if (!holding) return <Navigate to="/net-worth/holdings" resetScroll={false} />
+  if (!holding) return <Navigate to="/net-worth" resetScroll={false} />
 
   const label = holdingLabel(
     {
@@ -35,7 +35,7 @@ function EditHolding() {
 
   return (
     <RouteSheet
-      to="/net-worth/holdings"
+      to="/net-worth"
       title={t('holdings.editTitle')}
       actions={
         <HoldingActions holding={{ ...holding, label }} placement="sheet" />

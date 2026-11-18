@@ -125,12 +125,113 @@ export function annualChangeOver(
   // summed into an amount (ADR-004).
   const growth =
     first.minor > 0n && last.minor > 0n
-      ? (Number(last.minor) / Number(first.minor)) ** ((365.25 / days)) - 1
+      ? (Number(last.minor) / Number(first.minor)) ** (365.25 / days) - 1
       : null
   return {
     amount: fromMinor(perYear, DIGITS),
     percent: growth === null ? null : (growth * 100).toFixed(3),
     perYearFrom: first.date,
+  }
+}
+
+/** Money into an investment on a date (out negative), in the display currency. */
+export type Flow = {
+  date: string
+  /** Null when a rate is missing. */
+  amount: string | null
+}
+
+const daysBetween = (from: string, to: string) =>
+  Math.round((Date.parse(to) - Date.parse(from)) / MS_PER_DAY)
+
+type Ends = { start: string; end: string; a: bigint; b: bigint }
+
+/** The range's first and last figures; an item not there yet starts at 0. */
+function endsOf(points: ReadonlyArray<SeriesPoint>, key: string): Ends | null {
+  const start = points.at(0)
+  const end = points.at(-1)
+  if (!start || !end || start === end) return null
+  const first = start.values[key] ?? '0'
+  const last = end.values[key]
+  const a = typeof first === 'string' ? toMinor(first, DIGITS) : null
+  const b = typeof last === 'string' ? toMinor(last, DIGITS) : null
+  if (a === null || b === null) return null
+  return { start: start.date, end: end.date, a, b }
+}
+
+type Flows = { net: bigint; weighted: number }
+
+/**
+ * The money put in over the range and its weight by the share of the range it was in.
+ * While the holding has no value at the start, earlier flows count from the start.
+ */
+function flowsOver(flows: ReadonlyArray<Flow>, ends: Ends): Flows | null {
+  const span = Date.parse(ends.end) - Date.parse(ends.start)
+  const sum: Flows = { net: 0n, weighted: 0 }
+  for (const flow of flows) {
+    const before = flow.date <= ends.start
+    if (flow.date > ends.end || (before && ends.a !== 0n)) continue
+    const minor = flow.amount === null ? null : toMinor(flow.amount, DIGITS)
+    if (minor === null) return null
+    const share = before
+      ? 1
+      : (Date.parse(ends.end) - Date.parse(flow.date)) / span
+    sum.net += minor
+    sum.weighted += Number(minor) * share
+  }
+  return sum
+}
+
+/** A holding with no value at the start begins at its first money in, if that is later. */
+function startsWithMoney(
+  ends: Ends | null,
+  flows: ReadonlyArray<Flow>,
+): Ends | null {
+  if (!ends || ends.a !== 0n) return ends
+  const first = flows
+    .map((f) => f.date)
+    .filter((date) => date <= ends.end)
+    .sort()
+    .at(0)
+  return first && first > ends.start && first < ends.end
+    ? { ...ends, start: first }
+    : ends
+}
+
+/**
+ * An investment's return over the range, with deposits and withdrawals left out (ADR-062):
+ * the gain is the change in value less the money put in, and the percent is over the start
+ * value plus each flow weighted by the share of the range it was in (modified Dietz). On
+ * Tout, past a year, both are per year and the percent is compounded.
+ */
+export function returnOver(
+  points: ReadonlyArray<SeriesPoint>,
+  key: string,
+  { flows, range }: { flows: ReadonlyArray<Flow>; range: SeriesRange },
+): Change | null {
+  const ends = startsWithMoney(endsOf(points, key), flows)
+  const moved = ends && flowsOver(flows, ends)
+  if (!ends || !moved) return null
+  const gain = ends.b - ends.a - moved.net
+  // The weights make the percent a float; it is only shown, never summed (ADR-004).
+  const base = Number(ends.a) + moved.weighted
+  const rate = base > 0 ? Number(gain) / base : null
+
+  const days = daysBetween(ends.start, ends.end)
+  if (range !== 'all' || days * 100 < Number(DAYS_PER_YEAR_X100))
+    return {
+      amount: fromMinor(gain, DIGITS),
+      percent: rate === null ? null : (rate * 100).toFixed(3),
+    }
+  const annual =
+    rate === null || rate <= -1 ? null : (1 + rate) ** (365.25 / days) - 1
+  return {
+    amount: fromMinor(
+      (gain * DAYS_PER_YEAR_X100) / (BigInt(days) * 100n),
+      DIGITS,
+    ),
+    percent: annual === null ? null : (annual * 100).toFixed(3),
+    perYearFrom: ends.start,
   }
 }
 

@@ -109,9 +109,7 @@ describe('axisTicks', () => {
     expect(axisTicks(150_000, 370_000)).toEqual([
       150_000, 200_000, 250_000, 300_000, 350_000, 400_000,
     ])
-    expect(axisTicks(-80_000, 160_000)).toEqual([
-      -100_000, 0, 100_000, 200_000,
-    ])
+    expect(axisTicks(-80_000, 160_000)).toEqual([-100_000, 0, 100_000, 200_000])
   })
 
   it('works for small and flat figures', () => {

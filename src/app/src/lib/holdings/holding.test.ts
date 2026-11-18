@@ -10,7 +10,6 @@ import {
   transferFormSchema,
   transferTargets,
 } from '#/lib/holdings/holding'
-import { drawersOf, holdingComparator } from '#/lib/holdings/holding-list'
 
 describe('isOpenOn', () => {
   const holding = { openedOn: '2020-01-01', closedOn: '2026-06-30' }
@@ -108,67 +107,6 @@ describe('holdingLabel', () => {
     expect(holdingLabel({ ...parts, institution: null }, 'fr')).toBe(
       'REER en CAD',
     )
-  })
-})
-
-describe('drawersOf', () => {
-  const holding = (label: string, institutionId: string | null) =>
-    ({ label, institutionId }) as Parameters<typeof drawersOf>[0][number]
-  const by = (a: { name: string }, b: { name: string }) =>
-    a.name.localeCompare(b.name)
-  const banks = [
-    { id: 'b', name: 'Banque B', websiteUrl: null },
-    { id: 'a', name: 'Banque A', websiteUrl: null },
-    { id: 'c', name: 'Banque C', websiteUrl: null },
-  ]
-  it('orders institutions, then the holdings with none, and drops empty ones', () => {
-    const drawers = drawersOf(
-      [
-        holding('Z', 'a'),
-        holding('Y', 'a'),
-        holding('X', null),
-        holding('W', 'b'),
-      ],
-      banks,
-      {
-        compare: by,
-        compareHoldings: (a, b) => by({ name: a.label }, { name: b.label }),
-      },
-    )
-    expect(drawers.map((d) => d.key)).toEqual(['a', 'b', ''])
-    expect(drawers[0]?.holdings.map((h) => h.label)).toEqual(['Y', 'Z'])
-  })
-})
-
-describe('holdingComparator', () => {
-  const one = (
-    label: string,
-    displayValue: string | null,
-    extra: Record<string, unknown> = {},
-  ) =>
-    ({
-      label,
-      displayValue,
-      kind: 'investment',
-      typeText: 'REER',
-      currency: 'CAD',
-      ...extra,
-    }) as Parameters<ReturnType<typeof holdingComparator>>[0]
-  const order = (sort: Parameters<typeof holdingComparator>[0]) =>
-    [
-      one('B', '500.0000'),
-      one('A', null),
-      one('C', '900.0000'),
-      one('D', '300.0000', { kind: 'debt' }),
-    ]
-      .sort(holdingComparator(sort, 'fr'))
-      .map((h) => h.label)
-  it('sorts by value, a debt below zero, a missing rate last', () => {
-    expect(order('valueAsc')).toEqual(['D', 'B', 'C', 'A'])
-    expect(order('valueDesc')).toEqual(['C', 'B', 'D', 'A'])
-  })
-  it('sorts by name', () => {
-    expect(order('name')).toEqual(['A', 'B', 'C', 'D'])
   })
 })
 

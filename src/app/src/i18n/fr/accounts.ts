@@ -1,21 +1,11 @@
 export const accountsFr = {
   accounts: {
     title: 'Comptes',
-    empty: 'Aucun compte pour l’instant.',
     noInstitution: 'Sans institution',
     accountsOf: 'Comptes de “{{name}}”',
-    sort: {
-      name: 'Nom (A à Z)',
-      type: 'Type',
-      currency: 'Devise',
-      balanceAsc: 'Solde (plus faible)',
-      balanceDesc: 'Solde (plus élevé)',
-    },
     addAccount: 'Ajouter un compte',
     hidden: 'Masqué des nouvelles transactions',
     pending: 'dont {{amount}} en attente',
-    closed: 'Comptes archivés ({{count}})',
-    closedOn: 'Archivé le {{date}}',
     newTitle: 'Nouveau compte',
     editTitle: 'Modifier le compte',
     created: 'Compte créé.',

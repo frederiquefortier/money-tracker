@@ -9,8 +9,22 @@ import {
 } from '#/lib/net-worth/net-worth-series'
 import { parseRange, pointsInRange } from '#/lib/net-worth/net-worth-range'
 import { todayIso } from '#/lib/shared/format'
-import type { ChartItem, SeriesRow } from '#/lib/net-worth/net-worth-series'
-import type { SeriesRange } from '#/lib/net-worth/net-worth-range'
+import type {
+  ChartItem,
+  FlowRow,
+  SeriesRow,
+} from '#/lib/net-worth/net-worth-series'
+import type { Flow, SeriesRange } from '#/lib/net-worth/net-worth-range'
+
+function flowsByHolding(rows: ReadonlyArray<FlowRow>) {
+  const byHolding = new Map<string, Array<Flow>>()
+  for (const row of rows) {
+    const list = byHolding.get(row.holdingId) ?? []
+    list.push({ date: row.onDate, amount: row.displayAmount })
+    byHolding.set(row.holdingId, list)
+  }
+  return byHolding
+}
 
 /**
  * The hub's choices, kept per browser (NW-05), and the figures they give. The range is
@@ -19,6 +33,7 @@ import type { SeriesRange } from '#/lib/net-worth/net-worth-range'
 export function useNetWorthChart(
   series: ReadonlyArray<SeriesRow>,
   items: ReadonlyArray<ChartItem>,
+  flowRows: ReadonlyArray<FlowRow>,
 ) {
   const [range, setRange] = useStoredState<SeriesRange>(
     'netWorth.chart.range',
@@ -42,6 +57,7 @@ export function useNetWorthChart(
     () => itemPoints(series, excluded.ids, groups),
     [series, groups, excludedKey],
   )
+  const flows = useMemo(() => flowsByHolding(flowRows), [flowRows])
   const today = todayIso()
   const counted = items.filter((i) => !excluded.ids.has(i.id))
 
@@ -61,6 +77,10 @@ export function useNetWorthChart(
     points: pointsInRange(totals, range, today),
     /** Each counted item over the range. */
     itemPoints: pointsInRange(perItem, range, today),
+    /** Each counted item over its whole history: an archived item draws it all. */
+    historyPoints: perItem,
+    /** Each investment's deposits and withdrawals, by id. */
+    flows,
   }
 }
 

@@ -29,7 +29,7 @@ export function EntriesSheet({
 
   return (
     <>
-      <RouteSheet to="/net-worth/holdings" title={label}>
+      <RouteSheet to="/net-worth" title={label}>
         <SheetBody>
           <EntryList
             label={label}

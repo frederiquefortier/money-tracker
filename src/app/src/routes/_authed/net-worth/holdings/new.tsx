@@ -24,7 +24,7 @@ function NewHolding() {
   const type = typesFor(types, country, locale).at(0)
 
   return (
-    <RouteSheet to="/net-worth/holdings" title={t('holdings.newTitle')}>
+    <RouteSheet to="/net-worth" title={t('holdings.newTitle')}>
       <HoldingForm
         initial={{
           country,

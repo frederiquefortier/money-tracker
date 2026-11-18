@@ -34,7 +34,7 @@ function Transfer() {
   }))
   const source = listed.find((h) => h.id === detail?.id)
   if (!detail || !source || source.kind !== 'investment')
-    return <Navigate to="/net-worth/holdings" resetScroll={false} />
+    return <Navigate to="/net-worth" resetScroll={false} />
   return (
     <TransferSheet
       source={source}

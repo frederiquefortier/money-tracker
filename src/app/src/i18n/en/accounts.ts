@@ -3,21 +3,11 @@ import type { accountsFr } from '../fr/accounts'
 export const accountsEn: typeof accountsFr = {
   accounts: {
     title: 'Accounts',
-    empty: 'No accounts yet.',
     noInstitution: 'No institution',
     accountsOf: 'Accounts of “{{name}}”',
-    sort: {
-      name: 'Name (A to Z)',
-      type: 'Type',
-      currency: 'Currency',
-      balanceAsc: 'Balance (lowest)',
-      balanceDesc: 'Balance (highest)',
-    },
     addAccount: 'Add an account',
     hidden: 'Hidden from new transactions',
     pending: 'including {{amount}} pending',
-    closed: 'Archived accounts ({{count}})',
-    closedOn: 'Archived on {{date}}',
     newTitle: 'New account',
     editTitle: 'Edit account',
     created: 'Account created.',

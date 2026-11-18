@@ -5,7 +5,6 @@ export const shellFr = {
   nav: {
     label: 'Navigation principale',
     transactions: 'Transactions',
-    accounts: 'Comptes',
     dashboard: 'Dashboard',
     budget: 'Budget',
   },

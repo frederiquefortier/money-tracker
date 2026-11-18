@@ -10,6 +10,7 @@ import {
   ratio,
   splitMinor,
   toMinor,
+  negateDecimal,
 } from '#/lib/shared/money'
 
 describe('minor units', () => {
@@ -115,5 +116,13 @@ describe('amountForInput', () => {
   it('writes a share or percentage with only the decimals it needs', () => {
     expect(amountForInput('1.5000', null, 'fr')).toBe('1,5')
     expect(amountForInput('2.0000', null, 'en')).toBe('2')
+  })
+})
+
+describe('negateDecimal', () => {
+  it('flips the sign and leaves zero unsigned', () => {
+    expect(negateDecimal('850.0000')).toBe('-850.0000')
+    expect(negateDecimal('-235.63')).toBe('235.63')
+    expect(negateDecimal('0.0000')).toBe('0.0000')
   })
 })

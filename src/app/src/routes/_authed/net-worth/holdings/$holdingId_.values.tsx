@@ -14,6 +14,6 @@ export const Route = createFileRoute(
 
 function Values() {
   const holding = Route.useLoaderData()
-  if (!holding) return <Navigate to="/net-worth/holdings" resetScroll={false} />
+  if (!holding) return <Navigate to="/net-worth" resetScroll={false} />
   return <EntriesSheet kind="snapshot" holding={holding} />
 }
