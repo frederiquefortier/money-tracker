@@ -81,7 +81,7 @@ export function PeriodTabs({
         }
         title={t('transactions.list.pickDates')}
         onClick={onPickDates}
-        className="flex flex-1 items-center gap-1.5 px-1.5 sm:px-2.5"
+        className="flex flex-1 items-center justify-center gap-1.5 px-1.5 sm:px-2.5"
       >
         <Icon name="calendar" className="size-4 shrink-0" />
         {preset === null && (

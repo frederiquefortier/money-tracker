@@ -8,6 +8,7 @@ import {
   merchantNodes,
 } from '#/components/forms/check-ticks'
 import { useRevealed } from '#/hooks/app/use-revealed'
+import { ListEnd } from '#/components/lists/list-end'
 import { todayIso } from '#/lib/shared/format'
 import type { Merchant } from '#/lib/merchants/merchant'
 import { useFormatLocale } from '#/hooks/app/use-locale'
@@ -66,7 +67,7 @@ function MerchantList({
       stateOf={ticks.stateOf}
       onToggle={(node) => onChange(ticks.toggle(node))}
     >
-      {more && <div ref={sentinel} aria-hidden="true" />}
+      {more && <ListEnd sentinel={sentinel} />}
     </CheckList>
   )
 }

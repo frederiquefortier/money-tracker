@@ -27,7 +27,7 @@ import type {
   CategoryKind,
 } from '#/lib/categories/category'
 import { archivedTree, categoryContext } from '#/lib/categories/category-tree'
-import { matchesWithParents } from '#/lib/categories/category-list'
+import { matchesInTree } from '#/lib/categories/category-list'
 import { useLocale } from '#/hooks/app/use-locale'
 import { useStoredState } from '#/hooks/app/use-stored-state'
 import { getCategories } from '#/server/categories'
@@ -63,9 +63,9 @@ function shape(
   const ofKind = categories.filter((c) => c.kind === kind)
   const activeOfKind = ofKind.filter((c) => !isArchived(c))
   const archivedOfKind = ofKind.filter(isArchived)
-  const found = query ? matchesWithParents(activeOfKind, query, byId) : null
+  const found = query ? matchesInTree(activeOfKind, query, byId) : null
   const foundArchived = query
-    ? matchesWithParents(archivedOfKind, query, byId)
+    ? matchesInTree(archivedOfKind, query, byId)
     : null
   const archived = foundArchived
     ? archivedOfKind.filter((c) => foundArchived.has(c.id))
@@ -152,6 +152,7 @@ function Categories() {
   return (
     <ListPage
       title={t('categories.title')}
+      count={ofKind.length}
       actions={
         <>
           {parents.length > 0 && !found && (

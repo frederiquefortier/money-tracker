@@ -11,6 +11,7 @@ import { useOverlayContainer } from '#/components/ui/overlay-container'
 import { treeGuides } from '#/lib/shared/tree-layout'
 import { cn } from '#/lib/utils'
 import { useRevealed } from '#/hooks/app/use-revealed'
+import { ListEnd } from '#/components/lists/list-end'
 import { fieldSurface } from '#/components/styles'
 
 // The chosen option is tinted, as in a native select; hover and the keyboard's position
@@ -48,7 +49,7 @@ export function ComboboxList({
     rows.map((row) => (row.kind === 'option' ? (row.option.depth ?? 0) : 0)),
   )
   // Options build as the list scrolls; the keyboard's position is always built.
-  const revealed = useRevealed<ComboboxRow, HTMLLIElement>(rows, 60, active + 1)
+  const revealed = useRevealed<ComboboxRow, HTMLElement>(rows, 60, active + 1)
   // The keyboard's position stays in view as it moves down a long list.
   useEffect(() => {
     if (active < 0) return
@@ -99,7 +100,7 @@ export function ComboboxList({
           </Fragment>
         )
       })}
-      {revealed.more && <li ref={revealed.sentinel} aria-hidden="true" />}
+      {revealed.more && <ListEnd sentinel={revealed.sentinel} as="li" />}
     </ul>
   )
 }

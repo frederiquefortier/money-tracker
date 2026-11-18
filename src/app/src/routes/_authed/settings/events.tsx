@@ -197,6 +197,7 @@ function Events() {
     'dateDesc',
     parseSort,
   )
+  const { events, types } = Route.useLoaderData()
   const [typeSort, setTypeSort] = useStoredState<TypeSort>(
     'events.typeSort',
     'nameAsc',
@@ -206,6 +207,9 @@ function Events() {
   return (
     <ListPage
       title={t('events.title')}
+      count={
+        { events: events.length, types: types.length, settings: null }[tab]
+      }
       actions={
         <SortFor
           tab={tab}

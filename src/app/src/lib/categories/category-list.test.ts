@@ -72,6 +72,17 @@ describe('categoryChildren', () => {
     expect(names(childrenOf)).toEqual({ null: ['food'], food: ['cafe'] })
     expect([...(open ?? [])].sort()).toEqual(['cafe', 'food'])
   })
+
+  it('keeps the subcategories of a matching parent', () => {
+    const { childrenOf } = categoryChildren(categories, {
+      ...options,
+      query: 'alim',
+    })
+    expect(names(childrenOf)).toEqual({
+      null: ['food'],
+      food: ['cafe', 'grocery'],
+    })
+  })
 })
 
 describe('frequentCategories', () => {

@@ -7,19 +7,10 @@ import { MerchantRow } from '#/components/merchants/merchant-row'
 import { SearchField } from '#/components/forms/search-field'
 import { ListPage } from '#/components/layout/list-page'
 import { SortMenu } from '#/components/lists/sort-menu'
-import { useFilterLabel } from '#/hooks/transactions/use-filter-label'
-import { FilterChips } from '#/components/transactions/filters/filter-chips'
-import { FilterBubble } from '#/components/transactions/filters/filter-bubble'
-import { FilterSheet } from '#/components/transactions/filters/filter-sheet'
 import { categoryPath } from '#/lib/categories/category'
 import type { Category } from '#/lib/categories/category'
-import {
-  MERCHANT_SORTS,
-  filterMerchants,
-  sortMerchants,
-} from '#/lib/merchants/merchant'
+import { MERCHANT_SORTS, sortMerchants } from '#/lib/merchants/merchant'
 import type { Merchant, MerchantSort } from '#/lib/merchants/merchant'
-import { NO_FILTERS } from '#/lib/transactions/transaction-filters'
 import { useFormatLocale } from '#/hooks/app/use-locale'
 import { useStoredState } from '#/hooks/app/use-stored-state'
 import { getCategories } from '#/server/categories'
@@ -28,6 +19,7 @@ import { indexById, oneOf } from '#/lib/shared/collections'
 import { matcher } from '#/lib/shared/search'
 import { listPagePending } from '#/components/layout/page-pending'
 import { useRevealed } from '#/hooks/app/use-revealed'
+import { ListEnd } from '#/components/lists/list-end'
 
 export const Route = createFileRoute('/_authed/settings/merchants')({
   ...listPagePending((t) => t('merchants.title')),
@@ -54,56 +46,7 @@ function categoryLookup(categories: ReadonlyArray<Category>) {
   return {
     rows,
     pathOf: (id: string) => rows.get(id)?.path,
-    parentOf: (id: string) => byId.get(id)?.parentId,
   }
-}
-
-const CATEGORY_TABS = ['categories'] as const
-
-/** The same bubble and sheet as the transactions' Catégories filter. */
-function CategoryFilter({
-  categories,
-  picked,
-  onChange,
-}: {
-  categories: ReadonlyArray<Category>
-  picked: ReadonlyArray<string>
-  onChange: (ids: Array<string>) => void
-}) {
-  const labelOf = useFilterLabel({ ...NO_FILTERS, categoryIds: [...picked] })
-  const [open, setOpen] = useState(false)
-  const values = { ...NO_FILTERS, categoryIds: [...picked] }
-  const names = {
-    accounts: [],
-    categories: categories.filter((c) => picked.includes(c.id)),
-    merchants: [],
-    people: [],
-    events: [],
-  }
-  return (
-    <div className="flex flex-col items-start gap-3">
-      <FilterBubble
-        label={labelOf('categories')}
-        count={picked.length}
-        disabled={categories.length === 0 && picked.length === 0}
-        onOpen={() => setOpen(true)}
-      />
-      <FilterChips
-        values={values}
-        names={names}
-        onChange={(next) => onChange(next.categoryIds)}
-      />
-      <FilterSheet
-        open={open}
-        tabs={CATEGORY_TABS}
-        tab="categories"
-        values={values}
-        onOpenChange={setOpen}
-        onTab={() => {}}
-        onChange={(next) => onChange(next.categoryIds)}
-      />
-    </div>
-  )
 }
 
 function MerchantList({
@@ -116,7 +59,7 @@ function MerchantList({
   tree: ReturnType<typeof categoryLookup>
 }) {
   const { t } = useTranslation()
-  const revealed = useRevealed<Merchant, HTMLLIElement>(shown)
+  const revealed = useRevealed(shown)
   if (shown.length === 0) return <EmptyState>{t('common.noMatch')}</EmptyState>
   return (
     <ListCard>
@@ -137,7 +80,7 @@ function MerchantList({
           }
         />
       ))}
-      {revealed.more && <li ref={revealed.sentinel} aria-hidden="true" />}
+      {revealed.more && <ListEnd sentinel={revealed.sentinel} as="li" />}
     </ListCard>
   )
 }
@@ -160,16 +103,16 @@ function Merchants() {
     parseSort,
   )
   const tree = categoryLookup(categories)
-  const [picked, setPicked] = useState<Array<string>>([])
   const matches = matcher(query)
   const shown = sortMerchants(
-    filterMerchants(merchants, picked, tree).filter((m) => matches(m.name)),
+    merchants.filter((m) => matches(m.name)),
     { sort, pathOf: tree.pathOf, locale },
   )
 
   return (
     <ListPage
       title={t('merchants.title')}
+      count={merchants.length}
       actions={
         <SortMenu
           sort={sort}
@@ -184,11 +127,6 @@ function Merchants() {
       ) : (
         <>
           <SearchField value={query} onChange={setQuery} />
-          <CategoryFilter
-            categories={categories}
-            picked={picked}
-            onChange={setPicked}
-          />
           <MerchantList merchants={merchants} shown={shown} tree={tree} />
         </>
       )}

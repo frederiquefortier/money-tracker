@@ -105,8 +105,15 @@ type BubblesProps = {
 /** What is pending or owed, and below `lg` the Filtres button, wrapping onto more lines. */
 function Bubbles(props: BubblesProps) {
   const { filters, pending, owed } = props
+  // From `lg` the Filtres button hides; with no status either, the row takes no space.
+  const status = pending.on || !!pending.count || owed.on || !!owed.count
   return (
-    <div className="flex flex-wrap items-center gap-2">
+    <div
+      className={cn(
+        'flex flex-wrap items-center gap-2',
+        !status && 'lg:hidden',
+      )}
+    >
       <StatusButton
         status="pending"
         count={pending.count}
@@ -161,7 +168,8 @@ export function ListHeader({
   return (
     <>
       {/* The tabs with the search at their end (under them on phones), then what is
-          pending or owed under the tabs at every width (author, 2026-11-17). */}
+          pending or owed under the tabs at every width (author, 2026-11-17), as far from
+          them and from the chips as the chips are from the list (author, 2026-11-18). */}
       <div className="flex flex-wrap items-center gap-3">
         <PeriodTabs
           choice={choice}
@@ -172,13 +180,12 @@ export function ListHeader({
         <div className="w-full sm:ml-auto sm:max-w-72">
           <SearchField value={search} onChange={onSearch} />
         </div>
-        <div className="w-full">
-          <Bubbles
-            {...{ filters, pending, owed, onPending, onOwed }}
-            onOpen={() => setSheet({ open: true, tab: null })}
-          />
-        </div>
       </div>
+      {/* Its own row of the list's column, spaced as the chips under it. */}
+      <Bubbles
+        {...{ filters, pending, owed, onPending, onOwed }}
+        onOpen={() => setSheet({ open: true, tab: null })}
+      />
       <FilterChips values={filters} names={names} onChange={onFilters} />
       <FilterSheet
         open={sheet.open}

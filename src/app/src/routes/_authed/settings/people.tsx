@@ -182,6 +182,7 @@ function People() {
   return (
     <ListPage
       title={t('people.title')}
+      count={tab === 'people' ? people.length : groups.length}
       actions={
         <SortMenu
           sort={sort}

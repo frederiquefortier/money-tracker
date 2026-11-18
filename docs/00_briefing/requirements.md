@@ -87,7 +87,7 @@ English; this file is in English like every other meta-doc.
 | CAT-06 | The picker starts with a "Fréquents" group (first "Fréquentes", then "Fréquemment utilisées", "Fréquents" since 2026-11-05): the most used categories of the transaction's type, worked out from recent transactions and shown as "Parent > Enfant". They also keep their place in the tree below, which lists categories as the category page draws them. Hand-picked favourites were dropped on 2026-11-04. | v1, ai, add, C7, author | 1 (with the transaction form) |
 | CAT-07 | A category has a coolicons icon, chosen in a searchable picker of a curated subset of the set (ADR-020). A default is suggested from the name; picking the suggested icon returns to it. Each category has its own colour, chosen freely; a sub-category starts from a variation of its parent's colour. | v1, ai, add, C11 | 1 |
 | CAT-08 | A category can be excluded from the emergency-fund calculation. | v1, ai | 4 |
-| CAT-09 | The category tree sorts by name or by colour (rainbow order), kept per browser. One button opens or closes every branch, in every tab. A search filters the open tab by name, keeping each match's parents. | author | 1 |
+| CAT-09 | The category tree sorts by name or by colour (rainbow order), kept per browser. One button opens or closes every branch, in every tab. A search filters the open tab by name, keeping each match's parents and its sub-categories, here and in the transaction's category picker. | author | 1 |
 | CAT-10 | An expense category can be marked a need or a want. A sub-category with no mark follows its nearest marked parent and can set its own (Santé a need, Massothérapie a want). A category with no mark anywhere up its branch is unclassified. Income categories have no mark; investment categories count as savings. | author | 1 |
 
 ## 6. Merchants (`MER`)
@@ -99,7 +99,7 @@ English; this file is in English like every other meta-doc.
 | MER-07 | ~~A merchant can be a person.~~ Replaced on 2026-11-11 by PPL-09: the seller is a person field on the transaction, and the merchant has no person (ADR-040, which supersedes ADR-038). | author | 3 |
 | MER-03 | A merchant has a country of origin. | v1 | later |
 | MER-04 | For one merchant, see how the bill has changed over time, in percent. | v1, ai | 4 |
-| MER-06 | The merchant list sorts by name (A–Z, Z–A) or by category, kept per browser, and filters by default category (a parent keeps its branch) or none. | author | 1 |
+| MER-06 | The merchant list sorts by name (A–Z, Z–A) or by category, kept per browser. The default category filter was removed on 2026-11-18: the category sort does its job. | author | 1 |
 | MER-08 | On the merchants list, a merchant with no default category shows the category its own transactions use most (ties go to the one used last) in a faded badge and italic path, with a "Suggérée" tag and a sparkle, the mark the app uses for what it did by itself (as for an event link made by the rule). Clicking the tag makes the suggestion the default category. The merchant's sheet also opens with it filled in. | author | 1 |
 | MER-05 | Merge two merchants: the transactions of one move to the other, which keeps its name and default category; the source's name becomes an alias (MER-02). | author | 1 |
 

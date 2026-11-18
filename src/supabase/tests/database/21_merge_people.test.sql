@@ -13,12 +13,12 @@ insert into public.accounts (id, user_id, name, type, currency, opening_balance)
 insert into public.categories (id, user_id, name, kind, color) values
   ('a0000000-0000-0000-0000-000000000001', '11111111-1111-1111-1111-111111111111', 'Restaurants', 'expense', '#aa3322');
 insert into public.people (id, user_id, name) values
-  ('a4000000-0000-0000-0000-000000000001', '11111111-1111-1111-1111-111111111111', 'Nina'),
+  ('a4000000-0000-0000-0000-000000000001', '11111111-1111-1111-1111-111111111111', 'Tom'),
   ('a4000000-0000-0000-0000-000000000002', '11111111-1111-1111-1111-111111111111', 'Sam'),
-  ('a4000000-0000-0000-0000-000000000003', '11111111-1111-1111-1111-111111111111', 'Claire'),
+  ('a4000000-0000-0000-0000-000000000003', '11111111-1111-1111-1111-111111111111', 'Thomas'),
   ('b4000000-0000-0000-0000-000000000001', '22222222-2222-2222-2222-222222222222', 'Ines');
 insert into public.person_aliases (user_id, person_id, alias) values
-  ('11111111-1111-1111-1111-111111111111', 'a4000000-0000-0000-0000-000000000003', 'Clo');
+  ('11111111-1111-1111-1111-111111111111', 'a4000000-0000-0000-0000-000000000003', 'Tommy');
 insert into public.person_groups (id, user_id, name) values
   ('a5000000-0000-0000-0000-000000000001', '11111111-1111-1111-1111-111111111111', 'Amis');
 insert into public.person_group_members (user_id, group_id, person_id) values
@@ -37,7 +37,7 @@ set local role authenticated;
 select set_config('request.jwt.claims',
   '{"sub": "11111111-1111-1111-1111-111111111111", "role": "authenticated", "aal": "aal2"}', true);
 
--- Nina and Sam share the first dinner; Claire is on the second one alone.
+-- Tom and Sam share the first dinner; Thomas is on the second one alone.
 select public.save_transaction(null, 'a2000000-0000-0000-0000-000000000001', 'expense', '2026-11-03', 60,
   '[{"category_id": "a0000000-0000-0000-0000-000000000001", "input_mode": "amount", "input_value": 60}]',
   people => '[{"role": "me", "input_mode": "share", "input_value": 1},
@@ -72,32 +72,32 @@ select throws_ok(
 select lives_ok(
   $$ select public.merge_people('a4000000-0000-0000-0000-000000000003', 'a4000000-0000-0000-0000-000000000001');
      select pg_temp.check_now() $$,
-  'Claire merges into Nina'
+  'Thomas merges into Tom'
 );
 select is(
   (select count(*)::int from public.transaction_people
    where person_id = 'a4000000-0000-0000-0000-000000000001'),
-  2, 'her line is now Nina''s'
+  2, 'his line is now Tom''s'
 );
 select is(
   (select array_agg(alias order by alias) from public.person_aliases
    where person_id = 'a4000000-0000-0000-0000-000000000001'),
-  array['Clo', 'Claire'], 'her name and her alias are Nina''s aliases'
+  array['Thomas', 'Tommy'], 'his name and his alias are Tom''s aliases'
 );
 select is_empty(
   $$ select 1 from public.people where id = 'a4000000-0000-0000-0000-000000000003' $$,
-  'Claire is gone'
+  'Thomas is gone'
 );
 select is(
   (select count(*)::int from public.person_group_members
    where group_id = 'a5000000-0000-0000-0000-000000000001'
      and person_id = 'a4000000-0000-0000-0000-000000000001'),
-  1, 'Nina joins her groups'
+  1, 'Tom joins his groups'
 );
 select is(
   (select count(*)::int from public.transactions
    where seller_person_id = 'a4000000-0000-0000-0000-000000000001'),
-  1, 'what was bought from her was bought from Nina'
+  1, 'what was bought from him was bought from Tom'
 );
 
 select * from finish();

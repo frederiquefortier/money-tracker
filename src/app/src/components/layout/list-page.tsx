@@ -1,5 +1,6 @@
 import { cn } from '#/lib/utils'
 import { pageColumn } from '#/components/styles'
+import { ListCount } from '#/components/lists/list-count'
 
 export function PageTitle({ children }: { children: React.ReactNode }) {
   return (
@@ -13,6 +14,7 @@ export function PageTitle({ children }: { children: React.ReactNode }) {
 export function ListPage({
   title,
   back,
+  count,
   titleNote,
   actions,
   wide = false,
@@ -21,6 +23,8 @@ export function ListPage({
   title: string
   /** The link above the title, on a page opened from a hub card. */
   back?: React.ReactNode
+  /** How many items the list holds, beside the title; none while unknown. */
+  count?: number | null
   /** A status beside the title, such as a warning tag. */
   titleNote?: React.ReactNode
   actions?: React.ReactNode
@@ -40,6 +44,7 @@ export function ListPage({
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex flex-wrap items-center gap-3">
           <PageTitle>{title}</PageTitle>
+          {count != null && <ListCount count={count} className="text-sm" />}
           {titleNote}
         </div>
         {actions && (

@@ -63,7 +63,7 @@ export function useTransactionPages(first: TransactionPage, query: Query) {
   })
   const [loading, setLoading] = useState(false)
   // A callback ref: the sentinel can appear after the first render (once every day shows).
-  const [target, sentinel] = useState<HTMLDivElement | null>(null)
+  const [target, sentinel] = useState<HTMLElement | null>(null)
   if (state.first !== first) {
     // A second save while the pages reload keeps the depth the first one asked for.
     const depth =
@@ -122,7 +122,6 @@ export function useTransactionPages(first: TransactionPage, query: Query) {
   return {
     days: pages.flatMap((p) => p.days),
     more: cursor !== null,
-    loading,
     sentinel,
   }
 }

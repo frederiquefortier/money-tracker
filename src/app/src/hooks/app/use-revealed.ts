@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react'
  * for most of a second; now only what is near the screen is built. `atLeast` keeps that
  * many built whatever the scroll (a list's keyboard position).
  */
-export function useRevealed<T, TElement extends Element = HTMLDivElement>(
+export function useRevealed<T, TElement extends Element = HTMLElement>(
   items: ReadonlyArray<T>,
   step = 60,
   atLeast = 0,

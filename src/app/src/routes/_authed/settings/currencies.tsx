@@ -5,6 +5,7 @@ import {
   CurrencyManager,
 } from '#/components/currencies/currency-manager'
 import { ListPage } from '#/components/layout/list-page'
+import { useMyCurrencies } from '#/hooks/currencies/use-my-currencies'
 import { getCurrencySettings } from '#/server/currencies'
 import { listPagePending } from '#/components/layout/page-pending'
 
@@ -17,9 +18,10 @@ export const Route = createFileRoute('/_authed/settings/currencies')({
 function Currencies() {
   const { t } = useTranslation()
   const { ratesFrom, openAccounts, openHoldings } = Route.useLoaderData()
+  const { currencies } = useMyCurrencies()
 
   return (
-    <ListPage title={t('currencies.title')}>
+    <ListPage title={t('currencies.title')} count={currencies.length}>
       <CurrencyManager
         ratesFrom={ratesFrom}
         openAccounts={openAccounts}

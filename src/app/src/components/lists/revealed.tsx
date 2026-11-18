@@ -1,14 +1,15 @@
 import { useRevealed } from '#/hooks/app/use-revealed'
+import { ListEnd } from '#/components/lists/list-end'
 
 /**
- * Renders `items` as they near the screen (useRevealed), then a hidden sentinel: an `li`
+ * Renders `items` as they near the screen (useRevealed), then the list's end: an `li`
  * inside a list, a `div` elsewhere. Any list that grows with the user's data goes
  * through it, so a larger account than ours stays fast.
  */
 export function Revealed<T>({
   items,
   step,
-  as: Sentinel = 'li',
+  as = 'li',
   children,
 }: {
   items: ReadonlyArray<T>
@@ -20,7 +21,7 @@ export function Revealed<T>({
   return (
     <>
       {children(shown)}
-      {more && <Sentinel ref={sentinel} aria-hidden="true" />}
+      {more && <ListEnd sentinel={sentinel} as={as} />}
     </>
   )
 }

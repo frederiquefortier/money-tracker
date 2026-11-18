@@ -167,6 +167,7 @@ function NetWorthHub() {
   return (
     <ListPage
       title={t('netWorth.title')}
+      count={entries.length}
       wide="xl"
       titleNote={
         <Unlinked

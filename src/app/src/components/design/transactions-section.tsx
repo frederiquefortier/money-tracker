@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { GallerySection, Specimen } from '#/components/design/gallery-section'
 import { FilterSidebar } from '#/components/transactions/filters/filter-sidebar'
+import { ListEnd } from '#/components/lists/list-end'
 import { ListHeader } from '#/components/transactions/list/list-header'
 import { TransactionDayGroup } from '#/components/transactions/list/transaction-day'
 import { NO_FILTERS } from '#/lib/transactions/transaction-filters'
@@ -114,7 +115,7 @@ function DemoList() {
         onPeriod={setPeriod}
         className="hidden lg:col-span-3 lg:flex"
       />
-      <div className="flex min-w-0 flex-col gap-4 lg:col-span-7 lg:col-start-5">
+      <div className="flex min-w-0 flex-col gap-6 lg:col-span-7 lg:col-start-5">
         <ListHeader
           choice={period}
           filters={filters}
@@ -128,7 +129,7 @@ function DemoList() {
           onOwed={() => {}}
           onSearch={setSearch}
         />
-        <div className="mt-2 flex flex-col gap-4">
+        <div className="flex flex-col gap-4">
           {DAYS.map((day) => (
             <TransactionDayGroup
               key={day.date}
@@ -138,6 +139,8 @@ function DemoList() {
               feeCategory={null}
             />
           ))}
+          {/* The end of a list with more to load. */}
+          <ListEnd sentinel={() => {}} />
         </div>
       </div>
     </div>
@@ -149,7 +152,7 @@ export function TransactionsSection() {
     <GallerySection id="transactions" title="Transactions">
       <Specimen
         name="ListHeader, FilterSidebar, TransactionDayGroup"
-        source="transactions/list/, transactions/filters/"
+        source="transactions/list/, transactions/filters/, lists/list-end"
       >
         <DemoList />
       </Specimen>

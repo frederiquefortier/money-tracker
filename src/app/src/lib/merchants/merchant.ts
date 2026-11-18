@@ -27,37 +27,6 @@ export type MerchantSort = (typeof MERCHANT_SORTS)[number]
 
 type Tree = {
   pathOf: (categoryId: string) => string | undefined
-  parentOf: (categoryId: string) => string | null | undefined
-}
-
-function withAncestors(
-  categoryId: string,
-  { parentOf }: Pick<Tree, 'parentOf'>,
-) {
-  const ids: Array<string> = []
-  for (
-    let id: string | null | undefined = categoryId;
-    id && !ids.includes(id);
-    id = parentOf(id)
-  )
-    ids.push(id)
-  return ids
-}
-
-/** Those whose default category is one of `categoryIds` or below it; all when none. */
-export function filterMerchants(
-  merchants: ReadonlyArray<Merchant>,
-  categoryIds: ReadonlyArray<string>,
-  tree: Pick<Tree, 'parentOf'>,
-) {
-  if (categoryIds.length === 0) return [...merchants]
-  return merchants.filter(
-    (m) =>
-      m.defaultCategoryId !== null &&
-      withAncestors(m.defaultCategoryId, tree).some((id) =>
-        categoryIds.includes(id),
-      ),
-  )
 }
 
 /** By category path, merchants with none last; within a category, by name. */

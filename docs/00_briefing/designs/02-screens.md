@@ -14,7 +14,7 @@ Everything else in phases 1 to 3 is built; read the code.
 ## Rules
 
 - **Page:** the title with its buttons beside it. A tab or menu page has no back link, and a sheet closes instead. Order of controls: expand all, filter, grouping, sort. On a page with a chart and a list, each control sits with what it acts on (the net worth page). Adding is one round + bottom right, never beside the title.
-- **Lists:** cards, one line per item. Tapping an item opens its form. A chevron alone toggles a card or a tree branch. Collapsed state is remembered per browser.
+- **Lists:** cards, one line per item, the number of items in small type beside the page title (the transactions list counts its filtered result). The end of a list that loads more as it scrolls spins until the rest comes. Tapping an item opens its form. A chevron alone toggles a card or a tree branch. Collapsed state is remembered per browser.
 - **Row actions:** icons at the end of the row from `md` up; on phones they move to the item's sheet header, so the row keeps its width. A row with more actions than fit (the net worth list) puts them behind one ⋮ at every width, as a menu of icon and word. Delete is always `trash-full`. An action that cannot apply is muted, and a tap says why in a toast. Any failure is a toast. A toast is green for a success, the error style of a FormAlert for a failure, and plain for a note.
 - **Archive:** the word is "Archiver", a dialog asks the date (default today). Archived items sit in a collapsed "… archivé(e)s (n)" section, flat and muted.
 - **Confirmations:** red title and button, "Supprimer “{name}”" then "Cette action est irréversible.", or a sentence naming what else is affected.

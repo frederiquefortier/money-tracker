@@ -1,18 +1,13 @@
 import { describe, expect, it } from 'vitest'
-import { filterMerchants, sortMerchants } from '#/lib/merchants/merchant'
+import { sortMerchants } from '#/lib/merchants/merchant'
 import type { Merchant } from '#/lib/merchants/merchant'
 
-const categories: Partial<
-  Record<string, { path: string; parent: string | null }>
-> = {
-  food: { path: 'Alimentation', parent: null },
-  grocery: { path: 'Alimentation > Épicerie', parent: 'food' },
-  home: { path: 'Logement', parent: null },
+const paths: Partial<Record<string, string>> = {
+  food: 'Alimentation',
+  grocery: 'Alimentation > Épicerie',
+  home: 'Logement',
 }
-const tree = {
-  pathOf: (id: string) => categories[id]?.path,
-  parentOf: (id: string) => categories[id]?.parent,
-}
+const tree = { pathOf: (id: string) => paths[id] }
 const merchant = (
   name: string,
   defaultCategoryId: string | null,
@@ -64,15 +59,5 @@ describe('sortMerchants', () => {
         }),
       ),
     ).toEqual(['Zoo Bistro', 'Épicerie Tau', 'Hydro Nord', 'Librairie'])
-  })
-})
-
-describe('merchant filter', () => {
-  it('keeps a category with its branch', () => {
-    expect(names(filterMerchants(merchants, ['food'], tree))).toEqual([
-      'Zoo Bistro',
-      'Épicerie Tau',
-    ])
-    expect(names(filterMerchants(merchants, [], tree))).toHaveLength(4)
   })
 })

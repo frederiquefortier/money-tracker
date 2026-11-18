@@ -14,6 +14,8 @@ export const commonFr = {
     save: 'Enregistrer',
     suggestions: 'Suggestions pour {{label}}',
     loading: 'Chargement…',
+    total_one: '{{count}} au total',
+    total_other: '{{count}} au total',
     clear: 'Effacer',
     chooseDates: 'Choisir les dates',
     done: 'Terminé',

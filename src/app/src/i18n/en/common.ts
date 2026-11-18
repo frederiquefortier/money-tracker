@@ -16,6 +16,8 @@ export const commonEn: typeof commonFr = {
     save: 'Save',
     suggestions: 'Suggestions for {{label}}',
     loading: 'Loading…',
+    total_one: '{{count}} in total',
+    total_other: '{{count}} in total',
     clear: 'Clear',
     chooseDates: 'Choose dates',
     done: 'Done',

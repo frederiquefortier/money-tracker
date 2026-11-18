@@ -30,6 +30,8 @@ import type { PeriodChoice } from '#/lib/transactions/transaction-list'
 import { Spinner } from '#/components/feedback/spinner'
 import { PagePending } from '#/components/layout/page-pending'
 import { useRevealed } from '#/hooks/app/use-revealed'
+import { ListEnd } from '#/components/lists/list-end'
+import { cn } from '#/lib/utils'
 
 // The query the loader last asked for, in the browser only.
 let requested: string | null = null
@@ -148,26 +150,12 @@ function OlderDays({
   revealed,
   pages,
 }: {
-  revealed: { more: boolean; sentinel: React.Ref<HTMLDivElement> }
-  pages: {
-    more: boolean
-    loading: boolean
-    sentinel: React.Ref<HTMLDivElement>
-  }
+  revealed: { more: boolean; sentinel: (el: HTMLElement | null) => void }
+  pages: { more: boolean; sentinel: (el: HTMLElement | null) => void }
 }) {
-  const { t } = useTranslation()
-  if (revealed.more) return <div ref={revealed.sentinel} aria-hidden="true" />
-  if (!pages.more) return null
-  return (
-    <div
-      ref={pages.sentinel}
-      className="py-4 text-center text-muted-foreground"
-    >
-      {pages.loading && (
-        <Spinner label={t('common.loading')} className="mx-auto" />
-      )}
-    </div>
-  )
+  if (revealed.more) return <ListEnd sentinel={revealed.sentinel} />
+  if (pages.more) return <ListEnd sentinel={pages.sentinel} />
+  return null
 }
 
 function Transactions() {
@@ -179,7 +167,10 @@ function Transactions() {
   const { displayCurrency } = useMyCurrencies()
   const go = useListNavigation()
   usePreloadForm()
-  const { days, more, loading, sentinel } = useTransactionPages(data, deps)
+  const { days, more, sentinel } = useTransactionPages(data, deps)
+  // A filter, period or search the list does not show yet: the reload runs in the
+  // background, so the list says it is coming (the sheet may already be closed).
+  const waiting = queryKey(listQuery(Route.useSearch())) !== queryKey(deps)
   // Days are built as they near the screen; older pages load once all are shown.
   const revealed = useRevealed(days, 12)
   const [text, setText] = useSearchText(deps.search ?? '', go.search)
@@ -189,7 +180,7 @@ function Transactions() {
     // The net worth hub's grid (2026-11-17): the title at the far left, and from `lg` the
     // filters on 3 of 12 columns, staying in view as the list scrolls on 7, an empty
     // column on each side of it (author).
-    <ListPage title={t('nav.transactions')} wide>
+    <ListPage title={t('nav.transactions')} count={data.total} wide>
       <div className="grid items-start gap-3 lg:grid-cols-12">
         <FilterSidebar
           values={deps}
@@ -199,7 +190,7 @@ function Transactions() {
           onPeriod={go.period}
           className="hidden lg:sticky lg:top-20 lg:col-span-3 lg:flex"
         />
-        <div className="flex min-w-0 flex-col gap-4 lg:col-span-7 lg:col-start-5">
+        <div className="flex min-w-0 flex-col gap-6 lg:col-span-7 lg:col-start-5">
           <ListHeader
             choice={deps}
             filters={deps}
@@ -207,13 +198,19 @@ function Transactions() {
             pending={{ count: data.pendingCount, on: deps.pendingOnly }}
             owed={{ count: data.owedCount, on: deps.owedOnly }}
             search={text}
-              onPeriod={go.period}
+            onPeriod={go.period}
             onFilters={go.filters}
             onPending={go.pending}
             onOwed={go.owed}
             onSearch={setText}
           />
-          <div className="mt-2 flex flex-col gap-4">
+          <div
+            aria-busy={waiting}
+            className={cn('flex flex-col gap-4', waiting && 'opacity-50')}
+          >
+            {waiting && (
+              <Spinner label={t('common.loading')} className="mx-auto size-6" />
+            )}
             {days.length === 0 ? (
               <EmptyState>{empty}</EmptyState>
             ) : (
@@ -227,10 +224,7 @@ function Transactions() {
                 />
               ))
             )}
-            <OlderDays
-              revealed={revealed}
-              pages={{ more, loading, sentinel }}
-            />
+            <OlderDays revealed={revealed} pages={{ more, sentinel }} />
           </div>
           <FloatingAddLink
             to="/transactions/new"

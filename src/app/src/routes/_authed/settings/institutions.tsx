@@ -19,7 +19,7 @@ function Institutions() {
   const institutions = Route.useLoaderData()
 
   return (
-    <ListPage title={t('settings.institutions')}>
+    <ListPage title={t('settings.institutions')} count={institutions.length}>
       {institutions.length === 0 ? (
         <EmptyState>{t('institutions.empty')}</EmptyState>
       ) : (

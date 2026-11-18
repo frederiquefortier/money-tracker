@@ -15,15 +15,30 @@ import { foldForSearch, matcher } from '#/lib/shared/search'
 
 /**
  * The ids of the categories whose name matches the folded query `q`, with their parents
- * so each keeps its place in the tree. `byId` finds parents outside `categories`.
+ * so each keeps its place in the tree, and their subcategories: "voyage" lists what is
+ * filed under it. `byId` finds parents outside `categories`.
  */
-export function matchesWithParents(
+export function matchesInTree(
   categories: ReadonlyArray<Category>,
   q: string,
   byId: ReadonlyMap<string, Category> = indexById(categories),
 ): Set<string> {
   const matches = matcher(q)
   const keep = new Set<string>()
+  const below = new Map<string, Array<Category>>()
+  for (const category of categories)
+    if (category.parentId)
+      below.set(category.parentId, [
+        ...(below.get(category.parentId) ?? []),
+        category,
+      ])
+  const keepBelow = (category: Category) => {
+    for (const child of below.get(category.id) ?? []) {
+      if (keep.has(child.id)) continue
+      keep.add(child.id)
+      keepBelow(child)
+    }
+  }
   for (const category of categories) {
     if (!matches(category.name)) continue
     for (
@@ -32,13 +47,14 @@ export function matchesWithParents(
       c = c.parentId ? byId.get(c.parentId) : undefined
     )
       keep.add(c.id)
+    keepBelow(category)
   }
   return keep
 }
 
 /**
  * One kind's categories active on `date` (CAT-04), as children by parent in the chosen
- * order, for `CategoryTree`. While searching, only the matches and their parents, and
+ * order, for `CategoryTree`. While searching, only the matches with their parents and subcategories, and
  * `open` lists the branches to show them.
  */
 export function categoryChildren(
@@ -64,7 +80,7 @@ export function categoryChildren(
     (c) => c.kind === kind && isActiveOn(c, date),
   )
   const q = foldForSearch(query)
-  const keep = q ? matchesWithParents(ofKind, q) : null
+  const keep = q ? matchesInTree(ofKind, q) : null
   const shown = keep ? ofKind.filter((c) => keep.has(c.id)) : ofKind
   return {
     childrenOf: sortSiblings(childrenByParent(shown, locale), sort, locale),
