@@ -1,3 +1,4 @@
+import { useNavigate } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import {
   Bar,
@@ -9,7 +10,6 @@ import {
 } from 'recharts'
 import {
   CHART_MARGIN,
-  ChartLegendRow,
   FLOW_COLORS,
   bucketTick,
   bucketTitle,
@@ -23,22 +23,19 @@ import { DashboardCard } from '#/components/dashboard/dashboard-card'
 import { ChartContainer, ChartTooltip } from '#/components/ui/chart'
 import { useLocale } from '#/hooks/app/use-locale'
 import type { Flows } from '#/lib/dashboard/money-flows'
+import { useBarPointer } from '#/hooks/dashboard/use-bar-pointer'
+import type { DashboardPeriod } from '#/lib/dashboard/dashboard-period'
+import { bucketSearch } from '#/lib/dashboard/drill-down'
 import { compareDecimal } from '#/lib/shared/money'
 
 const DEFICIT_FILL = 'var(--flow-spent)'
 
 const GAP_FILL = 'var(--muted-foreground)'
 
-/** Earned and spent, then the deficit and gap shadings when the period has them. */
-function useSeries({
-  hasDeficit,
-  hasGap,
-}: {
-  hasDeficit: boolean
-  hasGap: boolean
-}) {
+/** Earned and spent, named by the summary beside the chart and in the tooltip. */
+function useSeries(): Array<ChartSeries> {
   const { t } = useTranslation()
-  const flows: Array<ChartSeries> = [
+  return [
     {
       key: 'earned',
       label: t('dashboard.flows.earned'),
@@ -50,20 +47,6 @@ function useSeries({
       color: FLOW_COLORS.spent,
     },
   ]
-  const legend = [...flows]
-  if (hasDeficit)
-    legend.push({
-      key: 'deficit',
-      label: t('dashboard.flows.deficit'),
-      color: 'color-mix(in oklch, var(--flow-spent) 18%, transparent)',
-    })
-  if (hasGap)
-    legend.push({
-      key: 'gap',
-      label: t('dashboard.flows.gap'),
-      color: 'color-mix(in oklch, var(--muted-foreground) 25%, transparent)',
-    })
-  return { flows, legend }
 }
 
 /** Called, not rendered: Recharts reads its own elements among the chart's children. */
@@ -96,17 +79,58 @@ function chartData(buckets: ReadonlyArray<Flows & { bucket: string }>) {
   }
 }
 
-/** The buckets shaded red (a deficit) and grey (a month without any transaction). */
+/**
+ * The buckets shaded red (a deficit) and grey (a month without any transaction). The one
+ * not over yet is never a deficit: its spending may still catch up with its income.
+ */
 function shadings(
   buckets: ReadonlyArray<Flows & { bucket: string }>,
   missing: ReadonlyArray<string>,
+  current: string,
 ) {
   return {
-    deficits: buckets.filter(isDeficit).map((b) => b.bucket),
+    deficits: buckets
+      .filter((b) => b.bucket !== current && isDeficit(b))
+      .map((b) => b.bucket),
     gaps: buckets
       .map((b) => b.bucket)
       .filter((b) => missing.some((m) => m === b || m.slice(0, 4) === b)),
   }
+}
+
+/** The tooltip's title, naming a deficit or a month without any transaction. */
+function useNotedTitle({
+  deficits,
+  gaps,
+  current,
+}: {
+  deficits: ReadonlyArray<string>
+  gaps: ReadonlyArray<string>
+  current: string
+}) {
+  const { t } = useTranslation()
+  const locale = useLocale()
+  const title = bucketTitle(locale, current, t)
+  return (key: string) => {
+    if (deficits.includes(key))
+      return `${title(key)} · ${t('dashboard.flows.deficit')}`
+    if (gaps.includes(key)) return `${title(key)} · ${t('dashboard.flows.gap')}`
+    return title(key)
+  }
+}
+
+/** A bar opens its month's (or year's) income or spending: its kind's categories. */
+function useOpenBar(
+  period: DashboardPeriod,
+  categoryIds: Record<string, ReadonlyArray<string>>,
+) {
+  const navigate = useNavigate()
+  return useBarPointer((series, key) => {
+    void navigate({
+      to: '/transactions',
+      search: bucketSearch(period, key, categoryIds[series]),
+    })
+  })
 }
 
 function isDeficit(b: Flows) {
@@ -120,7 +144,8 @@ function isDeficit(b: Flows) {
 /**
  * Earned and spent side by side, per month of a year or per year of everything. A bucket
  * where spending passed income is shaded red, one with a month without any transaction
- * grey; the one not over yet is drawn lighter.
+ * grey, each named in the tooltip; the one not over yet is drawn lighter. A bar opens
+ * its transactions.
  */
 export function MonthlyChart({
   buckets,
@@ -128,6 +153,8 @@ export function MonthlyChart({
   current,
   currency,
   yearly,
+  categoryIds,
+  period,
 }: {
   buckets: ReadonlyArray<Flows & { bucket: string }>
   /** The months without any transaction ("2025-04"). */
@@ -135,15 +162,17 @@ export function MonthlyChart({
   current: string
   currency: string
   yearly: boolean
+  /** The top-level income and expense categories, for a bar's transactions. */
+  categoryIds: { earned: ReadonlyArray<string>; spent: ReadonlyArray<string> }
+  period: DashboardPeriod
 }) {
   const { t } = useTranslation()
   const locale = useLocale()
-  const { deficits, gaps } = shadings(buckets, missing)
-  const { flows, legend } = useSeries({
-    hasDeficit: deficits.length > 0,
-    hasGap: gaps.length > 0,
-  })
+  const { deficits, gaps } = shadings(buckets, missing, current)
+  const flows = useSeries()
   const { rows, figuresOf } = chartData(buckets)
+  const titleOf = useNotedTitle({ deficits, gaps, current })
+  const { handlers, hoveredIn } = useOpenBar(period, categoryIds)
   return (
     <DashboardCard
       title={t(yearly ? 'dashboard.flows.byYear' : 'dashboard.flows.byMonth')}
@@ -172,11 +201,11 @@ export function MonthlyChart({
             )}
           />
           <ChartTooltip
-            cursor={{ fill: 'var(--secondary)' }}
+            cursor={false}
             content={tooltipFor({
               series: flows,
               currency,
-              titleOf: bucketTitle(locale, current, t),
+              titleOf,
               figuresOf,
             })}
           />
@@ -187,13 +216,13 @@ export function MonthlyChart({
               fill={s.color}
               radius={[4, 4, 0, 0]}
               isAnimationActive={false}
+              {...handlers(s.key)}
             >
-              {progressCells(rows, current)}
+              {progressCells(rows, current, hoveredIn(s.key))}
             </Bar>
           ))}
         </BarChart>
       </ChartContainer>
-      <ChartLegendRow series={legend} />
     </DashboardCard>
   )
 }

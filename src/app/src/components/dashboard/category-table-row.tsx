@@ -1,4 +1,5 @@
 import { useId } from 'react'
+import { Link } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { CategoryBadge } from '#/components/categories/category-badge'
 import { drawn } from '#/components/dashboard/chart-parts'
@@ -10,12 +11,11 @@ import { TreeGuides } from '#/components/lists/tree-guides'
 import { focusRing } from '#/components/styles'
 import { isAboveAverage } from '#/lib/dashboard/category-table'
 import type { TableColumn, TableRow } from '#/lib/dashboard/category-table'
+import type { DashboardPeriod } from '#/lib/dashboard/dashboard-period'
+import { periodSearch } from '#/lib/dashboard/drill-down'
 import type { TreeGuide } from '#/lib/shared/tree-layout'
 import { cn } from '#/lib/utils'
 
-// A group's row tint, opaque so the sticky first column hides what scrolls under it.
-export const GROUP_ROW =
-  'bg-[color-mix(in_oklch,var(--secondary)_40%,var(--card))]'
 export const STICKY = 'sticky left-0 z-10'
 const UP = '▲'
 
@@ -54,18 +54,20 @@ function NameCell({
   row,
   guide,
   fold,
+  period,
 }: {
   row: TableRow
   guide: TreeGuide
   fold: Fold
+  period: DashboardPeriod
 }) {
   const { category, depth } = row
   return (
     <td
       className={cn(
         STICKY,
-        'max-w-48 py-1.5 pr-3 pl-3 sm:max-w-none',
-        depth === 0 ? GROUP_ROW : 'bg-card',
+        // Opaque, so the sticky column hides what scrolls under it.
+        'max-w-48 bg-card py-1.5 pr-3 pl-3 sm:max-w-none',
       )}
     >
       <span
@@ -76,8 +78,21 @@ function NameCell({
       >
         {depth === 0 && <FoldButton fold={fold} name={category.name} />}
         <TreeGuides guide={guide} className="-my-1.5 -mr-1 ml-4" />
-        <CategoryBadge icon={category.icon} color={category.color} size="sm" />
-        <span className="truncate">{category.name}</span>
+        <Link
+          to="/transactions"
+          search={periodSearch(period, category.id)}
+          className={cn(
+            'flex min-w-0 items-center gap-2 rounded-md hover:underline',
+            focusRing,
+          )}
+        >
+          <CategoryBadge
+            icon={category.icon}
+            color={category.color}
+            size="sm"
+          />
+          <span className="truncate">{category.name}</span>
+        </Link>
       </span>
     </td>
   )
@@ -120,11 +135,13 @@ function TrendButton({
   row,
   open,
   panel,
+  values,
   onToggle,
 }: {
   row: TableRow
   open: boolean
   panel: string
+  values: ReadonlyArray<number | null>
   onToggle: () => void
 }) {
   const { t } = useTranslation()
@@ -139,15 +156,15 @@ function TrendButton({
       )}
       onClick={onToggle}
       className={cn(
-        'rounded-md p-0.5 hover:bg-secondary',
+        'ml-auto flex w-full max-w-sm min-w-20 rounded-md p-0.5 hover:bg-secondary',
         open && 'bg-secondary',
         focusRing,
       )}
     >
       <Sparkline
-        values={row.trend.map(drawn)}
+        values={values}
         color={row.category.color}
-        className="h-5 w-20"
+        className="h-5 w-full"
       />
     </button>
   )
@@ -162,6 +179,7 @@ export function CategoryTableRow({
   guide,
   fold,
   chart,
+  period,
   columns,
   markAbove,
   currency,
@@ -173,31 +191,29 @@ export function CategoryTableRow({
     open: boolean
     onToggle: () => void
     keys: ReadonlyArray<string>
+    /** Months without any transaction: a break in the line, never a drop to zero. */
+    gaps: ReadonlyArray<string>
     current: string
   }
+  period: DashboardPeriod
   columns: ReadonlyArray<TableColumn>
   markAbove: boolean
   currency: string
 }) {
   const panel = useId()
   const { category, depth } = row
+  const values = row.trend.map((value, i) =>
+    chart.gaps.includes(chart.keys[i] ?? '') ? null : drawn(value),
+  )
   return (
     <>
-      <tr className={cn('border-b last:border-0', depth === 0 && GROUP_ROW)}>
-        <NameCell row={row} guide={guide} fold={fold} />
-        <td className="py-1 pl-3">
-          <TrendButton
-            row={row}
-            open={chart.open}
-            panel={panel}
-            onToggle={chart.onToggle}
-          />
-        </td>
+      <tr className="border-b last:border-0">
+        <NameCell row={row} guide={guide} fold={fold} period={period} />
         {columns.map((column) => (
           <td
             key={column.key}
             className={cn(
-              'py-1.5 pl-3 text-right last:pr-4',
+              'py-1.5 pl-6 text-right whitespace-nowrap',
               depth === 0 && 'font-semibold',
             )}
           >
@@ -212,6 +228,15 @@ export function CategoryTableRow({
             />
           </td>
         ))}
+        <td className="py-1 pr-4 pl-6">
+          <TrendButton
+            row={row}
+            open={chart.open}
+            panel={panel}
+            values={values}
+            onToggle={chart.onToggle}
+          />
+        </td>
       </tr>
       {chart.open && (
         <tr id={panel} className="border-b">

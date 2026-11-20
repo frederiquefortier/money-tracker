@@ -137,23 +137,71 @@ function FlowFigure({
   )
 }
 
-/**
- * The period at a glance: income as the headline and as the whole bar, cut into what was
- * spent, invested and what remains (author, 2026-11-19: the full bar reads as income), each
- * with its share of income and its change from the same stretch a year earlier.
- */
-export function FlowSummary({
-  flows,
-  before,
+/** Each flow per month (or year) over the months counted, at the card's foot. */
+function AverageBand({
+  average,
+  yearly,
   currency,
 }: {
-  flows: Flows
-  before: { flows: Flows; year: string } | null
+  average: { flows: Flows; count: number }
+  yearly: boolean
   currency: string
 }) {
   const { t } = useTranslation()
   return (
-    // Beside the monthly chart from `xl`: as tall, the figures at its foot.
+    <div className="flex flex-col gap-2 border-t pt-3">
+      <p className="text-xs font-semibold text-muted-foreground">
+        {t(
+          yearly
+            ? 'dashboard.table.columns.averageYear'
+            : 'dashboard.table.columns.averageMonth',
+        )}
+        {' · '}
+        {t(
+          yearly ? 'dashboard.flows.overYears' : 'dashboard.table.overMonths',
+          {
+            count: average.count,
+          },
+        )}
+      </p>
+      <ul className="grid grid-cols-2 gap-x-3 gap-y-2 sm:grid-cols-4">
+        {(['earned', 'spent', 'invested', 'remaining'] as const).map((flow) => (
+          <li key={flow} className="flex min-w-0 flex-col gap-0.5">
+            <Label flow={flow}>{t(`dashboard.flows.${flow}`)}</Label>
+            <Figure
+              amount={average.flows[flow]}
+              currency={currency}
+              className="font-semibold"
+            />
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+}
+
+/**
+ * The period at a glance: income as the headline and as the whole bar, cut into what was
+ * spent, invested and what remains (author, 2026-11-19: the full bar reads as income), each
+ * with its share of income and its change from the same stretch a year earlier; then each
+ * flow per month or per year at the foot (author, 2026-11-20).
+ */
+export function FlowSummary({
+  flows,
+  before,
+  average,
+  yearly,
+  currency,
+}: {
+  flows: Flows
+  before: { flows: Flows; year: string } | null
+  average: { flows: Flows; count: number }
+  yearly: boolean
+  currency: string
+}) {
+  const { t } = useTranslation()
+  return (
+    // Beside a chart from `xl`: as tall, the averages at its foot.
     <section
       className={cn(
         cardSurface,
@@ -176,18 +224,19 @@ export function FlowSummary({
           />
         </div>
         <IncomeBar flows={flows} />
+        <ul className="grid grid-cols-3 gap-x-3 gap-y-0.5">
+          {(['spent', 'invested', 'remaining'] as const).map((flow) => (
+            <FlowFigure
+              key={flow}
+              flow={flow}
+              flows={flows}
+              before={before}
+              currency={currency}
+            />
+          ))}
+        </ul>
       </div>
-      <ul className="grid grid-cols-3 gap-x-3 gap-y-0.5">
-        {(['spent', 'invested', 'remaining'] as const).map((flow) => (
-          <FlowFigure
-            key={flow}
-            flow={flow}
-            flows={flows}
-            before={before}
-            currency={currency}
-          />
-        ))}
-      </ul>
+      <AverageBand average={average} yearly={yearly} currency={currency} />
     </section>
   )
 }

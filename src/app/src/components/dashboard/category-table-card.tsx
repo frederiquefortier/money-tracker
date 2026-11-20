@@ -5,70 +5,153 @@ import {
   CategoryTableRow,
   STICKY,
 } from '#/components/dashboard/category-table-row'
-import { ChoiceMenu } from '#/components/display/choice-menu'
+import { FLOW_COLORS } from '#/components/dashboard/chart-parts'
+import { ExpandAllButton } from '#/components/lists/expand-all-button'
 import { EmptyState } from '#/components/lists/list-card'
+import { SortMenu } from '#/components/lists/sort-menu'
+import { TabList } from '#/components/lists/tab-list'
 import { useLocale } from '#/hooks/app/use-locale'
 import { useStoredIds } from '#/hooks/app/use-stored-state'
 import { KINDS } from '#/lib/categories/category'
 import type { CategoryKind } from '#/lib/categories/category'
-import { shownRows } from '#/lib/dashboard/category-table'
-import type { TableColumn, TableRow } from '#/lib/dashboard/category-table'
+import { TABLE_SORTS, shownRows } from '#/lib/dashboard/category-table'
+import type {
+  TableColumn,
+  TableRow,
+  TableSort,
+} from '#/lib/dashboard/category-table'
+import type { DashboardPeriod } from '#/lib/dashboard/dashboard-period'
 import { formatMonth, todayIso } from '#/lib/shared/format'
 import { treeGuides } from '#/lib/shared/tree-layout'
 import { cn } from '#/lib/utils'
 
+const PANEL = 'category-table'
+
+// Each type in its flow's colour, as the summary (author, 2026-11-20).
+const KIND_COLORS: Record<CategoryKind, string> = {
+  expense: FLOW_COLORS.spent,
+  income: FLOW_COLORS.earned,
+  investment: FLOW_COLORS.invested,
+}
+
+/** Expand-all, the sort, and the type as three colour dots (author, 2026-11-20). */
+function TableControls({
+  kind,
+  onKind,
+  sort,
+  onSort,
+  groups,
+  open,
+}: {
+  kind: CategoryKind
+  onKind: (kind: CategoryKind) => void
+  sort: TableSort
+  onSort: (sort: TableSort) => void
+  groups: ReadonlyArray<string>
+  open: ReturnType<typeof useStoredIds>
+}) {
+  const { t } = useTranslation()
+  const allOpen = groups.length > 0 && groups.every((id) => open.ids.has(id))
+  return (
+    <>
+      {groups.length > 0 && (
+        <ExpandAllButton
+          allExpanded={allOpen}
+          onToggle={() => open.setAll(groups, !allOpen)}
+        />
+      )}
+      <SortMenu
+        sort={sort}
+        options={TABLE_SORTS}
+        labelOf={(option) => t(`dashboard.table.sort.${option}`)}
+        onChange={onSort}
+      />
+      <TabList
+        label={t('dashboard.categories.kindsLabel')}
+        tabs={KINDS}
+        value={kind}
+        labelOf={(value) => t(`categories.kinds.${value}`)}
+        dot={(value) => KIND_COLORS[value]}
+        panelId={PANEL}
+        idPrefix="table-kind"
+        fit
+        onSelect={onKind}
+      />
+    </>
+  )
+}
+
 /**
- * The sheet's table, figures only: each group folding its categories, each row's trend
- * opening its chart, then on a year this month, the year so far and the monthly average;
- * on everything, a total per year and the yearly average. Spending well above its average
- * this month is marked.
+ * The sheet's table, figures only: each group folding its categories, then on a year this
+ * month, the year so far and the monthly average; on everything, a total per year and the
+ * yearly average; the trend last, across what is left, opening its chart (author,
+ * 2026-11-20: the figures beside their names). Spending well above its average this month
+ * is marked. A category's name opens its transactions over the period.
  */
 export function CategoryTableCard({
   kind,
   onKind,
+  sort,
+  onSort,
   columns,
   rows,
   trendKeys,
+  gaps,
+  period,
   current,
   currency,
 }: {
   kind: CategoryKind
   onKind: (kind: CategoryKind) => void
+  sort: TableSort
+  onSort: (sort: TableSort) => void
   columns: ReadonlyArray<TableColumn>
   rows: ReadonlyArray<TableRow>
   /** The months (or years) each row's trend covers. */
   trendKeys: ReadonlyArray<string>
+  /** Months without any transaction, a break in each trend. */
+  gaps: ReadonlyArray<string>
+  period: DashboardPeriod
   current: string
   currency: string
 }) {
   const { t } = useTranslation()
+  const open = useStoredIds('dashboard.table.open')
+  // The groups with categories under them, which the expand-all button opens or closes.
+  const groups = shownRows(rows, new Set())
+    .filter(({ folds }) => folds)
+    .map(({ row }) => row.category.id)
   return (
     <DashboardCard
       title={t('dashboard.table.title')}
       actions={
-        <ChoiceMenu
-          label={t('dashboard.categories.kindLabel', {
-            kind: t(`categories.kinds.${kind}`),
-          })}
-          value={kind}
-          options={KINDS}
-          labelOf={(value) => t(`categories.kinds.${value}`)}
-          onChange={onKind}
+        <TableControls
+          kind={kind}
+          onKind={onKind}
+          sort={sort}
+          onSort={onSort}
+          groups={groups}
+          open={open}
         />
       }
     >
-      {rows.length === 0 ? (
-        <EmptyState>{t('dashboard.empty')}</EmptyState>
-      ) : (
-        <FiguresTable
-          columns={columns}
-          rows={rows}
-          markAbove={kind === 'expense'}
-          trendKeys={trendKeys}
-          current={current}
-          currency={currency}
-        />
-      )}
+      <div id={PANEL} role="tabpanel" aria-labelledby={`table-kind-${kind}`}>
+        {rows.length === 0 ? (
+          <EmptyState>{t('dashboard.empty')}</EmptyState>
+        ) : (
+          <FiguresTable
+            columns={columns}
+            rows={rows}
+            open={open}
+            markAbove={kind === 'expense'}
+            trendKeys={trendKeys}
+            gaps={gaps}
+            period={period}
+            current={current}
+            currency={currency}
+          />
+        )}
+      </div>
     </DashboardCard>
   )
 }
@@ -82,16 +165,7 @@ function ColumnHead({ column }: { column: TableColumn }) {
   if (column.kind === 'thisMonth' && !now)
     return <span className="capitalize">{formatMonth(column.to, locale)}</span>
   if (column.kind === 'thisYear' && !now) return column.to.slice(0, 4)
-  return (
-    <>
-      {t(`dashboard.table.columns.${column.kind}`)}
-      {column.kind === 'averageMonth' && (
-        <span className="block font-normal">
-          {t('dashboard.table.overMonths', { count: column.divisor })}
-        </span>
-      )}
-    </>
-  )
+  return t(`dashboard.table.columns.${column.kind}`)
 }
 
 function TableHead({ columns }: { columns: ReadonlyArray<TableColumn> }) {
@@ -102,17 +176,17 @@ function TableHead({ columns }: { columns: ReadonlyArray<TableColumn> }) {
         <th className={cn(STICKY, 'bg-card py-2 pr-3 pl-4 font-semibold')}>
           {t('dashboard.table.category')}
         </th>
-        <th className="py-2 pl-3 font-semibold">
-          {t('dashboard.table.trend')}
-        </th>
         {columns.map((column) => (
           <th
             key={column.key}
-            className="py-2 pl-3 text-right font-semibold last:pr-4"
+            className="py-2 pl-6 text-right font-semibold whitespace-nowrap"
           >
             <ColumnHead column={column} />
           </th>
         ))}
+        <th className="w-full py-2 pr-4 pl-6 text-right font-semibold">
+          {t('dashboard.table.trend')}
+        </th>
       </tr>
     </thead>
   )
@@ -121,19 +195,24 @@ function TableHead({ columns }: { columns: ReadonlyArray<TableColumn> }) {
 function FiguresTable({
   columns,
   rows,
+  open,
   markAbove,
   trendKeys,
+  gaps,
+  period,
   current,
   currency,
 }: {
   columns: ReadonlyArray<TableColumn>
   rows: ReadonlyArray<TableRow>
+  open: ReturnType<typeof useStoredIds>
   markAbove: boolean
   trendKeys: ReadonlyArray<string>
+  gaps: ReadonlyArray<string>
+  period: DashboardPeriod
   current: string
   currency: string
 }) {
-  const open = useStoredIds('dashboard.table.open')
   const [charts, setCharts] = useState<ReadonlySet<string>>(new Set())
   const toggleChart = (id: string) => {
     const next = new Set(charts)
@@ -161,8 +240,10 @@ function FiguresTable({
                 open: charts.has(row.category.id),
                 onToggle: () => toggleChart(row.category.id),
                 keys: trendKeys,
+                gaps,
                 current,
               }}
+              period={period}
               columns={columns}
               markAbove={markAbove}
               currency={currency}

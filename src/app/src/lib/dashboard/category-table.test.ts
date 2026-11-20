@@ -3,6 +3,7 @@ import {
   categoryTable,
   isAboveAverage,
   shownRows,
+  sortTable,
   tableColumns,
 } from '#/lib/dashboard/category-table'
 import { at, categories } from '#/lib/dashboard/dashboard-fixtures.test-utils'
@@ -34,12 +35,8 @@ describe('category table on a year', () => {
       thisYear: '3000.0000',
       averageMonth: '272.7273',
     })
-    // Last year's spending stays out of this year's figures.
-    expect(of('fun')).toMatchObject({
-      thisMonth: '0.0000',
-      thisYear: '0.0000',
-      averageMonth: '0.0000',
-    })
+    // Last year's spending stays out of this year's figures, and so does its category.
+    expect(of('fun')).toBeUndefined()
   })
 
   it('averages from the first month of a history that starts within the year', () => {
@@ -55,13 +52,23 @@ describe('category table on a year', () => {
 
   it('puts a group over its categories, with their figures added', () => {
     expect(rows.map((r) => [r.category.id, r.depth])).toEqual([
-      ['fun', 0],
       ['home', 0],
       ['rent', 1],
-      ['misc', 0],
     ])
     expect(of('home')?.thisYear).toBe('3000.0000')
-    expect(of('misc')?.thisYear).toBe('0.0000')
+  })
+
+  it('sorts siblings, a group always over its categories', () => {
+    const all = categoryTable(
+      [...months, at('2026-03', 'fun', '-5000.0000')],
+      categories,
+      { kind: 'expense', columns, locale: 'fr' },
+    )
+    const ids = (sort: Parameters<typeof sortTable>[1]) =>
+      sortTable(all, sort, 'fr').map((r) => r.category.id)
+    expect(ids('amountDesc')).toEqual(['fun', 'home', 'rent'])
+    expect(ids('amountAsc')).toEqual(['home', 'rent', 'fun'])
+    expect(ids('nameDesc')).toEqual(['home', 'rent', 'fun'])
   })
 
   it("draws each row over the year's months to this one", () => {
@@ -135,11 +142,15 @@ describe('folded groups', () => {
     { unit: 'year', year: '2026' },
     { today, firstYear: 2025 },
   )
-  const rows = categoryTable(months, categories, {
-    kind: 'expense',
-    columns,
-    locale: 'fr',
-  })
+  const rows = categoryTable(
+    [...months, at('2026-02', 'fun', '-10.0000')],
+    categories,
+    {
+      kind: 'expense',
+      columns,
+      locale: 'fr',
+    },
+  )
   const ids = (open: Set<string>) =>
     shownRows(rows, open).map(({ row, folds }) => [row.category.id, folds])
 
@@ -147,7 +158,6 @@ describe('folded groups', () => {
     expect(ids(new Set())).toEqual([
       ['fun', false],
       ['home', true],
-      ['misc', false],
     ])
   })
 
@@ -156,7 +166,6 @@ describe('folded groups', () => {
       'fun',
       'home',
       'rent',
-      'misc',
     ])
   })
 })

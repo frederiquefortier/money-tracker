@@ -22,12 +22,14 @@ function FlowCards({
   period,
   today,
   daily,
+  categoryIds,
   currency,
 }: {
   state: State
   period: DashboardPeriod
   today: string
   daily: Daily
+  categoryIds: { earned: Array<string>; spent: Array<string> }
   currency: string
 }) {
   const { current } = state
@@ -38,6 +40,8 @@ function FlowCards({
       current={current}
       currency={currency}
       yearly={period.unit === 'all'}
+      categoryIds={categoryIds}
+      period={period}
     />
   )
   return (
@@ -45,6 +49,8 @@ function FlowCards({
       <FlowSummary
         flows={state.flows}
         before={state.compared}
+        average={state.average}
+        yearly={period.unit === 'all'}
         currency={currency}
       />
       {period.unit === 'all' ? (
@@ -79,10 +85,12 @@ function FlowCards({
 function CategoryCards({
   state,
   dashboard,
+  period,
   currency,
 }: {
   state: State
   dashboard: Dashboard
+  period: DashboardPeriod
   currency: string
 }) {
   const { current } = state
@@ -97,6 +105,7 @@ function CategoryCards({
         chart={state.expenseChart}
         onChart={state.setExpenseChart}
         view={{ value: state.splitView, onChange: state.setSplitView }}
+        period={period}
         current={current}
         currency={currency}
       />
@@ -108,6 +117,7 @@ function CategoryCards({
         onPick={state.setIncomePicked}
         chart={state.incomeChart}
         onChart={state.setIncomeChart}
+        period={period}
         current={current}
         currency={currency}
       />
@@ -115,9 +125,13 @@ function CategoryCards({
         <CategoryTableCard
           kind={state.tableKind}
           onKind={state.setTableKind}
+          sort={state.tableSort}
+          onSort={state.setTableSort}
           columns={state.tableColumns}
           rows={state.table}
           trendKeys={state.trendKeys}
+          gaps={state.missing}
+          period={period}
           current={current}
           currency={currency}
         />
@@ -145,6 +159,10 @@ export function MoneyOverview({
 }) {
   const state = useDashboard(dashboard, period, today)
   const currency = dashboard.displayCurrency
+  const topOf = (kind: 'income' | 'expense') =>
+    dashboard.categories
+      .filter((c) => c.kind === kind && c.parentId === null)
+      .map((c) => c.id)
   return (
     <div className="grid gap-4 xl:grid-cols-2">
       <FlowCards
@@ -152,9 +170,15 @@ export function MoneyOverview({
         period={period}
         today={today}
         daily={daily}
+        categoryIds={{ earned: topOf('income'), spent: topOf('expense') }}
         currency={currency}
       />
-      <CategoryCards state={state} dashboard={dashboard} currency={currency} />
+      <CategoryCards
+        state={state}
+        dashboard={dashboard}
+        period={period}
+        currency={currency}
+      />
     </div>
   )
 }

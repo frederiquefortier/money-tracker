@@ -1,15 +1,16 @@
 import { useState } from 'react'
+import { useNavigate } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { CategoryFilterSheet } from '#/components/dashboard/category-filter-sheet'
-import { ChartLegendRow } from '#/components/dashboard/chart-parts'
 import { DashboardCard, Figure } from '#/components/dashboard/dashboard-card'
 import { SplitDonut } from '#/components/dashboard/split-donut'
 import type { Part } from '#/components/dashboard/split-donut'
 import { StackedBars } from '#/components/dashboard/stacked-bars'
-import { IconButton } from '#/components/display/icon-button'
+import { ChoiceMenu } from '#/components/display/choice-menu'
+import { Icon } from '#/components/display/icon'
+import { IconToggle } from '#/components/display/icon-toggle'
 import { EmptyState } from '#/components/lists/list-card'
-import { TabList } from '#/components/lists/tab-list'
-import { ToggleGroup, ToggleGroupItem } from '#/components/ui/toggle-group'
+import { chipActive, chipSurface } from '#/components/styles'
 import type { Category, CategoryKind } from '#/lib/categories/category'
 import { CHART_KINDS, SPLIT_VIEWS } from '#/lib/dashboard/category-stacks'
 import type {
@@ -17,9 +18,11 @@ import type {
   ChartKind,
   SplitView,
 } from '#/lib/dashboard/category-stacks'
-import { oneOf } from '#/lib/shared/collections'
+import type { DashboardPeriod } from '#/lib/dashboard/dashboard-period'
+import { bucketSearch } from '#/lib/dashboard/drill-down'
+import { cn } from '#/lib/utils'
 
-const parseChart = oneOf(CHART_KINDS)
+const CHART_ICONS = { stack: 'chart-bar-stacked', donut: 'chart-pie' } as const
 const UNMARKED_COLOR = 'var(--muted-foreground)'
 
 // Needs and wants are both spending: two shades of its red, so they never read as
@@ -52,7 +55,7 @@ function useParts(stacks: CategoryStacks): Array<Part> {
   })
 }
 
-/** Stacked by month or the whole as a donut (author, 2026-11-20). */
+/** Stacked by month or the whole as a donut, as two icons (author, 2026-11-20). */
 function ChartChoice({
   value,
   onChange,
@@ -62,57 +65,82 @@ function ChartChoice({
 }) {
   const { t } = useTranslation()
   return (
-    <ToggleGroup
-      type="single"
+    <IconToggle
+      label={t('dashboard.reports.chartLabel')}
       value={value}
-      onValueChange={(next) => {
-        const chart = parseChart(next)
-        if (chart) onChange(chart)
-      }}
-      aria-label={t('dashboard.reports.chartLabel')}
-      className="gap-0.5"
-    >
-      {CHART_KINDS.map((chart) => (
-        <ToggleGroupItem key={chart} value={chart} className="px-2.5">
-          {t(`dashboard.reports.charts.${chart}`)}
-        </ToggleGroupItem>
-      ))}
-    </ToggleGroup>
+      options={CHART_KINDS.map((chart) => ({
+        value: chart,
+        icon: CHART_ICONS[chart],
+        label: t(`dashboard.reports.charts.${chart}`),
+      }))}
+      onChange={onChange}
+    />
   )
 }
 
-/** The period's total and the categories' filter. */
-function ReportTotal({
-  total,
+/** Expenses' split as a menu, as the net worth list's grouping (author, 2026-11-20). */
+function SplitChoice({ view }: { view: ViewChoice }) {
+  const { t } = useTranslation()
+  const labelOf = (v: SplitView) => t(`dashboard.split.views.${v}`)
+  return (
+    <ChoiceMenu
+      label={t('dashboard.split.menuLabel', { view: labelOf(view.value) })}
+      value={view.value}
+      options={SPLIT_VIEWS}
+      labelOf={labelOf}
+      onChange={view.onChange}
+    />
+  )
+}
+
+/**
+ * The categories' filter as the transactions list's: a chip with the filter icon,
+ * "Filtrer", the count after it and the accent outline while some are ticked (author,
+ * 2026-11-20).
+ */
+function FilterChip({
   picked,
-  currency,
-  onFilter,
+  onOpen,
 }: {
-  total: string | null
   picked: number
-  currency: string
-  onFilter: () => void
+  onOpen: () => void
 }) {
   const { t } = useTranslation()
+  const label = picked
+    ? t('dashboard.categories.filterCount', { count: picked })
+    : t('dashboard.categories.filter')
   return (
-    <>
-      <span className="text-sm">
-        <span className="text-muted-foreground">
-          {t('dashboard.reports.total')}{' '}
-        </span>
-        <Figure amount={total} currency={currency} className="font-semibold" />
+    <button
+      type="button"
+      aria-haspopup="dialog"
+      aria-label={label}
+      title={label}
+      onClick={onOpen}
+      className={cn(chipSurface, picked > 0 && chipActive)}
+    >
+      <Icon name="filter" className="size-4" />
+      <span aria-hidden="true">
+        {t('dashboard.categories.filterShort')}
+        {picked > 0 && ` · ${picked}`}
       </span>
-      <IconButton
-        icon="filter"
-        label={
-          picked
-            ? t('dashboard.categories.filterCount', { count: picked })
-            : t('dashboard.categories.filter')
-        }
-        pressed={picked > 0}
-        onClick={onFilter}
-      />
-    </>
+    </button>
+  )
+}
+
+/** The period's total, beside the title without a label (author, 2026-11-20). */
+function ReportTotal({
+  total,
+  currency,
+}: {
+  total: string | null
+  currency: string
+}) {
+  return (
+    <Figure
+      amount={total}
+      currency={currency}
+      className="text-sm font-semibold text-muted-foreground"
+    />
   )
 }
 
@@ -120,28 +148,41 @@ function ReportChart({
   chart,
   parts,
   rows,
+  period,
   current,
   currency,
 }: {
   chart: ChartKind
   parts: ReadonlyArray<Part>
   rows: CategoryStacks['rows']
+  period: DashboardPeriod
   current: string
   currency: string
 }) {
   const { t } = useTranslation()
+  const navigate = useNavigate()
+  const categoryOf = (key: string) =>
+    parts.find((p) => p.key === key)?.category?.id
   if (parts.length === 0) return <EmptyState>{t('dashboard.empty')}</EmptyState>
-  if (chart === 'donut') return <SplitDonut parts={parts} currency={currency} />
+  if (chart === 'donut')
+    return <SplitDonut parts={parts} period={period} currency={currency} />
+  // No legend: the tooltip names each part (author, 2026-11-20).
   return (
-    <>
-      <StackedBars
-        series={parts}
-        rows={rows}
-        current={current}
-        currency={currency}
-      />
-      <ChartLegendRow series={parts} />
-    </>
+    <StackedBars
+      series={parts}
+      rows={rows}
+      current={current}
+      currency={currency}
+      canOpen={(key) => categoryOf(key) !== undefined}
+      onOpen={(key, bucket) => {
+        const id = categoryOf(key)
+        if (id)
+          void navigate({
+            to: '/transactions',
+            search: bucketSearch(period, bucket, [id]),
+          })
+      }}
+    />
   )
 }
 
@@ -154,7 +195,8 @@ export type ViewChoice = {
 /**
  * The income or expense card (DSH-02, DSH-07, DSH-09): the period's money split by group
  * (expenses also by need and want or by category), as each month stacked or as a donut of
- * the whole, with a filter on the categories and the period's total.
+ * the whole, with a filter on the categories and the period's total. A part opens its
+ * category's transactions.
  */
 export function CategoryReport({
   kind,
@@ -165,6 +207,7 @@ export function CategoryReport({
   chart,
   onChart,
   view,
+  period,
   current,
   currency,
 }: {
@@ -176,56 +219,36 @@ export function CategoryReport({
   chart: ChartKind
   onChart: (chart: ChartKind) => void
   view?: ViewChoice
+  period: DashboardPeriod
   current: string
   currency: string
 }) {
   const { t } = useTranslation()
   const [filterOpen, setFilterOpen] = useState(false)
   const parts = useParts(stacks)
-  const panel = `${kind}-report`
   return (
     <DashboardCard
       title={t(`dashboard.reports.${kind}`)}
+      note={<ReportTotal total={stacks.total} currency={currency} />}
       actions={
-        <ReportTotal
-          total={stacks.total}
-          picked={picked.length}
-          currency={currency}
-          onFilter={() => setFilterOpen(true)}
-        />
+        <>
+          {view && <SplitChoice view={view} />}
+          <FilterChip
+            picked={picked.length}
+            onOpen={() => setFilterOpen(true)}
+          />
+          <ChartChoice value={chart} onChange={onChart} />
+        </>
       }
     >
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        {view && (
-          <TabList
-            label={t('dashboard.split.viewLabel')}
-            tabs={SPLIT_VIEWS}
-            value={view.value}
-            labelOf={(v) => t(`dashboard.split.views.${v}`)}
-            panelId={panel}
-            idPrefix={`${kind}-view`}
-            wrap
-            onSelect={view.onChange}
-          />
-        )}
-        <ChartChoice value={chart} onChange={onChart} />
-      </div>
-      <div
-        id={panel}
-        {...(view && {
-          role: 'tabpanel',
-          'aria-labelledby': `${kind}-view-${view.value}`,
-        })}
-        className="flex flex-col gap-4"
-      >
-        <ReportChart
-          chart={chart}
-          parts={parts}
-          rows={stacks.rows}
-          current={current}
-          currency={currency}
-        />
-      </div>
+      <ReportChart
+        chart={chart}
+        parts={parts}
+        rows={stacks.rows}
+        period={period}
+        current={current}
+        currency={currency}
+      />
       <CategoryFilterSheet
         open={filterOpen}
         onOpenChange={setFilterOpen}

@@ -1,16 +1,13 @@
 import { z } from 'zod'
 import { yearSchema } from '#/lib/transactions/transaction-list'
 
-// The dashboard's period (DSH-01, DSH-08): one calendar year, or everything. A year
-// counts by month, everything by year (author, 2026-11-19).
+// The dashboard's period (DSH-01, DSH-08): everything by default, or one calendar year
+// from the same menu (author, 2026-11-20). A year counts by month, everything by year.
 
-export const DASHBOARD_PERIODS = ['year', 'all'] as const
-export type DashboardPeriodUnit = (typeof DASHBOARD_PERIODS)[number]
+export type DashboardPeriod = { unit: 'year' | 'all'; year: string }
 
-export type DashboardPeriod = { unit: DashboardPeriodUnit; year: string }
-
+// An old address's `unit` is dropped: a year shows its year, anything else everything.
 export const dashboardSearchSchema = z.object({
-  unit: z.enum(DASHBOARD_PERIODS).optional().catch(undefined),
   year: yearSchema.optional().catch(undefined),
 })
 export type DashboardSearch = z.infer<typeof dashboardSearchSchema>
@@ -19,11 +16,13 @@ export function periodFromSearch(
   search: DashboardSearch,
   today: string,
 ): DashboardPeriod {
-  return { unit: search.unit ?? 'year', year: search.year ?? today.slice(0, 4) }
+  return search.year
+    ? { unit: 'year', year: search.year }
+    : { unit: 'all', year: today.slice(0, 4) }
 }
 
 export function searchOfPeriod(period: DashboardPeriod): DashboardSearch {
-  return period.unit === 'all' ? { unit: 'all' } : { year: period.year }
+  return period.unit === 'all' ? {} : { year: period.year }
 }
 
 /** The bars and points of the period: "2026-01".."2026-12", or "2018".."2026". */

@@ -24,6 +24,7 @@ type TabListProps<TTab extends string> = {
   fit?: boolean
   wrap?: boolean
   count?: (tab: TTab) => number
+  dot?: (tab: TTab) => string
   onSelect: (tab: TTab) => void
 }
 
@@ -33,7 +34,8 @@ type TabListProps<TTab extends string> = {
  * still answers, so the caller can say why. `disabled` turns the whole row off. `fit`
  * sizes each tab to its label, for labels of very different lengths in a narrow row.
  * `wrap` lets the tabs fall onto more lines instead of squeezing. `count` shows a number
- * after a tab's label while it is above zero.
+ * after a tab's label while it is above zero. `dot` shows a colour dot in place of the label, which stays the tab's name and
+ * title.
  */
 export function TabList<TTab extends string>({
   label,
@@ -47,6 +49,7 @@ export function TabList<TTab extends string>({
   fit = false,
   wrap = false,
   count,
+  dot,
   onSelect,
 }: TabListProps<TTab>) {
   const idOf = (tab: TTab) => `${idPrefix}-${tab}`
@@ -83,6 +86,7 @@ export function TabList<TTab extends string>({
           tabIndex={tab === value ? 0 : -1}
           disabled={disabled}
           onClick={() => onSelect(tab)}
+          {...(dot && { 'aria-label': labelOf(tab), title: labelOf(tab) })}
           className={cn(
             'rounded-lg px-2 py-1.5 text-sm font-semibold',
             wrap && 'flex-1',
@@ -96,7 +100,15 @@ export function TabList<TTab extends string>({
             focusRing,
           )}
         >
-          {labelOf(tab)}
+          {dot ? (
+            <span
+              aria-hidden="true"
+              className="mx-1 inline-block size-2.5 rounded-full align-middle"
+              style={{ backgroundColor: dot(tab) }}
+            />
+          ) : (
+            labelOf(tab)
+          )}
           <TabCount n={count?.(tab) ?? 0} />
         </button>
       ))}

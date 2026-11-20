@@ -1,11 +1,17 @@
 import type { Category, CategoryKind } from '#/lib/categories/category'
-import { isArchived } from '#/lib/categories/category'
+import { rainbowKey } from '#/lib/categories/category'
 import { DIGITS, Sum, readSign } from '#/lib/dashboard/dashboard'
 import type { MonthAmount } from '#/lib/dashboard/dashboard'
 import type { DashboardPeriod } from '#/lib/dashboard/dashboard-period'
 import { monthOf, shiftMonth } from '#/lib/shared/months'
+import { compareNames } from '#/lib/shared/collections'
 import { treeOrder } from '#/lib/shared/tree-layout'
-import { divideRounded, fromMinor, toMinor } from '#/lib/shared/money'
+import {
+  compareDecimal,
+  divideRounded,
+  fromMinor,
+  toMinor,
+} from '#/lib/shared/money'
 
 // The sheet's table: each group and its categories. On a year, this month, the year so far
 // and the monthly average over that same stretch (author, 2026-11-19: everything from the
@@ -153,9 +159,8 @@ export function categoryTable(
       category = category.parentId ? byId.get(category.parentId) : undefined
     }
   }
-  const shown = categories.filter(
-    (c) => c.kind === kind && (!isArchived(c) || sums.has(c.id)),
-  )
+  // Only a category with a transaction in the period, or under it (author, 2026-11-20).
+  const shown = categories.filter((c) => c.kind === kind && sums.has(c.id))
   return treeOrder(shown, locale).map(({ item, depth }) => {
     const own = sums.get(item.id)
     return {
@@ -167,6 +172,63 @@ export function categoryTable(
       trend: trend.map((t) => figureOf(own?.get(t.key), 1)),
     }
   })
+}
+
+export const TABLE_SORTS = [
+  'name',
+  'nameDesc',
+  'color',
+  'amountDesc',
+  'amountAsc',
+] as const
+export type TableSort = (typeof TABLE_SORTS)[number]
+
+/**
+ * The table's rows with each group's siblings in the chosen order, a group always over its
+ * categories. An amount sort reads the last column, the period's average, which ranks as
+ * its total; a missing figure goes last.
+ */
+export function sortTable(
+  rows: ReadonlyArray<TableRow>,
+  sort: TableSort,
+  locale: string,
+): Array<TableRow> {
+  const byName = compareNames(locale)
+  const amountOf = (row: TableRow) => Object.values(row.figures).at(-1) ?? null
+  const byAmount = (a: TableRow, b: TableRow) => {
+    const [x, y] = [amountOf(a), amountOf(b)]
+    if (x === null || y === null)
+      return (x === null ? 1 : 0) - (y === null ? 1 : 0)
+    return sort === 'amountDesc' ? compareDecimal(y, x) : compareDecimal(x, y)
+  }
+  const compare = (a: TableRow, b: TableRow) => {
+    if (sort === 'nameDesc') return byName(b.category, a.category)
+    if (sort === 'color') {
+      const [x, y] = [
+        rainbowKey(a.category.color),
+        rainbowKey(b.category.color),
+      ]
+      return x[0] - y[0] || x[1] - y[1] || byName(a.category, b.category)
+    }
+    if (sort === 'name') return byName(a.category, b.category)
+    return byAmount(a, b) || byName(a.category, b.category)
+  }
+  const ids = new Set(rows.map((r) => r.category.id))
+  const children = new Map<string | null, Array<TableRow>>()
+  for (const row of rows) {
+    const parent = row.category.parentId
+    const key = parent && ids.has(parent) ? parent : null
+    children.set(key, [...(children.get(key) ?? []), row])
+  }
+  const out: Array<TableRow> = []
+  const walk = (parent: string | null) => {
+    for (const row of [...(children.get(parent) ?? [])].sort(compare)) {
+      out.push(row)
+      walk(row.category.id)
+    }
+  }
+  walk(null)
+  return out
 }
 
 /**

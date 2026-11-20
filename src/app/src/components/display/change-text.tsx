@@ -10,10 +10,12 @@ function Figures({
   change,
   currency,
   percentOnly,
+  whole,
 }: {
   change: Change
   currency: string
   percentOnly: boolean
+  whole: boolean
 }) {
   const { t } = useTranslation()
   const percent = change.percent === null ? null : absDecimal(change.percent)
@@ -33,7 +35,11 @@ function Figures({
     )
   return (
     <>
-      <Money amount={absDecimal(change.amount)} currency={currency} />
+      <Money
+        amount={absDecimal(change.amount)}
+        currency={currency}
+        whole={whole}
+      />
       {percent !== null && (
         <>
           {' ('}
@@ -56,6 +62,7 @@ export function ChangeText({
   currency,
   lowerIsBetter = false,
   percentOnly = false,
+  whole = false,
   className,
 }: {
   change: Change
@@ -63,6 +70,8 @@ export function ChangeText({
   /** A debt: down is good. */
   lowerIsBetter?: boolean
   percentOnly?: boolean
+  /** Without cents, under a total shown without them. */
+  whole?: boolean
   /** Its size where it sits under an amount larger than the default. */
   className?: string
 }) {
@@ -86,7 +95,12 @@ export function ChangeText({
           {up ? '▲ ' : '▼ '}
         </span>
       )}
-      <Figures change={change} currency={currency} percentOnly={percentOnly} />
+      <Figures
+        change={change}
+        currency={currency}
+        percentOnly={percentOnly}
+        whole={whole}
+      />
     </span>
   )
 }

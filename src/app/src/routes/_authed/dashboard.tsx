@@ -3,13 +3,13 @@ import { useTranslation } from 'react-i18next'
 import { DashboardCard } from '#/components/dashboard/dashboard-card'
 import { MissingMonthsNotice } from '#/components/dashboard/missing-months-notice'
 import { MoneyOverview } from '#/components/dashboard/money-overview'
-import { PeriodControls } from '#/components/dashboard/period-controls'
+import { PeriodMenu } from '#/components/dashboard/period-menu'
+import { IconToggle } from '#/components/display/icon-toggle'
 import { EventSummaryList } from '#/components/events/overview/event-summary-list'
 import { PeriodCalendar } from '#/components/events/overview/period-calendar'
 import { TypeComparison } from '#/components/events/overview/type-comparison'
 import { ListPage } from '#/components/layout/list-page'
 import { listPagePending } from '#/components/layout/page-pending'
-import { TabList } from '#/components/lists/tab-list'
 import { useStoredState } from '#/hooks/app/use-stored-state'
 import { useDailySpending } from '#/hooks/dashboard/use-daily-spending'
 import {
@@ -44,7 +44,7 @@ export const Route = createFileRoute('/_authed/dashboard')({
 const TABS = ['money', 'events'] as const
 type Tab = (typeof TABS)[number]
 const parseTab = oneOf(TABS)
-const PANEL_ID = 'dashboard-panel'
+const TAB_ICONS = { money: 'coins', events: 'calendar' } as const
 
 function MoneyTab({
   period,
@@ -111,29 +111,27 @@ function DashboardPage() {
       }
       wide
       actions={
-        <PeriodControls
-          period={period}
-          firstYear={dashboard.firstYear}
-          today={today}
-          onChange={(next) => void navigate({ search: searchOfPeriod(next) })}
-        />
+        <>
+          <PeriodMenu
+            period={period}
+            firstYear={dashboard.firstYear}
+            today={today}
+            onChange={(next) => void navigate({ search: searchOfPeriod(next) })}
+          />
+          <IconToggle
+            label={t('dashboard.tabsLabel')}
+            value={tab}
+            options={TABS.map((value) => ({
+              value,
+              icon: TAB_ICONS[value],
+              label: t(`dashboard.tabs.${value}`),
+            }))}
+            onChange={setTab}
+          />
+        </>
       }
     >
-      <TabList
-        label={t('dashboard.tabsLabel')}
-        tabs={TABS}
-        value={tab}
-        labelOf={(value) => t(`dashboard.tabs.${value}`)}
-        panelId={PANEL_ID}
-        idPrefix="dashboard-tab"
-        onSelect={setTab}
-      />
-      <div
-        id={PANEL_ID}
-        role="tabpanel"
-        aria-labelledby={`dashboard-tab-${tab}`}
-        className="flex flex-col gap-4"
-      >
+      <div className="flex flex-col gap-4">
         {tab === 'money' ? (
           <MoneyTab period={period} today={today} />
         ) : (

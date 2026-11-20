@@ -2,14 +2,19 @@ import { MissingRate, Money } from '#/components/display/money'
 import { cardSurface } from '#/components/styles'
 import { cn } from '#/lib/utils'
 
-/** A dashboard section: its title, the controls that act on it, then its body. */
+/**
+ * A dashboard section: its title with a figure beside it (`note`), the controls that act
+ * on it, then its body.
+ */
 export function DashboardCard({
   title,
+  note,
   actions,
   className,
   children,
 }: {
   title: string
+  note?: React.ReactNode
   actions?: React.ReactNode
   className?: string
   children: React.ReactNode
@@ -23,7 +28,10 @@ export function DashboardCard({
       )}
     >
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h2 className="font-semibold">{title}</h2>
+        <div className="flex flex-wrap items-baseline gap-x-3">
+          <h2 className="font-semibold">{title}</h2>
+          {note}
+        </div>
         {actions && (
           <div className="flex flex-wrap items-center gap-2">{actions}</div>
         )}

@@ -11,19 +11,16 @@ import {
 const today = '2026-11-19'
 
 describe('dashboard period', () => {
-  it('opens on the current year and reads back what it writes', () => {
-    expect(periodFromSearch({}, today)).toEqual({ unit: 'year', year: '2026' })
-    const all = { unit: 'all' as const, year: '2026' }
-    expect(periodFromSearch(searchOfPeriod(all), today).unit).toBe('all')
+  it('opens on everything and reads back what it writes', () => {
+    expect(periodFromSearch({}, today)).toEqual({ unit: 'all', year: '2026' })
+    const year = { unit: 'year' as const, year: '2024' }
+    expect(periodFromSearch(searchOfPeriod(year), today)).toEqual(year)
     expect(
       periodFromSearch(
-        dashboardSearchSchema.parse({ unit: 'nope', year: 'x' }),
+        dashboardSearchSchema.parse({ unit: 'year', year: 'x' }),
         today,
-      ),
-    ).toEqual({
-      unit: 'year',
-      year: '2026',
-    })
+      ).unit,
+    ).toBe('all')
   })
 
   it('counts a year by month and everything by year', () => {

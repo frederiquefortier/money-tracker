@@ -28,6 +28,7 @@ export const KEPT = [
   'q',
   'pending',
   'owed',
+  'dashboard',
 ] as const
 
 const ids = z.array(z.uuid()).max(100).optional().catch(undefined)
@@ -54,6 +55,11 @@ export const searchSchema = z.object({
   q: z.string().max(200).optional().catch(undefined),
   pending: z.boolean().optional().catch(undefined),
   owed: z.boolean().optional().catch(undefined),
+  // Opened from the dashboard on this period ("2026" or "all"): the page links back to it.
+  dashboard: z
+    .union([yearSchema, z.literal('all')])
+    .optional()
+    .catch(undefined),
 })
 
 /** What the list asks for, from the address. */

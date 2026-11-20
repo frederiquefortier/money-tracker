@@ -12,6 +12,7 @@ import {
 import type { ChartSeries } from '#/components/dashboard/chart-parts'
 import { ChartContainer, ChartTooltip } from '#/components/ui/chart'
 import { useLocale } from '#/hooks/app/use-locale'
+import { useBarPointer } from '#/hooks/dashboard/use-bar-pointer'
 import type { CategoryStacks } from '#/lib/dashboard/category-stacks'
 
 /** The height each bucket's stack reaches, and how far below zero it goes. */
@@ -28,20 +29,28 @@ function stackExtent(
   })
 }
 
-/** Each bucket's bar, stacked by series; the tooltip reads the string figures. */
+/**
+ * Each bucket's bar, stacked by series; the tooltip reads the string figures. A part that
+ * `canOpen` says yes to opens on a click, outlined under the pointer.
+ */
 export function StackedBars({
   series,
   rows: stackRows,
   current,
   currency,
+  canOpen,
+  onOpen,
 }: {
   series: ReadonlyArray<ChartSeries>
   rows: CategoryStacks['rows']
   current: string
   currency: string
+  canOpen: (series: string) => boolean
+  onOpen: (series: string, bucket: string) => void
 }) {
   const { t } = useTranslation()
   const locale = useLocale()
+  const { handlers, hoveredIn } = useBarPointer(onOpen)
   const byBucket = new Map(stackRows.map((r) => [r.bucket, r.values]))
   const rows = stackRows.map((r) => ({
     key: r.bucket,
@@ -67,7 +76,7 @@ export function StackedBars({
         />
         <YAxis {...moneyAxis(stackExtent(rows), currency, locale)} />
         <ChartTooltip
-          cursor={{ fill: 'var(--secondary)' }}
+          cursor={false}
           content={tooltipFor({
             series,
             currency,
@@ -85,8 +94,9 @@ export function StackedBars({
             strokeWidth={1}
             maxBarSize={48}
             isAnimationActive={false}
+            {...(canOpen(s.key) && handlers(s.key))}
           >
-            {progressCells(rows, current)}
+            {progressCells(rows, current, hoveredIn(s.key))}
           </Bar>
         ))}
       </BarChart>

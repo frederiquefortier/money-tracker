@@ -14,15 +14,19 @@ import {
 } from '#/lib/dashboard/category-stacks'
 import type { ChartKind, SplitView } from '#/lib/dashboard/category-stacks'
 import {
+  TABLE_SORTS,
   categoryTable,
+  sortTable,
   tableColumns,
   trendSpans,
 } from '#/lib/dashboard/category-table'
+import type { TableSort } from '#/lib/dashboard/category-table'
 import { missingMonths } from '#/lib/dashboard/missing-months'
 import type { Dashboard } from '#/lib/dashboard/dashboard'
 import { bucketsOf } from '#/lib/dashboard/dashboard-period'
 import type { DashboardPeriod } from '#/lib/dashboard/dashboard-period'
 import {
+  averageFlows,
   bucketFlows,
   comparedFlows,
   cumulative,
@@ -33,6 +37,7 @@ import { oneOf } from '#/lib/shared/collections'
 const parseKind = oneOf(KINDS)
 const parseView = oneOf(SPLIT_VIEWS)
 const parseChart = oneOf(CHART_KINDS)
+const parseSort = oneOf(TABLE_SORTS)
 const parseIds = (v: unknown) =>
   Array.isArray(v) && v.every((x) => typeof x === 'string') ? v : undefined
 
@@ -80,7 +85,14 @@ function useDashboardChoices() {
     'expense',
     parseKind,
   )
+  const [tableSort, setTableSort] = useStoredState<TableSort>(
+    'dashboard.tableSort',
+    'name',
+    parseSort,
+  )
   return {
+    tableSort,
+    setTableSort,
     incomePicked,
     setIncomePicked,
     expensePicked,
@@ -104,7 +116,8 @@ export function useDashboard(
 ) {
   const locale = useFormatLocale()
   const choices = useDashboardChoices()
-  const { incomePicked, expensePicked, splitView, tableKind } = choices
+  const { incomePicked, expensePicked, splitView, tableKind, tableSort } =
+    choices
 
   const figures = useMemo(() => {
     const { months, categories } = data
@@ -116,8 +129,14 @@ export function useDashboard(
       firstMonth,
     })
     const lastYear = String(Number(period.year) - 1)
+    const flows = periodFlows(months, categories, period)
+    // Over the same months (or years) as the table's average column.
+    const count =
+      columns.find((c) => c.kind === 'averageMonth' || c.kind === 'averageYear')
+        ?.divisor ?? 1
     return {
-      flows: periodFlows(months, categories, period),
+      flows,
+      average: { flows: averageFlows(flows, count), count },
       compared: comparedFlows(months, categories, { period, today }),
       lastYear:
         Number(lastYear) < data.firstYear
@@ -145,11 +164,11 @@ export function useDashboard(
         view: splitView,
       }),
       tableColumns: columns,
-      table: categoryTable(months, categories, {
-        kind: tableKind,
-        columns,
+      table: sortTable(
+        categoryTable(months, categories, { kind: tableKind, columns, locale }),
+        tableSort,
         locale,
-      }),
+      ),
     }
   }, [
     data,
@@ -159,6 +178,7 @@ export function useDashboard(
     expensePicked,
     splitView,
     tableKind,
+    tableSort,
     locale,
   ])
 

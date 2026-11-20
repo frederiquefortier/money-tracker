@@ -1,8 +1,6 @@
 import { Icon } from '#/components/display/icon'
-import { chipSurface } from '#/components/styles'
+import { chipActive, chipSurface } from '#/components/styles'
 import { cn } from '#/lib/utils'
-
-export const inUse = 'border-primary text-primary'
 
 /**
  * A filter's bubble: always its name, "Catégories", with the number ticked after it,
@@ -28,7 +26,7 @@ export function FilterBubble({
       aria-label={label}
       disabled={disabled}
       onClick={onOpen}
-      className={cn(chipSurface, count > 0 && inUse)}
+      className={cn(chipSurface, count > 0 && chipActive)}
     >
       <span className="max-w-40 truncate">{label}</span>
       <Icon name="chevron-down" className="size-4" />

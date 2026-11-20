@@ -4,6 +4,18 @@ Short record of each working session: what the author asked, what was decided an
 
 <!-- Newest first: a new session goes directly below this line. Template at the bottom. -->
 
+### 2026-11-20 - Dashboard against transactions and net worth
+
+**What We Worked On:**
+- The author asked the assistant, as a senior dashboard designer, to compare /dashboard with /transactions and /net-worth. The review, on the design gallery with invented figures at desktop and phone width, found the dashboard coherent in look but cut off from the transactions, with a half-empty summary, a deficit shown on the month in progress, trends dropping over a month without data, a stretched table, wrapping controls on a phone, legends the net worth page had dropped and cents on the net worth totals only.
+- The author asked for every change, then moved the period menu first, dropped its arrows, put Tout in it as the default and made Argent and Événements two icons (design-decisions.md).
+- Built: links from a category, a month and a day to the transactions list (`lib/dashboard/drill-down.ts`), averages per month in the summary, a shared `IconToggle`, the `chart-bar-stacked` icon, net worth totals without cents.
+- After trying it, the author asked for clicks on one part only, the heat map's count over the days gone by, a sortable table without its tint, the split as a menu and a scroll cue, and answered four questions: no legend on the stacked bars, empty categories hidden, the filter as the transactions chip, "Montant" for the amount sorts (design-decisions.md). `chipActive` moved to `styles.ts` for both pages.
+- Then: the total beside the title without a label, the donut clockwise, "Filtrer" on the chip, the table's type as three colour dots, the dashboard first in the nav, and a shared `BackLink` on the transactions list when opened from the dashboard.
+
+**What Could We Do Better:**
+- Deleting `period-controls.tsx` left the running dev server's server render looking for it; the page fell back to client rendering until a restart.
+
 ### 2026-11-19 - Dashboard design review
 
 **What We Worked On:**

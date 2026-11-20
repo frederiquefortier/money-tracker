@@ -148,7 +148,7 @@ export const CATEGORY_SORTS = ['name', 'nameDesc', 'color'] as const
 export type CategorySort = (typeof CATEGORY_SORTS)[number]
 
 // Rainbow order from red; greys last, darker first.
-function rainbowKey(hex: string) {
+export function rainbowKey(hex: string) {
   const { l, c, h } = hexToOklch(hex)
   return [c < 0.05 ? 1 : 0, c < 0.05 ? l : (h - 10 + 360) % 360] as const
 }

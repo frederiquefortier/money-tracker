@@ -7,6 +7,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { FloatingAddLink } from '#/components/layout/floating-add-button'
 import { EmptyState } from '#/components/lists/list-card'
+import { BackLink } from '#/components/layout/back-link'
 import { ListPage } from '#/components/layout/list-page'
 import { FilterSidebar } from '#/components/transactions/filters/filter-sidebar'
 import { ListHeader } from '#/components/transactions/list/list-header'
@@ -158,6 +159,20 @@ function OlderDays({
   return null
 }
 
+/** Opened from a dashboard figure: back to the dashboard on its period (author, 2026-11-20). */
+function DashboardBack() {
+  const { t } = useTranslation()
+  const { dashboard } = Route.useSearch()
+  if (!dashboard) return null
+  return (
+    <BackLink
+      label={t('nav.dashboard')}
+      to="/dashboard"
+      search={dashboard === 'all' ? {} : { year: dashboard }}
+    />
+  )
+}
+
 function Transactions() {
   const { t } = useTranslation()
   // The loader's object itself: the pages hook knows a reload by its identity.
@@ -180,7 +195,12 @@ function Transactions() {
     // The net worth hub's grid (2026-11-17): the title at the far left, and from `lg` the
     // filters on 3 of 12 columns, staying in view as the list scrolls on 7, an empty
     // column on each side of it (author).
-    <ListPage title={t('nav.transactions')} count={data.total} wide>
+    <ListPage
+      title={t('nav.transactions')}
+      count={data.total}
+      back={<DashboardBack />}
+      wide
+    >
       <div className="grid items-start gap-3 lg:grid-cols-12">
         <FilterSidebar
           values={deps}

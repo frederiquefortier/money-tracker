@@ -19,17 +19,34 @@ export const FLOW_COLORS = {
 /** The month (or year) not over yet: drawn lighter, named so in the tooltip. */
 const IN_PROGRESS_OPACITY = 0.45
 
-/** A bar's cells, the bucket not over yet lighter. Called, not rendered, for Recharts. */
+/**
+ * A bar's cells, the bucket not over yet lighter, the hovered one outlined: a click opens
+ * that one part (author, 2026-11-20). Called, not rendered, for Recharts.
+ */
 export function progressCells(
   rows: ReadonlyArray<{ key: string }>,
   current: string,
+  hovered: string | null = null,
 ) {
   return rows.map((r) => (
     <Cell
       key={r.key}
       fillOpacity={r.key === current ? IN_PROGRESS_OPACITY : 1}
+      {...(r.key === hovered && {
+        stroke: 'var(--foreground)',
+        strokeWidth: 1.5,
+      })}
     />
   ))
+}
+
+/** The bar part under the pointer: its series and its bucket. */
+export type HoveredBar = { series: string; key: string } | null
+
+/** The bucket key of the bar Recharts hands to an event. */
+export function barKey(data: unknown): string | null {
+  const payload = (data as { payload?: { key?: unknown } } | null)?.payload
+  return typeof payload?.key === 'string' ? payload.key : null
 }
 
 /** A series as the legend and the tooltip name it. */
@@ -95,24 +112,6 @@ function Swatch({ series }: { series: ChartSeries }) {
           : { backgroundColor: series.color }
       }
     />
-  )
-}
-
-/** The swatches under a chart: identity never rests on colour alone (dataviz rule). */
-export function ChartLegendRow({
-  series,
-}: {
-  series: ReadonlyArray<ChartSeries>
-}) {
-  return (
-    <ul className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
-      {series.map((s) => (
-        <li key={s.key} className="flex items-center gap-1.5">
-          <Swatch series={s} />
-          {s.label}
-        </li>
-      ))}
-    </ul>
   )
 }
 

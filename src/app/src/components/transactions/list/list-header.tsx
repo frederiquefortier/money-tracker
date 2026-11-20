@@ -9,8 +9,7 @@ import type {
   ListFilters,
   PeriodChoice,
 } from '#/lib/transactions/transaction-list'
-import { chipSurface } from '#/components/styles'
-import { inUse } from '#/components/transactions/filters/filter-bubble'
+import { chipActive, chipSurface } from '#/components/styles'
 import { cn } from '#/lib/utils'
 import {
   FILTER_KEYS,
@@ -44,7 +43,7 @@ function AllFiltersButton({
       type="button"
       aria-haspopup="dialog"
       onClick={onOpen}
-      className={cn(chipSurface, count > 0 && inUse, 'lg:hidden')}
+      className={cn(chipSurface, count > 0 && chipActive, 'lg:hidden')}
     >
       <Icon name="filter" className="size-4" />
       {label}
@@ -79,7 +78,7 @@ function StatusButton({
       className={cn(
         chipSurface,
         pending ? 'bg-pending' : 'bg-owed',
-        on && inUse,
+        on && chipActive,
       )}
     >
       <Icon name={pending ? 'clock' : 'users'} className="size-4" />

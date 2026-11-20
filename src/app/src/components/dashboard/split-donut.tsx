@@ -1,21 +1,39 @@
+import { useState } from 'react'
+import { Link, useNavigate } from '@tanstack/react-router'
 import { Cell, Pie, PieChart } from 'recharts'
 import { CategoryBadge } from '#/components/categories/category-badge'
 import type { ChartSeries } from '#/components/dashboard/chart-parts'
 import { Figure } from '#/components/dashboard/dashboard-card'
 import { Percent } from '#/components/display/percent'
 import { ChartContainer, ChartTooltip } from '#/components/ui/chart'
+import { focusRing, rowHover } from '#/components/styles'
+import { useScrollMore } from '#/hooks/app/use-scroll-more'
 import type { StackSeries } from '#/lib/dashboard/category-stacks'
+import type { DashboardPeriod } from '#/lib/dashboard/dashboard-period'
+import { periodSearch } from '#/lib/dashboard/drill-down'
+import { cn } from '#/lib/utils'
 
 /** A series as both charts draw it: its name and colour, its total and share. */
 export type Part = ChartSeries & Omit<StackSeries, 'key'>
 
+// The list's bottom edge fades while more parts sit below it.
+const FADE =
+  '[mask-image:linear-gradient(to_bottom,black_calc(100%-2.5rem),transparent)]'
+
+/** A slice opens its category's transactions; the hovered one stays bright. */
 function Donut({
   parts,
+  period,
   currency,
 }: {
   parts: ReadonlyArray<Part>
+  period: DashboardPeriod
   currency: string
 }) {
+  const navigate = useNavigate()
+  const [hovered, setHovered] = useState<string | null>(null)
+  const partOf = (data: unknown) =>
+    (data as { payload?: { part?: Part } } | null)?.payload?.part
   const data = parts
     .filter((p) => p.total !== null && Number(p.total) > 0)
     .map((p) => ({ key: p.key, value: Number(p.total), part: p }))
@@ -41,12 +59,32 @@ function Donut({
           nameKey="key"
           innerRadius="60%"
           outerRadius="100%"
+          // From 12 o'clock, clockwise, in the list's order (author, 2026-11-20).
+          startAngle={90}
+          endAngle={-270}
           stroke="var(--card)"
           strokeWidth={2}
           isAnimationActive={false}
+          onMouseEnter={(slice: unknown) =>
+            setHovered(partOf(slice)?.key ?? null)
+          }
+          onMouseLeave={() => setHovered(null)}
+          onClick={(slice: unknown) => {
+            const id = partOf(slice)?.category?.id
+            if (id)
+              void navigate({
+                to: '/transactions',
+                search: periodSearch(period, id),
+              })
+          }}
         >
           {data.map((d) => (
-            <Cell key={d.key} fill={d.part.color} />
+            <Cell
+              key={d.key}
+              fill={d.part.color}
+              fillOpacity={hovered && hovered !== d.key ? 0.4 : 1}
+              className={d.part.category ? 'cursor-pointer' : undefined}
+            />
           ))}
         </Pie>
       </PieChart>
@@ -54,9 +92,9 @@ function Donut({
   )
 }
 
-function PartRow({ part, currency }: { part: Part; currency: string }) {
+function PartContent({ part, currency }: { part: Part; currency: string }) {
   return (
-    <li className="flex items-center gap-2 py-1.5 text-sm">
+    <>
       {part.category ? (
         <CategoryBadge
           icon={part.category.icon}
@@ -81,24 +119,71 @@ function PartRow({ part, currency }: { part: Part; currency: string }) {
         currency={currency}
         className="font-semibold"
       />
+    </>
+  )
+}
+
+/** A part; a category's opens its transactions over the period. */
+function PartRow({
+  part,
+  period,
+  currency,
+}: {
+  part: Part
+  period: DashboardPeriod
+  currency: string
+}) {
+  const row = 'flex items-center gap-2 px-1 py-1.5 text-sm'
+  if (!part.category)
+    return (
+      <li className={row}>
+        <PartContent part={part} currency={currency} />
+      </li>
+    )
+  return (
+    <li className={rowHover}>
+      <Link
+        to="/transactions"
+        search={periodSearch(period, part.category.id)}
+        className={cn(row, 'rounded-md', focusRing)}
+      >
+        <PartContent part={part} currency={currency} />
+      </Link>
     </li>
   )
 }
 
-/** The whole as a donut beside its parts, each with its share and amount. */
+/**
+ * The whole as a donut beside its parts, each with its share and amount. The list scrolls
+ * past a set height, so a long one never stretches the card (author, 2026-11-20).
+ */
 export function SplitDonut({
   parts,
+  period,
   currency,
 }: {
   parts: ReadonlyArray<Part>
+  period: DashboardPeriod
   currency: string
 }) {
+  const list = useScrollMore<HTMLUListElement>()
   return (
     <div className="grid items-center gap-4 sm:grid-cols-[11rem_1fr]">
-      <Donut parts={parts} currency={currency} />
-      <ul className="flex flex-col divide-y">
+      <Donut parts={parts} period={period} currency={currency} />
+      <ul
+        ref={list.ref}
+        className={cn(
+          'flex max-h-72 flex-col divide-y overflow-y-auto',
+          list.more && FADE,
+        )}
+      >
         {parts.map((part) => (
-          <PartRow key={part.key} part={part} currency={currency} />
+          <PartRow
+            key={part.key}
+            part={part}
+            period={period}
+            currency={currency}
+          />
         ))}
       </ul>
     </div>

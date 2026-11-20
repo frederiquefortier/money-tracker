@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { at, categories } from '#/lib/dashboard/dashboard-fixtures.test-utils'
 import {
+  averageFlows,
   bucketFlows,
   comparedFlows,
   cumulative,
@@ -26,6 +27,25 @@ describe('money flows', () => {
       spent: '1250.0000',
       invested: '500.0000',
       remaining: '1250.0000',
+    })
+  })
+
+  it('averages each flow over the months counted', () => {
+    expect(
+      averageFlows(
+        {
+          earned: '3000.0000',
+          spent: '1250.0000',
+          invested: null,
+          remaining: '1.0000',
+        },
+        3,
+      ),
+    ).toEqual({
+      earned: '1000.0000',
+      spent: '416.6667',
+      invested: null,
+      remaining: '0.3333',
     })
   })
 

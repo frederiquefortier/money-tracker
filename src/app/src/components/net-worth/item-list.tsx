@@ -34,14 +34,18 @@ function Subtotal({
         owed={negateDecimal(worth)}
         currency={currency}
         converted={converted}
+        whole
         className="text-lg font-semibold"
       />
     )
+  // A group's total without cents, as the dashboard's totals (author, 2026-11-20); its
+  // items keep theirs.
   return (
     <Money
       amount={worth}
       currency={currency}
       converted={converted}
+      whole
       className="text-lg font-semibold"
     />
   )

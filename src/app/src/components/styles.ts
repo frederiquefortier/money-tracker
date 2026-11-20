@@ -37,6 +37,9 @@ export const chipSurface = cn(
   focusRing,
 )
 
+/** A chip while what it opens has something chosen: a filter in use. */
+export const chipActive = 'border-primary text-primary'
+
 /** The card every list sits in: settings rows, accounts, currencies. */
 export const cardSurface = cn(
   'overflow-hidden rounded-xl border bg-card',

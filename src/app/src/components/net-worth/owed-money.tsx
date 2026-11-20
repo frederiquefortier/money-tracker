@@ -10,12 +10,14 @@ export function OwedMoney({
   owed,
   currency,
   converted,
+  whole,
   className,
 }: {
   /** Positive when owed, negative when in credit. */
   owed: string
   currency: string
   converted?: boolean
+  whole?: boolean
   className?: string
 }) {
   const sign = compareDecimal(owed, '0')
@@ -24,6 +26,7 @@ export function OwedMoney({
       amount={absDecimal(owed)}
       currency={currency}
       converted={converted}
+      whole={whole}
       signed={sign < 0}
       className={cn(
         className,

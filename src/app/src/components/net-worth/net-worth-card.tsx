@@ -49,7 +49,7 @@ function SinceStartLines({
   return (
     <>
       <p className="flex flex-wrap items-baseline gap-x-1.5">
-        <ChangeText change={since.change} currency={currency} />
+        <ChangeText change={since.change} currency={currency} whole />
         <span className="text-xs text-muted-foreground">
           {t('netWorth.change.since', { year: since.since.slice(0, 4) })}
         </span>
@@ -65,7 +65,7 @@ function SinceStartLines({
       </p>
       {since.perYear !== null && (
         <p className="text-xs text-muted-foreground">
-          <Money amount={since.perYear} currency={currency} />{' '}
+          <Money amount={since.perYear} currency={currency} whole />{' '}
           {t('netWorth.change.perYearAverage')}
         </p>
       )}
@@ -102,6 +102,7 @@ function Headline({
           amount={shown}
           currency={currency}
           converted={converted}
+          whole
           className="text-3xl font-bold"
         />
       )}
@@ -110,7 +111,7 @@ function Headline({
       )}
       {change && chart.range !== 'all' && (
         <p className="flex flex-wrap items-baseline gap-x-1.5">
-          <ChangeText change={change} currency={currency} />
+          <ChangeText change={change} currency={currency} whole />
           <span className="text-xs text-muted-foreground">
             {rangeText(
               chart.range,

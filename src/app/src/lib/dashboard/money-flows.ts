@@ -1,9 +1,10 @@
 import type { Category, CategoryKind } from '#/lib/categories/category'
-import { Sum } from '#/lib/dashboard/dashboard'
+import { DIGITS, Sum } from '#/lib/dashboard/dashboard'
 import type { MonthAmount } from '#/lib/dashboard/dashboard'
 import { bucketOf, inPeriod } from '#/lib/dashboard/dashboard-period'
 import type { DashboardPeriod } from '#/lib/dashboard/dashboard-period'
 import { shiftMonth } from '#/lib/shared/months'
+import { divideRounded, fromMinor, toMinor } from '#/lib/shared/money'
 
 // The sheet's four figures and its two charts over time: earned, spent, invested and
 // what remains (earned less spent and invested), per period and per month or year.
@@ -65,6 +66,22 @@ export function periodFlows(
     if (kind && inPeriod(period, row.month)) addTo(sums, kind, row.amount)
   }
   return flowsOf(sums)
+}
+
+/** Each flow divided by the months (or years) counted, as the table's average. */
+export function averageFlows(flows: Flows, count: number): Flows {
+  const per = (amount: string | null) => {
+    const minor = amount === null ? null : toMinor(amount, DIGITS)
+    return minor === null || count < 1
+      ? null
+      : fromMinor(divideRounded(minor, BigInt(count)), DIGITS)
+  }
+  return {
+    earned: per(flows.earned),
+    spent: per(flows.spent),
+    invested: per(flows.invested),
+    remaining: per(flows.remaining),
+  }
 }
 
 /**

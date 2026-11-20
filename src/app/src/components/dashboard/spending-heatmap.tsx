@@ -1,17 +1,25 @@
 import { useState } from 'react'
+import { useNavigate } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { DashboardCard, Figure } from '#/components/dashboard/dashboard-card'
 import { EmptyState } from '#/components/lists/list-card'
 import { useFormatLocale, useLocale } from '#/hooks/app/use-locale'
 import { heatLevel, heatSteps } from '#/lib/dashboard/daily-spending'
+import { daySearch } from '#/lib/dashboard/drill-down'
 import type { DaySpent } from '#/lib/dashboard/daily-spending'
 import { formatDay, formatMonth } from '#/lib/shared/format'
 import { monthWeeks } from '#/lib/events/event-calendar'
-import { firstDayOf, weekdayNames } from '#/lib/shared/week'
+import { firstDayOf } from '#/lib/shared/week'
 import { cn } from '#/lib/utils'
 
-const daysInYear = (year: string) =>
-  new Date(Date.UTC(Number(year), 1, 29)).getUTCMonth() === 1 ? 366 : 365
+/** The days of the year gone by, today included: all of a past year's. */
+function daysPassed(year: string, today: string): number {
+  const start = Date.UTC(Number(year), 0, 1)
+  const end = today.startsWith(year)
+    ? Date.parse(`${today}T00:00:00Z`)
+    : Date.UTC(Number(year), 11, 31)
+  return Math.max(Math.round((end - start) / 86_400_000) + 1, 0)
+}
 
 // No spending (and days to come) in one neutral grey, then four steps of the spending
 // red: one hue, light to dark (dataviz rule; author, 2026-11-19: a day without spending
@@ -25,24 +33,6 @@ const LEVELS = [
   'var(--flow-spent)',
 ]
 const MISSING = 'color-mix(in oklch, var(--muted-foreground) 50%, var(--card))'
-
-function Legend() {
-  const { t } = useTranslation()
-  return (
-    <span className="flex items-center gap-1 text-xs text-muted-foreground">
-      {t('dashboard.heatmap.less')}
-      {LEVELS.map((color) => (
-        <span
-          key={color}
-          aria-hidden="true"
-          className="size-3 rounded-[3px]"
-          style={{ backgroundColor: color }}
-        />
-      ))}
-      {t('dashboard.heatmap.more')}
-    </span>
-  )
-}
 
 /** The hovered day and what it cost, or nothing yet. */
 function Caption({
@@ -80,12 +70,14 @@ function DayCell({
   spent,
   steps,
   onHover,
+  onOpen,
 }: {
   day: string | null
   today: string
   spent: string | null | undefined
   steps: ReadonlyArray<number>
   onHover: (day: DaySpent | null) => void
+  onOpen: (day: string) => void
 }) {
   if (day === null) return <span />
   const future = day > today
@@ -93,16 +85,18 @@ function DayCell({
     spent === null ? MISSING : LEVELS[heatLevel(Number(spent ?? 0), steps)]
   return (
     <span
-      className="aspect-square rounded-[3px]"
+      className={cn('aspect-square rounded-[3px]', !future && 'cursor-pointer')}
       style={{ backgroundColor: future ? NONE : background }}
       onMouseEnter={() => onHover(future ? null : { day, spent: spent ?? '0' })}
+      onClick={future ? undefined : () => onOpen(day)}
     />
   )
 }
 
 /**
  * The twelve months as small calendars, six across (three on a phone), so the year is no
- * taller than the monthly chart beside it (author, 2026-11-20).
+ * taller than the monthly chart beside it (author, 2026-11-20); weeks start on the
+ * locale's first day, without weekday letters. A day opens its transactions.
  */
 function MonthGrids({
   year,
@@ -117,8 +111,8 @@ function MonthGrids({
 }) {
   const locale = useLocale()
   const formatLocale = useFormatLocale()
+  const navigate = useNavigate()
   const firstDay = firstDayOf(formatLocale)
-  const names = weekdayNames(formatLocale, firstDay)
   const byDay = new Map(days.map((d) => [d.day, d.spent]))
   const steps = heatSteps(days)
   const months = Array.from(
@@ -135,12 +129,7 @@ function MonthGrids({
           <span className="text-xs font-semibold capitalize">
             {formatMonth(month, locale, 'short')}
           </span>
-          <div className="grid grid-cols-7 gap-[2px] text-center text-[0.625rem] leading-none text-muted-foreground">
-            {names.map((name, i) => (
-              <span key={i} aria-hidden="true">
-                {name}
-              </span>
-            ))}
+          <div className="grid grid-cols-7 gap-[2px]">
             {monthWeeks(month, firstDay)
               .flat()
               .map((day, i) => (
@@ -151,6 +140,12 @@ function MonthGrids({
                   spent={byDay.get(day ?? '')}
                   steps={steps}
                   onHover={onHover}
+                  onOpen={(open) =>
+                    void navigate({
+                      to: '/transactions',
+                      search: daySearch({ unit: 'year', year }, open),
+                    })
+                  }
                 />
               ))}
           </div>
@@ -188,11 +183,16 @@ export function SpendingHeatmap({
       actions={
         days && (
           <span
-            className="font-mono text-sm text-muted-foreground"
-            title={t('dashboard.heatmap.daysLabel', { count })}
-            aria-label={t('dashboard.heatmap.daysLabel', { count })}
+            className="text-sm text-muted-foreground"
+            title={t('dashboard.heatmap.daysLabel', {
+              count,
+              total: daysPassed(year, today),
+            })}
           >
-            {t('dashboard.heatmap.days', { count, total: daysInYear(year) })}
+            {t('dashboard.heatmap.days', {
+              count,
+              total: daysPassed(year, today),
+            })}
           </span>
         )
       }
@@ -213,10 +213,10 @@ export function SpendingHeatmap({
               onHover={setHovered}
             />
           </div>
-          <div className="flex flex-wrap items-center justify-between gap-2">
+          {/* Room kept for the hovered day, so the card never changes height. */}
+          <p className="h-5 truncate text-xs leading-5">
             <Caption day={hovered} currency={currency} />
-            <Legend />
-          </div>
+          </p>
         </>
       )}
     </DashboardCard>

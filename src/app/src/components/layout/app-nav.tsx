@@ -5,7 +5,14 @@ import type { IconName } from '#/components/display/icon'
 import { cn } from '#/lib/utils'
 import { focusRing } from '#/components/styles'
 
+// The dashboard first (author, 2026-11-20).
 const TABS = [
+  {
+    to: '/dashboard',
+    label: 'nav.dashboard',
+    icon: 'chart-pie',
+    activeIcon: 'chart-pie-fill',
+  },
   {
     to: '/transactions',
     label: 'nav.transactions',
@@ -17,12 +24,6 @@ const TABS = [
     label: 'netWorth.title',
     icon: 'chart-line',
     activeIcon: 'chart-line-fill',
-  },
-  {
-    to: '/dashboard',
-    label: 'nav.dashboard',
-    icon: 'chart-pie',
-    activeIcon: 'chart-pie-fill',
   },
   {
     to: '/budget',
