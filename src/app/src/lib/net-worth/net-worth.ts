@@ -1,5 +1,6 @@
 import { fromMinor, toMinor } from '#/lib/shared/money'
 import { HOLDING_KINDS } from '#/lib/holdings/holding'
+import { isOneOf } from '#/lib/shared/collections'
 import type { HoldingKind } from '#/lib/holdings/holding'
 import type {
   ChartItem,
@@ -79,4 +80,59 @@ export type NetWorth = {
   items: Array<ChartItem>
   /** Each investment's deposits and withdrawals, for its return (ADR-062). */
   flows: Array<FlowRow>
+}
+
+const isKind = isOneOf<HoldingKind>(HOLDING_KINDS)
+
+/**
+ * Today's net worth as the hub shows it: the open accounts' balances and the open
+ * holdings' latest values. The dashboard uses it too, so both pages show one figure.
+ */
+export function todayTotal({
+  balances,
+  accounts,
+  holdings,
+  totals,
+}: {
+  balances: ReadonlyArray<{
+    account_id: string | null
+    display_balance: string | null
+  }>
+  accounts: ReadonlyArray<{ id: string; closed_on: string | null }>
+  holdings: ReadonlyArray<{
+    id: string
+    kind: string
+    closed_on: string | null
+  }>
+  totals: ReadonlyArray<{
+    holding_id: string | null
+    latest_on: string | null
+    display_value: string | null
+  }>
+}): string | null {
+  const open = new Set(
+    accounts.filter((a) => a.closed_on === null).map((a) => a.id),
+  )
+  const accountTotal = sumAmounts(
+    balances
+      .filter((b) => b.account_id !== null && open.has(b.account_id))
+      .map((b) => b.display_balance),
+  )
+  const byHolding = new Map(totals.map((t) => [t.holding_id, t]))
+  const summary = summarizeHoldings(
+    holdings
+      .filter((h) => h.closed_on === null)
+      .flatMap((h) => {
+        if (!isKind(h.kind)) return []
+        const row = byHolding.get(h.id)
+        return [
+          {
+            kind: h.kind,
+            latestOn: row?.latest_on ?? null,
+            displayValue: row?.display_value ?? null,
+          },
+        ]
+      }),
+  )
+  return sumAmounts([accountTotal, summary.total])
 }

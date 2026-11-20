@@ -1,11 +1,11 @@
 import { z } from 'zod'
 import { todayIso } from '#/lib/shared/format'
+import { monthOf } from '#/lib/shared/months'
 import { FILTER_KINDS, idFilters } from '#/lib/transactions/transaction-filters'
 import {
   NO_EVENT,
   PERIOD_UNITS,
   lastThirtyDays,
-  monthOf,
   monthSchema,
   periodRange,
   yearSchema,

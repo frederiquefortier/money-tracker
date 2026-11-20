@@ -7,6 +7,26 @@ type Tables = Database['public']['Tables']
 type Loaded<T> =
   { data: T; error: null } | { data: null; error: { code: string } }
 
+/** The API's row cap (`max_rows` in config.toml). */
+const PAGE = 1000
+
+/**
+ * Every row of a query the API would cut at its row cap, fetched a page at a time.
+ * `page` asks for rows `from` to `to`; the query must order its rows so pages do not
+ * overlap. Shaped like a single response, for `loaded`.
+ */
+export async function allRows<T>(
+  page: (from: number, to: number) => PromiseLike<Loaded<Array<T>>>,
+): Promise<Loaded<Array<T>>> {
+  const rows: Array<T> = []
+  for (let from = 0; ; from += PAGE) {
+    const result = await page(from, from + PAGE - 1)
+    if (result.error) return result
+    rows.push(...result.data)
+    if (result.data.length < PAGE) return { data: rows, error: null }
+  }
+}
+
 /** Each query's rows; the first error throws, naming what could not be loaded. */
 export function loaded<TResults extends ReadonlyArray<Loaded<unknown>>>(
   what: string,

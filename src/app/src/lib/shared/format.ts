@@ -29,15 +29,20 @@ function dateFormat(locale: Locale, options: Intl.DateTimeFormatOptions) {
   return format
 }
 
+/** `whole` rounds to the unit, for a dashboard where size matters more than cents. */
 export function moneyFormat(
   currency: string,
   locale: Locale,
-  signDisplay: 'auto' | 'exceptZero' = 'auto',
+  {
+    signDisplay = 'auto',
+    whole = false,
+  }: { signDisplay?: 'auto' | 'exceptZero'; whole?: boolean } = {},
 ) {
   return numberFormat(locale, {
     style: 'currency',
     currency,
     signDisplay,
+    ...(whole && { minimumFractionDigits: 0, maximumFractionDigits: 0 }),
   })
 }
 

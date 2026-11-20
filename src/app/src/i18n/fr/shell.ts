@@ -9,7 +9,6 @@ export const shellFr = {
     budget: 'Budget',
   },
   comingSoon: {
-    dashboard: 'Vos dépenses par catégorie et par mois s’afficheront ici.',
     budget: 'Vos objectifs et votre fonds d’urgence vivront ici.',
   },
   fallback: {

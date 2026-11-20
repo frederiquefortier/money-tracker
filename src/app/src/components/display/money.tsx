@@ -8,13 +8,14 @@ import { cn } from '#/lib/utils'
 /**
  * An amount in its currency. `signed` shows the plus of an income. `converted` marks a
  * total that mixes currencies with ≈ (CUR-09); a converted row shows its original amount
- * instead. `detail` is the hover text and the screen readers' name.
+ * instead. `detail` is the hover text and the screen readers' name. `whole` drops the cents.
  */
 export function Money({
   amount,
   currency,
   signed = false,
   converted = false,
+  whole = false,
   detail,
   className,
 }: {
@@ -22,12 +23,16 @@ export function Money({
   currency: string
   signed?: boolean
   converted?: boolean
+  whole?: boolean
   detail?: string
   className?: string
 }) {
   const { t } = useTranslation()
   const locale = useLocale()
-  const format = moneyFormat(currency, locale, signed ? 'exceptZero' : 'auto')
+  const format = moneyFormat(currency, locale, {
+    signDisplay: signed ? 'exceptZero' : 'auto',
+    whole,
+  })
   const parts = format.formatToParts(amount as Intl.StringNumericLiteral)
   const text = parts.map((part) => part.value).join('')
   const label =

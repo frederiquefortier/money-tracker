@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { addDays, monthEnd, monthsStart } from '#/lib/shared/months'
 import type { LinkedEvent } from '#/lib/events/event'
 import type { HoldingParts } from '#/lib/holdings/holding'
 import type { FilterKind } from '#/lib/transactions/transaction-filters'
@@ -20,25 +21,9 @@ export type PeriodUnit = (typeof PERIOD_UNITS)[number]
 export const monthSchema = z.string().regex(/^\d{4}-(0[1-9]|1[0-2])$/)
 export const yearSchema = z.string().regex(/^\d{4}$/)
 
-export function monthOf(isoDate: string): string {
-  return isoDate.slice(0, 7)
-}
-
-export function shiftMonth(month: string, by: number): string {
-  const [year = 0, index = 1] = month.split('-').map(Number)
-  const months = year * 12 + index - 1 + by
-  return `${Math.floor(months / 12)}-${String((months % 12) + 1).padStart(2, '0')}`
-}
-
-function isoDay(date: Date): string {
-  return date.toISOString().slice(0, 10)
-}
-
 /** The 30 days up to `today`, where a custom period starts. */
 export function lastThirtyDays(today: string): { start: string; end: string } {
-  const start = new Date(`${today}T00:00:00Z`)
-  start.setUTCDate(start.getUTCDate() - 29)
-  return { start: isoDay(start), end: today }
+  return { start: addDays(today, -29), end: today }
 }
 
 /**
@@ -57,8 +42,7 @@ export function periodRange(
   if (period === 'all') return { from: null, to: null }
   if (period === 'year') return { from: `${year}-01-01`, to: `${year}-12-31` }
   if (period === 'custom') return { from: start, to: end }
-  const [y = 0, m = 1] = month.split('-').map(Number)
-  return { from: `${month}-01`, to: isoDay(new Date(Date.UTC(y, m, 0))) }
+  return { from: `${month}-01`, to: monthEnd(month) }
 }
 
 export type AccountName = { name: string; institution: string | null }
@@ -191,20 +175,6 @@ export type PeriodPreset = (typeof PERIOD_PRESETS)[number]
 
 export function presetMonths(preset: Exclude<PeriodPreset, 'all'>): number {
   return Number(preset.slice(1))
-}
-
-/**
- * The first day of the last `months` months to `today`: the day after the same date that
- * many months back, a short month taking its last day.
- */
-export function monthsStart(today: string, months: number): string {
-  const [year = 0, month = 1, day = 1] = today.split('-').map(Number)
-  const back = new Date(Date.UTC(year, month - 1 - months, 1))
-  const last = new Date(
-    Date.UTC(back.getUTCFullYear(), back.getUTCMonth() + 1, 0),
-  ).getUTCDate()
-  back.setUTCDate(Math.min(day, last) + 1)
-  return isoDay(back)
 }
 
 /** The tab a period is, or null for one only the calendar names. */

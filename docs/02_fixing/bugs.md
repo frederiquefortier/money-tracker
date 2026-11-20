@@ -4,6 +4,30 @@ Track bugs with dates, solutions, and prevention notes. Search this file before 
 
 <!-- Newest first: a new bug goes directly below this line. Template at the bottom. -->
 
+### 2026-11-19 - An income repaying several expenses kept only one
+- **Issue**: Ticking several owed lines on an income and saving kept a single one; the form showed one ticked again.
+- **Root Cause**: `save_transaction` paid the ticked lines in order, and a part not known yet took all that was left of the income. The next lines got 0, and a line given 0 is not stored (`amount > 0`), so its link vanished without a word.
+- **Solution**: Migration 20261119120000: the known parts are paid first in the order ticked, then the parts not known yet share what is left equally, each within its expense's room, a share that does not fit going to the others. pgTAP 36 failed on the old function (800 on the first line, nothing on the second) and passes on the new one.
+- **Prevention**: A rule that hands "all that is left" to one item needs a test with two of them.
+
+### 2026-11-19 - The dashboard's net worth differed from the net worth page
+- **Issue**: The Patrimoine tile showed another figure than the net worth page.
+- **Root Cause**: The page shows today's balances (open accounts, open holdings' latest values) while no item is hidden; the tile read the last date of `net_worth_series`, which lags behind today.
+- **Solution**: `todayTotal` in `lib/net-worth/net-worth.ts` computes the page's figure; both server functions call it, and the tile ends its series on it while no item is hidden, as the page does.
+- **Prevention**: One figure shown on two pages comes from one function.
+
+### 2026-11-19 - The category table showed this month on a past year
+- **Issue**: With 2024 picked, the dashboard table still showed Ce mois-ci, the last 6 and 12 months and the average counted back from today, in 2026.
+- **Root Cause**: `tableColumns` always counted back from today's month and ignored the year picked.
+- **Solution**: A past year counts back from its December, the current one from today (`lib/dashboard/category-table.ts`, with a test).
+- **Prevention**: A figure "counted back from today" on a page with a period needs a test on a period other than the current one.
+
+### 2026-11-19 - Every dashboard figure was 0
+- **Issue**: On real data the dashboard showed 0 everywhere, while the gallery's invented figures were right.
+- **Root Cause**: The API returns at most 1000 rows (`max_rows`). `my_monthly()` gave 1751 for the owner's history, ordered oldest first, so the response stopped years before the current one. No error is raised on a cut response.
+- **Solution**: `allRows` in `lib/server/db.server.ts` fetches a function's rows a page at a time with `.range`. The dashboard uses it for `my_monthly` and `net_worth_series`, the net worth page for `net_worth_series` (629 rows today) and `holding_flows`. Each function orders its rows, so the pages never overlap.
+- **Prevention**: A query that returns one row per month and item can pass 1000 rows: page it, and count its rows on the real history before calling it done.
+
 ### 2026-11-18 - CI red after the history rewrite push
 - **Issue**: The first push in a while failed three jobs: docs (em dashes), app (`npm run verify`) and e2e (sign-in setup).
 - **Root Cause**: The "no figure" mark was a literal em dash in four components and three docs; four files had drifted from Prettier and an import was duplicated; the show-password button's name contains "Password", so `getByLabel('Password')` matched two elements.

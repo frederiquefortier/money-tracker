@@ -73,10 +73,17 @@ describe('formatDay and formatMonth', () => {
 describe('signed amounts', () => {
   it('shows a plus on incomes and nothing on zero', () => {
     expect(plain(formatMoney('3400', 'CAD', 'fr'))).toBe('3 400,00 $')
-    expect(plain(moneyFormat('CAD', 'fr', 'exceptZero').format(3400))).toBe(
-      '+3 400,00 $',
+    expect(
+      plain(
+        moneyFormat('CAD', 'fr', { signDisplay: 'exceptZero' }).format(3400),
+      ),
+    ).toBe('+3 400,00 $')
+    expect(
+      moneyFormat('CAD', 'en', { signDisplay: 'exceptZero' }).format(0),
+    ).toBe('$0.00')
+    expect(moneyFormat('CAD', 'en', { whole: true }).format('1234.50')).toBe(
+      '$1,235',
     )
-    expect(moneyFormat('CAD', 'en', 'exceptZero').format(0)).toBe('$0.00')
   })
 })
 

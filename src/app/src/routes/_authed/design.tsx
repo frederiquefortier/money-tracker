@@ -1,6 +1,7 @@
 import { createFileRoute, notFound } from '@tanstack/react-router'
 import { useState } from 'react'
 import { ActionsSection } from '#/components/design/actions-section'
+import { DashboardSection } from '#/components/design/dashboard-section'
 import { DisplaySection } from '#/components/design/display-section'
 import { FeedbackSection } from '#/components/design/feedback-section'
 import { FieldsSection } from '#/components/design/fields-section'
@@ -20,6 +21,7 @@ const CONTENTS = [
   ['lists', 'Lists and cards'],
   ['transactions', 'Transactions'],
   ['net-worth', 'Net worth'],
+  ['dashboard', 'Dashboard'],
   ['feedback', 'Feedback'],
 ] as const
 
@@ -34,7 +36,7 @@ export const Route = createFileRoute('/_authed/design')({
 function Design() {
   const [dark, setDark] = useState(false)
   return (
-    <div className="mx-auto flex w-full max-w-5xl flex-col gap-6">
+    <div className="mx-auto flex w-full max-w-7xl flex-col gap-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <PageTitle>Design</PageTitle>
         <button
@@ -66,6 +68,7 @@ function Design() {
         <ListsSection />
         <TransactionsSection />
         <NetWorthSection />
+        <DashboardSection />
         <FeedbackSection />
       </div>
     </div>

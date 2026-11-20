@@ -7,7 +7,7 @@ Business rules the schema and the screens do not make obvious. The code is the s
 - An expense line can say someone owes me (`owes`). Its part may be unknown. A later income from that person, linked to the line, settles it and sets the part.
 - **An empty amount is "not known yet"** and never blocks a save. An empty `owes` part is set by its reimbursement. An empty Moi or Invité takes what is left once the other parts are known: one part in Parts, an equal share in Amount and %.
 - In Amount mode typed lines keep their amounts and the empty ones absorb what a reimbursement changes. With nothing else empty, Moi absorbs it, since Moi is what I really paid.
-- A reimbursement spreads over the ticked lines in order; each takes at most what it is owed. **What the income has over stays an income in the expense's category**, so that category's total can go below zero (a roommate paying two months at once).
+- A reimbursement pays the ticked lines with a known part first, in the order ticked, each taking at most what it is owed; then the parts not known yet share what is left equally, each within what its expense can give up (author, 2026-11-19: one income can repay several expenses). **What the income has over stays an income in the expense's category**, so that category's total can go below zero (a roommate paying two months at once).
 - The first line linked gives the income its expense's category, as a refund, unless one was chosen by hand. An expense category on an income lowers that category's spending.
 - Linking is done from the income only. Deleting the income unlinks it and an unknown part becomes unknown again. Re-saving an expense keeps its links.
 - An income from "Sans nom" (a `from` line with no person) repays lines owed without a name.

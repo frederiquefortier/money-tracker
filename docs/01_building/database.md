@@ -95,7 +95,9 @@ transactions, the last used on a tie (MER-08); the list offers it when there is 
 - `used_category_ids()`, `used_account_ids()` and `holdings_with_history()` return the ids
   in use (security invoker); those are archived, not deleted.
 - `reimbursements` link an income to `owes` lines of an expense, each taking at most what it
-  is owed; written by `save_transaction`, deleted with either side. Views `owed_lines` and
+  is owed; written by `save_transaction`, deleted with either side. The known parts are paid
+  first in the order ticked, then the parts not known yet share what is left equally within
+  each expense's `empty_part_room` (20261119120000, pgTAP 36). Views `owed_lines` and
   `person_balances`.
 - `import_ref` (unique per user) makes re-importing skip what is in. See [import.md](import.md).
 - `recurring_rules` use plain columns, not an iCal RRULE, which would need a parser for
@@ -118,6 +120,8 @@ sub-categories, a transaction is skipped only when all its splits are, ADR-055).
 `matching_event` links one transaction (the form, `save_transaction`); `relink_events`
 applies the same rules to a date range in one pass (the import, saving an event or the
 default list), since one call per transaction took 87 s over the whole history.
+
+**Dashboard.** `my_lines(from, to)` gives one row per split of an expense or income at my share in the display currency: an expense less its known owed parts, an income less what it repaid. NULL with a missing rate; null dates mean everything. `event_totals()` sums it per event and `my_monthly()` per month and category (ADR-063).
 
 **Holdings.** `holdings` are investments, assets and debts (bank accounts count through their
 balance). `holding_snapshots` are the dated values, one per holding per date, in the holding's

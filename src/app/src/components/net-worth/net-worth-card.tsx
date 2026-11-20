@@ -2,12 +2,14 @@ import { useTranslation } from 'react-i18next'
 import type { TFunction } from 'i18next'
 import { ChangeBars } from '#/components/net-worth/change-bars'
 import { TOTAL_COLOR } from '#/components/net-worth/chart-lines'
-import { ChangeText } from '#/components/net-worth/change-text'
+import { ChangeText } from '#/components/display/change-text'
 import { MissingRate, Money } from '#/components/display/money'
 import { HideItemsButton } from '#/components/net-worth/hide-items-sheet'
 import { NetWorthChart } from '#/components/net-worth/net-worth-chart'
 import { cardSurface } from '#/components/styles'
 import { rangeChange, rangeMonths } from '#/lib/net-worth/net-worth-range'
+import { changeSinceStart } from '#/lib/net-worth/net-worth-since'
+import { useFormatLocale } from '#/hooks/app/use-locale'
 import { cn } from '#/lib/utils'
 import type { NetWorthChartState } from '#/hooks/net-worth/use-net-worth-chart'
 import type { SeriesRange } from '#/lib/net-worth/net-worth-range'
@@ -26,6 +28,49 @@ function rangeText(
       ? t('netWorth.chart.years', { count: months / 12 })
       : t('netWorth.chart.months', { count: months })
   return t('netWorth.change.over', { period })
+}
+
+/**
+ * Tout: "▲ 202 516 $ depuis 2018 · ×12,3", then "22 502 $ par an en moyenne" (author,
+ * 2026-11-19: the compounded percent per year read as a return, and the multiple moved
+ * here from the dashboard).
+ */
+function SinceStartLines({
+  chart,
+  currency,
+}: {
+  chart: NetWorthChartState
+  currency: string
+}) {
+  const { t } = useTranslation()
+  const locale = useFormatLocale()
+  const since = changeSinceStart(chart.points, 'total')
+  if (!since) return null
+  return (
+    <>
+      <p className="flex flex-wrap items-baseline gap-x-1.5">
+        <ChangeText change={since.change} currency={currency} />
+        <span className="text-xs text-muted-foreground">
+          {t('netWorth.change.since', { year: since.since.slice(0, 4) })}
+        </span>
+        {since.multiple !== null && (
+          <span className="text-xs font-semibold">
+            {t('netWorth.change.multiple', {
+              multiple: new Intl.NumberFormat(locale, {
+                maximumFractionDigits: 1,
+              }).format(Number(since.multiple)),
+            })}
+          </span>
+        )}
+      </p>
+      {since.perYear !== null && (
+        <p className="text-xs text-muted-foreground">
+          <Money amount={since.perYear} currency={currency} />{' '}
+          {t('netWorth.change.perYearAverage')}
+        </p>
+      )}
+    </>
+  )
 }
 
 /**
@@ -60,7 +105,10 @@ function Headline({
           className="text-3xl font-bold"
         />
       )}
-      {change && (
+      {chart.range === 'all' && (
+        <SinceStartLines chart={chart} currency={currency} />
+      )}
+      {change && chart.range !== 'all' && (
         <p className="flex flex-wrap items-baseline gap-x-1.5">
           <ChangeText change={change} currency={currency} />
           <span className="text-xs text-muted-foreground">

@@ -1587,6 +1587,14 @@ export type Database = {
         Args: { category_ids: string[]; event: string }
         Returns: boolean
       }
+      event_totals: {
+        Args: never
+        Returns: {
+          display_total: string
+          event_id: string
+          transaction_count: number
+        }[]
+      }
       exchange_rate: {
         Args: { from_currency: string; on_date: string; to_currency: string }
         Returns: number
@@ -1684,6 +1692,27 @@ export type Database = {
       merge_people: {
         Args: { source: string; target: string }
         Returns: undefined
+      }
+      my_lines: {
+        Args: { from_date?: string; to_date?: string }
+        Returns: {
+          category_id: string
+          display_amount: string
+          event_id: string
+          kind: string
+          occurred_on: string
+          owed_open: boolean
+          pending: boolean
+          transaction_id: string
+        }[]
+      }
+      my_monthly: {
+        Args: never
+        Returns: {
+          category_id: string
+          display_amount: string
+          month: string
+        }[]
       }
       net_worth_series: {
         Args: never

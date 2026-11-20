@@ -1,19 +1,26 @@
+import { cn } from '#/lib/utils'
+
 const WIDTH = 64
 const HEIGHT = 20
 
 /**
  * A tiny line of a figure over time, without axes, for a row. Numbers are used for the
- * drawing only; a gap (null) breaks the line.
+ * drawing only; a gap (null) breaks the line. A `className` with a size stretches it.
  */
 export function Sparkline({
   values,
   color,
+  className,
 }: {
   values: ReadonlyArray<number | null>
   color: string
+  className?: string
 }) {
   const known = values.filter((v) => v !== null)
-  if (known.length < 2) return <svg width={WIDTH} height={HEIGHT} aria-hidden />
+  const sized = className
+    ? { className: cn('shrink-0', className), preserveAspectRatio: 'none' }
+    : { width: WIDTH, height: HEIGHT, className: 'shrink-0' }
+  if (known.length < 2) return <svg {...sized} aria-hidden />
   const min = Math.min(...known)
   const span = Math.max(...known) - min || 1
   const x = (i: number) => (i / (values.length - 1)) * WIDTH
@@ -26,14 +33,14 @@ export function Sparkline({
     })
     .join('')
   return (
-    <svg
-      width={WIDTH}
-      height={HEIGHT}
-      viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
-      aria-hidden
-      className="shrink-0"
-    >
-      <path d={path} fill="none" stroke={color} strokeWidth={1.5} />
+    <svg {...sized} viewBox={`0 0 ${WIDTH} ${HEIGHT}`} aria-hidden>
+      <path
+        d={path}
+        fill="none"
+        stroke={color}
+        strokeWidth={1.5}
+        vectorEffect="non-scaling-stroke"
+      />
     </svg>
   )
 }

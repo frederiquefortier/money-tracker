@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { Money } from '#/components/display/money'
-import { ChangeText } from '#/components/net-worth/change-text'
+import { ChangeText } from '#/components/display/change-text'
 import { compareDecimal } from '#/lib/shared/money'
 import type { Holding } from '#/lib/holdings/holding'
 import { NO_FIGURE } from '#/lib/shared/format'

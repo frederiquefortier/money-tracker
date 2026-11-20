@@ -27,6 +27,8 @@ export const netWorthFr = {
     },
     change: {
       perYear: ' par an',
+      multiple: '· ×{{multiple}}',
+      perYearAverage: 'par an en moyenne',
       perYearShort: '/an',
       over: 'sur {{period}}',
       since: 'depuis {{year}}',

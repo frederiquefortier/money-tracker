@@ -37,7 +37,8 @@ export function fromMinor(minor: bigint, digits: number): string {
   return `${negative ? '-' : ''}${int}${frac}`
 }
 
-function divideRounded(numerator: bigint, denominator: bigint): bigint {
+/** Rounded half away from zero. */
+export function divideRounded(numerator: bigint, denominator: bigint): bigint {
   const negative = numerator < 0n !== denominator < 0n
   const n = numerator < 0n ? -numerator : numerator
   const d = denominator < 0n ? -denominator : denominator

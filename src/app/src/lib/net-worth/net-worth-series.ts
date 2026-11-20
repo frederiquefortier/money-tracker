@@ -1,6 +1,7 @@
 import { sumAmounts } from '#/lib/net-worth/net-worth'
 import { accountLabel } from '#/lib/accounts/account'
-import { holdingLabel } from '#/lib/holdings/holding'
+import { HOLDING_KINDS, holdingLabel } from '#/lib/holdings/holding'
+import { isOneOf } from '#/lib/shared/collections'
 import { fromMinor, toMinor } from '#/lib/shared/money'
 import type { HoldingKind, HoldingParts } from '#/lib/holdings/holding'
 import type { Locale } from '#/i18n/locales'
@@ -218,5 +219,30 @@ export function axisTicks(min: number, max: number): Array<number> {
   return Array.from(
     { length: Math.ceil(high / step) - first + 1 },
     (_, i) => (first + i) * step,
+  )
+}
+
+const isSeriesKind = isOneOf<SeriesRow['kind']>(['account', ...HOLDING_KINDS])
+
+/** net_worth_series rows as the browser reads them. */
+export function seriesRows(
+  rows: ReadonlyArray<{
+    on_date: string
+    kind: string
+    item_id: string
+    display_value: string | null
+  }>,
+): Array<SeriesRow> {
+  return rows.flatMap((r) =>
+    isSeriesKind(r.kind)
+      ? [
+          {
+            onDate: r.on_date,
+            kind: r.kind,
+            itemId: r.item_id,
+            displayValue: r.display_value,
+          },
+        ]
+      : [],
   )
 }

@@ -132,8 +132,8 @@ English; this file is in English like every other meta-doc.
 | EVT-01 | User-defined event types, each with a name and a colour. | ai, author | 2 |
 | EVT-02 | An event has a name, optional dates (one day or a range), an optional type and optional people. | v1, ai | 2 |
 | EVT-03 | Transactions can be linked to an event, by hand or automatically (EVT-07). The event shows as a tag on the transaction. | v1, ai, author | 2 |
-| EVT-04 | Calendar view of events with the total spent on each. | v1, ai | 2 |
-| EVT-05 | Compare events of the same type. | ai | 2 |
+| EVT-04 | Calendar view of events with the total spent on each: the dashboard's Événements tab shows the period as month grids, each event's days tinted with its type's colour, and its events with what each cost me (author, 2026-11-18). | v1, ai | 4 |
+| EVT-05 | Compare events of the same type: a bar per event of the chosen type over every year, with its days and cost per day. | ai | 4 |
 | EVT-06 | Give an event a budget and follow it live. Moved to phase 4 with the other budgets, built once on the shared `budgets` table (author, 2026-11-08). | ai, author | 4 |
 | EVT-07 | In its dates, an event attaches itself to every expense and income (categories skipped since 2026-11-13, ADR-055: a default list for every event in the Réglages tab, shown ticked in the event and deselectable there, ADR-056). With no dates, only by hand. Automatic links are marked as such and can be removed or changed by hand; a removed one stays removed. An event can turn the automatic link off (2026-11-11, ADR-042): it then holds only the transactions linked by hand, and its automatic links are removed. | ai (was TAG-02), author | 2 |
 
@@ -141,15 +141,16 @@ English; this file is in English like every other meta-doc.
 
 | ID | Requirement | Source | Phase |
 |---|---|---|---|
-| DSH-01 | Date range picker: a calendar year, last 12 months, last 6 months, custom. | v1, ai | 4 |
-| DSH-02 | Filter by date, category, sub-category and tag. List or chart view of the same data. | v1, ai | 4 |
+| DSH-01 | Period: a calendar year (the current one by default) or everything (author, 2026-11-19: no 6 or 12 months, no custom). A year counts by month, everything by year. | v1, ai | 4 |
+| DSH-02 | The income and the expense reports each filter by category, a ticked category taking its sub-categories. Tags were dropped (TAG-01). | v1, ai | 4 |
 | DSH-03 | An archived category is hidden from charts when the range does not overlap its active period. | v1, ai | 4 |
-| DSH-04 | Per category: count, total, mean and median for the period, and the change versus the previous period in percent. | v1, ai | 4 |
-| DSH-05 | Expenses waiting for a reimbursement are highlighted. A reimbursed expense shows its net amount. | v1, ai | 4 |
-| DSH-06 | Header tiles: total available, spent this month, invested this month, pending count. | sheet | 4 |
-| DSH-07 | Category ranking by spend over the range. | sheet | 4 |
-| DSH-08 | Year view and month view. | misc | 4 |
+| DSH-04 | The sheet's table: each group folding its categories, each row with its trend opening the category's chart, then this month, the year so far and its monthly average, everything from the year shown (author, 2026-11-19: in November the year is divided by 11; the last 6 and 12 months dropped), to today on the current year and to December on a past one; spending more than 10 % over its average this month is marked. On everything, a total per year and the yearly average (author, 2026-11-19; replaced count, mean and median). | v1, ai | 4 |
+| DSH-05 | Every figure counts a shared expense at my share, net of what was repaid (ADR-063). The pending and owed bubbles live on the transactions list only (author, 2026-11-19). | v1, ai | 4 |
+| DSH-06 | The period at a glance, as the sheet's figures: income as the headline and as one bar cut into spent, invested and remaining (earned less spent and invested), each with its share of income and its change from the same stretch a year earlier. Months without any transaction are named in a warning tag beside the page title (author, 2026-11-20). The net worth stays on its own page (author, 2026-11-19: its tile was removed). | sheet | 4 |
+| DSH-07 | Charts as the sheet, in forms that read better (author, 2026-11-19): earned and spent per month (per year on everything) as paired bars, a month where spending passed income shaded red, one without any transaction grey; income on top of what earlier years left against spending, as two lines that stop at this month, with last year's two lines dashed; expenses split by need and want, by group or by category, and income by group, each card switching between the months stacked and a donut of the whole with its list (author, 2026-11-20). The month or year not over yet is drawn lighter. Earned is green, spent red, invested yellow, what remains pale. | sheet | 4 |
+| DSH-08 | One full-width page with tabs: Argent (the sheet's dashboard), Événements (EVT-04, 05), and the yearly review's social view to come (YR-01). | misc | 4 |
 | DSH-09 | Needs, wants and savings over the range: expenses by their need or want mark (CAT-10), unclassified ones apart, and investments as savings, in amounts and as shares of income. | author | 4 |
+| DSH-10 | A heat map of the year: what I spent each day, darker for more, in steps at the year's quartiles, a day without spending grey as a day to come; hovering a day names it and its amount (author, 2026-11-19). | author | 4 |
 
 ## 11. Budget (`BUD`)
 
@@ -170,7 +171,7 @@ English; this file is in English like every other meta-doc.
 | NW-01 | Holdings: investment accounts, debts and other assets. Each has a country, a type (predefined by country, or typed with a kind), an optional name (otherwise type, institution and currency name it), an institution and a currency. | v1, ai, author (2026-11-12) | 2 |
 | NW-02 | Dated value snapshots per holding. A month with no snapshot keeps the last value in the chart (author, 2026-11-16). | v1, ai | 2 |
 | NW-03 | Contributions per holding, split between my money (transactions linked to the holding) and external money (employer, government; entered on the holding). Money can be transferred from one holding to another on a date. Holdings sort as accounts do (ACC-07). Shows amount placed (never reduced by a withdrawal), amount withdrawn, and profit in amount and percent; on the hub an investment's row shows its return over the range, and its opened chart shows placed, withdrawn and profit (ADR-062, author 2026-11-18). | v1, ai, net-worth data, author (2026-11-12) | 2 |
-| NW-04 | Net worth chart (total, investments, debts) and percent change over a range of 1, 3, 5, 7 or 10 years or everything; default is account start to today. The chart draws the net worth alone, with bars of what moved it by year (by month on a short range) split by group; assets count accounts, debts count credit cards. A list gives every account and holding with its own trend, as the spreadsheet did; a row opens the item's page and its chevron opens its own chart (author, 2026-11-17). The net worth and each item show their change over the same range (assets and debts no longer have figures of their own, author 2026-11-18), per year on everything, which also takes 1, 3 or 6 months (author, 2026-11-16 and 17). An investment's change is its return, without the money put in or taken out (ADR-062, author 2026-11-18). | v1, ai, author | 5 |
+| NW-04 | Net worth chart (total, investments, debts) and percent change over a range of 1, 3, 5, 7 or 10 years or everything; default is account start to today. The chart draws the net worth alone, with bars of what moved it by year (by month on a short range) split by group; assets count accounts, debts count credit cards. A list gives every account and holding with its own trend, as the spreadsheet did; a row opens the item's page and its chevron opens its own chart (author, 2026-11-17). The net worth and each item show their change over the same range (assets and debts no longer have figures of their own, author 2026-11-18), per year on everything, which also takes 1, 3 or 6 months (author, 2026-11-16 and 17); the net worth's own headline on everything reads its change since the first figure, how many times it multiplied and the average per year (author, 2026-11-19). An investment's change is its return, without the money put in or taken out (ADR-062, author 2026-11-18). | v1, ai, author | 5 |
 | NW-05 | Chosen holdings and accounts can be hidden, to simulate (the life insurance "with/without" line): they leave the chart, the hub's net worth and the group totals, and stay listed, marked (ADR-058, ADR-059, ADR-061). The choice is remembered per browser. | net-worth data, author (2026-11-12) | 5 |
 | NW-06 | Projections at fixed growth rates (5, 7, 10 %) or custom inputs. | v1, ai | later |
 | NW-07 | Goal solver: "to reach X in N years at r %, invest Y per year", with r defaulting to my actual return. | v1, ai | later |
@@ -182,11 +183,11 @@ English; this file is in English like every other meta-doc.
 
 | ID | Requirement | Source | Phase |
 |---|---|---|---|
-| YR-01 | Toggle between a money view and a social view. | ai, misc | 6 |
+| YR-01 | Toggle between a money view and a social view: the dashboard's tabs (author, 2026-11-18). | ai, misc | 4 |
 | YR-02 | Layout: a timeline with sticky months on the left, a calendar on the right that scrolls with it. | ai, misc | 6 |
-| YR-03 | Top 3 most expensive days. | ai | 6 |
-| YR-04 | Who I spent the most with, the least with, and who I shared the most events with. | ai, misc | 6 |
-| YR-05 | Who owes me and whom I owe, at a glance. | ai | 6 |
+| YR-03 | Top 3 most expensive days. | ai | 4 |
+| YR-04 | Who I spent the most with, the least with, and who I shared the most events with. | ai, misc | 4 |
+| YR-05 | Who owes me and whom I owe, at a glance. | ai | 4 |
 | YR-06 | Share of purchases made at local merchants. | v1 | later |
 | YR-07 | Export the review as charts in several formats. | ai | 6 |
 

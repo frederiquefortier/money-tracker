@@ -66,7 +66,8 @@ export type Change = {
   perYearFrom?: string
 }
 
-function between(first: string, last: string): Change | null {
+/** From one figure to another; no percent from zero. */
+export function changeBetween(first: string, last: string): Change | null {
   const a = toMinor(first, DIGITS)
   const b = toMinor(last, DIGITS)
   if (a === null || b === null) return null
@@ -90,7 +91,7 @@ export function changeOver(
     return typeof value === 'string' ? [value] : []
   })
   if (values.length < 2) return null
-  return between(values[0], values[values.length - 1])
+  return changeBetween(values[0], values[values.length - 1])
 }
 
 const DAYS_PER_YEAR_X100 = 36525n

@@ -29,6 +29,8 @@ export const netWorthEn: typeof netWorthFr = {
     },
     change: {
       perYear: ' a year',
+      multiple: '· ×{{multiple}}',
+      perYearAverage: 'a year on average',
       perYearShort: '/yr',
       over: 'over {{period}}',
       since: 'since {{year}}',

@@ -1,20 +1,14 @@
 import { createServerFn } from '@tanstack/react-start'
-import { loaded } from '#/lib/server/db.server'
+import { seriesRows } from '#/lib/net-worth/net-worth-series'
+import { allRows, loaded } from '#/lib/server/db.server'
 import { getSupabase } from '#/lib/server/supabase.server'
-import { sumAmounts, summarizeHoldings } from '#/lib/net-worth/net-worth'
-import { HOLDING_KINDS } from '#/lib/holdings/holding'
-import { isOneOf } from '#/lib/shared/collections'
-import type { HoldingKind } from '#/lib/holdings/holding'
+import { todayTotal } from '#/lib/net-worth/net-worth'
 import type { NetWorth } from '#/lib/net-worth/net-worth'
 import type {
   ChartItem,
   FlowRow,
   ItemGroup,
-  SeriesRow,
 } from '#/lib/net-worth/net-worth-series'
-
-const isKind = isOneOf<HoldingKind>(HOLDING_KINDS)
-const isSeriesKind = isOneOf<SeriesRow['kind']>(['account', ...HOLDING_KINDS])
 
 type Named = { name: string } | null
 
@@ -69,28 +63,6 @@ function chartItems(
   ]
 }
 
-function seriesRows(
-  rows: ReadonlyArray<{
-    on_date: string
-    kind: string
-    item_id: string
-    display_value: string | null
-  }>,
-): Array<SeriesRow> {
-  return rows.flatMap((r) =>
-    isSeriesKind(r.kind)
-      ? [
-          {
-            onDate: r.on_date,
-            kind: r.kind,
-            itemId: r.item_id,
-            displayValue: r.display_value,
-          },
-        ]
-      : [],
-  )
-}
-
 function flowRows(
   rows: ReadonlyArray<{
     on_date: string
@@ -128,40 +100,19 @@ export const getNetWorth = createServerFn({ method: 'GET' }).handler(
       supabase
         .from('holding_totals')
         .select('holding_id, latest_on, display_value::text'),
-      supabase.rpc('net_worth_series'),
-      supabase.rpc('holding_flows'),
+      // One row per item per month grows past the API's row cap (bugs.md).
+      allRows((from, to) => supabase.rpc('net_worth_series').range(from, to)),
+      allRows((from, to) => supabase.rpc('holding_flows').range(from, to)),
     ])
     const [profile, balances, accounts, holdings, totals, series, flows] =
       loaded('Net worth', ...results)
 
     const openAccounts = accounts.filter((a) => a.closed_on === null)
     const openHoldings = holdings.filter((h) => h.closed_on === null)
-    const open = new Set(openAccounts.map((a) => a.id))
-    const accountTotal = sumAmounts(
-      balances
-        .filter((b) => b.account_id !== null && open.has(b.account_id))
-        .map((b) => b.display_balance),
-    )
-
-    const byHolding = new Map(totals.map((t) => [t.holding_id, t]))
-    const summary = summarizeHoldings(
-      openHoldings.flatMap((h) => {
-        if (!isKind(h.kind)) return []
-        const row = byHolding.get(h.id)
-        return [
-          {
-            kind: h.kind,
-            latestOn: row?.latest_on ?? null,
-            displayValue: row?.display_value ?? null,
-          },
-        ]
-      }),
-    )
-
     const display = profile.display_currency
     return {
       displayCurrency: display,
-      total: sumAmounts([accountTotal, summary.total]),
+      total: todayTotal({ balances, accounts, holdings, totals }),
       converted: [...openAccounts, ...openHoldings].some(
         (item) => item.currency !== display,
       ),

@@ -1,12 +1,9 @@
 import { describe, expect, it } from 'vitest'
 import {
   groupByDay,
-  monthOf,
   monthSchema,
   lastThirtyDays,
   periodRange,
-  shiftMonth,
-  monthsStart,
   presetChoice,
   presetOf,
 } from '#/lib/transactions/transaction-list'
@@ -16,16 +13,6 @@ import type {
 } from '#/lib/transactions/transaction-list'
 
 describe('months', () => {
-  it('steps across years', () => {
-    expect(shiftMonth('2026-01', -1)).toBe('2025-12')
-    expect(shiftMonth('2025-12', 1)).toBe('2026-01')
-    expect(shiftMonth('2026-11', 14)).toBe('2028-01')
-  })
-
-  it('takes the month of a date', () => {
-    expect(monthOf('2026-11-05')).toBe('2026-11')
-  })
-
   it('accepts only a real month', () => {
     expect(monthSchema.safeParse('2026-11').success).toBe(true)
     expect(monthSchema.safeParse('2026-13').success).toBe(false)
@@ -135,14 +122,6 @@ describe('period presets', () => {
     start: '2026-10-19',
     end: '2026-11-17',
   }
-
-  it('starts the last N months the day after the same date N months back', () => {
-    expect(monthsStart('2026-11-17', 1)).toBe('2026-10-18')
-    expect(monthsStart('2026-11-17', 12)).toBe('2025-11-18')
-    expect(monthsStart('2026-01-10', 3)).toBe('2025-10-11')
-    // A short month takes its last day: 31 March, one month back, is 29 February.
-    expect(monthsStart('2024-03-31', 1)).toBe('2024-03-01')
-  })
 
   it('gives each tab its range, which reads back as the same tab', () => {
     const today = '2026-11-17'

@@ -4,6 +4,23 @@ Technical and structural choices, with the alternatives that were rejected. Chec
 
 <!-- Newest first: a new ADR goes directly below this line. Template at the bottom. -->
 
+### ADR-063: My share is computed once in SQL, per line; the dashboard aggregates in the browser (2026-11-18)
+
+**Context:**
+- The dashboard needs totals, means, medians, the change versus the previous period and event totals, all at my share (Q5) and without counting a repayment on top of the share it repays.
+
+**Decision:**
+- `my_lines(from, to)` returns one row per split of an expense or income at my share in the display currency: an expense less its known owed parts, an income less what it repaid (the excess stays in its category). NULL with a missing rate. `event_totals()` sums the same lines per event.
+- `my_monthly()` sums those lines per month and category over the whole history. The dashboard loads it once and cuts the year or everything in the browser with BigInt (2026-11-19, when the author asked for the sheet's charts and table: they all read monthly sums, and switching the period then loads nothing).
+
+**Alternatives Considered:**
+- One SQL aggregate per figure -> A round trip per filter change.
+- Every line to the browser -> Eight years of splits on each load, for figures that only need monthly sums.
+- Gross amounts -> A shared bill and its repayment would both count.
+
+**Consequences:**
+- The money rules for reports live in one function with its pgTAP test. Conversion costs computed from rates are not in the lines yet.
+
 ### ADR-062: An investment's row shows its return over the range, deposits left out (2026-11-18)
 
 **Context:**

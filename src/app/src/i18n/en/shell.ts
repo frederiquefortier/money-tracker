@@ -11,7 +11,6 @@ export const shellEn: typeof shellFr = {
     budget: 'Budget',
   },
   comingSoon: {
-    dashboard: 'Your spending by category and by month will show here.',
     budget: 'Your goals and your emergency fund will live here.',
   },
   fallback: {

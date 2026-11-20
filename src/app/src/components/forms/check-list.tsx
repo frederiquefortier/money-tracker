@@ -171,8 +171,9 @@ function GroupCard({
 }
 
 /**
- * One filter's list: groups as cards that fold, all closed in a sheet (2026-11-16), or plain
- * rows in one card (merchants, a search's matches).
+ * One filter's list: groups as cards that fold, all closed in a sheet (2026-11-16) unless
+ * there is only one (author, 2026-11-19), or plain rows in one card (merchants, a search's
+ * matches).
  */
 export function CheckList({
   nodes,
@@ -200,7 +201,7 @@ export function CheckList({
                 key={group.id}
                 group={group}
                 ticks={ticks}
-                defaultOpen={i < openCount}
+                defaultOpen={i < openCount || nodes.length === 1}
               />
             ))
           }

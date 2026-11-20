@@ -4,6 +4,40 @@ Short record of each working session: what the author asked, what was decided an
 
 <!-- Newest first: a new session goes directly below this line. Template at the bottom. -->
 
+### 2026-11-19 - Dashboard design review
+
+**What We Worked On:**
+- The author asked the assistant, as a senior dashboard designer, to review the Argent tab and suggest improvements. The review, done on the design gallery with invented figures, found figures with nothing to compare to, a card repeating the tiles, colours meaning different things side by side, cents everywhere, the month in progress drawn as finished, a donut past a few slices, and a table pairing this month with totals (design-decisions.md).
+- The author asked for every change, with earned green, spent red, invested yellow and what remains pale; the pending and owed bubbles removed, as the transactions list has them; both the percent and the ×N kept on the net worth. The table counting back from today on a past year was a bug, not intended (bugs.md).
+- Built: the summary (Reste as the headline, the income bar, changes against the same stretch a year earlier, the net worth line), flow colour tokens checked with the dataviz palette validator, whole amounts, round axis steps, the month in progress lighter, deficit months shaded, last year's spending pace, the net worth chart on Tout, ranked bars for the split, the table's trend, average beside this month, above-average mark and fixed first column, a year stepper. Checked in the gallery at desktop and phone width.
+
+- After trying it, the author asked for a second pass: flag months without any transaction, a true red for spending, Gagné's change aligned with the others, last year's income dashed in the cumulative chart with "Revenus + reste 20xx" labels, the table's groups folding and its trend opening a chart, only this month, this year and the monthly average, a lone filter group open by default, and a donut back for needs and wants. Asked whether to remove the net worth tile as its figure differed from the net worth page, the assistant traced it to the series' last date against today's balances and kept the tile on the page's own figure (bugs.md).
+
+- A third pass: a heat map of each day's spending (from `my_lines` for the year shown, loaded with the year, no schema change); income as the headline over the full bar; the net worth tile removed from the dashboard, its ×N moved to the net worth page, whose Tout headline the assistant rewrote as the change since the first figure, ×N and the average per year, dropping the compounded percent; the table's average over the year shown only, divided by the months counted.
+
+- The author reported that ticking several expenses on a repayment kept only one. The cause was the part not known yet taking all the income (bugs.md). The author chose: known parts first, then the unknown ones share equally; and approved pushing the migration (20261119120000, pgTAP 36).
+
+- On 2026-11-20 the author asked for every dashboard card at half width; the heat map moved to month calendars to fill its card, then six across to match the monthly chart's height, with the cumulative chart beside the summary and the count as "290/365". Then Dépenses and its split merged into one card beside Revenus, each switching between stacked months and a donut, and the table back across the page; every series shown without Autres, and the missing-months warning as a tag beside the title.
+
+**What Could We Do Better:**
+- Changing the heat map's count to "290/365" with a regex also rewrote the events tab's "{{count}} jours" strings; caught while removing Autres, before any commit. Scope a translation edit to its own block.
+- A dry run of `npm run db:push` passed `--dry-run` to the shell wrapper instead of the CLI, so it pushed for real. The push had been approved, but a preview was meant.
+- A new sparkline overwrote the existing `components/display/sparkline.tsx`; caught by the type check, restored from Git and extended instead. Search the layout's folders before writing a file.
+
+### 2026-11-18 - Dashboard: the sheet's figures, and events
+
+**What We Worked On:**
+- The author asked for the dashboard page to mix three plans: the spreadsheet dashboard (DSH), the events calendar and comparison (EVT-04, 05) and the yearly review (YR). The author chose one page with a period and tabs (Argent, Événements, then Social), this build covering DSH and EVT with the Social tab next, and a year, a month, the last 6 or 12 months or custom days as the period.
+- On events the author chose month grids tinted by type with each event's total, bars per type to compare, and totals at my share, net of repayments.
+- Built: `my_lines()` and `event_totals()` (ADR-063, pgTAP 35), the period and figures models with tests, the server function and both tabs.
+- After seeing it, the author found it missing most of the sheet and asked for a full-width page with its information: the tiles (spent, earned, invested, remaining, net worth with its change and multiple), the cumulative and monthly charts, where the money went, income and expense reports by category with a filter, the expense split three ways, and the category table (this month, 6 and 12 months, average). The author kept a year and everything as periods, accepted the assistant's chart forms without filled lines, and kept Événements as a tab.
+- Rebuilt on `my_monthly()` (pgTAP 35 extended); the old per-category stats and the narrow layout were removed. Checked in the design gallery with invented figures, at desktop and phone width.
+- On real data the author found every figure at 0: the API cut `my_monthly` at 1000 of its 1751 rows (bugs.md); the long series are now fetched a page at a time. At the author's request the category table draws the tree's lines, and on Tout shows a total per year and the yearly average.
+
+**What Could We Do Better:**
+- The first version followed the requirement rows instead of the sheet the author works from; reading the sheet's layout first would have saved a rebuild.
+- The usage limit cut the first build short, leaving lint errors and the docs for the next turn.
+
 ### 2026-11-18 - Security check, event skips test
 
 **What We Worked On:**

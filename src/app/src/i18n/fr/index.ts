@@ -4,6 +4,7 @@ import { authFr } from './auth'
 import { categoriesFr } from './categories'
 import { commonFr } from './common'
 import { currenciesFr } from './currencies'
+import { dashboardFr } from './dashboard'
 import { eventsFr } from './events'
 import { holdingsFr } from './holdings'
 import { importFr } from './import'
@@ -23,6 +24,7 @@ export const fr = {
   ...categoriesFr,
   ...merchantsFr,
   ...eventsFr,
+  ...dashboardFr,
   ...netWorthFr,
   ...peopleFr,
   ...importFr,

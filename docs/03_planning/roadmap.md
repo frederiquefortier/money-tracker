@@ -48,10 +48,11 @@ The milestone: eight years of history in the app. It comes before the dashboard 
 - [x] The first real import, done by the author.
 
 ## Phase 4: Seeing it
-- [ ] Dashboard: range, filters, per-category stats, tiles, ranking, needs/wants/savings, expenses waiting for reimbursement. DSH-01..09.
+- [x] Dashboard: the sheet's tiles, charts and table on one full-width page, a year or everything, with a heat map of each day's spending. DSH-01..10 ([spec](../00_briefing/designs/22-dashboard.md), ADR-063).
 - [ ] Budgets and the emergency fund, event budgets included. BUD-01..04, 06, CAT-08, EVT-06.
 - [ ] Recurring transactions. TRX-08.
-- [ ] Event calendar and comparison. EVT-04, 05.
+- [x] Event calendar and comparison, the dashboard's Événements tab. EVT-04, 05.
+- [ ] The dashboard's Social tab: top days, people, who owes whom. YR-01, 03, 04, 05.
 - [ ] Merchant price evolution. MER-04.
 - [ ] Last reconciled and last transaction per account. ACC-08.
 - [ ] Delete my account and all its data. SEC-04.
@@ -65,7 +66,7 @@ The milestone: eight years of history in the app. It comes before the dashboard 
 # v3
 
 ## Phase 6: The year
-- [ ] Yearly review, money and social views, export. YR-01..05, 07. May merge with the dashboard; decide when phase 4 is built.
+- [ ] The rest of the yearly review: the sticky-month timeline (YR-02, if still wanted beside the Événements calendar) and the export (YR-07). Its money and social views became the dashboard's tabs (author, 2026-11-18).
 
 ## Before a second real user
 The app works for its owner without these; nobody else can use it safely until both exist.
