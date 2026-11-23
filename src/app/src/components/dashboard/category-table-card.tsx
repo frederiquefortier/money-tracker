@@ -1,19 +1,18 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { DashboardCard } from '#/components/dashboard/dashboard-card'
-import {
-  CategoryTableRow,
-  STICKY,
-} from '#/components/dashboard/category-table-row'
+import { CategoryTableHead } from '#/components/dashboard/category-table-head'
+import { CategoryTableRow } from '#/components/dashboard/category-table-row'
 import { FLOW_COLORS } from '#/components/dashboard/chart-parts'
 import { ExpandAllButton } from '#/components/lists/expand-all-button'
+import { TableScroll } from '#/components/lists/table-scroll'
 import { EmptyState } from '#/components/lists/list-card'
 import { SortMenu } from '#/components/lists/sort-menu'
 import { TabList } from '#/components/lists/tab-list'
-import { useLocale } from '#/hooks/app/use-locale'
 import { useStoredIds } from '#/hooks/app/use-stored-state'
 import { KINDS } from '#/lib/categories/category'
 import type { CategoryKind } from '#/lib/categories/category'
+import { changeSpans, changeYear } from '#/lib/dashboard/category-change'
 import { TABLE_SORTS, shownRows } from '#/lib/dashboard/category-table'
 import type {
   TableColumn,
@@ -21,9 +20,7 @@ import type {
   TableSort,
 } from '#/lib/dashboard/category-table'
 import type { DashboardPeriod } from '#/lib/dashboard/dashboard-period'
-import { formatMonth, todayIso } from '#/lib/shared/format'
 import { treeGuides } from '#/lib/shared/tree-layout'
-import { cn } from '#/lib/utils'
 
 const PANEL = 'category-table'
 
@@ -144,6 +141,7 @@ export function CategoryTableCard({
             rows={rows}
             open={open}
             markAbove={kind === 'expense'}
+            lowerIsBetter={kind === 'expense'}
             trendKeys={trendKeys}
             gaps={gaps}
             period={period}
@@ -156,47 +154,12 @@ export function CategoryTableCard({
   )
 }
 
-/** On the current year, "Ce mois-ci" and "Cette année"; on a past one, its December and itself. */
-function ColumnHead({ column }: { column: TableColumn }) {
-  const { t } = useTranslation()
-  const locale = useLocale()
-  const now = column.to === todayIso().slice(0, 7)
-  if (column.kind === 'year') return column.key
-  if (column.kind === 'thisMonth' && !now)
-    return <span className="capitalize">{formatMonth(column.to, locale)}</span>
-  if (column.kind === 'thisYear' && !now) return column.to.slice(0, 4)
-  return t(`dashboard.table.columns.${column.kind}`)
-}
-
-function TableHead({ columns }: { columns: ReadonlyArray<TableColumn> }) {
-  const { t } = useTranslation()
-  return (
-    <thead>
-      <tr className="border-b text-left text-xs text-muted-foreground">
-        <th className={cn(STICKY, 'bg-card py-2 pr-3 pl-4 font-semibold')}>
-          {t('dashboard.table.category')}
-        </th>
-        {columns.map((column) => (
-          <th
-            key={column.key}
-            className="py-2 pl-6 text-right font-semibold whitespace-nowrap"
-          >
-            <ColumnHead column={column} />
-          </th>
-        ))}
-        <th className="w-full py-2 pr-4 pl-6 text-right font-semibold">
-          {t('dashboard.table.trend')}
-        </th>
-      </tr>
-    </thead>
-  )
-}
-
 function FiguresTable({
   columns,
   rows,
   open,
   markAbove,
+  lowerIsBetter,
   trendKeys,
   gaps,
   period,
@@ -207,6 +170,7 @@ function FiguresTable({
   rows: ReadonlyArray<TableRow>
   open: ReturnType<typeof useStoredIds>
   markAbove: boolean
+  lowerIsBetter: boolean
   trendKeys: ReadonlyArray<string>
   gaps: ReadonlyArray<string>
   period: DashboardPeriod
@@ -219,12 +183,16 @@ function FiguresTable({
     if (!next.delete(id)) next.add(id)
     setCharts(next)
   }
+  const spans = changeSpans(columns)
+  const compared = spans ? changeYear(spans) : null
+  // Last year's line only on a year: on everything each bar is already a year.
+  const lastYear = columns.some((c) => c.kind === 'thisYear') ? compared : null
   const shown = shownRows(rows, open.ids)
   const guides = treeGuides(shown.map(({ row }) => row.depth))
   return (
-    <div className="-mx-4 overflow-x-auto">
+    <TableScroll>
       <table className="w-full min-w-[34rem] text-sm">
-        <TableHead columns={columns} />
+        <CategoryTableHead columns={columns} compared={compared} />
         <tbody>
           {shown.map(({ row, folds }, i) => (
             <CategoryTableRow
@@ -246,11 +214,12 @@ function FiguresTable({
               period={period}
               columns={columns}
               markAbove={markAbove}
+              change={{ shown: compared !== null, lowerIsBetter, lastYear }}
               currency={currency}
             />
           ))}
         </tbody>
       </table>
-    </div>
+    </TableScroll>
   )
 }

@@ -2,6 +2,7 @@ import { CategoryReport } from '#/components/dashboard/category-report'
 import { CategoryTableCard } from '#/components/dashboard/category-table-card'
 import { CumulativeChart } from '#/components/dashboard/cumulative-chart'
 import { FlowSummary } from '#/components/dashboard/flow-summary'
+import { MerchantTableCard } from '#/components/dashboard/merchant-table-card'
 import { MonthlyChart } from '#/components/dashboard/monthly-chart'
 import { SpendingHeatmap } from '#/components/dashboard/spending-heatmap'
 import { useDashboard } from '#/hooks/dashboard/use-dashboard'
@@ -80,7 +81,7 @@ function FlowCards({
 
 /**
  * Expenses beside income, each stacked by month or as a donut (author, 2026-11-20), then
- * the table across the page.
+ * the categories' table and the merchants' across the page.
  */
 function CategoryCards({
   state,
@@ -131,6 +132,18 @@ function CategoryCards({
           rows={state.table}
           trendKeys={state.trendKeys}
           gaps={state.missing}
+          period={period}
+          current={current}
+          currency={currency}
+        />
+      </div>
+      <div className="min-w-0 xl:col-span-2">
+        <MerchantTableCard
+          rows={state.merchants}
+          sort={state.merchantSort}
+          onSort={state.setMerchantSort}
+          columns={state.tableColumns}
+          trendKeys={state.trendKeys}
           period={period}
           current={current}
           currency={currency}

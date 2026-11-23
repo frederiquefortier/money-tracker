@@ -1,4 +1,3 @@
-import { useRouter } from '@tanstack/react-router'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
@@ -13,6 +12,7 @@ import { InfoTooltip } from '#/components/forms/info-tooltip'
 import { ListCard } from '#/components/lists/list-card'
 import { focusRing, rowHover } from '#/components/styles'
 import { useFormatLocale } from '#/hooks/app/use-locale'
+import { useRefresh } from '#/hooks/app/use-refresh'
 import { useToast } from '#/hooks/app/use-toast'
 import { categoryPath } from '#/lib/categories/category'
 import type { Category } from '#/lib/categories/category'
@@ -28,7 +28,7 @@ const row = 'flex min-h-14 items-center gap-3 px-4 py-2'
 function useSaveDefaults(saved: Ids, setPicked: (ids: Ids) => void) {
   const { t } = useTranslation()
   const toast = useToast()
-  const router = useRouter()
+  const refresh = useRefresh()
   return async (ids: Ids) => {
     if (ids.length === saved.length && ids.every((id) => saved.includes(id)))
       return
@@ -39,7 +39,7 @@ function useSaveDefaults(saved: Ids, setPicked: (ids: Ids) => void) {
       return
     }
     toast({ text: t('events.defaultSkipsSaved'), tone: 'success' })
-    await router.invalidate()
+    await refresh()
   }
 }
 

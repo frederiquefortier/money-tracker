@@ -16,9 +16,17 @@ import { cn } from '#/lib/utils'
 /** A series as both charts draw it: its name and colour, its total and share. */
 export type Part = ChartSeries & Omit<StackSeries, 'key'>
 
-// The list's bottom edge fades while more parts sit below it.
-const FADE =
-  '[mask-image:linear-gradient(to_bottom,black_calc(100%-2.5rem),transparent)]'
+// Each edge of the list fades while more parts sit past it (author, 2026-11-20).
+const FADE_LENGTH = '2.5rem'
+
+function fadeMask(above: boolean, below: boolean): string | undefined {
+  if (!above && !below) return undefined
+  const top = above ? `transparent, black ${FADE_LENGTH}` : 'black'
+  const bottom = below
+    ? `black calc(100% - ${FADE_LENGTH}), transparent`
+    : 'black'
+  return `linear-gradient(to bottom, ${top}, ${bottom})`
+}
 
 /** A slice opens its category's transactions; the hovered one stays bright. */
 function Donut({
@@ -111,7 +119,7 @@ function PartContent({ part, currency }: { part: Part; currency: string }) {
       <span className="min-w-0 flex-1 truncate">{part.label}</span>
       {part.share !== null && (
         <span className="text-xs text-muted-foreground">
-          <Percent points={part.share} digits={0} />
+          <Percent points={part.share} />
         </span>
       )}
       <Figure
@@ -172,10 +180,8 @@ export function SplitDonut({
       <Donut parts={parts} period={period} currency={currency} />
       <ul
         ref={list.ref}
-        className={cn(
-          'flex max-h-72 flex-col divide-y overflow-y-auto',
-          list.more && FADE,
-        )}
+        className="flex max-h-72 flex-col divide-y overflow-y-auto"
+        style={{ maskImage: fadeMask(list.start, list.end) }}
       >
         {parts.map((part) => (
           <PartRow

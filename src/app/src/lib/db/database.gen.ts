@@ -1685,6 +1685,17 @@ export type Database = {
         }
         Returns: string
       }
+      merchant_monthly: {
+        Args: never
+        Returns: {
+          display_max: string
+          display_min: string
+          display_total: string
+          merchant_id: string
+          month: string
+          visits: number
+        }[]
+      }
       merge_merchants: {
         Args: { source: string; target: string }
         Returns: undefined

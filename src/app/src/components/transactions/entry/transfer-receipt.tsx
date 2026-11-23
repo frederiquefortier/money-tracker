@@ -13,6 +13,7 @@ import {
   slipTyped,
 } from '#/components/transactions/receipt/receipt-line'
 import { Checkbox } from '#/components/ui/checkbox'
+import { receiptSlip } from '#/components/styles'
 import { amountForInput } from '#/lib/shared/money'
 import { transferPreview } from '#/lib/transfers/transfer-draft'
 import type { TransferDraft } from '#/lib/transfers/transfer-draft'
@@ -169,7 +170,7 @@ export function TransferReceipt(props: ReceiptProps) {
   const toPendingId = useId()
   const { from, to } = currencies
   return (
-    <div className="receipt flex flex-col gap-3 bg-background px-4 pt-4 font-mono">
+    <div className={receiptSlip}>
       <div className="flex items-center gap-3">
         <span
           aria-hidden="true"

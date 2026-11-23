@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Icon } from '#/components/display/icon'
 import { SearchField } from '#/components/forms/search-field'
+import { FilterButton } from '#/components/lists/filter-button'
 import { PeriodTabs } from '#/components/transactions/period/period-tabs'
 import { FilterChips } from '#/components/transactions/filters/filter-chips'
 import { FilterSheet } from '#/components/transactions/filters/filter-sheet'
@@ -20,36 +21,6 @@ import type {
   FilterValues,
 } from '#/lib/transactions/transaction-filters'
 import { useEmptyFilters } from '#/hooks/transactions/use-empty-filters'
-
-/** Below `lg`, one button for the filters, "Filtres · 3", opening their list; the sidebar shows them from `lg` up. */
-function AllFiltersButton({
-  values,
-  onOpen,
-}: {
-  values: FilterValues
-  onOpen: () => void
-}) {
-  const { t } = useTranslation()
-  const name = t('transactions.list.filters')
-  const count = FILTER_TABS.reduce(
-    (sum, tab) => sum + values[FILTER_KEYS[tab]].length,
-    0,
-  )
-  const label = count
-    ? t('transactions.list.filterCount', { name, count })
-    : name
-  return (
-    <button
-      type="button"
-      aria-haspopup="dialog"
-      onClick={onOpen}
-      className={cn(chipSurface, count > 0 && chipActive, 'lg:hidden')}
-    >
-      <Icon name="filter" className="size-4" />
-      {label}
-    </button>
-  )
-}
 
 /**
  * A status's bubble in its rows' colour, at any date, while some exist; pressed, the list
@@ -125,7 +96,14 @@ function Bubbles(props: BubblesProps) {
         on={owed.on}
         onToggle={props.onOwed}
       />
-      <AllFiltersButton values={filters} onOpen={props.onOpen} />
+      <FilterButton
+        count={FILTER_TABS.reduce(
+          (sum, tab) => sum + filters[FILTER_KEYS[tab]].length,
+          0,
+        )}
+        onOpen={props.onOpen}
+        className="lg:hidden"
+      />
     </div>
   )
 }

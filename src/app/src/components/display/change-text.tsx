@@ -3,7 +3,7 @@ import { Money } from '#/components/display/money'
 import { Percent } from '#/components/display/percent'
 import { absDecimal } from '#/lib/shared/money'
 import { cn } from '#/lib/utils'
-import type { Change } from '#/lib/net-worth/net-worth-range'
+import type { Change } from '#/lib/shared/change'
 
 /** The unsigned amount and percent, or the percent alone, then "par an" on Tout. */
 function Figures({

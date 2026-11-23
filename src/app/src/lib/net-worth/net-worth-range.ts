@@ -1,4 +1,6 @@
-import { fromMinor, ratio, toMinor } from '#/lib/shared/money'
+import { changeBetween } from '#/lib/shared/change'
+import type { Change } from '#/lib/shared/change'
+import { fromMinor, toMinor } from '#/lib/shared/money'
 import type { SeriesPoint } from '#/lib/net-worth/net-worth-series'
 
 // The chart's range and the changes the hub shows (NW-04).
@@ -56,26 +58,6 @@ export function pointsInRange(
   if (months === null) return [...points]
   const from = monthsBack(today.slice(0, 7), months)
   return points.filter((p) => p.date.slice(0, 7) >= from)
-}
-
-export type Change = {
-  amount: string
-  /** Percent points over the first value's size; null when it was zero. */
-  percent: string | null
-  /** Set when both are per year: Tout, from this date (author, 2026-11-17). */
-  perYearFrom?: string
-}
-
-/** From one figure to another; no percent from zero. */
-export function changeBetween(first: string, last: string): Change | null {
-  const a = toMinor(first, DIGITS)
-  const b = toMinor(last, DIGITS)
-  if (a === null || b === null) return null
-  const size = a < 0n ? -a : a
-  return {
-    amount: fromMinor(b - a, DIGITS),
-    percent: ratio((b - a) * 100n, size),
-  }
 }
 
 /**

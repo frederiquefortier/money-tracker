@@ -7,10 +7,9 @@ import { SplitDonut } from '#/components/dashboard/split-donut'
 import type { Part } from '#/components/dashboard/split-donut'
 import { StackedBars } from '#/components/dashboard/stacked-bars'
 import { ChoiceMenu } from '#/components/display/choice-menu'
-import { Icon } from '#/components/display/icon'
 import { IconToggle } from '#/components/display/icon-toggle'
+import { FilterButton } from '#/components/lists/filter-button'
 import { EmptyState } from '#/components/lists/list-card'
-import { chipActive, chipSurface } from '#/components/styles'
 import type { Category, CategoryKind } from '#/lib/categories/category'
 import { CHART_KINDS, SPLIT_VIEWS } from '#/lib/dashboard/category-stacks'
 import type {
@@ -20,7 +19,6 @@ import type {
 } from '#/lib/dashboard/category-stacks'
 import type { DashboardPeriod } from '#/lib/dashboard/dashboard-period'
 import { bucketSearch } from '#/lib/dashboard/drill-down'
-import { cn } from '#/lib/utils'
 
 const CHART_ICONS = { stack: 'chart-bar-stacked', donut: 'chart-pie' } as const
 const UNMARKED_COLOR = 'var(--muted-foreground)'
@@ -90,40 +88,6 @@ function SplitChoice({ view }: { view: ViewChoice }) {
       labelOf={labelOf}
       onChange={view.onChange}
     />
-  )
-}
-
-/**
- * The categories' filter as the transactions list's: a chip with the filter icon,
- * "Filtrer", the count after it and the accent outline while some are ticked (author,
- * 2026-11-20).
- */
-function FilterChip({
-  picked,
-  onOpen,
-}: {
-  picked: number
-  onOpen: () => void
-}) {
-  const { t } = useTranslation()
-  const label = picked
-    ? t('dashboard.categories.filterCount', { count: picked })
-    : t('dashboard.categories.filter')
-  return (
-    <button
-      type="button"
-      aria-haspopup="dialog"
-      aria-label={label}
-      title={label}
-      onClick={onOpen}
-      className={cn(chipSurface, picked > 0 && chipActive)}
-    >
-      <Icon name="filter" className="size-4" />
-      <span aria-hidden="true">
-        {t('dashboard.categories.filterShort')}
-        {picked > 0 && ` · ${picked}`}
-      </span>
-    </button>
   )
 }
 
@@ -233,8 +197,8 @@ export function CategoryReport({
       actions={
         <>
           {view && <SplitChoice view={view} />}
-          <FilterChip
-            picked={picked.length}
+          <FilterButton
+            count={picked.length}
             onOpen={() => setFilterOpen(true)}
           />
           <ChartChoice value={chart} onChange={onChart} />

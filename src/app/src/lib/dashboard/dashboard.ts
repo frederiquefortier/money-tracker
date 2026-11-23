@@ -1,4 +1,5 @@
 import type { Category, CategoryKind } from '#/lib/categories/category'
+import type { Merchant, MerchantMonth } from '#/lib/dashboard/merchant-bills'
 import { fromMinor, toMinor } from '#/lib/shared/money'
 
 // What the dashboard counts: my_monthly, my share net of repayments per month and
@@ -20,6 +21,9 @@ export type Dashboard = {
   firstYear: number
   months: Array<MonthAmount>
   categories: Array<Category>
+  /** Full bills, not my share (ADR-064). */
+  merchantMonths: Array<MerchantMonth>
+  merchants: Array<Merchant>
 }
 
 /** A running sum that turns null at the first missing figure and stays null. */

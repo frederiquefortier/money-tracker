@@ -15,7 +15,8 @@ import { getCategories } from '#/server/categories'
 import { getEvents } from '#/server/events'
 
 /**
- * Every month's figures per category and the categories. One round trip (ADR-053); the period is cut in the browser, so switching it
+ * Every month's figures per category and the categories, and each merchant's bills per
+ * month (MER-04). One round trip (ADR-053); the period is cut in the browser, so switching it
  * loads nothing.
  */
 export const getDashboard = createServerFn({ method: 'GET' }).handler(
@@ -26,10 +27,12 @@ export const getDashboard = createServerFn({ method: 'GET' }).handler(
         supabase.from('profiles').select('display_currency').single(),
         // About 50 categories a month for years: far past one page (bugs.md).
         allRows((from, to) => supabase.rpc('my_monthly').range(from, to)),
+        allRows((from, to) => supabase.rpc('merchant_monthly').range(from, to)),
+        supabase.from('merchants').select('id, name'),
       ]),
       getCategories(),
     ])
-    const [profile, months] = loaded('Dashboard', ...results)
+    const [profile, months, bills, merchants] = loaded('Dashboard', ...results)
     const firstMonth = months.at(0)?.month.slice(0, 7)
     return {
       displayCurrency: profile.display_currency,
@@ -40,6 +43,15 @@ export const getDashboard = createServerFn({ method: 'GET' }).handler(
         amount: m.display_amount,
       })),
       categories,
+      merchantMonths: bills.map((b) => ({
+        month: b.month.slice(0, 7),
+        merchantId: b.merchant_id,
+        visits: b.visits,
+        total: b.display_total,
+        min: b.display_min,
+        max: b.display_max,
+      })),
+      merchants,
     }
   },
 )

@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, redirect } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { DashboardCard } from '#/components/dashboard/dashboard-card'
 import { MissingMonthsNotice } from '#/components/dashboard/missing-months-notice'
@@ -16,6 +16,8 @@ import {
   dashboardSearchSchema,
   periodFromSearch,
   searchOfPeriod,
+  storeSearch,
+  storedSearch,
 } from '#/lib/dashboard/dashboard-period'
 import type { DashboardPeriod } from '#/lib/dashboard/dashboard-period'
 import { missingMonths } from '#/lib/dashboard/missing-months'
@@ -30,6 +32,14 @@ import { getDashboard, getEventsOverview } from '#/server/dashboard'
 export const Route = createFileRoute('/_authed/dashboard')({
   ...listPagePending((t) => t('nav.dashboard'), { wide: true }),
   validateSearch: dashboardSearchSchema,
+  // Coming back from another page (the nav has no year) opens the period last picked. In
+  // the browser only: the server has no storage, and a reload keeps the year in the URL.
+  beforeLoad: ({ search }) => {
+    if (typeof window === 'undefined' || search.year) return
+    const stored = storedSearch()
+    if (stored?.year)
+      throw redirect({ to: '/dashboard', search: stored, replace: true })
+  },
   // The whole history loads once; the period is cut in the browser.
   loader: async () => {
     const [dashboard, events] = await Promise.all([
@@ -116,7 +126,10 @@ function DashboardPage() {
             period={period}
             firstYear={dashboard.firstYear}
             today={today}
-            onChange={(next) => void navigate({ search: searchOfPeriod(next) })}
+            onChange={(next) => {
+              storeSearch(searchOfPeriod(next))
+              void navigate({ search: searchOfPeriod(next) })
+            }}
           />
           <IconToggle
             label={t('dashboard.tabsLabel')}

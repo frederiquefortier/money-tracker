@@ -4,6 +4,44 @@ Short record of each working session: what the author asked, what was decided an
 
 <!-- Newest first: a new session goes directly below this line. Template at the bottom. -->
 
+### 2026-11-23 - Currency switch loader, table row hover
+
+**What We Worked On:**
+- The author asked for a loader while the display currency changes. The assistant first put a spinner in the currency chip; the author found it went away before the amounts changed, added a new kind of loader, and asked whether all loaders should be the same. The assistant proposed one loader per situation, a write's refresh showing the page bar as a page change does (ADR-065). Built: `useRefresh`, used by every write.
+- The author reported the dashboard tables' names changing colour before the rest of the row on hover (bugs.md).
+- The author asked for a gradient where a table's columns continue past its edge: `TableScroll` (`components/lists/table-scroll.tsx`) fades each edge while more columns sit past it, the left one after the sticky name column; `useScrollMore` takes the axis. Then a border on the sticky name column's right edge, drawn as a shadow so it moves with the cell.
+- The author asked for the dashboard's category filter to match the transactions page's, the source of truth: the chip reads "Filtres" (`FilterButton`, shared), the sheet is titled Filtres, has the categories' search, and Effacer and Voir les résultats in its footer (`FilterFooter`, moved to `components/sheet/`), where it had "Tout effacer" at the top.
+- The author asked for the dashboard to keep its year when left and opened again. The other choices were already kept per browser; the year, in the URL, was lost from the nav. The page now stores the period picked and opens on it when the URL has no year (DSH-01).
+- The author asked for the chart's missing months in the warning's colour (`--warning` at 15%, as the notice) and the expense red as #c30839 in light mode. The new red sits closer to the green in lightness (0.52 against 0.42, from 0.63).
+- The author renamed "aucune transaction" to "transactions manquantes" for a missing month, in the chart and in the notice.
+- The author set the invested colour to rgb(255, 204, 0) and the earned green to rgb(33, 139, 48) in light mode. The green and the red are now close in lightness (0.56 and 0.52); the assistant pointed it out for colour-blind readers.
+- The author asked for every percent rounded to a whole number, except below 1. `Percent` does it for every figure; the conversion fee's rate and the percent left to split keep their decimals, being typed or matched exactly.
+
+### 2026-11-20 - Par marchand card review
+
+**What We Worked On:**
+- The author asked the assistant, as a senior UI and UX designer, to review the Par marchand card. The review, on the design gallery at desktop and phone width, found the open panel running off a phone's screen, a chart that looked like the categories' but drew the average bill, a receipt repeating the row, the change cut off from its line, the figures far from the names, red bars on every merchant, and no way to find one merchant (bugs.md).
+- The author asked for every change: the total per month in the chart, the receipt starting from the average, the change on the Moyenne 2025 line, the two tables' columns lined up with a row hover, the primary purple, muted zeros, `aria-controls` on the chevron, and a search on the name. Mid-way the author reported "taux manquant" in the chart, which the total per month fixes.
+- The author then brought back the trend column, a month without a visit continuing the line at zero, and had the sort arrow the assistant added in the column heads removed.
+- Built: `TablePanel` and the `table*` class strings in `styles.ts`, shared by both tables; `FoldButton` takes the panel it opens.
+
+**What Could We Do Better:**
+- A width on a cell is ignored beside a full-width column; the first try measured off by 20px on the gallery. The widths now sit inside the head cells.
+- The running dev server keeps its translations for its whole life, so new keys showed as raw keys until a full page reload.
+
+### 2026-11-20 - Change in percent per category and per merchant
+
+**What We Worked On:**
+- The author pointed out two v1 notes missing from the dashboard: a merchant's bill changing in percent (MER-04) and each category's change in percent (DSH-04 had only the trend).
+- The assistant proposed an Évolution column against the same stretch a year earlier, and a Marchands card with each merchant's average bill. The author chose the average bill per visit, the full bill rather than my share (ADR-064), and the column; and asked for last year as a dashed line in each opened chart.
+- The author asked whether the transaction form's receipt slip could show a merchant's bill. The assistant suggested it only in the opened panel, beside the chart; the author agreed. `receiptSlip` and `slipRuleLine` moved to `styles.ts`, `changeBetween` to `lib/shared/change.ts`.
+- Then: last year's line paler, and the donut list's top edge fading once scrolled, as its bottom does.
+- After the push, the author asked for merchants at my share after all (migration 20261120110000 replaces the function; ADR-064 rewritten before any commit), a sort as the categories' plus the number of transactions, no change column and no trend line, "Transactions" for "Visites", and rows built on scroll instead of a show-all button. The receipt and chart now open from a chevron. Then the category table's columns as totals, a Tout column on Tout, no average column; the slip's count beside the name as ×N, its total as the main figure, Moyenne under it, then Moyenne 2025. No comparison on Tout, as the summary. Migration 20261120110000 pushed with the author's approval.
+- Built: `merchant_monthly()` (migration 20261120100000, pgTAP 37; pushed with the author's approval), `lib/dashboard/category-change.ts`, `merchant-bills.ts`, the Marchands card. Checked on the design gallery.
+
+**What Could We Do Better:**
+- Moving `changeOf` out of the category table cut everything after it too; the type check caught it. Cut between two named markers, never to the end of a file.
+
 ### 2026-11-20 - Dashboard against transactions and net worth
 
 **What We Worked On:**

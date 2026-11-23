@@ -31,6 +31,16 @@ export const focusRing =
  */
 export const insetFocus = '[&_:focus-visible]:-outline-offset-2!'
 
+/**
+ * A paper slip torn along the bottom: the transaction form's amount, and a merchant's
+ * typical bill on the dashboard (MER-04).
+ */
+export const receiptSlip =
+  'receipt flex flex-col gap-3 bg-background px-4 pt-4 font-mono'
+
+/** The dashed rule between a slip's sections. */
+export const slipRuleLine = 'my-1 border-dashed border-border'
+
 /** A bubble: the transactions list's period and filters, all the same height. */
 export const chipSurface = cn(
   'inline-flex h-8 shrink-0 items-center gap-1.5 rounded-full border border-input bg-transparent px-3 text-sm font-semibold hover:bg-secondary disabled:pointer-events-none disabled:opacity-50',
@@ -54,6 +64,17 @@ export const rowHover = cn(
   'transition-colors hover:bg-secondary/60',
   '[--row-bg:var(--card)] hover:[--row-bg:color-mix(in_oklab,var(--secondary)_60%,var(--card))]',
 )
+
+// The dashboard's category and merchant tables, one above the other: the same name and
+// figure widths so their first columns line up (author, 2026-11-20). The widths sit inside
+// the head cells: beside a full-width trend column, a width on the cell itself is ignored.
+/** A row's panel, pinned to the visible width while the figures scroll under it, over the fades. */
+export const tablePanel = 'sticky left-0 z-30 w-[100cqw] bg-card px-4 pt-4 pb-3'
+/** On a name cell: long names cut at the width the head sets. */
+export const tableNameWidth = 'max-w-48 sm:max-w-56'
+/** Inside the name head, after its padding: the column at `sm:max-w-56`. */
+export const tableNameHead = 'block sm:w-[12.25rem]'
+export const tableFigureHead = 'block min-w-20'
 
 /** The gap between stacked icons (a split's categories, a group's members): the row's colour. */
 export const stackRing = 'ring-2 ring-[var(--row-bg,var(--card))]'

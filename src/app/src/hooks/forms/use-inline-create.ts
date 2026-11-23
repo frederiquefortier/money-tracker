@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { useRouter } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
+import { useRefresh } from '#/hooks/app/use-refresh'
 import { useToast } from '#/hooks/app/use-toast'
 
 /**
@@ -20,7 +20,7 @@ export function useInlineCreate<T extends { id: string }>(
 ) {
   const { t } = useTranslation()
   const toast = useToast()
-  const router = useRouter()
+  const refresh = useRefresh()
   const [created, setCreated] = useState<Array<T>>([])
   const items = [
     ...loaded,
@@ -35,7 +35,7 @@ export function useInlineCreate<T extends { id: string }>(
     }
     setCreated((list) => [...list, item])
     onCreated(item)
-    await router.invalidate()
+    await refresh()
   }
 
   return { items, create: (name: string) => void create(name) }

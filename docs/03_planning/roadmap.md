@@ -53,7 +53,7 @@ The milestone: eight years of history in the app. It comes before the dashboard 
 - [ ] Recurring transactions. TRX-08.
 - [x] Event calendar and comparison, the dashboard's Événements tab. EVT-04, 05.
 - [ ] The dashboard's Social tab: top days, people, who owes whom. YR-01, 03, 04, 05.
-- [ ] Merchant price evolution. MER-04.
+- [x] Merchant price evolution: the dashboard's Par marchand card. MER-04 (ADR-064).
 - [ ] Last reconciled and last transaction per account. ACC-08.
 - [ ] Delete my account and all its data. SEC-04.
 

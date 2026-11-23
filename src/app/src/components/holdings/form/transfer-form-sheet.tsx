@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { useRouter } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { Combobox } from '#/components/combobox/combobox'
 import { EntryFields } from '#/components/holdings/form/entry-sheet'
@@ -7,6 +6,7 @@ import { HoldingForm } from '#/components/holdings/form/holding-form'
 import { startingValues } from '#/components/holdings/form/holding-fields'
 import { FormSheet } from '#/components/sheet/route-sheet'
 import { SheetForm } from '#/components/sheet/sheet-form'
+import { useRefresh } from '#/hooks/app/use-refresh'
 import { useSheetForm } from '#/hooks/forms/use-sheet-form'
 import { transferFormSchema, transferTargets } from '#/lib/holdings/holding'
 import { todayIso } from '#/lib/shared/format'
@@ -38,7 +38,7 @@ export function TransferFormSheet({
   onClosed: () => void
 }) {
   const { t } = useTranslation()
-  const router = useRouter()
+  const refresh = useRefresh()
   const [target, setTarget] = useState<string | null>(null)
   // The name typed in "Créer « … »", while the new holding's sheet is open.
   const [creating, setCreating] = useState<string | undefined>()
@@ -61,7 +61,7 @@ export function TransferFormSheet({
     <>
       <FormSheet
         title={t('holdings.newTransfer')}
-        onClosed={() => void router.invalidate().then(onClosed)}
+        onClosed={() => void refresh().then(onClosed)}
       >
         <SheetForm {...form.formProps} submitLabel={t('holdings.transfer')}>
           <EntryFields field={form.field} />
@@ -81,9 +81,7 @@ export function TransferFormSheet({
       {creating !== undefined && (
         <FormSheet
           title={t('holdings.newTitle')}
-          onClosed={() =>
-            void router.invalidate().then(() => setCreating(undefined))
-          }
+          onClosed={() => void refresh().then(() => setCreating(undefined))}
         >
           <HoldingForm
             initial={startingValues(source, creating, todayIso())}

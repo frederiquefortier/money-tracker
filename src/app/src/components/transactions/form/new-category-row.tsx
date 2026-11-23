@@ -1,9 +1,9 @@
 import { useRef, useState } from 'react'
-import { useRouter } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { CategoryForm } from '#/components/categories/form/category-form'
 import { CreateButton } from '#/components/forms/create-row'
 import { FormSheet } from '#/components/sheet/route-sheet'
+import { useRefresh } from '#/hooks/app/use-refresh'
 import { DEFAULT_ICON, nextTopColor } from '#/lib/categories/category'
 import type { Category, CategoryKind } from '#/lib/categories/category'
 
@@ -22,14 +22,12 @@ function NewCategorySheet({
   onClosed: (id: string | null) => void
 }) {
   const { t } = useTranslation()
-  const router = useRouter()
+  const refresh = useRefresh()
   const saved = useRef<string | null>(null)
   return (
     <FormSheet
       title={t('categories.newTitle')}
-      onClosed={() =>
-        void router.invalidate().then(() => onClosed(saved.current))
-      }
+      onClosed={() => void refresh().then(() => onClosed(saved.current))}
     >
       <CategoryForm
         initial={{

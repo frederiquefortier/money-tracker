@@ -6,6 +6,7 @@ import {
   sortTable,
   tableColumns,
 } from '#/lib/dashboard/category-table'
+import { changeSpans } from '#/lib/dashboard/category-change'
 import { at, categories } from '#/lib/dashboard/dashboard-fixtures.test-utils'
 
 const today = '2026-11-19'
@@ -123,6 +124,62 @@ describe('category table on everything', () => {
       2026: '3000.0000',
       averageYear: '1500.0000',
     })
+  })
+})
+
+describe('change against a year earlier', () => {
+  const history = [
+    at('2026-02', 'fun', '-150.0000'),
+    at('2026-11', 'fun', '-60.0000'),
+    at('2025-02', 'fun', '-100.0000'),
+    at('2025-11', 'fun', '-80.0000'),
+    // After November: outside the same months a year earlier.
+    at('2025-12', 'fun', '-900.0000'),
+    at('2026-03', 'misc', '-40.0000'),
+    at('2024-05', 'rent', '-500.0000'),
+    at('2025-05', 'rent', '-600.0000'),
+  ]
+  const rowsOf = (period: { unit: 'year' | 'all'; year: string }) =>
+    categoryTable(history, categories, {
+      kind: 'expense',
+      columns: tableColumns(period, { today, firstYear: 2024 }),
+      locale: 'fr',
+    })
+  const row = (rows: ReturnType<typeof rowsOf>, id: string) =>
+    rows.find((r) => r.category.id === id)
+
+  it('compares the year so far with the same months a year earlier', () => {
+    const rows = rowsOf({ unit: 'year', year: '2026' })
+    expect(row(rows, 'fun')?.change).toEqual({
+      amount: '30.0000',
+      percent: '16.667',
+    })
+  })
+
+  it('shows no change without spending a year earlier', () => {
+    expect(row(rowsOf({ unit: 'year', year: '2026' }), 'misc')?.change).toBe(
+      null,
+    )
+  })
+
+  it('draws last year under the same months, on a year only', () => {
+    const fun = row(rowsOf({ unit: 'year', year: '2026' }), 'fun')
+    expect(fun?.lastYearTrend).toHaveLength(11)
+    expect(fun?.lastYearTrend?.[1]).toBe('100.0000')
+    expect(fun?.lastYearTrend?.[10]).toBe('80.0000')
+    expect(
+      row(rowsOf({ unit: 'all', year: '2026' }), 'fun')?.lastYearTrend,
+    ).toBe(null)
+  })
+
+  it('compares nothing on everything', () => {
+    const rows = rowsOf({ unit: 'all', year: '2026' })
+    expect(row(rows, 'rent')?.change).toBeNull()
+    const columns = tableColumns(
+      { unit: 'all', year: '2026' },
+      { today, firstYear: 2024 },
+    )
+    expect(changeSpans(columns)).toBeNull()
   })
 })
 

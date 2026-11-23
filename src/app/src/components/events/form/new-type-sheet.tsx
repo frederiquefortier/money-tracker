@@ -1,8 +1,8 @@
 import { useRef } from 'react'
-import { useRouter } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { EventTypeForm } from '#/components/events/form/type-form'
 import { FormSheet } from '#/components/sheet/route-sheet'
+import { useRefresh } from '#/hooks/app/use-refresh'
 import { DEFAULT_EVENT_COLOR } from '#/lib/events/event'
 
 /**
@@ -18,14 +18,12 @@ export function NewTypeSheet({
   onClosed: (id: string | null) => void
 }) {
   const { t } = useTranslation()
-  const router = useRouter()
+  const refresh = useRefresh()
   const saved = useRef<string | null>(null)
   return (
     <FormSheet
       title={t('events.newType')}
-      onClosed={() =>
-        void router.invalidate().then(() => onClosed(saved.current))
-      }
+      onClosed={() => void refresh().then(() => onClosed(saved.current))}
     >
       <EventTypeForm
         row={null}

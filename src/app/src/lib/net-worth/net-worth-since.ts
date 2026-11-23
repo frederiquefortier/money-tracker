@@ -1,4 +1,4 @@
-import type { Change } from '#/lib/net-worth/net-worth-range'
+import type { Change } from '#/lib/shared/change'
 import type { SeriesPoint } from '#/lib/net-worth/net-worth-series'
 import { daysIn } from '#/lib/shared/months'
 import { fromMinor, ratio, toMinor } from '#/lib/shared/money'

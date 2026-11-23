@@ -3,6 +3,7 @@ import { useRouter } from '@tanstack/react-router'
 import type { LinkProps } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { ConfirmDialog } from '#/components/feedback/confirm-dialog'
+import { useRefresh } from '#/hooks/app/use-refresh'
 import { CloseSheet, EscapeTo, MarkChanged } from '#/hooks/forms/use-sheet'
 import { Sheet, SheetContent } from '#/components/ui/sheet'
 import { takeOverDelay } from '#/components/sheet/pending-sheet'
@@ -100,6 +101,7 @@ export function RouteSheet({
   to: LinkProps['to']
 }) {
   const router = useRouter()
+  const refresh = useRefresh()
   return (
     <FormSheet
       {...sheet}
@@ -107,9 +109,9 @@ export function RouteSheet({
       // the navigation would scroll the list back to the top. The sheets' own routes are
       // left out: they are about to go, and the form's pickers would load again for nothing.
       onClosed={() =>
-        void router
-          .invalidate({ filter: (match) => match.staticData.sheet !== true })
-          .then(() => router.navigate({ to, resetScroll: false }))
+        void refresh((match) => match.staticData.sheet !== true).then(() =>
+          router.navigate({ to, resetScroll: false }),
+        )
       }
     />
   )

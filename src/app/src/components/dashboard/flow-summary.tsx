@@ -5,7 +5,7 @@ import { ChangeText } from '#/components/display/change-text'
 import { Percent } from '#/components/display/percent'
 import { cardSurface } from '#/components/styles'
 import type { Flows } from '#/lib/dashboard/money-flows'
-import { changeBetween } from '#/lib/net-worth/net-worth-range'
+import { changeBetween } from '#/lib/shared/change'
 import { ratio, toMinor } from '#/lib/shared/money'
 import { cn } from '#/lib/utils'
 
@@ -122,7 +122,7 @@ function FlowFigure({
       />
       {share !== null && (
         <span className="text-xs text-muted-foreground">
-          <Percent points={share} digits={0} /> {t('dashboard.flows.ofIncome')}
+          <Percent points={share} /> {t('dashboard.flows.ofIncome')}
         </span>
       )}
       <span className="row-start-4">

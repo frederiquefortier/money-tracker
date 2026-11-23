@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
-import { useRouter } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
+import { useRefresh } from '#/hooks/app/use-refresh'
 import { useToast } from '#/hooks/app/use-toast'
 import { withDecisions } from '#/lib/import/import-merges'
 import type { Decisions } from '#/lib/import/import-merges'
@@ -25,7 +25,7 @@ type Refusal = { errors: Array<ImportErrorItem>; count: number }
 export function useImportRun(input: ImportInput, decisions: Decisions) {
   const { t } = useTranslation()
   const toast = useToast()
-  const router = useRouter()
+  const refresh = useRefresh()
   const [checked, setChecked] = useState<Checked | null>(null)
   const [busy, setBusy] = useState<'checking' | 'importing' | null>(null)
   const [done, setDone] = useState<ImportDone | null>(null)
@@ -78,7 +78,7 @@ export function useImportRun(input: ImportInput, decisions: Decisions) {
     setBusy(null)
     if (result?.ok) {
       setDone(result.done)
-      await router.invalidate()
+      await refresh()
     } else if (result?.error === 'invalid') {
       setRefusal({ errors: result.errors, count: result.errorCount })
     } else {

@@ -4,6 +4,40 @@ Technical and structural choices, with the alternatives that were rejected. Chec
 
 <!-- Newest first: a new ADR goes directly below this line. Template at the bottom. -->
 
+### ADR-065: One loader per situation; a write's refresh shows the page bar (2026-11-23)
+
+**Context:**
+- Switching the display currency showed nothing while every amount reloaded. A spinner in the currency chip was tried first: it was a new kind of loader, and it went away before the amounts changed, since `router.invalidate()` reloads a page that has data in the background and ends at once.
+
+**Decision:**
+- Four loaders, one per situation: a page loading for the first time shows the spinner in its body (`listPagePending`, ADR-054); a page changing or loading its data again shows the bar at the top (`RouteProgress`); a button that saves shows a spinner inside it; a list growing on scroll shows a spinner at its end.
+- Every write refreshes through `useRefresh` (`hooks/app/use-refresh.ts`): `invalidate({ sync: true })`, so the router stays pending and the page bar shows until the new data is on screen. The page stays as it was meanwhile.
+- Sign-in, sign-out and the error retry keep a plain `invalidate()`: they navigate right after, which shows the bar.
+
+**Alternatives Considered:**
+- A spinner in the control that started the write -> One more kind of loader, and each control would need the same fix.
+- `defaultStaleReloadMode: 'blocking'` on the router -> A cached page would wait for its reload on every visit (ADR-054).
+
+**Consequences:**
+- A dialog's busy state, and a sheet's `onClosed`, last until the new data shows.
+
+### ADR-064: A merchant's bills per month, summed from my lines (2026-11-20)
+
+**Context:**
+- MER-04 shows what a merchant's bill costs and how it changed. The dashboard reads monthly sums at my share (ADR-063), which have no merchant.
+
+**Decision:**
+- `merchant_monthly()` sums each expense's `my_lines` back into one bill, then per merchant and month: transactions, total, smallest and largest bill, NULL with a missing rate. At my share, as every dashboard figure; the author first chose the full bill, then my part the same day.
+- The row gives the category table's totals and the number of transactions. The slip gives the average per bill, so going more often does not read as a price rise; on a year, it compares it with the same months a year earlier.
+- Loaded with the dashboard's months in the same round trip; the browser cuts the period and sorts.
+
+**Alternatives Considered:**
+- The full bill -> A shared dinner would read differently here and in the categories.
+- One row per transaction -> Every bill over eight years on each load, for sums, a minimum and a maximum per month.
+
+**Consequences:**
+- The merchants card and the categories agree on what a shared meal cost me.
+
 ### ADR-063: My share is computed once in SQL, per line; the dashboard aggregates in the browser (2026-11-18)
 
 **Context:**

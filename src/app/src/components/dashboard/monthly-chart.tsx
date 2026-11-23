@@ -30,7 +30,8 @@ import { compareDecimal } from '#/lib/shared/money'
 
 const DEFICIT_FILL = 'var(--flow-spent)'
 
-const GAP_FILL = 'var(--muted-foreground)'
+// The missing months notice's tint (`warningTint`), so the shading reads as that warning.
+const GAP_FILL = 'var(--warning)'
 
 /** Earned and spent, named by the summary beside the chart and in the tooltip. */
 function useSeries(): Array<ChartSeries> {
@@ -50,14 +51,18 @@ function useSeries(): Array<ChartSeries> {
 }
 
 /** Called, not rendered: Recharts reads its own elements among the chart's children. */
-function shadedAreas(buckets: ReadonlyArray<string>, fill: string) {
+function shadedAreas(
+  buckets: ReadonlyArray<string>,
+  fill: string,
+  opacity = 0.12,
+) {
   return buckets.map((bucket) => (
     <ReferenceArea
       key={bucket}
       x1={bucket}
       x2={bucket}
       fill={fill}
-      fillOpacity={0.12}
+      fillOpacity={opacity}
       ifOverflow="extendDomain"
     />
   ))
@@ -184,7 +189,7 @@ export function MonthlyChart({
         <BarChart data={rows} margin={CHART_MARGIN} barGap={2}>
           <CartesianGrid vertical={false} />
           {shadedAreas(deficits, DEFICIT_FILL)}
-          {shadedAreas(gaps, GAP_FILL)}
+          {shadedAreas(gaps, GAP_FILL, 0.15)}
           <XAxis
             dataKey="key"
             tickLine={false}

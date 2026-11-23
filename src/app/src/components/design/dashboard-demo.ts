@@ -2,6 +2,7 @@ import type { Category, CategoryKind } from '#/lib/categories/category'
 import type { Necessity } from '#/lib/categories/category-necessity'
 import type { Dashboard, MonthAmount } from '#/lib/dashboard/dashboard'
 import type { DaySpent } from '#/lib/dashboard/daily-spending'
+import type { Merchant, MerchantMonth } from '#/lib/dashboard/merchant-bills'
 
 // Invented categories and amounts for the dashboard's gallery section.
 
@@ -118,12 +119,53 @@ function months(today: string): Array<MonthAmount> {
   return out
 }
 
+const MERCHANTS: Array<Merchant> = [
+  { id: 'grocer', name: 'Corner Grocer' },
+  { id: 'bakery', name: 'Bakery Lune' },
+  { id: 'fuel', name: 'Fuel Stop' },
+  { id: 'books', name: 'Book Nook' },
+]
+
+// Visits per month and a base bill that rises a little each month.
+const BILLS: Array<[string, (m: number) => number, number]> = [
+  ['grocer', (m) => 6 + (m % 3), 70],
+  ['bakery', (m) => 3 + (m % 4), 9],
+  ['fuel', (m) => 2 + (m % 2), 55],
+  ['books', (m) => (m % 4 === 1 ? 1 : 0), 32],
+]
+
+/** Every month from January 2024 to `today`, as `months` but per merchant. */
+function merchantMonths(today: string): Array<MerchantMonth> {
+  const out: Array<MerchantMonth> = []
+  for (let i = 0; ; i++) {
+    const month = `${2024 + Math.floor(i / 12)}-${String((i % 12) + 1).padStart(2, '0')}`
+    if (month > today.slice(0, 7)) break
+    if (month === '2026-02') continue
+    for (const [merchantId, visitsOf, base] of BILLS) {
+      const visits = visitsOf(i)
+      if (visits === 0) continue
+      const average = base * (1 + i * 0.006) + ((i * 13) % 7)
+      out.push({
+        month,
+        merchantId,
+        visits,
+        total: (average * visits).toFixed(4),
+        min: (average * 0.6).toFixed(4),
+        max: (average * 1.5).toFixed(4),
+      })
+    }
+  }
+  return out
+}
+
 export function demoDashboard(today: string): Dashboard {
   return {
     displayCurrency: 'CAD',
     firstYear: 2024,
     months: months(today),
     categories: CATEGORIES,
+    merchantMonths: merchantMonths(today),
+    merchants: MERCHANTS,
   }
 }
 

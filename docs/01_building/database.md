@@ -121,7 +121,7 @@ sub-categories, a transaction is skipped only when all its splits are, ADR-055).
 applies the same rules to a date range in one pass (the import, saving an event or the
 default list), since one call per transaction took 87 s over the whole history.
 
-**Dashboard.** `my_lines(from, to)` gives one row per split of an expense or income at my share in the display currency: an expense less its known owed parts, an income less what it repaid. NULL with a missing rate; null dates mean everything. `event_totals()` sums it per event and `my_monthly()` per month and category (ADR-063).
+**Dashboard.** `my_lines(from, to)` gives one row per split of an expense or income at my share in the display currency: an expense less its known owed parts, an income less what it repaid. NULL with a missing rate; null dates mean everything. `event_totals()` sums it per event and `my_monthly()` per month and category (ADR-063). `merchant_monthly()` sums each expense's lines back into one bill at my share, then per merchant and month: transactions, total, smallest and largest, NULL with a missing rate (ADR-064).
 
 **Holdings.** `holdings` are investments, assets and debts (bank accounts count through their
 balance). `holding_snapshots` are the dated values, one per holding per date, in the holding's

@@ -3,6 +3,12 @@ import { rainbowKey } from '#/lib/categories/category'
 import { DIGITS, Sum, readSign } from '#/lib/dashboard/dashboard'
 import type { MonthAmount } from '#/lib/dashboard/dashboard'
 import type { DashboardPeriod } from '#/lib/dashboard/dashboard-period'
+import {
+  changeOf,
+  changeSpans,
+  lastYearSpans,
+} from '#/lib/dashboard/category-change'
+import type { Change } from '#/lib/shared/change'
 import { monthOf, shiftMonth } from '#/lib/shared/months'
 import { compareNames } from '#/lib/shared/collections'
 import { treeOrder } from '#/lib/shared/tree-layout'
@@ -25,7 +31,7 @@ export type TableColumnKind =
   'thisMonth' | 'thisYear' | 'year' | 'averageMonth' | 'averageYear'
 
 /** First and last month counted, "2026-05" to "2026-11". */
-type Span = { key: string; from: string; to: string }
+export type Span = { key: string; from: string; to: string }
 
 export type TableColumn = Span & {
   kind: TableColumnKind
@@ -40,6 +46,10 @@ export type TableRow = {
   figures: Record<string, string | null>
   /** Oldest first. */
   trend: Array<string | null>
+  /** The same months a year earlier, on a year only. */
+  lastYearTrend: Array<string | null> | null
+  /** Against a year earlier (ChangeSpans); null without a figure on either side. */
+  change: Change | null
 }
 
 export function tableColumns(
@@ -138,7 +148,14 @@ export function categoryTable(
     ...span,
     key: `trend:${span.key}`,
   }))
-  const spans: ReadonlyArray<Span> = [...columns, ...trend]
+  const lastYear = lastYearSpans(columns, trendSpans(columns))
+  const compared = changeSpans(columns)
+  const spans: ReadonlyArray<Span> = [
+    ...columns,
+    ...trend,
+    ...lastYear,
+    ...(compared ? [compared.now, compared.then] : []),
+  ]
   const byId = new Map(categories.map((c) => [c.id, c]))
   const sign = readSign(kind)
   const sums = new Map<string, Map<string, Sum>>()
@@ -160,7 +177,11 @@ export function categoryTable(
     }
   }
   // Only a category with a transaction in the period, or under it (author, 2026-11-20).
-  const shown = categories.filter((c) => c.kind === kind && sums.has(c.id))
+  // Last year's figures alone do not show a category.
+  const shown = categories.filter(
+    (c) =>
+      c.kind === kind && columns.some((col) => sums.get(c.id)?.has(col.key)),
+  )
   return treeOrder(shown, locale).map(({ item, depth }) => {
     const own = sums.get(item.id)
     return {
@@ -170,6 +191,11 @@ export function categoryTable(
         columns.map((c) => [c.key, figureOf(own?.get(c.key), c.divisor)]),
       ),
       trend: trend.map((t) => figureOf(own?.get(t.key), 1)),
+      lastYearTrend:
+        lastYear.length > 0
+          ? lastYear.map((t) => figureOf(own?.get(t.key), 1))
+          : null,
+      change: compared ? changeOf(own, compared) : null,
     }
   })
 }

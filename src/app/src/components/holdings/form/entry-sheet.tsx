@@ -1,9 +1,9 @@
-import { useRouter } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { DatePickerField } from '#/components/forms/date-picker-field'
 import { FormField } from '#/components/forms/form-field'
 import { SheetForm } from '#/components/sheet/sheet-form'
 import { FormSheet } from '#/components/sheet/route-sheet'
+import { useRefresh } from '#/hooks/app/use-refresh'
 import { useSheetForm } from '#/hooks/forms/use-sheet-form'
 import type { FieldBinding } from '#/hooks/forms/use-sheet-form'
 import {
@@ -126,7 +126,7 @@ export function EntrySheet({
   onClosed: () => void
 }) {
   const { t } = useTranslation()
-  const router = useRouter()
+  const refresh = useRefresh()
   const locale = useLocale()
   const initial: EntryValues = {
     onDate: entry?.onDate ?? today,
@@ -140,10 +140,7 @@ export function EntrySheet({
   const Form = kind === 'snapshot' ? ValueForm : ContributionForm
 
   return (
-    <FormSheet
-      title={title}
-      onClosed={() => void router.invalidate().then(onClosed)}
-    >
+    <FormSheet title={title} onClosed={() => void refresh().then(onClosed)}>
       <Form holdingId={holdingId} id={entry?.id ?? null} initial={initial} />
     </FormSheet>
   )

@@ -4,6 +4,24 @@ Track bugs with dates, solutions, and prevention notes. Search this file before 
 
 <!-- Newest first: a new bug goes directly below this line. Template at the bottom. -->
 
+### 2026-11-23 - A dashboard row's name lit up before the rest on hover
+- **Issue**: Hovering a row of the category or merchant table, the name cell took the hover colour at once while the rest of the row faded in.
+- **Root Cause**: The row fades its background (`rowHover`), but the sticky name cell paints its own opaque background from `--row-bg`, and it had no transition.
+- **Solution**: `STICKY` in `components/dashboard/category-table-row.tsx` fades its background as the row does.
+- **Prevention**: A cell that paints its own background over a row's gets the row's transition too.
+
+### 2026-11-20 - A merchant's open panel ran off a phone's screen
+- **Issue**: At phone width, an open merchant's receipt lost its amounts and its chart ran past the card's edge.
+- **Root Cause**: The panel is a cell spanning the table's columns, inside the table's sideways scroll, so it took the table's width.
+- **Solution**: `TablePanel` (`components/dashboard/table-panel.tsx`) pins the panel to the scroll area's visible width (a container query, `tablePanel` in `styles.ts`). The category table's charts use it too.
+- **Prevention**: A row that opens content inside a table that scrolls sideways is checked at phone width.
+
+### 2026-11-20 - "Taux manquant" in a merchant's chart
+- **Issue**: Hovering a month without a visit in a merchant's chart said the rate was missing.
+- **Root Cause**: The chart drew the average bill, null without a visit, and the tooltip reads null as a missing rate.
+- **Solution**: The chart draws the total per month, 0 without a visit, as a category's (`merchant-bills.ts`, with a test). Only a missing rate stays null.
+- **Prevention**: A null in a money series means a missing rate; "nothing happened" is 0.
+
 ### 2026-11-19 - An income repaying several expenses kept only one
 - **Issue**: Ticking several owed lines on an income and saving kept a single one; the form showed one ticked again.
 - **Root Cause**: `save_transaction` paid the ticked lines in order, and a part not known yet took all that was left of the income. The next lines got 0, and a line given 0 is not stored (`amount > 0`), so its link vanished without a word.

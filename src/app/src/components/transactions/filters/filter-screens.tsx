@@ -1,10 +1,10 @@
 import { useTranslation } from 'react-i18next'
 import { IconButton } from '#/components/display/icon-button'
 import { SearchField } from '#/components/forms/search-field'
+import { FilterFooter } from '#/components/sheet/filter-footer'
 import { FilterList } from '#/components/transactions/filters/filter-lists'
 import { PeriodPanel } from '#/components/transactions/period/period-panel'
-import { Button } from '#/components/ui/button'
-import { SheetBody, SheetFooter, SheetHead } from '#/components/ui/sheet'
+import { SheetBody, SheetHead } from '#/components/ui/sheet'
 import { FilterRoot } from '#/components/transactions/filters/filter-root'
 import {
   FILTER_KEYS,
@@ -21,34 +21,6 @@ import type {
   PeriodChoice,
 } from '#/lib/transactions/transaction-list'
 import { Spinner } from '#/components/feedback/spinner'
-
-export function FilterFooter({
-  cleared,
-  onClear,
-  onClose,
-}: {
-  cleared?: boolean
-  /** Left out where there is nothing to clear (the period). */
-  onClear?: () => void
-  onClose: () => void
-}) {
-  const { t } = useTranslation()
-  return (
-    <SheetFooter>
-      {onClear && (
-        <Button
-          variant="ghost"
-          className="mr-auto"
-          disabled={cleared}
-          onClick={onClear}
-        >
-          {t('common.clear')}
-        </Button>
-      )}
-      <Button onClick={onClose}>{t('transactions.list.showResults')}</Button>
-    </SheetFooter>
-  )
-}
 
 /** The way back to the list of filters, with the name of the one open. */
 function BackRow({

@@ -11,6 +11,7 @@ import {
   NoteField,
 } from '#/components/transactions/entry/entry-fields'
 import { AmountInput } from '#/components/transactions/receipt/receipt-amount'
+import { receiptSlip } from '#/components/styles'
 import {
   slipRule,
   ReceiptLine,
@@ -96,7 +97,7 @@ function AdjustmentReceipt({
   const label = t('transactions.adjustment.realBalance')
   const gap = adjustmentGap(realBalance, appBalance, currency ?? '')
   return (
-    <div className="receipt flex flex-col gap-3 bg-background px-4 pt-4 font-mono">
+    <div className={receiptSlip}>
       <span
         className={cn(
           'tracking-wide text-muted-foreground uppercase',

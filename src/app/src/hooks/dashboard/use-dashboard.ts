@@ -20,7 +20,13 @@ import {
   tableColumns,
   trendSpans,
 } from '#/lib/dashboard/category-table'
-import type { TableSort } from '#/lib/dashboard/category-table'
+import type { TableColumn, TableSort } from '#/lib/dashboard/category-table'
+import {
+  MERCHANT_SORTS,
+  merchantBills,
+  sortMerchants,
+} from '#/lib/dashboard/merchant-bills'
+import type { MerchantSort } from '#/lib/dashboard/merchant-bills'
 import { missingMonths } from '#/lib/dashboard/missing-months'
 import type { Dashboard } from '#/lib/dashboard/dashboard'
 import { bucketsOf } from '#/lib/dashboard/dashboard-period'
@@ -38,6 +44,7 @@ const parseKind = oneOf(KINDS)
 const parseView = oneOf(SPLIT_VIEWS)
 const parseChart = oneOf(CHART_KINDS)
 const parseSort = oneOf(TABLE_SORTS)
+const parseMerchantSort = oneOf(MERCHANT_SORTS)
 const parseIds = (v: unknown) =>
   Array.isArray(v) && v.every((x) => typeof x === 'string') ? v : undefined
 
@@ -90,7 +97,14 @@ function useDashboardChoices() {
     'name',
     parseSort,
   )
+  const [merchantSort, setMerchantSort] = useStoredState<MerchantSort>(
+    'dashboard.merchantSort',
+    'amountDesc',
+    parseMerchantSort,
+  )
   return {
+    merchantSort,
+    setMerchantSort,
     tableSort,
     setTableSort,
     incomePicked,
@@ -108,6 +122,20 @@ function useDashboardChoices() {
   }
 }
 
+/** The merchants' rows over the table's stretch, apart so a sort recounts nothing else. */
+function useMerchants(
+  data: Dashboard,
+  columns: ReadonlyArray<TableColumn>,
+  sort: MerchantSort,
+) {
+  const locale = useFormatLocale()
+  const rows = useMemo(
+    () => merchantBills(data.merchantMonths, data.merchants, columns),
+    [data, columns],
+  )
+  return useMemo(() => sortMerchants(rows, sort, locale), [rows, sort, locale])
+}
+
 /** The Argent tab's figures for the period. */
 export function useDashboard(
   data: Dashboard,
@@ -116,8 +144,14 @@ export function useDashboard(
 ) {
   const locale = useFormatLocale()
   const choices = useDashboardChoices()
-  const { incomePicked, expensePicked, splitView, tableKind, tableSort } =
-    choices
+  const {
+    incomePicked,
+    expensePicked,
+    splitView,
+    tableKind,
+    tableSort,
+    merchantSort,
+  } = choices
 
   const figures = useMemo(() => {
     const { months, categories } = data
@@ -181,8 +215,9 @@ export function useDashboard(
     tableSort,
     locale,
   ])
+  const merchants = useMerchants(data, figures.tableColumns, merchantSort)
 
   // The bucket not over yet: this month on a year, this year on everything.
   const current = period.unit === 'year' ? today.slice(0, 7) : today.slice(0, 4)
-  return { ...figures, ...choices, current }
+  return { ...figures, merchants, ...choices, current }
 }

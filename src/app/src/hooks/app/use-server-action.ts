@@ -1,6 +1,6 @@
 import { useTransition } from 'react'
-import { useRouter } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
+import { useRefresh } from '#/hooks/app/use-refresh'
 import { useToast } from '#/hooks/app/use-toast'
 import type { Result } from '#/lib/shared/result'
 
@@ -15,11 +15,12 @@ export type ServerActionOptions = {
 
 /**
  * Every write from a list: the call runs in a transition, a success refreshes the
- * loaders, a failure (or a network error) shows a toast.
+ * loaders, a failure (or a network error) shows a toast. The refresh blocks (ADR-065):
+ * in the background it would end before the new data, and the page bar would not show.
  */
 export function useServerAction() {
   const { t } = useTranslation()
-  const router = useRouter()
+  const refresh = useRefresh()
   const toast = useToast()
   const [busy, startTransition] = useTransition()
 
@@ -34,7 +35,7 @@ export function useServerAction() {
       }))
       options.onResult?.(result.ok)
       if (result.ok) {
-        await router.invalidate()
+        await refresh()
         return
       }
       toast({

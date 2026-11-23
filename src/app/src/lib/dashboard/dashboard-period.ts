@@ -12,6 +12,31 @@ export const dashboardSearchSchema = z.object({
 })
 export type DashboardSearch = z.infer<typeof dashboardSearchSchema>
 
+const STORED_PERIOD = 'dashboard.period'
+
+/**
+ * The period last picked, kept per browser as the page's other choices (author,
+ * 2026-11-23); undefined in storage's absence. Read in the browser only.
+ */
+export function storedSearch(): DashboardSearch | undefined {
+  try {
+    const stored = localStorage.getItem(STORED_PERIOD)
+    if (stored === null) return undefined
+    const parsed = dashboardSearchSchema.safeParse(JSON.parse(stored))
+    return parsed.success ? parsed.data : undefined
+  } catch {
+    return undefined
+  }
+}
+
+export function storeSearch(search: DashboardSearch) {
+  try {
+    localStorage.setItem(STORED_PERIOD, JSON.stringify(search))
+  } catch {
+    // Blocked storage: the period lasts until the page is left.
+  }
+}
+
 export function periodFromSearch(
   search: DashboardSearch,
   today: string,

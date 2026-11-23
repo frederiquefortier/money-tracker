@@ -48,11 +48,12 @@
   --chart-4: oklch(0.68 0.17 340);
   --chart-5: oklch(0.62 0.15 310);
   /* The dashboard's money flows (author, 2026-11-19): earned green, spent red (not
-     orange), invested yellow, what remains pale. Red and green sit apart in lightness for
-     protan readers (CVD dE 8.1). */
-  --flow-earned: oklch(0.42 0.12 150);
-  --flow-spent: oklch(0.63 0.2 27);
-  --flow-invested: oklch(0.76 0.15 80);
+     orange), invested yellow, what remains pale. Earned, spent and invested are the
+     author's (2026-11-23); earned and spent are close in lightness (0.56 and 0.52), hard to
+     tell apart for red-green colour-blind readers. */
+  --flow-earned: rgb(33 139 48);
+  --flow-spent: #c30839;
+  --flow-invested: rgb(255 204 0);
   --flow-remaining: oklch(0.85 0.045 290);
   --radius: 1rem;
   --sun-yellow: oklch(0.9 0.13 95);
