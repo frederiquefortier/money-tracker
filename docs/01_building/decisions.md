@@ -4,6 +4,30 @@ Technical and structural choices, with the alternatives that were rejected. Chec
 
 <!-- Newest first: a new ADR goes directly below this line. Template at the bottom. -->
 
+### ADR-067: The export is one SQL function, zipped by the server (2026-11-24)
+
+**Context:**
+- IMP-04 and the cold backup (security.md) need the user's data in the import format, and export then import must give it back. The spec named three files; the format now has nine (ADR-050).
+
+**Decision:**
+- `export_data()` (security invoker) returns one jsonb with the rows of every file, values as text. One value, so PostgREST's 1,000-row limit does not apply.
+- The server function writes the CSVs the user ticked (`toCsv`, the mirror of `parseCsv`) and zips those that have rows with Node's `zlib` (deflate and `crc32`) and a small writer of the zip format (`zip.server.ts`). The zip comes back as base64, since a server function answers in JSON, and downloads as `export-YYYY-MM-DD.zip`. No dependency.
+- `export_counts()` counts the rows of `export_data()`, so the Exporter tab shows what each file holds; it is fetched when the tab opens (about 0.35 s for the whole history).
+- A transaction's ref is its import ref, or its id. A holding's key is its name or type and its institution, numbered on a clash.
+- A pgTAP test imports an invented history, exports it, imports that into an empty account and compares the two exports.
+
+**Alternatives Considered:**
+- Queries per table from the server function -> Paging past 1,000 rows per table, and joins rebuilt in TypeScript.
+- One download per file, no archive (the first version) -> The author asked for one zip; the browser also asked to allow several downloads.
+- JSZip or fflate -> A dependency for what Node's zlib already does; only the container is written by hand, tested with `unzip`.
+- A server route streaming the zip -> Leaves the server functions (ADR-006) for a file of a few hundred kilobytes.
+
+**Consequences:**
+- What the format cannot hold is lost on a round trip: listed in import.md (Export).
+- The whole export is built in memory, fine at this size; no zip64, so it stops at 4 GB.
+
+---
+
 ### ADR-066: The year in review loads a year's transactions at my share, per year (2026-11-23)
 
 **Context:**

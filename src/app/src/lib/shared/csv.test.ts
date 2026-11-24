@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { parseCsv } from './csv'
+import { parseCsv, toCsv } from './csv'
 
 describe('parseCsv', () => {
   it('reads cells and records', () => {
@@ -44,6 +44,21 @@ describe('parseCsv', () => {
     expect(parseCsv('Épargne,Café\n').records[0].cells).toEqual([
       'Épargne',
       'Café',
+    ])
+  })
+})
+
+describe('toCsv', () => {
+  it('quotes what needs it and reads back the same cells', () => {
+    const text = toCsv(
+      ['a', 'b', 'c'],
+      [{ a: 'x, y', b: 'say "hi"\nbye', c: null }, { a: 'plain' }],
+    )
+    expect(text).toBe('a,b,c\n"x, y","say ""hi""\nbye",\nplain,,\n')
+    expect(parseCsv(text).records.map((r) => r.cells)).toEqual([
+      ['a', 'b', 'c'],
+      ['x, y', 'say "hi"\nbye', ''],
+      ['plain', '', ''],
     ])
   })
 })

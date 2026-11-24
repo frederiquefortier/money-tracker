@@ -90,3 +90,19 @@ export function parseCsv(text: string): CsvFile {
   if (reader.cell !== '' || reader.cells.length > 0) endRecord(reader)
   return { records: reader.records, unterminated: false }
 }
+
+function csvCell(value: string) {
+  return /[",\r\n]/.test(value) ? `"${value.replaceAll('"', '""')}"` : value
+}
+
+/** Writes rows the way `parseCsv` reads them back: a header, then one line per row. */
+export function toCsv(
+  columns: ReadonlyArray<string>,
+  rows: ReadonlyArray<Partial<Record<string, string | null>>>,
+) {
+  const lines = [
+    columns,
+    ...rows.map((row) => columns.map((c) => row[c] ?? '')),
+  ]
+  return lines.map((cells) => cells.map(csvCell).join(',')).join('\n') + '\n'
+}

@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
+import { ExportCard } from '#/components/import/export-card'
 import { ImportDone } from '#/components/import/import-done'
 import { ImportErrors } from '#/components/import/import-errors'
 import { ImportFilesCard } from '#/components/import/import-files-card'
@@ -8,12 +9,15 @@ import { ImportHistory } from '#/components/import/import-history'
 import { ImportSteps } from '#/components/import/import-steps'
 import { ImportSummary } from '#/components/import/import-summary'
 import { ListPage } from '#/components/layout/list-page'
+import { TabList } from '#/components/lists/tab-list'
+import { useStoredState } from '#/hooks/app/use-stored-state'
 import { useToast } from '#/hooks/app/use-toast'
 import { useImportDecisions } from '#/hooks/import/use-import-decisions'
 import { useImportFiles } from '#/hooks/import/use-import-files'
 import { useImportRun } from '#/hooks/import/use-import-run'
 import { decisionCount } from '#/lib/import/import-merges'
 import { stageOf } from '#/lib/import/import-stage'
+import { oneOf } from '#/lib/shared/collections'
 import {
   getHoldingTypeNames,
   getImports,
@@ -31,11 +35,43 @@ export const Route = createFileRoute('/_authed/data/import')({
     ])
     return { batches, targets, holdingTypes }
   },
-  component: Import,
+  component: DataPage,
 })
 
+const TABS = ['import', 'export'] as const
+type Tab = (typeof TABS)[number]
+const parseTab = oneOf(TABS)
+const PANEL_ID = 'data-panel'
+
+/** Importer and Exporter, one tab each (IMP-04). */
+function DataPage() {
+  const { t } = useTranslation()
+  const [tab, setTab] = useStoredState<Tab>('data.tab', 'import', parseTab)
+  return (
+    <ListPage title={t('import.title')}>
+      <TabList
+        label={t('import.tabsLabel')}
+        tabs={TABS}
+        value={tab}
+        labelOf={(value) => t(`import.tabs.${value}`)}
+        panelId={PANEL_ID}
+        idPrefix="data-tab"
+        onSelect={setTab}
+      />
+      <div
+        id={PANEL_ID}
+        role="tabpanel"
+        aria-labelledby={`data-tab-${tab}`}
+        className="flex flex-col gap-4"
+      >
+        {tab === 'import' ? <ImportTab /> : <ExportCard />}
+      </div>
+    </ListPage>
+  )
+}
+
 /** IMP-01, 05, 06: upload the files, see what is new and decide, import, undo. */
-function Import() {
+function ImportTab() {
   const { t } = useTranslation()
   const toast = useToast()
   const { batches, targets, holdingTypes } = Route.useLoaderData()
@@ -62,7 +98,7 @@ function Import() {
   }
 
   return (
-    <ListPage title={t('import.title')}>
+    <>
       <ImportSteps stage={stage} />
       {stage === 'files' && (
         <section className="flex flex-col gap-4">
@@ -117,6 +153,6 @@ function Import() {
         />
       )}
       <ImportHistory batches={batches} />
-    </ListPage>
+    </>
   )
 }

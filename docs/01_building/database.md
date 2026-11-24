@@ -100,6 +100,7 @@ transactions, the last used on a tie (MER-08); the list offers it when there is 
   each expense's `empty_part_room` (20261119120000, pgTAP 36). Views `owed_lines` and
   `person_balances`.
 - `import_ref` (unique per user) makes re-importing skip what is in. See [import.md](import.md).
+  `export_data()` returns every file of the format as one jsonb, values as text, and `export_counts()` its rows per file (ADR-067).
 - `recurring_rules` use plain columns, not an iCal RRULE, which would need a parser for
   schedules this simple. A rule's amount history is `recurring_rule_amounts`.
 

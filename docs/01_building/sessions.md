@@ -4,6 +4,17 @@ Short record of each working session: what the author asked, what was decided an
 
 <!-- Newest first: a new session goes directly below this line. Template at the bottom. -->
 
+### 2026-11-24 - The export
+
+**What We Worked On:**
+- The author asked for the export (IMP-04). The spec named three files; the assistant wrote all nine of the format, since ADR-050 asks for the holdings files too, and left the `holding` column on transactions.csv (ADR-045) out, as it changes the import.
+- Built: `export_data()` (migration, pgTAP 38 with another user seeing nothing and a full round trip into an empty account, pushed to the dev database, types regenerated), `toCsv` beside `parseCsv`, `exportFiles`, the `exportData` server function, and "Exporter mes données" on the data page (ADR-067). What the format loses on a round trip is listed in import.md.
+- The author asked for the export as a tab. The assistant first used the dashboard's icon toggle; the author pointed out the other settings pages use `TabList`, so the data page now has that tab row, remembered per browser. The author then asked to choose the files: the Exporter tab lists the nine files as a `CheckList`, all ticked, and the server builds only the ticked ones. The rows were cramped: `CheckList` rows are 48px with no padding of their own, too tight for the import's 44px bubble; the small bubble went in, then the large one came back with a line count under each name (`export_counts()`, migration, pgTAP 38, fetched when the tab opens).
+- The author asked for one zip instead of separate files, reversing the spec's "no archive". The assistant wrote it with Node's zlib and a small zip writer tested with `unzip`, with no dependency, and corrected ADR-067, which was not committed yet.
+
+**What Could We Do Better:**
+- The button was not tried in the browser: it would download the owner's real data into the session. It needs one click from the author, and the files a dry-run import.
+
 ### 2026-11-23 - Comparer rebuilt
 
 **What We Worked On:**

@@ -44,7 +44,7 @@ The milestone: eight years of history in the app. It comes before the dashboard 
 
 - [x] Fixed-format CSV import with check, summary, merges, commit and undo. IMP-01, 05, 06 (ADR-010, ADR-033 to ADR-037).
 - [x] Net-worth history through the same format: holdings, values, external contributions and transfers. IMP-02 (ADR-050).
-- [ ] Export in the same format. IMP-04, SEC-04 ([spec](../00_briefing/designs/18-export.md)).
+- [x] Export in the same format. IMP-04, SEC-04 ([spec](../00_briefing/designs/18-export.md), ADR-067).
 - [x] The first real import, done by the author.
 
 ## Phase 4: Seeing it

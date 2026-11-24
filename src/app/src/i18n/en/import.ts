@@ -1,5 +1,6 @@
 import type { importFr } from '../fr/import'
 import { importHoldingsEn } from './import-holdings'
+import { importExportEn } from './import-export'
 import { importTilesEn } from './import-tiles'
 
 export const importEn: typeof importFr = {
@@ -9,6 +10,9 @@ export const importEn: typeof importFr = {
     stepLabel: 'Step {{number}}',
     stepState: { done: 'Done', active: 'In progress', todo: 'Upcoming' },
     chooseFiles: 'Choose files',
+    tabsLabel: 'Import or export',
+    tabs: { import: 'Import', export: 'Export' },
+    export: importExportEn,
     templates: 'Templates',
     unknownFile: 'File not recognised: {{name}}',
     missingTransactions: 'Add transactions.csv, or a holdings file.',

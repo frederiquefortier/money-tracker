@@ -1,4 +1,5 @@
 import { importHoldingsFr } from './import-holdings'
+import { importExportFr } from './import-export'
 import { importTilesFr } from './import-tiles'
 
 export const importFr = {
@@ -8,6 +9,9 @@ export const importFr = {
     stepLabel: 'Étape {{number}}',
     stepState: { done: 'Terminée', active: 'En cours', todo: 'À venir' },
     chooseFiles: 'Choisir les fichiers',
+    tabsLabel: 'Importer ou exporter',
+    tabs: { import: 'Importer', export: 'Exporter' },
+    export: importExportFr,
     templates: 'Modèles',
     unknownFile: 'Fichier non reconnu: {{name}}',
     missingTransactions: 'Ajoutez transactions.csv ou des avoirs.',

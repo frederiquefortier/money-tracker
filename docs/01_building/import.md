@@ -202,8 +202,21 @@ part of the format yet; a transaction already imported is skipped by its `ref`.
 
 ## Export
 
-The app exports a user's data in this same format (IMP-04, SEC-04). Export then import
-reproduces the data, which is also how the format is tested.
+"Exporter mes données", in the data page's Exporter tab, downloads the files ticked there (all at first) that have rows, as one zip
+(IMP-04, SEC-04, ADR-067). Export then import into an empty account reproduces the data the
+format can hold; pgTAP 38 checks it.
+
+- A transaction's `ref` is its import ref, or its id when it was entered in the app.
+- A seller who is a person is written in `merchant`; the import reads it back as them.
+- `me` lines are left out (implied) and no part amount is written: the import sets them.
+- A holding's key is its name or type and its institution, numbered when two share it.
+
+Not carried, so lost on a round trip: archived states, colours, icons and necessity,
+event dates, types and skips (every link is written, so an automatic one comes back
+manual), people, merchants and events with no transaction, a part set by hand, a
+reimbursement after the first when an income repays several expenses, the link from a
+transaction to a holding (ADR-045), and a holding whose type was typed (its label is
+written, which the import refuses).
 
 ## Later
 

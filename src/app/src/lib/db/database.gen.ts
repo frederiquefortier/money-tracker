@@ -1611,6 +1611,8 @@ export type Database = {
         Args: { from_currency: string; on_date: string; to_currency: string }
         Returns: string
       }
+      export_counts: { Args: never; Returns: Json }
+      export_data: { Args: never; Returns: Json }
       fold_name: { Args: { name: string }; Returns: string }
       holding_flows: {
         Args: never
