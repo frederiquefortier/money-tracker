@@ -56,17 +56,3 @@ export function periodSearch(
       : bucketSearch(period, period.year)
   return categoryId ? { ...when, category: [categoryId] } : when
 }
-
-/** An event's transactions, whenever they fall, narrowed to one category when given. */
-export function eventSearch(
-  from: DashboardPeriod,
-  eventId: string,
-  categoryId?: string,
-): TransactionsSearch {
-  const search = {
-    period: 'all' as const,
-    event: [eventId],
-    dashboard: backTo(from),
-  }
-  return categoryId ? { ...search, category: [categoryId] } : search
-}

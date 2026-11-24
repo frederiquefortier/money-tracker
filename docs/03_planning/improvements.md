@@ -4,6 +4,27 @@ Ideas not built and not decided against. Review during planning to pick the next
 
 <!-- Newest first: a new idea goes directly below this line. Template at the bottom. -->
 
+### 2026-11-24 - Bring back the year in review (Événements)
+
+**Description:**
+- The dashboard's Événements tab: events by day on Dépenses par jour's grid, four highlight slips (top days, who I spent with, most events, who owes me), Comparer (an event type's events as columns of their cost per day cut by top-level category, the mean as a named line, a sortable list), and the sticky-month calendar. EVT-04, 05, YR-01..05; spec in [22-dashboard.md](../00_briefing/designs/22-dashboard.md).
+
+**Motivation:**
+- Built on 2026-11-23, then removed on 2026-11-24: the author's basic use case is complete without it, and Comparer had not settled.
+
+**Potential Approach:**
+- Restore from commit 45a8260 (`git show 45a8260 --stat`), then re-apply the last Comparer changes (category parts, lint fixes) described in sessions.md for 2026-11-23.
+- Already in place: `event_totals()`, `event_category_totals()` (pgTAP 35) and `getYearActivity`, which still returns each transaction's merchant, people and event although Argent reads only the days. If the tab stays away for long, load the days only.
+- Decide Comparer's form before rebuilding it: the author rejected bars inside rows; columns over time with stacked categories were the last choice, not yet seen rendered.
+
+**Priority:**
+- [ ] High - Critical improvement
+- [ ] Medium - Nice to have
+- [x] Low - Future consideration
+
+**Dependencies:**
+- None.
+
 ### 2026-11-23 - Compare across a move between countries
 
 **Description:**

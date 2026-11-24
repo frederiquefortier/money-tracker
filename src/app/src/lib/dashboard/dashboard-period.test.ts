@@ -3,7 +3,6 @@ import {
   bucketOf,
   bucketsOf,
   dashboardSearchSchema,
-  dayRangeOf,
   inPeriod,
   periodFromSearch,
   searchOfPeriod,
@@ -41,28 +40,5 @@ describe('dashboard period', () => {
     ])
     expect(bucketOf({ unit: 'all', year: '2026' }, '2024-03')).toBe('2024')
     expect(inPeriod({ unit: 'year', year: '2025' }, '2026-01')).toBe(false)
-  })
-})
-
-describe('dayRangeOf', () => {
-  it('starts at the first month on record, on Tout and on its year', () => {
-    expect(dayRangeOf({ unit: 'all', year: '2026' }, '2018-08', today)).toEqual(
-      {
-        from: '2018-08-01',
-        to: today,
-      },
-    )
-    expect(
-      dayRangeOf({ unit: 'year', year: '2018' }, '2018-08', today),
-    ).toEqual({
-      from: '2018-08-01',
-      to: '2018-12-31',
-    })
-    expect(
-      dayRangeOf({ unit: 'year', year: '2025' }, '2018-08', today),
-    ).toEqual({
-      from: '2025-01-01',
-      to: '2025-12-31',
-    })
   })
 })

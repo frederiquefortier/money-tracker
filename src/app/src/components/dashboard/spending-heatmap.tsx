@@ -10,8 +10,7 @@ import { heatFill, heatFills } from '#/components/styles'
 import { daySearch } from '#/lib/dashboard/drill-down'
 import type { DaySpent } from '#/lib/dashboard/daily-spending'
 import { formatDay } from '#/lib/shared/format'
-import { daysGoneBy } from '#/lib/shared/months'
-import { monthsOf } from '#/lib/events/event-calendar'
+import { daysGoneBy, monthsOf } from '#/lib/shared/months'
 import { cn } from '#/lib/utils'
 
 /** The hovered day and what it cost, or nothing yet. */

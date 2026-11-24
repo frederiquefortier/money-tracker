@@ -5,6 +5,8 @@ import {
   daysIn,
   monthEnd,
   monthOf,
+  monthWeeks,
+  monthsOf,
   monthsStart,
   shiftMonth,
 } from '#/lib/shared/months'
@@ -43,5 +45,18 @@ describe('daysGoneBy', () => {
     expect(daysGoneBy(range, '2026-01-10')).toBe(10)
     expect(daysGoneBy(range, '2027-03-01')).toBe(365)
     expect(daysGoneBy(range, '2025-12-31')).toBe(0)
+  })
+
+  it('lists the months of a range and lays a month out in weeks', () => {
+    expect(monthsOf({ from: '2025-11-19', to: '2026-02-03' })).toEqual([
+      '2025-11',
+      '2025-12',
+      '2026-01',
+      '2026-02',
+    ])
+    // November 2026 starts on a Sunday.
+    expect(monthWeeks('2026-11', 7)[0][0]).toBe('2026-11-01')
+    expect(monthWeeks('2026-11', 1)[0].slice(5)).toEqual([null, '2026-11-01'])
+    expect(monthWeeks('2026-11', 1).flat().filter(Boolean)).toHaveLength(30)
   })
 })

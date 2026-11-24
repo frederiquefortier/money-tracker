@@ -75,18 +75,3 @@ export function bucketOf(period: DashboardPeriod, month: string): string {
 export function inPeriod(period: DashboardPeriod, month: string): boolean {
   return period.unit === 'all' || month.startsWith(`${period.year}-`)
 }
-
-/**
- * The period's days for the events tab, from the first month on record when the history
- * starts within it, so no empty month shows before the data (author, 2026-11-23).
- */
-export function dayRangeOf(
-  period: DashboardPeriod,
-  firstMonth: string,
-  today: string,
-): { from: string; to: string } {
-  const start = `${firstMonth}-01`
-  if (period.unit === 'all') return { from: start, to: today }
-  const from = `${period.year}-01-01`
-  return { from: from < start ? start : from, to: `${period.year}-12-31` }
-}

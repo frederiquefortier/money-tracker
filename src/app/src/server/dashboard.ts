@@ -7,13 +7,10 @@ import { yearActivity } from '#/lib/dashboard/year-activity'
 import type { YearActivity } from '#/lib/dashboard/year-activity'
 import { yearSchema } from '#/lib/transactions/transaction-list'
 import type { Dashboard } from '#/lib/dashboard/dashboard'
-import type { EventTotal, EventsOverview } from '#/lib/events/event-calendar'
 import { todayIso } from '#/lib/shared/format'
 import { allRows, loaded } from '#/lib/server/db.server'
 import { getSupabase } from '#/lib/server/supabase.server'
 import { getCategories } from '#/server/categories'
-import { getEvents } from '#/server/events'
-import { getBalances } from '#/server/owed'
 
 /**
  * Every month's figures per category and the categories, and each merchant's bills per
@@ -60,8 +57,8 @@ export const getDashboard = createServerFn({ method: 'GET' }).handler(
 const isKind = isOneOf<CategoryKind>(KINDS)
 
 /**
- * A year's days and transactions at my share, for the heat maps, the events calendar and
- * the highlights (ADR-066). Loaded when the year is shown: a row per line over the whole
+ * A year's days and transactions at my share, for Dépenses par jour (ADR-066); the
+ * transactions wait for the year in review (improvements.md). Loaded when the year is shown: a row per line over the whole
  * history is far more than the months.
  */
 export const getYearActivity = createServerFn({ method: 'GET' })
@@ -123,43 +120,3 @@ export const getYearActivity = createServerFn({ method: 'GET' })
       kindOf,
     )
   })
-
-/**
- * EVT-04, EVT-05, YR-04, YR-05: the events, their types, each one's total over its whole
- * history and per category, the people's names and what each still owes me.
- */
-export const getEventsOverview = createServerFn({ method: 'GET' }).handler(
-  async (): Promise<EventsOverview> => {
-    const supabase = getSupabase()
-    const [events, totals, categoryTotals, people, balances] =
-      await Promise.all([
-        getEvents(),
-        supabase.rpc('event_totals'),
-        supabase.rpc('event_category_totals'),
-        supabase.from('people').select('id, name'),
-        getBalances(),
-      ])
-    const [rows, parts, names] = loaded(
-      'Events overview',
-      totals,
-      categoryTotals,
-      people,
-    )
-    return {
-      events: events.events,
-      types: events.types,
-      totals: rows.map((r): EventTotal => ({
-        eventId: r.event_id,
-        total: r.display_total,
-        transactionCount: r.transaction_count,
-      })),
-      categoryTotals: parts.map((r) => ({
-        eventId: r.event_id,
-        categoryId: r.category_id,
-        total: r.display_total,
-      })),
-      people: names,
-      balances,
-    }
-  },
-)

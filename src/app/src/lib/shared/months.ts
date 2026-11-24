@@ -56,3 +56,34 @@ export function daysGoneBy(range: DayRange, today: string): number {
   if (range.from > today) return 0
   return daysIn(range.from, range.to < today ? range.to : today)
 }
+
+export function monthsOf(range: DayRange): Array<string> {
+  const months: Array<string> = []
+  for (
+    let month = monthOf(range.from);
+    month <= monthOf(range.to);
+    month = shiftMonth(month, 1)
+  )
+    months.push(month)
+  return months
+}
+
+/**
+ * A month as weeks of seven days, `firstDay` 1 (Monday) to 7 (Sunday) as Intl gives it;
+ * null pads the days outside the month.
+ */
+export function monthWeeks(
+  month: string,
+  firstDay: number,
+): Array<Array<string | null>> {
+  const first = `${month}-01`
+  const weekday = new Date(`${first}T00:00:00Z`).getUTCDay() || 7
+  const lead = (weekday - firstDay + 7) % 7
+  const cells: Array<string | null> = Array.from({ length: lead }, () => null)
+  for (let day = first; day <= monthEnd(month); day = addDays(day, 1))
+    cells.push(day)
+  while (cells.length % 7 !== 0) cells.push(null)
+  const weeks: Array<Array<string | null>> = []
+  for (let i = 0; i < cells.length; i += 7) weeks.push(cells.slice(i, i + 7))
+  return weeks
+}

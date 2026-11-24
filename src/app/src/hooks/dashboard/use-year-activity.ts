@@ -20,7 +20,7 @@ function request(year: string): Promise<YearActivity> {
   return loading
 }
 
-export type YearState = YearActivity | 'failed' | undefined
+type YearState = YearActivity | 'failed' | undefined
 
 /** Each year's activity as it arrives: undefined while loading, 'failed' on an error. */
 export function useYearActivity(
