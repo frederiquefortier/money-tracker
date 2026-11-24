@@ -1,4 +1,6 @@
+import { EVENT_SORTS, sortEvents } from '#/lib/events/event'
 import type { EventItem, EventType } from '#/lib/events/event'
+import type { Balance } from '#/lib/people/owed'
 import {
   addDays,
   daysIn,
@@ -25,6 +27,25 @@ export type EventTotal = {
   eventId: string
   total: string | null
   transactionCount: number
+}
+
+/** An event's total in one category at my share, signed like a transaction. */
+export type EventCategoryTotal = {
+  eventId: string
+  categoryId: string
+  total: string | null
+}
+
+/** What the Événements tab loads with the page. */
+export type EventsOverview = {
+  events: Array<EventItem>
+  types: Array<EventType>
+  totals: Array<EventTotal>
+  /** EVT-05: each event's total per leaf category (event_category_totals). */
+  categoryTotals: Array<EventCategoryTotal>
+  people: Array<{ id: string; name: string }>
+  /** PPL-05: what each person still owes me today, by person id. */
+  balances: Record<string, Balance>
 }
 
 export type EventSummary = {
@@ -99,6 +120,17 @@ export function monthsOf(range: DayRange): Array<string> {
   return months
 }
 
+export function yearsOf(range: DayRange): Array<string> {
+  const years: Array<string> = []
+  for (
+    let year = Number(range.from.slice(0, 4));
+    year <= Number(range.to.slice(0, 4));
+    year++
+  )
+    years.push(String(year))
+  return years
+}
+
 /**
  * A month as weeks of seven days, `firstDay` 1 (Monday) to 7 (Sunday) as Intl gives it;
  * null pads the days outside the month.
@@ -119,6 +151,16 @@ export function monthWeeks(
   return weeks
 }
 
+/** The events overlapping a month ("2026-03"). */
+export function eventsInMonth(
+  summaries: ReadonlyArray<EventSummary>,
+  month: string,
+): Array<EventSummary> {
+  return summaries.filter(
+    (s) => s.from <= monthEnd(month) && s.to >= `${month}-01`,
+  )
+}
+
 /** The events on each day, for the tints. */
 export function eventsByDay(
   summaries: ReadonlyArray<EventSummary>,
@@ -137,16 +179,76 @@ export function eventsByDay(
   return out
 }
 
-/** EVT-05: one type's events over every year, the costliest first. */
+export type EventTypeComparison = {
+  /** The mean cost per day of the type's events that cost something (author, 2026-11-23). */
+  usual: string | null
+  /** Newest first, so a drift over the years reads down the list. */
+  events: Array<EventSummary>
+}
+
+const costs = (perDay: string | null): perDay is string =>
+  perDay !== null && compareDecimal(perDay, '0') > 0
+
+function meanOf(values: ReadonlyArray<string>): string | null {
+  const minors = values
+    .map((v) => toMinor(v, DIGITS))
+    .filter((v): v is bigint => v !== null)
+  if (minors.length === 0) return null
+  const sum = minors.reduce((a, b) => a + b, 0n)
+  return fromMinor(divideRounded(sum, BigInt(minors.length)), DIGITS)
+}
+
+/** The types with two dated events or more: one event has nothing to compare with. */
+export function comparableTypes(
+  summaries: ReadonlyArray<EventSummary>,
+  types: ReadonlyArray<EventType>,
+): Array<EventType> {
+  return types.filter(
+    (type) => summaries.filter((s) => s.event.typeId === type.id).length > 1,
+  )
+}
+
+/** EVT-05: one type's events over every year and their mean cost per day. */
 export function typeComparison(
   summaries: ReadonlyArray<EventSummary>,
   typeId: string,
-): Array<EventSummary> {
-  return summaries
+): EventTypeComparison {
+  const ofType = summaries
     .filter((s) => s.event.typeId === typeId)
-    .sort((a, b) => {
-      if (a.spent === null) return b.spent === null ? 0 : 1
-      if (b.spent === null) return -1
-      return compareDecimal(b.spent, a.spent)
+    .sort((a, b) => b.from.localeCompare(a.from) || b.to.localeCompare(a.to))
+  return {
+    usual: meanOf(ofType.map((s) => s.perDay).filter(costs)),
+    events: ofType,
+  }
+}
+
+/** The event list's orders, plus the cost per day. */
+export const COMPARE_SORTS = [
+  ...EVENT_SORTS,
+  'amountDesc',
+  'amountAsc',
+] as const
+export type CompareSort = (typeof COMPARE_SORTS)[number]
+
+/** The compared events in the chosen order; an event without a figure goes last. */
+export function sortCompared(
+  compared: ReadonlyArray<EventSummary>,
+  sort: CompareSort,
+  locale: string,
+): Array<EventSummary> {
+  if (sort === 'amountDesc' || sort === 'amountAsc') {
+    const sign = sort === 'amountDesc' ? -1 : 1
+    return [...compared].sort((a, b) => {
+      const [x, y] = [a.perDay, b.perDay]
+      if (x === null || y === null)
+        return (x === null ? 1 : 0) - (y === null ? 1 : 0)
+      return sign * compareDecimal(x, y)
     })
+  }
+  const byId = new Map(compared.map((c) => [c.event.id, c]))
+  return sortEvents(
+    compared.map((c) => c.event),
+    sort,
+    locale,
+  ).flatMap((event) => byId.get(event.id) ?? [])
 }

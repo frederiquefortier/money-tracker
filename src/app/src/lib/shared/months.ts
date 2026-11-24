@@ -50,3 +50,9 @@ export function monthsStart(today: string, months: number): string {
   back.setUTCDate(Math.min(day, last) + 1)
   return isoDay(back)
 }
+
+/** The days of a range gone by, today included: all of a range already over. */
+export function daysGoneBy(range: DayRange, today: string): number {
+  if (range.from > today) return 0
+  return daysIn(range.from, range.to < today ? range.to : today)
+}

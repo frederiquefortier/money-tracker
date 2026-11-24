@@ -1,7 +1,12 @@
 import { useTranslation } from 'react-i18next'
 import { ChangeText } from '#/components/display/change-text'
 import { MissingRate, Money } from '#/components/display/money'
-import { receiptSlip, slipRuleLine } from '#/components/styles'
+import {
+  receiptSlip,
+  slipLabel,
+  slipLine,
+  slipRuleLine,
+} from '#/components/styles'
 import type { MerchantRow } from '#/lib/dashboard/merchant-bills'
 import { cn } from '#/lib/utils'
 
@@ -16,12 +21,9 @@ function SlipLine({
 }) {
   return (
     <div
-      className={cn(
-        'flex items-baseline justify-between gap-3',
-        large ? 'text-base font-semibold' : 'text-sm',
-      )}
+      className={cn(slipLine, large ? 'text-base font-semibold' : 'text-sm')}
     >
-      <dt className="min-w-0 truncate tracking-wide uppercase">{label}</dt>
+      <dt className={slipLabel}>{label}</dt>
       <dd className="whitespace-nowrap tabular-nums">{children}</dd>
     </div>
   )

@@ -1,124 +1,148 @@
 import { useTranslation } from 'react-i18next'
-import { DashboardCard, Figure } from '#/components/dashboard/dashboard-card'
-import { ChoiceMenu } from '#/components/display/choice-menu'
-import { ShareBar } from '#/components/display/share-bar'
-import { useDateRange } from '#/components/events/list/event-row'
+import { DashboardCard } from '#/components/dashboard/dashboard-card'
+import { ComparedList } from '#/components/events/overview/compared-list'
+import { EventTag } from '#/components/display/event-tag'
 import { EmptyState } from '#/components/lists/list-card'
+import { SortMenu } from '#/components/lists/sort-menu'
+import { TabList } from '#/components/lists/tab-list'
+import { useFormatLocale } from '#/hooks/app/use-locale'
 import { useStoredState } from '#/hooks/app/use-stored-state'
-import { typeComparison } from '#/lib/events/event-calendar'
-import type { EventSummary } from '#/lib/events/event-calendar'
+import type { DashboardPeriod } from '#/lib/dashboard/dashboard-period'
+import {
+  COMPARE_SORTS,
+  comparableTypes,
+  sortCompared,
+  typeComparison,
+} from '#/lib/events/event-calendar'
+import type { CompareSort, EventSummary } from '#/lib/events/event-calendar'
 import type { EventType } from '#/lib/events/event'
+import type { EventPart } from '#/lib/events/event-parts'
+import type { Category } from '#/lib/categories/category'
+import { oneOf } from '#/lib/shared/collections'
 
-function ComparedRow({
-  summary,
-  max,
-  currency,
-}: {
-  summary: EventSummary
-  max: number
-  currency: string
-}) {
-  const { t } = useTranslation()
-  const dates = useDateRange(summary.event)
-  return (
-    <li className="flex flex-col gap-1.5 py-2.5">
-      <span className="flex items-baseline justify-between gap-3">
-        <span className="min-w-0 truncate font-semibold">
-          {summary.event.name}
-        </span>
-        <Figure
-          amount={summary.spent}
-          currency={currency}
-          className="text-sm font-semibold"
-        />
-      </span>
-      <ShareBar
-        value={summary.spent}
-        max={max}
-        color={summary.color ?? 'var(--primary)'}
-      />
-      <span className="flex justify-between gap-3 text-xs text-muted-foreground">
-        <span className="truncate">
-          {dates} · {t('dashboard.events.days', { count: summary.days })}
-        </span>
-        {summary.perDay !== null && (
-          <span className="whitespace-nowrap">
-            <Figure amount={summary.perDay} currency={currency} />{' '}
-            {t('dashboard.events.perDay')}
-          </span>
-        )}
-      </span>
-    </li>
-  )
-}
+const PANEL = 'type-comparison'
+const parseSort = oneOf(COMPARE_SORTS)
 
-function ComparedRows({
+const overlaps = (period: DashboardPeriod, summary: EventSummary) =>
+  period.unit === 'all' ||
+  (summary.from <= `${period.year}-12-31` &&
+    summary.to >= `${period.year}-01-01`)
+
+/** The sort, then the types as dots in their colour, as Par catégorie's. */
+function CompareControls({
+  types,
   typeId,
-  rows,
-  max,
-  currency,
+  onType,
+  sort,
+  onSort,
 }: {
-  typeId: string | undefined
-  rows: ReadonlyArray<EventSummary>
-  max: number
-  currency: string
+  types: ReadonlyArray<EventType>
+  typeId: string
+  onType: (id: string) => void
+  sort: CompareSort
+  onSort: (sort: CompareSort) => void
 }) {
   const { t } = useTranslation()
-  if (!typeId) return <EmptyState>{t('dashboard.events.noTypes')}</EmptyState>
-  if (rows.length === 0)
-    return <EmptyState>{t('dashboard.events.noneOfType')}</EmptyState>
   return (
-    <ul className="divide-y">
-      {rows.map((summary) => (
-        <ComparedRow
-          key={summary.event.id}
-          summary={summary}
-          max={max}
-          currency={currency}
-        />
-      ))}
-    </ul>
+    <>
+      <SortMenu
+        sort={sort}
+        options={COMPARE_SORTS}
+        labelOf={(option) => t(`dashboard.events.sort.${option}`)}
+        onChange={onSort}
+      />
+      <TabList
+        label={t('dashboard.events.typesLabel')}
+        tabs={types.map((type) => type.id)}
+        value={typeId}
+        labelOf={(id) => types.find((type) => type.id === id)?.name ?? ''}
+        dot={(id) => types.find((type) => type.id === id)?.color ?? ''}
+        panelId={PANEL}
+        idPrefix="compare-type"
+        fit
+        onSelect={onType}
+      />
+    </>
   )
 }
 
-/** EVT-05: one type's events over every year, as bars of what each cost. */
+/**
+ * EVT-05: one type's events as a chart of their cost per day and a sortable list, each
+ * against the type's mean over every year. On a year, only that year's events and the types that have
+ * one (author, 2026-11-23).
+ */
 export function TypeComparison({
   summaries,
   types,
+  parts,
+  categories,
+  period,
   currency,
 }: {
   summaries: ReadonlyArray<EventSummary>
   types: ReadonlyArray<EventType>
+  parts: ReadonlyMap<string, ReadonlyArray<EventPart> | null>
+  categories: ReadonlyArray<Category>
+  period: DashboardPeriod
   currency: string
 }) {
   const { t } = useTranslation()
-  const used = types.filter((type) => type.eventCount > 0)
-  const ids = used.map((type) => type.id)
+  const locale = useFormatLocale()
+  const inPeriod = (summary: EventSummary) => overlaps(period, summary)
+  const comparable = comparableTypes(summaries, types).filter((type) =>
+    summaries.some((s) => s.event.typeId === type.id && inPeriod(s)),
+  )
+  const ids = comparable.map((type) => type.id)
+  const typeOf = (id: string) => comparable.find((type) => type.id === id)
   const [stored, setTypeId] = useStoredState<string>(
     'dashboard.compareType',
     '',
     (v) => (typeof v === 'string' ? v : undefined),
   )
-  const typeId = ids.includes(stored) ? stored : ids[0]
-  const nameOf = (id: string) => used.find((type) => type.id === id)?.name ?? ''
-  const rows = typeId ? typeComparison(summaries, typeId) : []
-  const max = Math.max(...rows.map((r) => Number(r.spent ?? 0)), 0)
+  const typeId = ids.includes(stored) ? stored : ids.at(0)
+  const type = typeId === undefined ? undefined : typeOf(typeId)
+  const [sort, setSort] = useStoredState<CompareSort>(
+    'dashboard.compareSort',
+    'dateDesc',
+    parseSort,
+  )
+  const compared = typeId ? typeComparison(summaries, typeId) : null
+  const history = compared?.events ?? []
   return (
     <DashboardCard
       title={t('dashboard.events.compare')}
+      note={type && <EventTag name={type.name} color={type.color} />}
       actions={
         typeId && (
-          <ChoiceMenu
-            label={t('dashboard.events.typeLabel', { type: nameOf(typeId) })}
-            value={typeId}
-            options={ids}
-            labelOf={nameOf}
-            onChange={setTypeId}
+          <CompareControls
+            types={comparable}
+            typeId={typeId}
+            onType={setTypeId}
+            sort={sort}
+            onSort={setSort}
           />
         )
       }
     >
-      <ComparedRows typeId={typeId} rows={rows} max={max} currency={currency} />
+      {typeId ? (
+        <ComparedList
+          key={typeId}
+          panelId={PANEL}
+          parts={parts}
+          categories={categories}
+          typeId={typeId}
+          usual={compared?.usual ?? null}
+          events={sortCompared(history.filter(inPeriod), sort, locale)}
+          period={period}
+          currency={currency}
+        />
+      ) : (
+        <EmptyState>
+          {period.unit === 'all'
+            ? t('dashboard.events.noTypes')
+            : t('dashboard.events.noneInYear', { year: period.year })}
+        </EmptyState>
+      )}
     </DashboardCard>
   )
 }

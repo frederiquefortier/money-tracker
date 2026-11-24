@@ -1,19 +1,17 @@
 import { createFileRoute, redirect } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
-import { DashboardCard } from '#/components/dashboard/dashboard-card'
 import { MissingMonthsNotice } from '#/components/dashboard/missing-months-notice'
 import { MoneyOverview } from '#/components/dashboard/money-overview'
 import { PeriodMenu } from '#/components/dashboard/period-menu'
 import { IconToggle } from '#/components/display/icon-toggle'
-import { EventSummaryList } from '#/components/events/overview/event-summary-list'
-import { PeriodCalendar } from '#/components/events/overview/period-calendar'
-import { TypeComparison } from '#/components/events/overview/type-comparison'
+import { EventsOverview } from '#/components/events/overview/events-overview'
 import { ListPage } from '#/components/layout/list-page'
 import { listPagePending } from '#/components/layout/page-pending'
 import { useStoredState } from '#/hooks/app/use-stored-state'
-import { useDailySpending } from '#/hooks/dashboard/use-daily-spending'
+import { useYearActivity } from '#/hooks/dashboard/use-year-activity'
 import {
   dashboardSearchSchema,
+  dayRangeOf,
   periodFromSearch,
   searchOfPeriod,
   storeSearch,
@@ -22,13 +20,13 @@ import {
 import type { DashboardPeriod } from '#/lib/dashboard/dashboard-period'
 import { missingMonths } from '#/lib/dashboard/missing-months'
 import type { DayRange } from '#/lib/shared/months'
-import { eventSummaries, summariesIn } from '#/lib/events/event-calendar'
+import { yearsOf } from '#/lib/events/event-calendar'
 import { oneOf } from '#/lib/shared/collections'
 import { todayIso } from '#/lib/shared/format'
 import { getDashboard, getEventsOverview } from '#/server/dashboard'
 
-// One page for the spreadsheet's dashboard (DSH) and the events (EVT-04, 05), the yearly
-// review's social view to come as a third tab (spec 22).
+// One page for the spreadsheet's dashboard (DSH) and the year in review (EVT-04, 05,
+// YR-02..05), two tabs (spec 22).
 export const Route = createFileRoute('/_authed/dashboard')({
   ...listPagePending((t) => t('nav.dashboard'), { wide: true }),
   validateSearch: dashboardSearchSchema,
@@ -64,7 +62,12 @@ function MoneyTab({
   today: string
 }) {
   const { dashboard } = Route.useLoaderData()
-  const daily = useDailySpending(period.unit === 'year' ? period.year : null)
+  const activity = useYearActivity(period.unit === 'year' ? [period.year] : [])
+  const year = activity[period.year]
+  const daily = {
+    days: year && year !== 'failed' ? year.days : null,
+    failed: year === 'failed',
+  }
   return (
     <MoneyOverview
       dashboard={dashboard}
@@ -75,24 +78,27 @@ function MoneyTab({
   )
 }
 
-function EventsTab({ range }: { range: DayRange }) {
-  const { t } = useTranslation()
+function EventsTab({
+  period,
+  range,
+  today,
+}: {
+  period: DashboardPeriod
+  range: DayRange
+  today: string
+}) {
   const { dashboard, events } = Route.useLoaderData()
-  const summaries = eventSummaries(events.events, events.types, events.totals)
-  const inRange = summariesIn(summaries, range)
-  const currency = dashboard.displayCurrency
+  // Every year of the period: the highlights rank over all of it (ADR-066).
+  const activity = useYearActivity(yearsOf(range))
   return (
-    <>
-      <DashboardCard title={t('dashboard.events.calendar')}>
-        <PeriodCalendar summaries={inRange} range={range} />
-      </DashboardCard>
-      <EventSummaryList summaries={inRange} currency={currency} />
-      <TypeComparison
-        summaries={summaries}
-        types={events.types}
-        currency={currency}
-      />
-    </>
+    <EventsOverview
+      overview={events}
+      dashboard={dashboard}
+      period={period}
+      range={range}
+      today={today}
+      activity={activity}
+    />
   )
 }
 
@@ -103,10 +109,11 @@ function DashboardPage() {
   const navigate = Route.useNavigate()
   const today = todayIso()
   const period = periodFromSearch(search, today)
-  const range: DayRange =
-    period.unit === 'year'
-      ? { from: `${period.year}-01-01`, to: `${period.year}-12-31` }
-      : { from: `${dashboard.firstYear}-01-01`, to: today }
+  const range: DayRange = dayRangeOf(
+    period,
+    dashboard.months[0]?.month ?? today.slice(0, 7),
+    today,
+  )
   const [tab, setTab] = useStoredState<Tab>('dashboard.tab', 'money', parseTab)
   return (
     <ListPage
@@ -148,7 +155,7 @@ function DashboardPage() {
         {tab === 'money' ? (
           <MoneyTab period={period} today={today} />
         ) : (
-          <EventsTab range={range} />
+          <EventsTab period={period} range={range} today={today} />
         )}
       </div>
     </ListPage>

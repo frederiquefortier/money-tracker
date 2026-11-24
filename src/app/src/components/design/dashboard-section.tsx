@@ -1,12 +1,19 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { demoDashboard, demoDays } from '#/components/design/dashboard-demo'
+import {
+  demoActivity,
+  demoEventsOverview,
+} from '#/components/design/events-demo'
 import { GallerySection, Specimen } from '#/components/design/gallery-section'
+import { EventsOverview } from '#/components/events/overview/events-overview'
+import { yearsOf } from '#/lib/events/event-calendar'
 import { MissingMonthsNotice } from '#/components/dashboard/missing-months-notice'
 import { MoneyOverview } from '#/components/dashboard/money-overview'
 import { PeriodMenu } from '#/components/dashboard/period-menu'
 import { IconToggle } from '#/components/display/icon-toggle'
 import type { DashboardPeriod } from '#/lib/dashboard/dashboard-period'
+import { dayRangeOf } from '#/lib/dashboard/dashboard-period'
 import { missingMonths } from '#/lib/dashboard/missing-months'
 import { todayIso } from '#/lib/shared/format'
 
@@ -20,6 +27,11 @@ export function DashboardSection() {
   })
   const [tab, setTab] = useState<'money' | 'events'>('money')
   const dashboard = demoDashboard(today)
+  const range = dayRangeOf(
+    period,
+    dashboard.months[0]?.month ?? today.slice(0, 7),
+    today,
+  )
   return (
     <GallerySection id="dashboard" title="Dashboard">
       <Specimen
@@ -59,12 +71,25 @@ export function DashboardSection() {
               onChange={setTab}
             />
           </div>
-          <MoneyOverview
-            dashboard={dashboard}
-            period={period}
-            today={today}
-            daily={{ days: demoDays(period.year, today), failed: false }}
-          />
+          {tab === 'money' ? (
+            <MoneyOverview
+              dashboard={dashboard}
+              period={period}
+              today={today}
+              daily={{ days: demoDays(period.year, today), failed: false }}
+            />
+          ) : (
+            <EventsOverview
+              overview={demoEventsOverview(today)}
+              dashboard={dashboard}
+              period={period}
+              range={range}
+              today={today}
+              activity={Object.fromEntries(
+                yearsOf(range).map((y) => [y, demoActivity(y, today)]),
+              )}
+            />
+          )}
         </div>
       </Specimen>
     </GallerySection>

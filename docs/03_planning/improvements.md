@@ -4,6 +4,28 @@ Ideas not built and not decided against. Review during planning to pick the next
 
 <!-- Newest first: a new idea goes directly below this line. Template at the bottom. -->
 
+### 2026-11-23 - Compare across a move between countries
+
+**Description:**
+- A dated place of residence (country, currency, from when). The dashboard marks the move on the monthly and cumulative charts, and a comparison whose earlier period falls before the move compares shares of income instead of amounts, tagged "avant l'expatriation".
+
+**Motivation:**
+- After a move to a country with a higher cost of living, spending jumps in the display currency and the year-over-year changes (DSH-04, DSH-06) read as overspending. The amounts are right; comparing them across the move is what misleads. Income is paid in the new currency too, so the share of income spent, invested and remaining stays comparable.
+
+**Potential Approach:**
+- A small `residences` table (country, currency, start date) with RLS and a pgTAP test, or fields on the profile if one move is enough.
+- Shares are already computed for DSH-06; only the change switches from percent of amount to points of share.
+- Also prepares BUD-07, which compares budgets across places.
+- Alternative: a purchasing-power view converting at purchasing power parity (World Bank or OECD yearly factors, as a reference CSV) instead of market rate. Needs the dated residences, and gives a figure no account shows.
+
+**Priority:**
+- [ ] High - Critical improvement
+- [x] Medium - Nice to have
+- [ ] Low - Future consideration
+
+**Dependencies:**
+- None for the shares; the purchasing-power view needs the residences.
+
 ### 2026-11-17 - Drop the unused institution_totals view
 
 **Description:**

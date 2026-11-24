@@ -52,7 +52,7 @@ The milestone: eight years of history in the app. It comes before the dashboard 
 - [ ] Budgets and the emergency fund, event budgets included. BUD-01..04, 06, CAT-08, EVT-06.
 - [ ] Recurring transactions. TRX-08.
 - [x] Event calendar and comparison, the dashboard's Événements tab. EVT-04, 05.
-- [ ] The dashboard's Social tab: top days, people, who owes whom. YR-01, 03, 04, 05.
+- [x] The year in review in the Événements tab: an overview, top days, people, who owes me, and the sticky-month calendar. YR-01..05 (ADR-066; the Social tab was dropped, author, 2026-11-23).
 - [x] Merchant price evolution: the dashboard's Par marchand card. MER-04 (ADR-064).
 - [ ] Last reconciled and last transaction per account. ACC-08.
 - [ ] Delete my account and all its data. SEC-04.
@@ -66,7 +66,7 @@ The milestone: eight years of history in the app. It comes before the dashboard 
 # v3
 
 ## Phase 6: The year
-- [ ] The rest of the yearly review: the sticky-month timeline (YR-02, if still wanted beside the Événements calendar) and the export (YR-07). Its money and social views became the dashboard's tabs (author, 2026-11-18).
+- [ ] The rest of the yearly review: the export (YR-07). Its money and social views became the dashboard's tabs (author, 2026-11-18); the sticky-month timeline (YR-02) was built in Événements (2026-11-23).
 
 ## Before a second real user
 The app works for its owner without these; nobody else can use it safely until both exist.

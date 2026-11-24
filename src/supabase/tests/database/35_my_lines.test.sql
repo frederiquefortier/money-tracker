@@ -1,7 +1,7 @@
 begin;
 create extension if not exists pgtap with schema extensions;
 
-select plan(16);
+select plan(19);
 
 insert into auth.users (id, email) values
   ('11111111-1111-1111-1111-111111111111', 'alice@example.test'),
@@ -143,6 +143,22 @@ select is(
   (select x.display_total from public.event_totals() x
    join public.events e on e.id = x.event_id where e.name = 'Zurich'),
   null, 'an event with a missing rate has no total'
+);
+select is(
+  (select count(*)::int from public.event_category_totals() where event_id = 'b6000000-0000-0000-0000-000000000001'),
+  0, 'another user''s event category totals are not returned'
+);
+select is(
+  (select array_agg(c.name || ' ' || x.display_total order by c.name) from public.event_category_totals() x
+   join public.events e on e.id = x.event_id
+   join public.categories c on c.id = x.category_id where e.name = 'Voyage'),
+  array['Bars -20.0000', 'Restaurants -70.0000'],
+  'an event''s totals per category add up to its total'
+);
+select is(
+  (select x.display_total from public.event_category_totals() x
+   join public.events e on e.id = x.event_id where e.name = 'Zurich'),
+  null, 'a category with a missing rate has no total'
 );
 
 select is(

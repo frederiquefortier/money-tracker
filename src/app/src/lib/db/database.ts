@@ -13,6 +13,7 @@ type SaveEvent = Public['Functions']['save_event']
 type SaveEventType = Public['Functions']['save_event_type']
 type MyLines = Public['Functions']['my_lines']
 type EventTotals = Public['Functions']['event_totals']
+type EventCategoryTotals = Public['Functions']['event_category_totals']
 type MyMonthly = Public['Functions']['my_monthly']
 
 // The generator types numeric as number. Amounts travel as text (ADR-004).
@@ -129,6 +130,10 @@ type MyMonthlyRow = Omit<MyMonthly['Returns'][number], 'display_amount'> & {
 type EventTotalRow = Omit<EventTotals['Returns'][number], 'display_total'> & {
   display_total: string | null
 }
+type EventCategoryTotalRow = Omit<
+  EventCategoryTotals['Returns'][number],
+  'display_total'
+> & { display_total: string | null }
 
 /** The generated schema (`npm run db:types`), with amounts as decimal strings. */
 export type Database = Omit<Generated, 'public'> & {
@@ -170,6 +175,7 @@ export type Database = Omit<Generated, 'public'> & {
       | 'list_transactions'
       | 'my_lines'
       | 'event_totals'
+      | 'event_category_totals'
       | 'my_monthly'
     > & {
       save_transaction: Omit<SaveTransaction, 'Args'> & {
@@ -197,6 +203,9 @@ export type Database = Omit<Generated, 'public'> & {
       my_monthly: Omit<MyMonthly, 'Returns'> & { Returns: Array<MyMonthlyRow> }
       event_totals: Omit<EventTotals, 'Returns'> & {
         Returns: Array<EventTotalRow>
+      }
+      event_category_totals: Omit<EventCategoryTotals, 'Returns'> & {
+        Returns: Array<EventCategoryTotalRow>
       }
     }
   }

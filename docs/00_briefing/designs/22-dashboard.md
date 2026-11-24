@@ -1,6 +1,6 @@
 # Dashboard
 
-**Status:** built (Argent and Événements); the Social tab is next. Shared rules: [02-screens.md](02-screens.md). Decision: [ADR-063](../../01_building/decisions.md).
+**Status:** built (Argent and Événements); Événements redesigned on 2026-11-23 as the year in review, the social figures included (no third tab). Shared rules: [02-screens.md](02-screens.md). Decision: [ADR-063](../../01_building/decisions.md).
 
 ## Purpose
 
@@ -8,7 +8,7 @@ The spreadsheet's dashboard, the events calendar and the yearly review on one pa
 
 ## Requirements
 
-DSH-01..10, EVT-04, EVT-05, YR-01. Next: YR-03, YR-04, YR-05 in the Social tab.
+DSH-01..10, EVT-04, EVT-05, YR-01..05. Next: YR-07 (export, phase 6).
 
 ## The page
 
@@ -31,8 +31,20 @@ From the answer to the detail (author, 2026-11-19, after a design review), two c
 
 ### Événements
 
-The period as month grids, each event's days tinted with its type's colour; the period's events with their dates, days, people, cost and cost per day, a row opening its transactions; Comparer, a type menu and a bar per event of that type over every year.
+The year in review (author, 2026-11-23, after a design review): a quick look at the events and every day's spending, the highlights, the comparison, then the calendar, the long part, last. The social figures live here; the planned Social tab is dropped. Every figure is my share in the display currency, as on Argent.
+
+The period starts at the first month on record (author, 2026-11-23: no empty month before the data), on Tout and on that first year.
+
+- **Événements par jour** (author, 2026-11-23: as Argent's Dépenses par jour, the same component, `DayGrid`): the period's months as small calendars, six across (three on a phone), a history starting mid-year leaving its earlier months as blank places so each year keeps its rows; the year beside January and the first month on Tout. A day with an event in its type's colour (split diagonally between several, paler when to come), a day without one in the light grey. The card's corner reads the days with an event over the days gone by ("41/327 jours"); hovering a day names it and its events on a line of kept height. A month's name scrolls the calendar to it; a day opens its transactions. From `xl` it is half the page, Comparer beside it, the four highlight slips in a row under both (author, 2026-11-23). An eye in the card's header opens "Masquer des événements", every dated event under its type (newest first, those without a type last), ticked when hidden as the net worth page's "Masquer des éléments", a type ticking all its events, kept per browser: a hidden event leaves the overview, the calendar and what names a top day, so an event of a year or more does not cover the rest; its spending stays, and the highlights' event counts and Comparer still count it (author, 2026-11-23). A day in the spending red's four steps, as on Argent; each event's days underlined in its type's colour (neutral without a type). Hovering a day names it, its amount and its events on a line whose height is kept. Clicking a month scrolls the calendar to it.
+- **Faits saillants**, four receipt slips two by two beside Événements par jour (one column on a phone), as the transaction form's slip: the title in capitals, a dashed rule, then one line per row with the label in capitals and the figure at the right, a muted detail under it (author, 2026-11-23). Over the period:
+  - **Jours les plus chers** (YR-03): the three costliest days, each with its date, its amount and what drove it (its event, or else its largest transaction's merchant or category); a day opens its transactions.
+  - **Avec qui j'ai dépensé** (YR-04): the person I spent the most with and the one I spent the least with, each with what those shared expenses cost me. A person counts on an expense whatever their role, the seller included (author, 2026-11-23).
+  - **Le plus d'événements** (YR-04): the three people on the most events of the period, with the count.
+  - **Me doivent** (YR-05, PPL-05): who owes me today, whatever the period, as the people list's tag; a row opens the person. What I owe others stays out of scope (PPL-05, author, 2026-11-23).
+- **Comparer** (EVT-05; author, 2026-11-23, after a design review): a sort (Date plus récente, the default, or plus ancienne; Nom A à Z or Z à A, as the events list; Par jour plus élevé or plus faible; kept per browser; author, 2026-11-23), then the types with two dated events or more as tabs, each a dot in its type's colour (on Année, only the types with an event that year). Beside the title, the type as its tag in its colour (author, 2026-11-23: no figure in the header). Then a column chart (author, 2026-11-23, after rejecting bars in each row): one column per event in date order, its cost per day cut into its top-level categories in their colours (the largest overall at the bottom), their names under the chart; the axis named by month on Année and by year under its first event on Tout; the mean (of the type's events that cost something, every year) a dashed line named "Moyenne 173 $" at its right end. Hovering a column names the event, its total per day and each category's; clicking a part opens the event's transactions in that category. Under the chart, one row per event in the sort's order: the name opening its transactions, the year (on Tout only), days and total under it, and the cost per day. On Année, only that year's events, the mean still from every year. Every event shows, without a cap (author, 2026-11-23). An event with a missing rate or that brought money in has no bar, the latter's figure in green.
+- **Calendrier** (EVT-04, YR-02): a timeline with the calendar. From `lg`, the period's months as a sticky column at the left (each month's spending and its number of events, years as headings on Tout), the month on screen highlighted, a click scrolling to it. At the right, each month at least the screen's height: its name and its spending, then the month as seven columns (author, 2026-11-23: no event tags under the title, the bars name them). A day's box holds its number (opening the day's transactions), its spending, a tint in the heat map's step, its events as bars across their days, up to two transactions (merchant or category, then amount) and "+N" past them, and the avatars of the people on its expenses. Below `lg`, the months are a sticky row of chips and each month is a list of its days with activity only, each as the box's content on one row. On Tout, every month since the first transaction, each built as it nears the screen (author, 2026-11-23). Every year of the period loads with the tab, in parallel, since the highlights rank over all of it (ADR-066).
+- **Export** (YR-07) waits for phase 6; the header keeps room for an Exporter menu.
 
 ## Open questions
 
-- Social tab: is the YR-02 sticky-month timeline still wanted now that Événements has a calendar?
+- None.

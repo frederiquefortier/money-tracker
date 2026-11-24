@@ -3,16 +3,17 @@ import { z } from 'zod'
 import { isOneOf } from '#/lib/shared/collections'
 import { KINDS } from '#/lib/categories/category'
 import type { CategoryKind } from '#/lib/categories/category'
-import { dailySpending } from '#/lib/dashboard/daily-spending'
-import type { DaySpent } from '#/lib/dashboard/daily-spending'
+import { yearActivity } from '#/lib/dashboard/year-activity'
+import type { YearActivity } from '#/lib/dashboard/year-activity'
 import { yearSchema } from '#/lib/transactions/transaction-list'
 import type { Dashboard } from '#/lib/dashboard/dashboard'
-import type { EventTotal } from '#/lib/events/event-calendar'
+import type { EventTotal, EventsOverview } from '#/lib/events/event-calendar'
 import { todayIso } from '#/lib/shared/format'
 import { allRows, loaded } from '#/lib/server/db.server'
 import { getSupabase } from '#/lib/server/supabase.server'
 import { getCategories } from '#/server/categories'
 import { getEvents } from '#/server/events'
+import { getBalances } from '#/server/owed'
 
 /**
  * Every month's figures per category and the categories, and each merchant's bills per
@@ -59,48 +60,91 @@ export const getDashboard = createServerFn({ method: 'GET' }).handler(
 const isKind = isOneOf<CategoryKind>(KINDS)
 
 /**
- * The heat map's year: what I spent each day, from that year's lines only. Loaded when the
- * year is shown, since a day per line over the whole history is far more than the months.
+ * A year's days and transactions at my share, for the heat maps, the events calendar and
+ * the highlights (ADR-066). Loaded when the year is shown: a row per line over the whole
+ * history is far more than the months.
  */
-export const getDailySpending = createServerFn({ method: 'GET' })
+export const getYearActivity = createServerFn({ method: 'GET' })
   .validator(z.object({ year: yearSchema }))
-  .handler(async ({ data }): Promise<Array<DaySpent>> => {
+  .handler(async ({ data }): Promise<YearActivity> => {
     const supabase = getSupabase()
-    const [lines, categories] = loaded(
-      'Daily spending',
-      await allRows((from, to) =>
-        supabase
-          .rpc('my_lines', {
-            from_date: `${data.year}-01-01`,
-            to_date: `${data.year}-12-31`,
-          })
-          .range(from, to),
-      ),
-      await supabase.from('categories').select('id, kind'),
+    const from = `${data.year}-01-01`
+    const to = `${data.year}-12-31`
+    const [lines, categories, details] = loaded(
+      'Year activity',
+      ...(await Promise.all([
+        allRows((start, end) =>
+          supabase
+            .rpc('my_lines', { from_date: from, to_date: to })
+            .range(start, end),
+        ),
+        supabase.from('categories').select('id, kind'),
+        allRows((start, end) =>
+          supabase
+            .from('transactions')
+            .select(
+              'id, merchant_id, seller_person_id, transaction_people(person_id)',
+            )
+            .in('kind', ['expense', 'income'])
+            .gte('occurred_on', from)
+            .lte('occurred_on', to)
+            .order('id')
+            .range(start, end),
+        ),
+      ])),
     )
     const kindOf = new Map(
       categories.flatMap((c) =>
         isKind(c.kind) ? [[c.id, c.kind] as const] : [],
       ),
     )
-    return dailySpending(
+    return yearActivity(
       lines.map((l) => ({
+        transactionId: l.transaction_id,
         occurredOn: l.occurred_on,
+        kind: l.kind,
         categoryId: l.category_id,
+        eventId: l.event_id,
         amount: l.display_amount,
+      })),
+      details.map((d) => ({
+        id: d.id,
+        merchantId: d.merchant_id,
+        // Everyone on it, whatever their role, the seller included (author, 2026-11-23).
+        personIds: [
+          ...new Set([
+            ...d.transaction_people.flatMap((p) =>
+              p.person_id ? [p.person_id] : [],
+            ),
+            ...(d.seller_person_id ? [d.seller_person_id] : []),
+          ]),
+        ],
       })),
       kindOf,
     )
   })
 
-/** EVT-04, EVT-05: the events, their types and each one's total over its whole history. */
+/**
+ * EVT-04, EVT-05, YR-04, YR-05: the events, their types, each one's total over its whole
+ * history and per category, the people's names and what each still owes me.
+ */
 export const getEventsOverview = createServerFn({ method: 'GET' }).handler(
-  async () => {
-    const [events, totals] = await Promise.all([
-      getEvents(),
-      getSupabase().rpc('event_totals'),
-    ])
-    const [rows] = loaded('Event totals', totals)
+  async (): Promise<EventsOverview> => {
+    const supabase = getSupabase()
+    const [events, totals, categoryTotals, people, balances] =
+      await Promise.all([
+        getEvents(),
+        supabase.rpc('event_totals'),
+        supabase.rpc('event_category_totals'),
+        supabase.from('people').select('id, name'),
+        getBalances(),
+      ])
+    const [rows, parts, names] = loaded(
+      'Events overview',
+      totals,
+      categoryTotals,
+      people,
+    )
     return {
       events: events.events,
       types: events.types,
@@ -109,6 +153,13 @@ export const getEventsOverview = createServerFn({ method: 'GET' }).handler(
         total: r.display_total,
         transactionCount: r.transaction_count,
       })),
+      categoryTotals: parts.map((r) => ({
+        eventId: r.event_id,
+        categoryId: r.category_id,
+        total: r.display_total,
+      })),
+      people: names,
+      balances,
     }
   },
 )

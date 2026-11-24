@@ -4,6 +4,43 @@ Short record of each working session: what the author asked, what was decided an
 
 <!-- Newest first: a new session goes directly below this line. Template at the bottom. -->
 
+### 2026-11-23 - Comparer rebuilt
+
+**What We Worked On:**
+- The author found the dashboard's event comparator poor and asked the assistant, as a senior designer, for a proposal. The assistant proposed comparing each event's cost per day with its type's usual one, as a bar from a centre line with a percent, types as tabs, newest first, the year shown highlighted, eight rows then all, and later a split by category. The author asked for it built on the page itself.
+- Built: `typeComparison` returning the median and each event's gap, `comparableTypes`, tests; `eventSearch` in `drill-down.ts` so a row opens the event's transactions; the card rewritten without the measure menu; more invented trips in the gallery's demo.
+- The author then asked for the card beside Événements par jour (the slips moved under both, four in a row), only the year's events on Année instead of the other years paled, the type tabs as colour dots, and no cap on the rows. The type's name moved beside the title, since a dot alone does not name it.
+- Then the header's figures were replaced by the type's tag, the year dropped from each row on Année, and a label added above the bars naming the centre line as the mean; the median became a mean to match. The author also asked why not a chart; the assistant kept the rows (they are a bar chart on its side) and offered a dot chart over time on Tout.
+- A sort, as elsewhere: the events list's date and name orders plus the cost per day (`sortCompared`, with a test). The rows moved to `compared-list.tsx` to keep the card's file under the line limit.
+- The author rejected the bars in the rows twice (the diverging one, then a plain one from zero): a bar per row means nothing. Asked with three sketches, the author picked columns over time: `compared-chart.tsx` on Recharts as Argent's monthly chart, the mean a named dashed `ReferenceLine`, the rows below without a bar.
+- The author dropped the percent from the rows and asked to compare categories inside a trip. The server only had a total per event, so: `event_category_totals()` (migration, pgTAP 35 with another user seeing nothing, pushed to the dev database, types regenerated), `eventParts` folding leaf totals into top-level groups per day (`lib/events/event-parts.ts`, with a test), stacked columns with the category names under them, a part opening the event's transactions in its category. The unused gap to the mean was removed.
+
+**What Could We Do Better:**
+- The gallery could not be checked: the Playwright browser was held by another session and `/design` needs a signed-in session. The card needs a look at desktop and phone width.
+- The assistant defended its diverging bar for two rounds after the author questioned it; showing sketches of real charts at the first doubt would have saved them.
+
+
+### 2026-11-23 - Événements as the year in review
+
+**What We Worked On:**
+- The author asked the assistant, as a senior UX and UI designer, to fix the dashboard's Événements tab from a brief: a calendar of events with their cost, the comparison by type, a sticky-month timeline, the top three days, who I spent the most and least with, who shared the most events, who owes whom, an export, a heat map of the events and every transaction, and a full-screen month per screen on desktop whose days hold the transactions, events and people.
+- The assistant reviewed the tab (no money on the calendar, 96 grids on Tout, spending and events apart, a list repeating the calendar, no social figures) and proposed Aperçu, highlights, Comparer, then the timeline calendar. The author chose the social figures in Événements (no Social tab), who owes me only (PPL-05 keeps "I owe" out), every month on Tout, and the export in phase 6.
+- Built: `getYearActivity` replacing `getDailySpending` (ADR-066), `lib/dashboard/year-activity.ts` with tests, the overview, the highlight cards, the month rail and chips, the month grid and the phone's agenda, a measure switch and the average on Comparer, and a gallery specimen with invented events. `heatFills` and the event tag's tint moved to `styles.ts`.
+- The author then asked for everyone on a transaction to count in "Avec qui j'ai dépensé" whatever their role (the assistant had left out the seller and an income's payer), the highlight cards as receipt slips (`slipLine` and `slipLabel` moved to `styles.ts`), a way to hide an event so a year-long one does not overwhelm the calendar (the assistant first hid whole types; the author asked for every event listed, grouped by type, as "Masquer des éléments" on the net worth page, since a type alone was not useful), and no empty months before the data starts in August 2018 (`dayRangeOf`). The calendar helpers moved to `lib/dashboard/calendar-days.ts`. The author also had the event tags under each month's title removed, and Aperçu renamed Événements par jour, as Argent's Dépenses par jour. The assistant first changed only the title; the author pointed out the card should be built like Dépenses par jour, its day counter included. Built: `DayGrid` and `DaysCount` (`components/dashboard/day-grid.tsx`), shared by both cards, days in their event's colour, the card half width beside the slips, `daysGoneBy` in `lib/shared/months.ts`.
+
+**What Could We Do Better:**
+- "Like the expenses one" meant the same card, not the same name; asking or comparing the two cards would have saved a round.
+- The gallery could not be checked: the Playwright browser was held by another session. The layout still needs a look at desktop and phone width, the chips' sticky offset under the header in particular.
+
+### 2026-11-23 - Showing a move between countries on the dashboard
+
+**What We Worked On:**
+- The author asked how the dashboard could show an expatriation, 2026 spending looking far higher with nothing invested. The assistant first proposed an "exceptional" event for one-off moving costs; the author explained it is a cost of living gap in the new currency, with income in that currency too.
+- The assistant then proposed comparing shares of income across the move, a dated place of residence marked on the charts, and a purchasing-power view as an alternative. The author asked for it in improvements.md.
+
+**What Could We Do Better:**
+- The first proposal assumed one-off costs; asking what drove the jump would have saved a round.
+
 ### 2026-11-23 - Currency switch loader, table row hover
 
 **What We Worked On:**

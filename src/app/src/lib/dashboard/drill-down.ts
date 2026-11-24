@@ -8,7 +8,7 @@ import type { searchSchema } from '#/lib/transactions/transaction-search'
 // too, as the list's filter does. Each carries the dashboard's period, for the list's
 // link back to it.
 
-type TransactionsSearch = z.infer<typeof searchSchema>
+export type TransactionsSearch = z.infer<typeof searchSchema>
 
 /** The dashboard's period as the list's `dashboard` keeps it: a year or "all". */
 const backTo = (period: DashboardPeriod) =>
@@ -55,4 +55,18 @@ export function periodSearch(
       ? { period: 'all' as const, dashboard: backTo(period) }
       : bucketSearch(period, period.year)
   return categoryId ? { ...when, category: [categoryId] } : when
+}
+
+/** An event's transactions, whenever they fall, narrowed to one category when given. */
+export function eventSearch(
+  from: DashboardPeriod,
+  eventId: string,
+  categoryId?: string,
+): TransactionsSearch {
+  const search = {
+    period: 'all' as const,
+    event: [eventId],
+    dashboard: backTo(from),
+  }
+  return categoryId ? { ...search, category: [categoryId] } : search
 }

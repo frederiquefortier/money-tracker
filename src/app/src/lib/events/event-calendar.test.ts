@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import type { EventItem } from '#/lib/events/event'
 import {
+  comparableTypes,
+  sortCompared,
   eventSummaries,
   eventsByDay,
   monthWeeks,
@@ -94,11 +96,59 @@ describe('event calendar', () => {
     expect(monthWeeks('2026-11', 1)[0].slice(5)).toEqual([null, '2026-11-01'])
     expect(monthWeeks('2026-11', 1).flat().filter(Boolean)).toHaveLength(30)
   })
+})
 
-  it('compares one type over every year, the costliest first', () => {
-    expect(typeComparison(summaries, 'trip').map((s) => s.event.id)).toEqual([
-      'lisbon',
-      'cabin',
+describe('type comparison', () => {
+  it('compares one type over every year, newest first, with its mean per day', () => {
+    const trips = [
+      event('a', ['2023-03-01', '2023-03-04']),
+      event('b', ['2024-06-01', '2024-06-02']),
+      event('c', ['2025-07-01', '2025-07-01']),
+      event('d', ['2026-01-10', '2026-01-10']),
+      event('e', ['2026-02-01', '2026-02-01']),
+    ]
+    const compared = typeComparison(
+      eventSummaries(trips, types, [
+        { eventId: 'a', total: '-400.0000', transactionCount: 4 }, // 100 a day
+        { eventId: 'b', total: '-300.0000', transactionCount: 2 }, // 150 a day
+        { eventId: 'c', total: '-200.0000', transactionCount: 1 },
+        { eventId: 'd', total: null, transactionCount: 1 },
+        { eventId: 'e', total: '50.0000', transactionCount: 1 }, // brought money in
+      ]),
+      'trip',
+    )
+    expect(compared.events.map((c) => c.event.id)).toEqual([
+      'e',
+      'd',
+      'c',
+      'b',
+      'a',
     ])
+    expect(compared.usual).toBe('150.0000')
+  })
+
+  it('compares only the types with two dated events or more', () => {
+    expect(comparableTypes(summaries, types).map((t) => t.id)).toEqual(['trip'])
+  })
+
+  it('sorts by cost per day, an event without a figure last', () => {
+    const trips = [
+      event('a', ['2023-03-01', '2023-03-04']),
+      event('b', ['2024-06-01', '2024-06-01']),
+      event('c', ['2025-07-01', '2025-07-01']),
+    ]
+    const compared = typeComparison(
+      eventSummaries(trips, types, [
+        { eventId: 'a', total: '-400.0000', transactionCount: 4 },
+        { eventId: 'b', total: null, transactionCount: 1 },
+        { eventId: 'c', total: '-200.0000', transactionCount: 1 },
+      ]),
+      'trip',
+    ).events
+    const ids = (sort: Parameters<typeof sortCompared>[1]) =>
+      sortCompared(compared, sort, 'fr-CA').map((c) => c.event.id)
+    expect(ids('amountDesc')).toEqual(['c', 'a', 'b'])
+    expect(ids('amountAsc')).toEqual(['a', 'c', 'b'])
+    expect(ids('dateAsc')).toEqual(['a', 'b', 'c'])
   })
 })

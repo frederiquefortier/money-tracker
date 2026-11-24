@@ -9,9 +9,13 @@ export function firstDayOf(locale: string): number {
   return info.getWeekInfo?.().firstDay ?? info.weekInfo?.firstDay ?? 7
 }
 
-export function weekdayNames(locale: string, firstDay: number): Array<string> {
+export function weekdayNames(
+  locale: string,
+  firstDay: number,
+  style: 'narrow' | 'short' = 'narrow',
+): Array<string> {
   const format = new Intl.DateTimeFormat(locale, {
-    weekday: 'narrow',
+    weekday: style,
     timeZone: 'UTC',
   })
   // 2024-01-01 was a Monday.

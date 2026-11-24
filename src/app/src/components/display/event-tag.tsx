@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { Sparkle } from '#/components/display/sparkle'
-import { tagColors } from '#/lib/shared/color'
+import { tagTint, tagTintStyle } from '#/components/styles'
 import { cn } from '#/lib/utils'
 
 /**
@@ -20,26 +20,14 @@ export function EventTag({
   className?: string
 }) {
   const { t } = useTranslation()
-  const colors = color ? tagColors(color) : null
   return (
     <span
       className={cn(
         'inline-flex max-w-full items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold',
-        colors
-          ? 'bg-(--tag-bg) text-(--tag-text) dark:bg-(--tag-bg-dark) dark:text-(--tag-text-dark)'
-          : 'bg-secondary text-primary',
+        color ? tagTint : 'bg-secondary text-primary',
         className,
       )}
-      style={
-        colors
-          ? ({
-              '--tag-bg': colors.light.background,
-              '--tag-text': colors.light.text,
-              '--tag-bg-dark': colors.dark.background,
-              '--tag-text-dark': colors.dark.text,
-            } as React.CSSProperties)
-          : undefined
-      }
+      style={tagTintStyle(color)}
     >
       <span className="truncate">{name}</span>
       {auto && (

@@ -4,6 +4,24 @@ Technical and structural choices, with the alternatives that were rejected. Chec
 
 <!-- Newest first: a new ADR goes directly below this line. Template at the bottom. -->
 
+### ADR-066: The year in review loads a year's transactions at my share, per year (2026-11-23)
+
+**Context:**
+- The Événements redesign shows each day's transactions with their merchant and people, and ranks the costliest days and the people I spent with (YR-03, YR-04). `my_lines` has the amounts at my share but no merchant or people; ADR-063 rejected sending every line of the history on each load.
+
+**Decision:**
+- `getYearActivity(year)` reads that year's `my_lines` and, from the transactions table, each transaction's merchant and everyone on it, whatever their role, the seller included (author, 2026-11-23). It returns the days (the heat map's, as before) and one row per transaction at my share. No migration: both reads go through RLS with the user's session.
+- It replaces `getDailySpending`; Argent and Événements share one request per year. A past year loads once per visit, the current one on each mount.
+- On a year, one year loads. On Tout, every year loads in parallel with the tab, since the highlights rank over the whole period; the calendar's months are still built as they near the screen.
+- The highlights are computed in the browser and wait for every year: no ranking on part of the period.
+
+**Alternatives Considered:**
+- SQL aggregates per person and per day for the highlights -> Two more functions with pgTAP tests, and the calendar still needs the transactions per day.
+- Loading a year only when its months near the screen -> The highlights on Tout would rank on the years seen so far.
+
+**Consequences:**
+- Tout on Événements reads every line of the history, one year per request. Fine for one owner's eight years; a larger history would want the aggregates above.
+
 ### ADR-065: One loader per situation; a write's refresh shows the page bar (2026-11-23)
 
 **Context:**

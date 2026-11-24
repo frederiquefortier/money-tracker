@@ -1575,6 +1575,14 @@ export type Database = {
       delete_event: { Args: { event_id: string }; Returns: undefined }
       delete_transfer: { Args: { transfer_id: string }; Returns: undefined }
       empty_part_room: { Args: { transaction: string }; Returns: number }
+      event_category_totals: {
+        Args: never
+        Returns: {
+          category_id: string
+          display_total: string
+          event_id: string
+        }[]
+      }
       event_first_day: {
         Args: { ends: string; starts: string }
         Returns: string
