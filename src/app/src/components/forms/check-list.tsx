@@ -12,7 +12,7 @@ export type CheckNode = {
   label: string
   icon?: React.ReactNode
   /** A second, muted line under the label (a transaction's date). */
-  detail?: string
+  detail?: React.ReactNode
   /** Before the box, on the right (a transaction's amount). */
   aside?: React.ReactNode
   children?: Array<CheckNode>

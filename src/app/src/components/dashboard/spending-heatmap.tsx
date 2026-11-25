@@ -3,6 +3,8 @@ import { useNavigate } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { DashboardCard, Figure } from '#/components/dashboard/dashboard-card'
 import { EmptyState } from '#/components/lists/list-card'
+import { Skeleton } from '#/components/feedback/skeleton'
+import { Spinner } from '#/components/feedback/spinner'
 import { DayGrid, DaysCount } from '#/components/dashboard/day-grid'
 import { useLocale } from '#/hooks/app/use-locale'
 import { heatSteps } from '#/lib/dashboard/daily-spending'
@@ -72,12 +74,14 @@ export function SpendingHeatmap({
       title={t('dashboard.heatmap.title')}
       className="justify-between"
       actions={
-        days && (
+        days ? (
           <DaysCount
             count={count}
             total={total}
             label={t('dashboard.heatmap.daysLabel', { count, total })}
           />
+        ) : (
+          !failed && <Skeleton className="w-24 text-sm" />
         )
       }
     >
@@ -85,25 +89,33 @@ export function SpendingHeatmap({
         <EmptyState>{t('dashboard.heatmap.failed')}</EmptyState>
       ) : (
         <>
-          <div
-            role="img"
-            aria-label={t('dashboard.heatmap.label', { year, count })}
-            className={cn(!days && 'opacity-50')}
-          >
-            <DayGrid
-              months={monthsOf(range)}
-              today={today}
-              fillOf={(day, future) =>
-                future ? heatFills.none : heatFill(byDay.get(day), steps)
-              }
-              onHover={setHovered}
-              onOpen={(day) =>
-                void navigate({
-                  to: '/transactions',
-                  search: daySearch({ unit: 'year', year }, day),
-                })
-              }
-            />
+          <div className="relative">
+            <div
+              role="img"
+              aria-label={t('dashboard.heatmap.label', { year, count })}
+              className={cn(!days && 'opacity-50')}
+            >
+              <DayGrid
+                months={monthsOf(range)}
+                today={today}
+                fillOf={(day, future) =>
+                  future ? heatFills.none : heatFill(byDay.get(day), steps)
+                }
+                onHover={setHovered}
+                onOpen={(day) =>
+                  void navigate({
+                    to: '/transactions',
+                    search: daySearch({ unit: 'year', year }, day),
+                  })
+                }
+              />
+            </div>
+            {!days && (
+              <Spinner
+                label={t('common.loading')}
+                className="absolute inset-0 m-auto size-6 text-muted-foreground"
+              />
+            )}
           </div>
           {/* Room kept for the hovered day, so the card never changes height. */}
           <p className="h-5 truncate text-xs leading-5">

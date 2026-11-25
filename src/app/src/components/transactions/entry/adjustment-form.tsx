@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { FixedCurrency } from '#/components/display/currency-chip'
 import { FieldMessage } from '#/components/forms/form-field'
+import { Skeleton } from '#/components/feedback/skeleton'
 import { Icon } from '#/components/display/icon'
 import { Money } from '#/components/display/money'
 import { SheetForm } from '#/components/sheet/sheet-form'
@@ -34,14 +35,17 @@ export type AdjustmentValues = {
   note: string
 }
 
-/** The app's balance on a date, `undefined` while it loads. */
+/** The app's balance on a date: `undefined` while it loads, null without one or on an error. */
 function useAppBalance(
   accountId: string,
   date: string,
   adjustmentId: string | undefined,
 ) {
   const key = accountId && date ? `${accountId}:${date}` : null
-  const [loaded, setLoaded] = useState<{ key: string; balance: string }>()
+  const [loaded, setLoaded] = useState<{
+    key: string
+    balance: string | null
+  }>()
 
   useEffect(() => {
     if (!key) return
@@ -50,25 +54,31 @@ function useAppBalance(
       .then((balance) => {
         if (current) setLoaded({ key, balance })
       })
-      .catch(() => undefined)
+      .catch(() => {
+        if (current) setLoaded({ key, balance: null })
+      })
     return () => {
       current = false
     }
   }, [key, accountId, date, adjustmentId])
 
+  if (!key) return null
   return loaded?.key === key ? loaded.balance : undefined
 }
 
-/** A computed amount on the slip, a dash until it is known. */
+/** A computed amount on the slip: a skeleton while it loads, a dash when it is not known. */
 function SlipAmount({
   amount,
   currency,
   signed = false,
+  loading = false,
 }: {
   amount: string | null | undefined
   currency: string | null
   signed?: boolean
+  loading?: boolean
 }) {
+  if (loading) return <Skeleton className="w-24" />
   if (amount === null || amount === undefined || currency === null)
     return <span className="text-muted-foreground">{NO_FIGURE}</span>
   return <Money amount={amount} currency={currency} signed={signed} />
@@ -87,7 +97,7 @@ function AdjustmentReceipt({
   onChange,
 }: {
   realBalance: string
-  appBalance: string | undefined
+  appBalance: string | null | undefined
   currency: string | null
   error: string | undefined
   autoFocus: boolean
@@ -95,7 +105,12 @@ function AdjustmentReceipt({
 }) {
   const { t } = useTranslation()
   const label = t('transactions.adjustment.realBalance')
-  const gap = adjustmentGap(realBalance, appBalance, currency ?? '')
+  const gap = adjustmentGap(
+    realBalance,
+    appBalance ?? undefined,
+    currency ?? '',
+  )
+  const loading = currency !== null && appBalance === undefined
   return (
     <div className={receiptSlip}>
       <span
@@ -125,10 +140,10 @@ function AdjustmentReceipt({
       {error && <FieldMessage>{error}</FieldMessage>}
       {slipRule}
       <ReceiptLine label={t('transactions.adjustment.appBalance')}>
-        <SlipAmount amount={appBalance} currency={currency} />
+        <SlipAmount amount={appBalance} currency={currency} loading={loading} />
       </ReceiptLine>
       <ReceiptLine label={t('transactions.adjustment.gap')}>
-        <SlipAmount amount={gap} currency={currency} signed />
+        <SlipAmount amount={gap} currency={currency} signed loading={loading} />
       </ReceiptLine>
     </div>
   )

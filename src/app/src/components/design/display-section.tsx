@@ -4,6 +4,7 @@ import { CurrencyCode } from '#/components/display/currency-code'
 import { IconBubble } from '#/components/display/icon-bubble'
 import { Money } from '#/components/display/money'
 import { Tag } from '#/components/display/tag'
+import { Skeleton, SkeletonRows } from '#/components/feedback/skeleton'
 import { Spinner } from '#/components/feedback/spinner'
 
 // Invented colours, as an event type would carry.
@@ -46,6 +47,13 @@ export function DisplaySection() {
         <Spinner />
         <Spinner className="size-6" />
         <Spinner className="size-10 text-primary" />
+      </Specimen>
+      <Specimen name="Skeleton" source="feedback/skeleton.tsx">
+        <Skeleton />
+        <Skeleton className="w-24 text-sm" />
+        <div className="w-full">
+          <SkeletonRows count={3} />
+        </div>
       </Specimen>
     </GallerySection>
   )

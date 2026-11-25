@@ -1,4 +1,7 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import { Spinner } from '#/components/feedback/spinner'
+import { useHydrated } from '#/hooks/app/use-hydrated'
 import { cn } from '#/lib/utils'
 import * as RechartsPrimitive from 'recharts'
 import type { TooltipValueType } from 'recharts'
@@ -53,6 +56,8 @@ function ChartContainer({
     height: number
   }
 }) {
+  const { t } = useTranslation()
+  const hydrated = useHydrated()
   const uniqueId = React.useId()
   const chartId = `chart-${id ?? uniqueId.replace(/:/g, '')}`
 
@@ -68,11 +73,20 @@ function ChartContainer({
         {...props}
       >
         <ChartStyle id={chartId} config={config} />
-        <RechartsPrimitive.ResponsiveContainer
-          initialDimension={initialDimension}
-        >
-          {children}
-        </RechartsPrimitive.ResponsiveContainer>
+        {/* Recharts draws at its initial size until the browser measures the box, so
+            the chart waits for hydration behind a spinner in its own space. */}
+        {hydrated ? (
+          <RechartsPrimitive.ResponsiveContainer
+            initialDimension={initialDimension}
+          >
+            {children}
+          </RechartsPrimitive.ResponsiveContainer>
+        ) : (
+          <Spinner
+            label={t('common.loading')}
+            className="size-6 self-center text-muted-foreground"
+          />
+        )}
       </div>
     </ChartContext.Provider>
   )

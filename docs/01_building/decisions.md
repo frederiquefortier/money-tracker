@@ -4,6 +4,23 @@ Technical and structural choices, with the alternatives that were rejected. Chec
 
 <!-- Newest first: a new ADR goes directly below this line. Template at the bottom. -->
 
+### ADR-068: A skeleton for text, a spinner for the rest (2026-11-25)
+
+**Context:**
+- The author asked for loaders on the charts, then for text to load as a skeleton, with every loader checked.
+
+**Decision:**
+- Text, a figure or a list of rows on its way shows `Skeleton` (`feedback/skeleton.tsx`) at the text's size and usual width, or `SkeletonRows` for a list, so nothing moves when it arrives: the export's line counts, the heat map's days count, the filter sheet's options, the rate and fee lines of a foreign receipt or transfer, the adjustment's balance and gap.
+- `Spinner` stays for an action under way (in its button), a chart (`ChartContainer` until hydration, the heat map until its year arrives), rows coming at the end of a list, a list refreshing over its old rows, and a page or sheet whose shape is not known yet.
+- A value that failed or is missing reads as itself (a dash, the missing-rate mark), never as a skeleton that does not end.
+
+**Alternatives Considered:**
+- Skeletons for whole pages and sheets -> One per page to draw and keep in step with it; the spinner under the title is enough while the shape is unknown.
+- A skeleton chart -> A chart's shape is its data; a grey bar chart would read as a figure.
+
+**Consequences:**
+- A new value fetched after the page draws gets a skeleton in its place.
+
 ### ADR-067: The export is one SQL function, zipped by the server (2026-11-24)
 
 **Context:**

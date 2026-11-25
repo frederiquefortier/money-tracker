@@ -4,6 +4,16 @@ Short record of each working session: what the author asked, what was decided an
 
 <!-- Newest first: a new session goes directly below this line. Template at the bottom. -->
 
+### 2026-11-25 - Loaders and skeletons
+
+**What We Worked On:**
+- The author asked for a loader on every chart, and on the export's line counts, which squeezed the rows while they loaded. `ChartContainer` shows a spinner in the chart's own space until the page has hydrated (`useHydrated`), since Recharts draws at a guessed size before that; the heat map has the same spinner while its year loads; each export row shows a spinner in place of its count.
+- The author then asked for text to load as a skeleton and for every loader to be checked. `Skeleton` and `SkeletonRows` came in (ADR-068), in the gallery. Text now waits as a skeleton: the export counts, the heat map's days count, the filter sheet's options, the rate and fee on a foreign receipt or transfer, the adjustment's balance and gap (which also stops showing a dash while it loads, and shows one on an error instead of nothing). The spinners left are buttons, charts, the list end, the transactions list refreshing, and pending pages and sheets.
+- The author's list also named the adjustment sheet's length on a phone, the missing CPL and GTQ rates, and Safari moving the page when a field takes focus. Not touched in this session.
+
+**What Could We Do Better:**
+- Not seen in the browser: the Playwright browser was held by another session.
+
 ### 2026-11-25 - Budget tab removed
 
 **What We Worked On:**

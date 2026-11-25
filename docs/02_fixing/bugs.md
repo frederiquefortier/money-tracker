@@ -4,6 +4,12 @@ Track bugs with dates, solutions, and prevention notes. Search this file before 
 
 <!-- Newest first: a new bug goes directly below this line. Template at the bottom. -->
 
+### 2026-11-25 - The export's rows were squeezed while loading
+- **Issue**: On opening the Exporter tab, each file's row was one line high, then grew when the line counts arrived.
+- **Root Cause**: The count is the row's second line, left out until `getExportCounts` answers.
+- **Solution**: The row shows a skeleton in that line until then (`export-card.tsx`); `CheckNode.detail` takes any node.
+- **Prevention**: Text that arrives later keeps its place with a skeleton (ADR-068).
+
 ### 2026-11-23 - A dashboard row's name lit up before the rest on hover
 - **Issue**: Hovering a row of the category or merchant table, the name cell took the hover colour at once while the rest of the row faded in.
 - **Root Cause**: The row fades its background (`rowHover`), but the sticky name cell paints its own opaque background from `--row-bg`, and it had no transition.

@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next'
 import { FixedCurrency } from '#/components/display/currency-chip'
 import { FieldMessage } from '#/components/forms/form-field'
 import { Icon } from '#/components/display/icon'
+import { Skeleton } from '#/components/feedback/skeleton'
 import { MissingRate, Money } from '#/components/display/money'
 import { AmountInput } from '#/components/transactions/receipt/receipt-amount'
 import {
@@ -69,6 +70,11 @@ function ReceivedLines({
             </span>
           )}
         </ReceiptLine>
+        {rate === undefined && (
+          <ReceiptLine label={t('transactions.rateLabel')} muted>
+            <Skeleton label={t('common.loading')} className="w-28" />
+          </ReceiptLine>
+        )}
         {rate && (
           <ReceiptLine label={t('transactions.rateLabel')} muted>
             {t('transactions.rate', {
@@ -81,8 +87,9 @@ function ReceivedLines({
       </div>
       {error && <FieldMessage>{error}</FieldMessage>}
       <ReceiptLine label={t('transactions.conversionFee')}>
+        {rate === undefined && <Skeleton className="w-16" />}
         {rate === null && <MissingRate />}
-        {rate !== null && preview.cost !== null && (
+        {rate && preview.cost !== null && (
           <Money amount={preview.cost} currency={currencies.from} />
         )}
       </ReceiptLine>

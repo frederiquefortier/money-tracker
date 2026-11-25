@@ -20,7 +20,7 @@ import type {
   ListFilters,
   PeriodChoice,
 } from '#/lib/transactions/transaction-list'
-import { Spinner } from '#/components/feedback/spinner'
+import { SkeletonRows } from '#/components/feedback/skeleton'
 
 /** The way back to the list of filters, with the name of the one open. */
 function BackRow({
@@ -153,10 +153,7 @@ export function FilterDetail({
             onChange={onChange}
           />
         ) : (
-          <Spinner
-            label={t('common.loading')}
-            className="text-muted-foreground"
-          />
+          <SkeletonRows />
         )}
       </SheetBody>
       <FilterFooter

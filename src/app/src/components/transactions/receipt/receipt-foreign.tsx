@@ -2,6 +2,7 @@ import { CurrencyCode } from '#/components/display/currency-code'
 import { useId } from 'react'
 import { useTranslation } from 'react-i18next'
 import { FieldMessage } from '#/components/forms/form-field'
+import { Skeleton } from '#/components/feedback/skeleton'
 import { MissingRate, Money } from '#/components/display/money'
 import {
   ReceiptLine,
@@ -60,6 +61,11 @@ export function ForeignLines({
           />
           <CurrencyCode code={accountCurrency} />
         </ReceiptLine>
+        {rate === undefined && (
+          <ReceiptLine label={t('transactions.rateLabel')} muted>
+            <Skeleton label={t('common.loading')} className="w-28" />
+          </ReceiptLine>
+        )}
         {rate && (
           <ReceiptLine label={t('transactions.rateLabel')} muted>
             {t('transactions.rate', {
@@ -72,8 +78,9 @@ export function ForeignLines({
       </div>
       {error && <FieldMessage>{error}</FieldMessage>}
       <ReceiptLine label={t('transactions.conversionFee')}>
+        {rate === undefined && <Skeleton className="w-16" />}
         {rate === null && <MissingRate />}
-        {rate !== null && preview.fee !== null && (
+        {rate && preview.fee !== null && (
           <>
             <Money amount={preview.fee} currency={accountCurrency} />
             {preview.feeRatio !== null &&

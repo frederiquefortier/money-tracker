@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { IconBubble } from '#/components/display/icon-bubble'
+import { Skeleton } from '#/components/feedback/skeleton'
 import { Spinner } from '#/components/feedback/spinner'
 import { CheckList } from '#/components/forms/check-list'
 import { FILE_ICON } from '#/components/import/import-files-card'
@@ -36,9 +37,12 @@ export function ExportCard() {
             id: name,
             label: `${name}.csv`,
             icon: <IconBubble icon={FILE_ICON[name]} />,
-            detail: counts
-              ? t('import.rows', { count: counts[name] })
-              : undefined,
+            // The count line keeps its place while the counts load.
+            detail: counts ? (
+              t('import.rows', { count: counts[name] })
+            ) : (
+              <Skeleton label={t('common.loading')} className="w-20" />
+            ),
           }))}
           stateOf={(node) => (picked.has(node.id) ? 'on' : 'off')}
           onToggle={(node) => toggle(node.id)}
