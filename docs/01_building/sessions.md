@@ -4,6 +4,14 @@ Short record of each working session: what the author asked, what was decided an
 
 <!-- Newest first: a new session goes directly below this line. Template at the bottom. -->
 
+### 2026-11-25 - Budget tab removed
+
+**What We Worked On:**
+- The author asked to remove the budget page for now. It was a coming-soon card: the route, its nav tab (the phone's bar now has three columns) and its strings are gone. Budgets stay in phase 4 and the tab comes back with them.
+
+**What Could We Do Better:**
+- The nav was not looked at in the browser.
+
 ### 2026-11-24 - The export
 
 **What We Worked On:**

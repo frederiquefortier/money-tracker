@@ -6,10 +6,6 @@ export const shellFr = {
     label: 'Navigation principale',
     transactions: 'Transactions',
     dashboard: 'Dashboard',
-    budget: 'Budget',
-  },
-  comingSoon: {
-    budget: 'Vos objectifs et votre fonds d’urgence vivront ici.',
   },
   fallback: {
     errorTitle: 'Cette page n’a pas pu s’afficher',

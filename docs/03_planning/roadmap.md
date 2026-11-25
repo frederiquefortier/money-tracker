@@ -49,7 +49,7 @@ The milestone: eight years of history in the app. It comes before the dashboard 
 
 ## Phase 4: Seeing it
 - [x] Dashboard: the sheet's tiles, charts and table on one full-width page, a year or everything, with a heat map of each day's spending. DSH-01..10 ([spec](../00_briefing/designs/22-dashboard.md), ADR-063).
-- [ ] Budgets and the emergency fund, event budgets included. BUD-01..04, 06, CAT-08, EVT-06.
+- [ ] Budgets and the emergency fund, event budgets included, with the Budget tab back in the nav. BUD-01..04, 06, CAT-08, EVT-06.
 - [ ] Recurring transactions. TRX-08.
 - [x] Merchant price evolution: the dashboard's Par marchand card. MER-04 (ADR-064).
 - [ ] Last reconciled and last transaction per account. ACC-08.

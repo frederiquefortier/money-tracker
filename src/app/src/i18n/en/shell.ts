@@ -8,10 +8,6 @@ export const shellEn: typeof shellFr = {
     label: 'Main navigation',
     transactions: 'Transactions',
     dashboard: 'Dashboard',
-    budget: 'Budget',
-  },
-  comingSoon: {
-    budget: 'Your goals and your emergency fund will live here.',
   },
   fallback: {
     errorTitle: 'This page could not be shown',

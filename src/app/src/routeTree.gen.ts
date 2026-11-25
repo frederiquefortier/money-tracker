@@ -15,7 +15,6 @@ import { Route as MfaRouteImport } from './routes/mfa'
 import { Route as SetPasswordRouteImport } from './routes/set-password'
 import { Route as SignInRouteImport } from './routes/sign-in'
 import { Route as AuthedIndexRouteImport } from './routes/_authed/index'
-import { Route as AuthedBudgetRouteImport } from './routes/_authed/budget'
 import { Route as AuthedDashboardRouteImport } from './routes/_authed/dashboard'
 import { Route as AuthedDesignRouteImport } from './routes/_authed/design'
 import { Route as AuthedNetWorthRouteRouteImport } from './routes/_authed/net-worth/route'
@@ -87,11 +86,6 @@ const SignInRoute = SignInRouteImport.update({
 const AuthedIndexRoute = AuthedIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => AuthedRoute,
-} as any)
-const AuthedBudgetRoute = AuthedBudgetRouteImport.update({
-  id: '/budget',
-  path: '/budget',
   getParentRoute: () => AuthedRoute,
 } as any)
 const AuthedDashboardRoute = AuthedDashboardRouteImport.update({
@@ -346,7 +340,6 @@ export interface FileRoutesByFullPath {
   '/set-password': typeof SetPasswordRoute
   '/sign-in': typeof SignInRoute
   '/net-worth': typeof AuthedNetWorthRouteRouteWithChildren
-  '/budget': typeof AuthedBudgetRoute
   '/dashboard': typeof AuthedDashboardRoute
   '/design': typeof AuthedDesignRoute
   '/transactions': typeof AuthedTransactionsRouteWithChildren
@@ -395,7 +388,6 @@ export interface FileRoutesByTo {
   '/set-password': typeof SetPasswordRoute
   '/sign-in': typeof SignInRoute
   '/net-worth': typeof AuthedNetWorthRouteRouteWithChildren
-  '/budget': typeof AuthedBudgetRoute
   '/dashboard': typeof AuthedDashboardRoute
   '/design': typeof AuthedDesignRoute
   '/transactions': typeof AuthedTransactionsRouteWithChildren
@@ -447,7 +439,6 @@ export interface FileRoutesById {
   '/set-password': typeof SetPasswordRoute
   '/sign-in': typeof SignInRoute
   '/_authed/net-worth': typeof AuthedNetWorthRouteRouteWithChildren
-  '/_authed/budget': typeof AuthedBudgetRoute
   '/_authed/dashboard': typeof AuthedDashboardRoute
   '/_authed/design': typeof AuthedDesignRoute
   '/_authed/transactions': typeof AuthedTransactionsRouteWithChildren
@@ -501,7 +492,6 @@ export interface FileRouteTypes {
     | '/set-password'
     | '/sign-in'
     | '/net-worth'
-    | '/budget'
     | '/dashboard'
     | '/design'
     | '/transactions'
@@ -550,7 +540,6 @@ export interface FileRouteTypes {
     | '/set-password'
     | '/sign-in'
     | '/net-worth'
-    | '/budget'
     | '/dashboard'
     | '/design'
     | '/transactions'
@@ -601,7 +590,6 @@ export interface FileRouteTypes {
     | '/set-password'
     | '/sign-in'
     | '/_authed/net-worth'
-    | '/_authed/budget'
     | '/_authed/dashboard'
     | '/_authed/design'
     | '/_authed/transactions'
@@ -698,13 +686,6 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof AuthedIndexRouteImport
-      parentRoute: typeof AuthedRoute
-    }
-    '/_authed/budget': {
-      id: '/_authed/budget'
-      path: '/budget'
-      fullPath: '/budget'
-      preLoaderRoute: typeof AuthedBudgetRouteImport
       parentRoute: typeof AuthedRoute
     }
     '/_authed/dashboard': {
@@ -1179,7 +1160,6 @@ const AuthedSettingsPeopleRouteWithChildren =
 
 interface AuthedRouteChildren {
   AuthedNetWorthRouteRoute: typeof AuthedNetWorthRouteRouteWithChildren
-  AuthedBudgetRoute: typeof AuthedBudgetRoute
   AuthedDashboardRoute: typeof AuthedDashboardRoute
   AuthedDesignRoute: typeof AuthedDesignRoute
   AuthedTransactionsRoute: typeof AuthedTransactionsRouteWithChildren
@@ -1196,7 +1176,6 @@ interface AuthedRouteChildren {
 
 const AuthedRouteChildren: AuthedRouteChildren = {
   AuthedNetWorthRouteRoute: AuthedNetWorthRouteRouteWithChildren,
-  AuthedBudgetRoute: AuthedBudgetRoute,
   AuthedDashboardRoute: AuthedDashboardRoute,
   AuthedDesignRoute: AuthedDesignRoute,
   AuthedTransactionsRoute: AuthedTransactionsRouteWithChildren,

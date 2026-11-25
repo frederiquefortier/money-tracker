@@ -25,12 +25,6 @@ const TABS = [
     icon: 'chart-line',
     activeIcon: 'chart-line-fill',
   },
-  {
-    to: '/budget',
-    label: 'nav.budget',
-    icon: 'target',
-    activeIcon: 'target-fill',
-  },
 ] as const satisfies ReadonlyArray<{
   to: string
   label: string
@@ -45,7 +39,7 @@ export function AppNav({ variant }: { variant: 'bottom' | 'top' }) {
     <nav
       aria-label={t('nav.label')}
       className={
-        variant === 'bottom' ? 'grid grid-cols-4' : 'flex items-center gap-1'
+        variant === 'bottom' ? 'grid grid-cols-3' : 'flex items-center gap-1'
       }
     >
       {TABS.map((tab) => (
