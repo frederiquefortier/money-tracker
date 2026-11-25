@@ -4,6 +4,12 @@ Track bugs with dates, solutions, and prevention notes. Search this file before 
 
 <!-- Newest first: a new bug goes directly below this line. Template at the bottom. -->
 
+### 2026-11-25 - The end-to-end setup could not find the password field
+- **Issue**: In CI, the e2e job timed out on its first step: `getByLabel('Password', { exact: true })` found nothing, and the seven specs after it did not run.
+- **Root Cause**: Playwright matches `getByLabel` on the label's whole text, `aria-hidden` included, so a required field's label reads `Password*`. Email passed only because it was not matched exactly.
+- **Solution**: The specs match `/^Password\*?$/`, which still leaves out the "Show password" button.
+- **Prevention**: In e2e, match a required field's label with a regex that allows the asterisk.
+
 ### 2026-11-25 - The page showed under a sheet's footer when the keyboard opened
 - **Issue**: On an iPhone, tapping a field in a sheet moved the sheet up and showed the list behind it between the footer and the keyboard. A picker's list flipped above its field.
 - **Root Cause**: Once `useVisualViewport` was removed (above), Safari scrolled the page under the sheet to bring the field above the keyboard, past the bottom of the fixed sheet. Radix's `overflow: hidden` on the body does not stop that scroll on iOS.

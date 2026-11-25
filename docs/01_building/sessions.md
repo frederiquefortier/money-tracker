@@ -4,6 +4,14 @@ Short record of each working session: what the author asked, what was decided an
 
 <!-- Newest first: a new session goes directly below this line. Template at the bottom. -->
 
+### 2026-11-25 - CI's end-to-end job
+
+**What We Worked On:**
+- The author asked to fix the CI error. Every blocking job passed locally; the author pasted the log, and the e2e setup could not find the password field (bugs.md).
+
+**What Could We Do Better:**
+- Not run locally: no Docker or Playwright browser on the laptop, so the fix is confirmed by the next CI run.
+
 ### 2026-11-25 - The header's frosted glass elsewhere
 
 **What We Worked On:**
