@@ -268,8 +268,8 @@ Not in the notes, required by the brief. Details in [security.md](../01_building
   amount already in the display currency is shown as is, and converted amounts are marked
   (CUR-07, CUR-09).
 - **Q2. Rates provider** (2026-10-27): HexaRate validates a currency when it is added;
-  Frankfurter (ECB reference rates) provides the historical rates for conversion. See
-  ADR-009 for currencies outside the ECB list.
+  Frankfurter provides the historical rates for conversion, from the ECB and other central
+  banks (ADR-069).
 - **Q3. "Projections comme suisse"** (2026-10-27): projections are not v1. NW-06..08 and
   BUD-07 move to improvements.md.
 - **Q4. "Stat qui a été plus vue"** (2026-10-27): "who I saw the most", counted from shared

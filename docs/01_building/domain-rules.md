@@ -22,7 +22,7 @@ Business rules the schema and the screens do not make obvious. The code is the s
 ## Currency and conversion
 
 - Everything is displayed in the display currency, converted at the rate of the transaction's date; an amount already in it is never converted. A missing rate is an error, never zero, and one missing rate makes a total null rather than partial.
-- A currency the ECB does not publish has rates only from the day it was added.
+- Rates go back to 2018 for every currency Frankfurter has; one it lacks has rates only from the day it was added.
 - The conversion cost is spending wherever it happens (purchase in another currency, transfer between currencies). It is computed from rates, never stored, and counted in the transfer fee category, so nothing is counted twice.
 - Removing a currency never changes a transaction or account. The default currency and any currency an open account books in cannot be removed.
 

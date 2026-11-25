@@ -4,6 +4,25 @@ Technical and structural choices, with the alternatives that were rejected. Chec
 
 <!-- Newest first: a new ADR goes directly below this line. Template at the bottom. -->
 
+### ADR-069: Frankfurter v2 for every currency it has (2026-11-25)
+
+Supersedes ADR-009 for the rates; HexaRate still validates an added currency.
+
+**Context:**
+- Under ADR-009 a currency the ECB does not publish (CLP, GTQ) had HexaRate's rate from the day it was added and none before, so an older amount in it would stay without a rate. Frankfurter's v2 API now gathers rates from many central banks: 161 fiat currencies, CLP and GTQ daily from 1999.
+
+**Decision:**
+- The rates job asks Frankfurter v2 (`/v2/rates?base=EUR&from&to&quotes`) for the currencies someone uses and those already kept (the ECB's list), each resuming from its own last stored day, a year per call. A currency added later gets its history back to 2018 on the next run. Rows keep the `frankfurter` source; no migration.
+- `/v2/currencies` says which codes Frankfurter has, since an unknown one fails the whole query (422). HexaRate's daily rate stays only for a used currency Frankfurter lacks.
+
+**Alternatives Considered:**
+- Every currency Frankfurter has, used or not -> About 500,000 rows since 2018 for currencies nobody holds.
+- A paid provider -> Still a key, a bill and a third party seeing our currencies (ADR-009).
+
+**Consequences:**
+- Rates outside the ECB's list come from other central banks, not all of them the same kind of rate; over a trip the gap is a fraction of a percent.
+- A newly added currency has no rate until the next daily run, as before.
+
 ### ADR-068: A skeleton for text, a spinner for the rest (2026-11-25)
 
 **Context:**
@@ -980,6 +999,8 @@ Dependencies that stay:
 ---
 
 ### ADR-009: HexaRate validates, Frankfurter converts (2026-10-27)
+
+Partly superseded: the rates job by ADR-069.
 
 **Context:**
 - CUR-02 asks that added currencies be validated against HexaRate. CUR-07 converts at the rate of the transaction date, and the history starts in 2018.

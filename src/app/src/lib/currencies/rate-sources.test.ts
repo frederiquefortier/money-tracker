@@ -1,18 +1,24 @@
 import { describe, expect, it } from 'vitest'
-import { frankfurterRows, parseHexaRate } from '#/lib/currencies/rate-sources'
+import {
+  frankfurterCodes,
+  frankfurterRows,
+  parseHexaRate,
+} from '#/lib/currencies/rate-sources'
 
 describe('frankfurterRows', () => {
-  const known = new Set(['CAD', 'CHF', 'EUR'])
-  const body = {
-    base: 'EUR',
-    rates: {
-      '2024-02-29': { CAD: 1.4, CHF: 0.95 },
-      '2024-03-01': { CAD: 1.5039, CHF: 0.9551, ZZZ: 2, EUR: 1 },
-      '2024-03-04': { CAD: '1.6', CHF: -1 },
-    },
-  }
+  const known = new Set(['CAD', 'CLP', 'EUR'])
+  const body = [
+    { date: '2024-02-29', base: 'EUR', quote: 'CAD', rate: 1.4 },
+    { date: '2024-03-01', base: 'EUR', quote: 'CAD', rate: 1.5039 },
+    { date: '2024-03-01', base: 'EUR', quote: 'CLP', rate: 1047.2 },
+    { date: '2024-03-01', base: 'EUR', quote: 'ZZZ', rate: 2 },
+    { date: '2024-03-01', base: 'EUR', quote: 'EUR', rate: 1 },
+    { date: '2024-03-01', base: 'USD', quote: 'CLP', rate: 960 },
+    { date: '2024-03-02', base: 'EUR', quote: 'CLP', rate: '1050.1' },
+    { date: '2024-03-04', base: 'EUR', quote: 'CAD', rate: -1 },
+  ]
 
-  it('flattens days into rows from the start date, known currencies only', () => {
+  it('keeps EUR-based rows from the start date, known currencies only', () => {
     expect(frankfurterRows(body, '2024-03-01', known)).toEqual([
       {
         quote: 'CAD',
@@ -21,15 +27,15 @@ describe('frankfurterRows', () => {
         source: 'frankfurter',
       },
       {
-        quote: 'CHF',
+        quote: 'CLP',
         rate_date: '2024-03-01',
-        rate: '0.9551',
+        rate: '1047.2',
         source: 'frankfurter',
       },
       {
-        quote: 'CAD',
-        rate_date: '2024-03-04',
-        rate: '1.6',
+        quote: 'CLP',
+        rate_date: '2024-03-02',
+        rate: '1050.1',
         source: 'frankfurter',
       },
     ])
@@ -37,8 +43,24 @@ describe('frankfurterRows', () => {
 
   it('returns nothing for an unexpected body', () => {
     expect(
-      frankfurterRows({ message: 'not found' }, '2024-03-01', known),
+      frankfurterRows({ status: 422, message: 'invalid' }, '2024-03-01', known),
     ).toEqual([])
+  })
+})
+
+describe('frankfurterCodes', () => {
+  it('keeps the fiat currencies', () => {
+    expect(
+      frankfurterCodes([
+        { iso_code: 'GTQ', type: 'currency' },
+        { iso_code: 'ADA', type: 'crypto' },
+        { iso_code: 'XAU', type: 'metal' },
+      ]),
+    ).toEqual(new Set(['GTQ']))
+  })
+
+  it('returns nothing for an unexpected body', () => {
+    expect(frankfurterCodes(null)).toEqual(new Set())
   })
 })
 

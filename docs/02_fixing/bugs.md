@@ -4,6 +4,12 @@ Track bugs with dates, solutions, and prevention notes. Search this file before 
 
 <!-- Newest first: a new bug goes directly below this line. Template at the bottom. -->
 
+### 2026-11-25 - No exchange rate after 2026-11-02
+- **Issue**: No rate of any kind was stored after 2026-11-02, and CLP and GTQ, added on 2026-11-12, had none at all.
+- **Root Cause**: The Netlify rates function had no `SUPABASE_SECRET_KEY`; the history came from a run of `npm run rates` on the laptop. CLP and GTQ also had no source for past days (ADR-009).
+- **Solution**: The author sets `SUPABASE_SECRET_KEY` on Netlify (Functions only, setup.md). The job moved to Frankfurter v2 (ADR-069), and a laptop run filled CLP and GTQ back to 2018 and every currency to 2026-11-25. Each run now logs a first line, so one that stops at once still shows.
+- **Prevention**: A function that logs nothing has not run; check its variables first.
+
 ### 2026-11-25 - A sheet shrank and moved up when the keyboard opened
 - **Issue**: On an iPhone, tapping a field in a sheet made the sheet shorter and moved it up, so the whole page seemed to jump.
 - **Root Cause**: `useVisualViewport` (2026-11-12) set the sheet's top and height to the visible area at each keyboard move. It was added for two symptoms never confirmed on a device: the first letter lost in a picker and a tap landing below the field.

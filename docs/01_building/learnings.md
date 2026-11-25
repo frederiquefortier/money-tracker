@@ -4,6 +4,27 @@ Document new concepts, techniques, and knowledge gained. Reference this file to 
 
 <!-- Newest first: a new entry goes directly below this line. Template at the bottom. -->
 
+### 2026-11-25 - How Frankfurter v2 answers
+
+**What Was New:**
+- Frankfurter's v2 API, probed to give CLP and GTQ a history (ADR-069).
+
+**Key Points:**
+- `/v2/rates?base=EUR&from=…&to=…&quotes=…` returns a flat list of `{date, base, quote, rate}`. Like v1, it starts on the last day before `from`.
+- A year of every currency is about 68,000 rows, 4.3 MB and 25 s, crypto included; `quotes` keeps it small.
+- An unknown code in `quotes` fails the whole query with a 422; `/v2/currencies` lists the codes, typed `currency`, `crypto` or `metal`.
+- A start date in the future answers an empty list, not v1's 404.
+- Some central banks publish on weekends, so a day can hold a few currencies only.
+
+**Sources:**
+- api.frankfurter.dev, `/v2/currencies`, `/v2/providers`, `/v2/rates`
+
+**Where to Learn More:**
+- `/v2/providers` lists each central bank, its rate type and its currencies.
+
+**Applied In:**
+- `src/app/src/lib/currencies/rate-sources.ts`, `src/app/netlify/functions/rates.ts`.
+
 ### 2026-11-18 - Return without deposits (modified Dietz)
 
 **What Was New:**

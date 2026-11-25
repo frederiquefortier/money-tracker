@@ -11,7 +11,7 @@
   Supabase: Postgres (source of truth) + Auth (TOTP MFA)
         ▲
         │  daily rates + 2018 backfill
-  Frankfurter (ECB rates, conversion)    HexaRate (validates added currencies)
+  Frankfurter (central bank rates)       HexaRate (validates added currencies)
 ```
 
 ## Stack
@@ -23,7 +23,7 @@
 | UI | React 19, TanStack Router (loaders, no separate query cache), shadcn/ui on Tailwind, Recharts for charts | ADR-003, ADR-011 |
 | Forms | Native React 19 form actions; Zod validates every server function input | ADR-003, ADR-011 |
 | Money | `numeric` in Postgres, strings over the wire, `BigInt` minor units for the rare TypeScript calculation | ADR-004, ADR-011 |
-| Exchange rates | Frankfurter for history and daily rates, HexaRate to validate new currencies | ADR-009 |
+| Exchange rates | Frankfurter for history and daily rates, HexaRate to validate new currencies | ADR-009, ADR-069 |
 | Languages | French and English: react-i18next for messages, `Intl` for formatting | ADR-008 |
 | Dependencies | Platform first; the short list of what stays is in ADR-011 | ADR-011 |
 | Hosting | Netlify | brief |
