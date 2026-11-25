@@ -4,6 +4,26 @@ Technical and structural choices, with the alternatives that were rejected. Chec
 
 <!-- Newest first: a new ADR goes directly below this line. Template at the bottom. -->
 
+### ADR-070: The default excluded categories open from a settings icon (2026-11-25)
+
+Supersedes ADR-056 for where the default list lives; the model is unchanged.
+
+**Context:**
+- Under ADR-056 the default list was a third tab, Réglages, on the Événements page. It is a setting, not a list: on that tab the search, the sort and the count went away, and the + still offered an event or a type. The author asked to take it out of the tab row.
+
+**Decision:**
+- A round settings icon beside the sort, on both tabs, opens the category picker sheet ("Catégories exclues par défaut") directly. It saves when the sheet closes, as before.
+- The explanation, a tooltip before, is a help notice at the top of the sheet: `FormAlert` with a new `help` tone (a grey tint, a ? icon, `role="note"`).
+- The page keeps two tabs, Événements and Types, both lists with the search, the sort and the +.
+
+**Alternatives Considered:**
+- The list above the events -> ADR-055 had it there; ADR-056 moved it out.
+- Only from an event's form -> Changing a rule for every event would mean opening one of them.
+- A "Réglages" sheet linking to the picker -> One more step for a single setting; it can come if a second event setting does.
+
+**Consequences:**
+- The setting is behind an icon, less visible than a tab; it is set rarely.
+
 ### ADR-069: Frankfurter v2 for every currency it has (2026-11-25)
 
 Supersedes ADR-009 for the rates; HexaRate still validates an added currency.

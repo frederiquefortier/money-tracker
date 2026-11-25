@@ -4,6 +4,14 @@ Short record of each working session: what the author asked, what was decided an
 
 <!-- Newest first: a new session goes directly below this line. Template at the bottom. -->
 
+### 2026-11-25 - The excluded categories leave the tab row
+
+**What We Worked On:**
+- The author asked to redesign the Réglages tab of Événements (improvements.md, 2026-11-16): a setting does not fit a row of list tabs, where the search, the sort and the + belong. The assistant proposed a settings icon beside the sort opening the category picker directly, with the tooltip text in the sheet; the author asked for that text as a notice with a ? icon. Built (ADR-070): the round icon on both tabs, `FormAlert` with a `help` tone, in the gallery, and the `settings` and `circle-help` icons.
+
+**What Could We Do Better:**
+- Not seen in the browser: the Playwright browser was not signed in.
+
 ### 2026-11-25 - Loaders, skeletons, the adjustment sheet and Safari
 
 **What We Worked On:**

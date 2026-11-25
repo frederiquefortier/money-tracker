@@ -20,6 +20,9 @@ export const successTint = 'bg-income/10 text-income'
 /** The orange tint of a notice that asks for a look but is not an error. */
 export const warningTint = 'bg-warning/15 text-warning-foreground'
 
+/** The grey of a notice that explains a setting. */
+export const helpTint = 'bg-muted text-foreground'
+
 // Layers: 10 inside a screen, 20 header and tab bar, 30 add button, 50 overlays (sheet,
 // dialog, menu, calendar), 60 toast, 70 tooltip.
 

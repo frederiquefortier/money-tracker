@@ -15,6 +15,9 @@ export function FeedbackSection() {
           <FormAlert>The change was not saved.</FormAlert>
           <FormAlert tone="warning">3 transactions need a look.</FormAlert>
           <FormAlert tone="success">Saved.</FormAlert>
+          <FormAlert tone="help">
+            What a setting does, at the top of its sheet.
+          </FormAlert>
           <FormAlert tone="warning" size="tag">
             3 lines already in, skipped
           </FormAlert>

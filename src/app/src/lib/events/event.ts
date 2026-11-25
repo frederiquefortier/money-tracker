@@ -40,7 +40,7 @@ export type LinkedEvent = {
 
 export type EventSource = 'manual' | 'auto'
 
-export const EVENT_TABS = ['events', 'types', 'settings'] as const
+export const EVENT_TABS = ['events', 'types'] as const
 export type EventTab = (typeof EVENT_TABS)[number]
 
 export const EVENT_SORTS = [

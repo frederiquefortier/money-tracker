@@ -16,8 +16,9 @@ import { isArchived } from '#/lib/categories/category'
 import type { Category } from '#/lib/categories/category'
 import { cn } from '#/lib/utils'
 
-// The categories an event's link by date leaves out (EVT-07, ADR-055, ADR-056): the default
-// list in the Réglages tab, which an event follows until it has its own.
+// The categories an event's link by date leaves out (EVT-07, ADR-055, ADR-056, ADR-070): the
+// default list behind the Événements page's settings icon, which an event follows until it
+// has its own.
 
 type Ids = Array<string>
 

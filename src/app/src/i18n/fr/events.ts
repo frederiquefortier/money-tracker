@@ -3,7 +3,7 @@ export const eventsFr = {
   events: {
     title: 'Événements',
     tabsLabel: 'Événements ou types',
-    tabs: { events: 'Événements', types: 'Types', settings: 'Réglages' },
+    tabs: { events: 'Événements', types: 'Types' },
     sort: {
       dateDesc: 'Date (plus récente)',
       dateAsc: 'Date (plus ancienne)',
@@ -34,7 +34,7 @@ export const eventsFr = {
     choosePeople: 'Choisir des proches',
     skip: 'Catégories exclues du lien automatique',
     skipTitle: 'Catégories exclues',
-    skipInfoLabel: 'À propos des catégories exclues',
+    defaultSkipsTitle: 'Catégories exclues par défaut',
     skipDefaultInfo:
       'Un événement se lie automatiquement à toutes les transactions de ses dates, à moins que ce lien soit désactivé pour lui. Les catégories choisies ici ne sont jamais liées automatiquement, sauf pour un événement qui a sa propre liste.',
     usingDefault: 'Par défaut',

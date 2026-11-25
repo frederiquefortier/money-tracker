@@ -4,7 +4,7 @@ export const eventsEn: typeof eventsFr = {
   events: {
     title: 'Events',
     tabsLabel: 'Events or types',
-    tabs: { events: 'Events', types: 'Types', settings: 'Settings' },
+    tabs: { events: 'Events', types: 'Types' },
     sort: {
       dateDesc: 'Date (newest)',
       dateAsc: 'Date (oldest)',
@@ -35,7 +35,7 @@ export const eventsEn: typeof eventsFr = {
     choosePeople: 'Choose people',
     skip: 'Categories left out of the automatic link',
     skipTitle: 'Left-out categories',
-    skipInfoLabel: 'About left-out categories',
+    defaultSkipsTitle: 'Default left-out categories',
     skipDefaultInfo:
       'An event links itself to every transaction in its dates, unless its automatic link is turned off. The categories chosen here are never linked automatically, except for an event with its own list.',
     usingDefault: 'Default',

@@ -27,7 +27,7 @@ import { useStoredState } from '#/hooks/app/use-stored-state'
 import { getEvents } from '#/server/events'
 import { getPeople } from '#/server/people'
 import { getCategories } from '#/server/categories'
-import { DefaultSkips } from '#/components/events/list/default-skips'
+import { DefaultSkipsButton } from '#/components/events/list/default-skips'
 import { byName, oneOf } from '#/lib/shared/collections'
 import { todayIso } from '#/lib/shared/format'
 import { matcher } from '#/lib/shared/search'
@@ -146,7 +146,7 @@ function TypeList({ query, sort }: { query: string; sort: TypeSort }) {
   )
 }
 
-/** Each list keeps its sort; the settings tab has none. */
+/** Each list keeps its sort. */
 function SortFor({
   tab,
   sort,
@@ -161,7 +161,6 @@ function SortFor({
   onTypeSort: (sort: TypeSort) => void
 }) {
   const { t } = useTranslation()
-  if (tab === 'settings') return null
   return tab === 'events' ? (
     <SortMenu
       sort={sort}
@@ -179,11 +178,6 @@ function SortFor({
   )
 }
 
-function SkipSettings() {
-  const { categories, defaultSkipIds } = Route.useLoaderData()
-  return <DefaultSkips categories={categories} saved={defaultSkipIds} />
-}
-
 function Events() {
   const { t } = useTranslation()
   const [tab, setTab] = useStoredState<EventTab>(
@@ -197,7 +191,7 @@ function Events() {
     'dateDesc',
     parseSort,
   )
-  const { events, types } = Route.useLoaderData()
+  const { events, types, categories, defaultSkipIds } = Route.useLoaderData()
   const [typeSort, setTypeSort] = useStoredState<TypeSort>(
     'events.typeSort',
     'nameAsc',
@@ -207,20 +201,21 @@ function Events() {
   return (
     <ListPage
       title={t('events.title')}
-      count={
-        { events: events.length, types: types.length, settings: null }[tab]
-      }
+      count={tab === 'events' ? events.length : types.length}
       actions={
-        <SortFor
-          tab={tab}
-          sort={sort}
-          typeSort={typeSort}
-          onSort={setSort}
-          onTypeSort={setTypeSort}
-        />
+        <>
+          <SortFor
+            tab={tab}
+            sort={sort}
+            typeSort={typeSort}
+            onSort={setSort}
+            onTypeSort={setTypeSort}
+          />
+          <DefaultSkipsButton categories={categories} saved={defaultSkipIds} />
+        </>
       }
     >
-      {tab !== 'settings' && <SearchField value={query} onChange={setQuery} />}
+      <SearchField value={query} onChange={setQuery} />
       <TabList
         label={t('events.tabsLabel')}
         tabs={EVENT_TABS}
@@ -238,7 +233,6 @@ function Events() {
       >
         {tab === 'events' && <EventList query={query} sort={sort} />}
         {tab === 'types' && <TypeList query={query} sort={typeSort} />}
-        {tab === 'settings' && <SkipSettings />}
       </div>
       <AddMenu />
       {/* The event and type forms open here as sheets. */}

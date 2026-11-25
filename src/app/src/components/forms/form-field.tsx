@@ -6,6 +6,7 @@ import { FieldLabel } from '#/components/ui/field'
 import { cn } from '#/lib/utils'
 import {
   errorTint,
+  helpTint,
   focusRing,
   successTint,
   warningTint,
@@ -111,6 +112,14 @@ export const ALERT_TONES = {
     surface: successTint,
     icon: 'circle-check',
   },
+  help: { surface: helpTint, icon: 'circle-help' },
+} as const
+
+const ALERT_ROLES = {
+  error: 'alert',
+  warning: 'status',
+  success: 'status',
+  help: 'note',
 } as const
 
 export function FormAlert({
@@ -119,7 +128,7 @@ export function FormAlert({
   className,
   children,
 }: {
-  tone?: 'error' | 'success' | 'warning'
+  tone?: keyof typeof ALERT_TONES
   /** `tag`: one line, pill-shaped, to sit beside a title. */
   size?: 'default' | 'tag'
   className?: string
@@ -127,7 +136,7 @@ export function FormAlert({
 }) {
   return (
     <p
-      role={tone === 'error' ? 'alert' : 'status'}
+      role={ALERT_ROLES[tone]}
       className={cn(
         'flex gap-2',
         size === 'tag'
