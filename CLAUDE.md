@@ -60,19 +60,28 @@ laptop with `npm run db:push` and try work locally before it reaches `main` (ADR
 
 ## Definition of done
 A change is done when the docs it affects are updated in the same change. A stop hook
-flags a session that touched `src/` without touching `docs/`.
+flags a migration, a dependency or a new route with no doc change; for the rest, decide
+whether a row below applies.
 
 | The change... | ...also updates |
 |---|---|
 | adds, changes or drops a feature | [requirements.md](docs/00_briefing/requirements.md) (the row, its phase) and [roadmap.md](docs/03_planning/roadmap.md) |
 | touches the schema | [database.md](docs/01_building/database.md), with a pgTAP test, and `npm run db:types` |
-| makes or reverses a structural choice | a new ADR in [decisions.md](docs/01_building/decisions.md) (never edit an old ADR's decision; supersede it) |
+| makes or reverses a choice that is costly to undo (schema, security, data flow, hosting, a dependency, a pattern the whole codebase follows) | a new ADR in [decisions.md](docs/01_building/decisions.md) (never edit an old ADR's decision; supersede it). Screen and interaction choices go in design-decisions.md; naming and folder tweaks only in the session's entry |
 | adds a dependency | its line in ADR-011 |
 | changes the import format | [import.md](docs/01_building/import.md) and the templates |
 | changes a security rule | [security.md](docs/01_building/security.md) |
 | changes direction on a proposal | the session's entry in sessions.md, saying what was proposed and what the author decided |
-| ends a working session | the session's entry in [sessions.md](docs/01_building/sessions.md): one per session, short, kept up to date as the work goes; the big lines of what the author asked or corrected, and why |
+| ends a working session | the session's entry in [sessions.md](docs/01_building/sessions.md): one per session, kept up to date as the work goes; the big lines of what the author asked or corrected, and why |
 | changes what the project is or how to run it | [README.md](README.md) |
+
+Journal entries stay short, and a fact lives in one doc that the others point to (by ADR
+number or requirement ID) instead of restating it:
+- A sessions entry: at most 5 one-line bullets under What We Worked On, one line in each
+  other section, and a section with nothing to say is left out.
+- An ADR: about 120 words. One line of context, up to 3 decision bullets, up to 2 rejected
+  options, up to 2 consequences. No lists of component or file names; the code has them.
+- A bug: one line per field.
 
 Commit messages start with a plain type, `feat:`, `fix:`, `docs:`, `chore:`, `ci:`, `refactor:`,
 with no scope and no requirement ID in it.

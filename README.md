@@ -65,7 +65,8 @@ purchase belonged to, other than a memo column. The questions that matter most, 
 cost of a trip or who still owes what, can't be asked of it.
 
 The features were first written as user stories, then tried in a prototype on Lovable. This
-repo is the rewrite, on a stack I control.
+repo is the rewrite, on a stack I control. My role was product owner, and I was after
+development speed for an internal tool I use every month.
 
 ## Goals
 
@@ -136,8 +137,9 @@ runs. Setup from an empty Supabase project is in [setup.md](docs/01_building/set
   with a fee between currencies, and some currencies with no rate history. A missing rate
   shows as an error so a total is never quietly wrong.
 - **Steering an assistant that forgets.** Claude wrote most of the code and starts every
-  session blank. The rules live in [CLAUDE.md](CLAUDE.md), hooks and the dev journal, and I
-  learned to ask for options before code ([process.md](docs/01_building/process.md)).
+  session blank. The rules live in [CLAUDE.md](CLAUDE.md), hooks and the dev journal, and
+  every change starts with options and an explicit decision before any code
+  ([process.md](docs/01_building/process.md)).
 
 Most of the decisions below come straight out of these.
 

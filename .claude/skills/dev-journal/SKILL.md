@@ -260,8 +260,8 @@ This project maintains a development journal in `docs/` for consistency across s
 - Document new bugs and solutions when resolved
 
 **After completing AI coding sessions:**
-- Log session summary in `docs/01_building/sessions.md`
-- Include what worked well, friction points, and key takeaways
+- Log session summary in `docs/01_building/sessions.md`, one entry per session, within the caps below
+- Include what worked well, friction points, and key takeaways when there are any
 - Note patterns for future sessions
 
 **When the user learns something (teacher mode):**
@@ -283,7 +283,9 @@ This project maintains a development journal in `docs/` for consistency across s
 - **Newest first** - new entries go directly below the marker comment at the top of the file, never appended at the end
 - **Keep the format template at the bottom** of each file, below the `---` rule
 - **Prefer bullet lists over tables** for simplicity and ease of editing
-- **Keep entries concise** (1-3 lines for descriptions)
+- **Keep entries short, with caps**: a session's What We Worked On has at most 5 one-line bullets and each other section one line (left out when empty); an ADR is about 120 words (one line of context, up to 3 decision bullets, 2 rejected options, 2 consequences); a bug has one line per field. When an entry grows during a session, rewrite it short instead of appending
+- **One fact, one home**: an entry points to an ADR number or requirement ID instead of restating it; code details (component names, file lists, measurements) stay in the code and git history
+- **An ADR only for a choice costly to undo**: schema, security, data flow, hosting, a dependency, a pattern the whole codebase follows. Screen and interaction choices and naming tweaks are not ADRs
 - **Always include dates** for temporal context
 - **Include URLs** for tickets, documentation, monitoring dashboards, learning resources
 - **Manual cleanup** of old entries is expected (not automated)

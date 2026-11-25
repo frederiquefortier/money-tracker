@@ -18,6 +18,7 @@ Business rules the schema and the screens do not make obvious. The code is the s
 - Every expense and income has at least one split. With people, each person's share comes off each split proportionally.
 - A person once per transaction; a group is only a shortcut to add its members.
 - The seller (`seller_person_id`) is who I bought from, on expenses only. `with` lines carry no money.
+- An invited person is "with me, and I paid for them": no part of their own (0), like `me` and `with`, so Moi holds the whole amount less what others owe back. `owes` and `from` lines need a part (`owes` may be unknown). A tiny positive part was rejected: it rounds to 0 in some amounts.
 
 ## Currency and conversion
 
@@ -37,15 +38,18 @@ Business rules the schema and the screens do not make obvious. The code is the s
 
 - Only expenses and incomes link, the whole transaction whatever its splits. A transaction matches an event when its date is in the event's dates. Two matches: the narrower range wins, then the earlier created.
 - A manual link is never changed by the rule. An automatic link is lost when the date leaves the range. Removing an automatic link by hand is remembered, and choosing the event again forgets it.
-- Recomputed when an event's dates or `auto_link` change and when a transaction's date or kind changes.
+- The link by date skips categories: a default list, or the event's own list once it has one (`skips_own`), even empty. In the form the defaults show ticked; a change makes the list the event's own, and picking exactly the defaults follows the default again, so a later change to it reaches the event. A skipped category takes its sub-categories; a transaction is skipped only when all its splits are. Manual links ignore the skips.
+- An event with `auto_link` off links by hand only and is never offered for a date. Turning it off hands its automatic links to the next matching event and keeps the manual ones; no removal is recorded, so turning it on links the dates again.
+- The form, the save, the import and `relink_events` use the same match (`matching_event`). Recomputed when an event or the default list is saved, and when a transaction's date or kind changes.
 
 ## Net worth and holdings
 
 - The total counts open accounts (hidden-for-new ones included) and open holdings at their latest value. Debts subtract, a credit card counts as a debt, a holding with no value yet adds nothing, closed items are left out.
-- Hiding an item is a choice in the browser, never a setting on the item. A hidden item leaves the charts, the net worth and the group totals, and stays listed, marked (NW-05, ADR-058).
+- Hiding an item is a choice in the browser, never a setting on the item. A hidden item leaves the charts, the net worth and the group totals, and stays listed, marked (NW-05).
 - The chart takes month ends, then today, each at its own date's rate. A month with no new value keeps the last one; a closed item keeps its closing month end (an account at its balance, a holding at 0). Pending transactions count.
 - **Placed** is the money in (linked expenses at their own date's rate, external contributions, transfers in) and never goes down. **Withdrawn** is the money out (linked incomes, transfers out). **Profit** is the latest value plus withdrawn minus placed, and its percent is over placed. Both are empty, never zero, with no value, nothing placed or a missing rate.
-- An investment's change over a range is its return: money put in or taken out is left out, weighted by time (ADR-062). On Tout every change is per year.
+- An investment's change over a range is its return (modified Dietz): the change in value less money in plus money out, over the start value plus each flow weighted by its share of the range. A holding with no value at the start begins at its first money in. On Tout every change is per year, compounded. A return chained month by month was rejected: values are typed months apart, so a deposit read as a loss, then a jump.
+- The return's percent is a float, shown only and never summed (ADR-004); the gain stays an exact amount.
 - A transaction links to a holding only when it is an expense or an income whose categories are all investments. A debt's value is typed positive; a debt payment does not link to it.
 - A holding with a history (a linked transaction, a value, a contribution or a transfer) can only be archived, its currency is fixed, and it cannot close before its last entry. Two open holdings cannot share a name; unnamed ones never conflict.
 

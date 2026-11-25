@@ -22,15 +22,17 @@ work runs on:
 
 - **Design before code.** Options and trade-offs, then an explicit decision, then code. A
   plausible implementation looks finished, so the thinking never happens.
-- **Every structural decision is an ADR, written when it is made.** Written afterwards, it
-  documents what was built and loses the alternatives.
+- **Every decision costly to undo is an ADR, written when it is made.** Written afterwards, it
+  documents what was built and loses the alternatives. Screen choices go in
+  design-decisions.md. Journal entries have length caps (CLAUDE.md).
 - **Platform first, then mainstream** (ADR-011). The assistant tends to add a library per
   concern. Every dependency is listed in ADR-011 with why the native version is not enough.
 - **Real data never enters a transcript.** A hook denies reads of `src/data/local/`, `.env`
   files and dumps. Category names and counts are discussed; amounts, memos and people are not.
 - **The assistant never commits.** It proposes a message; the author reads the diff and commits.
 - **Docs are part of done.** The definition of done in CLAUDE.md names the doc each kind of
-  change updates, and a stop hook flags code changed without docs.
+  change updates, and a stop hook flags a migration, a dependency or a new route without docs.
+  ESLint runs once at the end of a turn, Prettier after each edit.
 
 ## How the output is checked
 

@@ -4,6 +4,48 @@ Technical and structural choices, with the alternatives that were rejected. Chec
 
 <!-- Newest first: a new ADR goes directly below this line. Template at the bottom. -->
 
+### ADR-078: Privacy mode and the folded net worth groups are httpOnly cookies (2026-11-25)
+
+Merges ADR-071 and ADR-074.
+
+**Context:**
+- Privacy mode (SET-08) and the hub's folded groups (ACC-07) must render right on a full load; browser storage applies only after hydration.
+
+**Decision:**
+- Each is an httpOnly cookie (`figures-hidden`, `net-worth-collapsed`) the server reads with the page's data and a server function writes. Folded keys are checked on both sides.
+- Privacy mode masks amounts as "##,## $" and percents as "## %" inside `Money`, `Percent` and `useMoneyText`, so the digits never reach the page. Forms being filled, memos and names stay shown.
+- Sorts, tabs and open branches stay in browser storage.
+
+**Alternatives Considered:**
+- Browser storage -> Figures flash and groups jump on every load. A cookie written by the browser -> Not httpOnly (security.md).
+- A CSS blur or bullets per digit -> The number, or its length and sign, stays in the page.
+
+**Consequences:**
+- Every new way of showing an amount goes through `Money`, `Percent` or `useMoneyText`.
+
+---
+
+### ADR-077: One hosted Supabase project on free plans, tested in CI (2026-11-25)
+
+Merges ADR-014, ADR-016, ADR-017 and ADR-022. The one account is ADR-021.
+
+**Context:**
+- The development Mac cannot run current Docker, so there is no local stack. One user, free plans.
+
+**Decision:**
+- One project, `money-tracker`, for development and real use, on free Supabase and Netlify. CI runs `db lint` and pgTAP on a fresh database; deploy previews are off.
+- CI on `main` migrates after a backup. Until the first real import, `npm run db:push` also migrates from the laptop, with no backup; revisit before that import. Migrations are additive, since the app and the database deploy apart.
+- The nightly encrypted dump is the only backup; it and one tested restore gate the first real import. Upgrade near 500 MB, or when pauses or Ohio latency hurt.
+
+**Alternatives Considered:**
+- Separate dev and production projects -> A second schema to keep in step, and the free slot kept for the demo (DEM-01), which must never share real data.
+- Supabase Pro now -> A cost not needed yet.
+
+**Consequences:**
+- A bad migration reaches real data; pgTAP, the additive rule and the backup are the defences.
+
+---
+
 ### ADR-076: Shared hooks in `hooks/`, features in `form/` and `list/`, history out of comments (2026-11-25)
 
 **Context:**
@@ -27,39 +69,11 @@ Technical and structural choices, with the alternatives that were rejected. Chec
 
 ### ADR-075: Each list page and list end loads in its own shape (2026-11-25)
 
-**Context:**
-- ADR-072 kept a spinner at the end of every list except transactions. The author asked for a skeleton there too.
-- ADR-072 gave the settings and data pages `SkeletonRows`, made for the filter sheet's check list: a checkbox on every row of pages that have none. The author asked to check each page's skeleton.
-
-**Decision:**
-- Supersedes ADR-072's spinner for the ends of lists. `ListEnd` shows one row of two bars at a list row's height, unless the list passes its own `placeholder` (transactions keep their skeleton day). Every `Revealed` list, the merchants page, the merchant filter and the combobox get it.
-- Supersedes ADR-072's `SkeletonRows` for the other pages. `listPagePending` has no default body: each page passes its own skeleton, next to its rows (`MerchantsSkeleton`, `PeopleSkeleton`, `EventsSkeleton`, `InstitutionsSkeleton`, `CurrenciesSkeleton`, `CategoriesSkeleton`, `ImportSkeleton`). The list pages draw the search and tabs they have, then their rows through `SkeletonListPage` and `SkeletonNameRow`, at the rows' height. `SkeletonRows` stays for the filter sheet.
-- `Spinner` stays for an action under way in its button and a sheet loading.
-
-**Alternatives Considered:**
-- A skeleton fitted to each list's end -> One more shape per list to keep in step, for a row that shows a moment at most.
-- Keep a default body -> A new page would get a shape that is not its own without anyone noticing.
-
-**Consequences:**
-- In the combobox the row is a little taller than an option.
+Removed 2026-11-25 (a screen choice): loading states are in [design-decisions.md](../00_briefing/designs/design-decisions.md).
 
 ### ADR-074: The net worth hub's folded groups are saved in a cookie (2026-11-25)
 
-**Context:**
-- The hub's groups kept their folded state in browser storage (ACC-07). The server cannot read it, so a page load rendered every group open until hydration, then closed the folded ones. The author asked for a cookie, as privacy mode has (ADR-071).
-
-**Decision:**
-- An httpOnly `net-worth-collapsed` cookie holds the folded group keys as JSON. `getNetWorth` reads it with the page's data, so the server renders the groups already folded. A toggle shows at once (`useCollapsedGroups`); `setCollapsedGroups` writes the cookie after, one save at a time.
-- The keys are checked on both sides: at most 100, each a type, an institution's id or empty (no institution).
-- The other stored choices (sorts, tabs, open category branches) stay in browser storage.
-
-**Alternatives Considered:**
-- Browser storage read on the first render -> Fixed a page opened from inside the app, not a full load.
-- A cookie written by the browser -> Not httpOnly, unlike every other cookie of the app (security.md).
-- Every stored choice in cookies -> They would ride on every request; the author asked for the drawers.
-
-**Consequences:**
-- Each fold or unfold is a small request. The choice is per browser and lost with the cookies; the earlier browser-stored state is not carried over.
+Merged into ADR-078.
 
 ### ADR-073: TanStack Query caches the reads made outside loaders (2026-11-25)
 
@@ -81,63 +95,15 @@ Technical and structural choices, with the alternatives that were rejected. Chec
 
 ### ADR-072: Pages, charts and transactions load as skeletons (2026-11-25)
 
-**Context:**
-- ADR-068 kept a spinner for charts, the transactions list and pages loading. The author asked for skeletons there instead: a spinner tells nothing of what is coming, and the page jumps when it arrives.
-
-**Decision:**
-- Supersedes ADR-068's spinner for charts, pages and the transactions list; its text skeletons stand.
-- A page with a loader shows its title and a skeleton of its body (`listPagePending`'s `body`): `DashboardSkeleton` (the cards' grid), `NetWorthSkeleton` (the chart's card beside the list), `TransactionDaysSkeleton` (days of rows), `SkeletonRows` for the other pages.
-- A chart waits as a plain block in its own space (`SkeletonCard`, `ChartContainer` until hydration), with no bars or lines drawn, so it never reads as a figure. The heat map's empty grid pulses while its year loads.
-- The transactions list gives way to its skeleton while a filter, period or search reloads, and the next days at its end load as one skeleton day (`ListEnd`'s `placeholder`).
-- `Spinner` stays for an action under way in its button, a sheet loading, and the ends of the other lists.
-
-**Alternatives Considered:**
-- Keep the stale list dimmed under a spinner while it reloads -> Rows that are about to change still read as the answer.
-- Fake bars or lines in a chart skeleton -> They would read as data (ADR-068's reason, kept).
-
-**Consequences:**
-- A page whose layout changes must update its skeleton in the same change.
+Removed 2026-11-25 (a screen choice): loading states are in [design-decisions.md](../00_briefing/designs/design-decisions.md).
 
 ### ADR-071: Privacy mode hides figures in a fixed shape, saved in a cookie (2026-11-25)
 
-**Context:**
-- The author uses the app where others can see the screen and asked for privacy mode (SET-08).
-
-**Decision:**
-- A shield in the top bar. On, every amount shows as "##,## $" and every percent as "## %", whatever its size or sign; the currency stays. `Money`, `Percent` and `useMoneyText` render the mask, so the digits never reach the page. Chart axes lose their labels.
-- Saved in an httpOnly `figures-hidden` cookie read with the session, so a load renders hidden from the server.
-- Forms being filled, memos, names and the tab title stay shown.
-
-**Alternatives Considered:**
-- Browser storage -> The real figures would flash on every load.
-- On the profile -> The concern is a device's screen.
-- A CSS blur -> The number stays in the page text.
-- Bullets per digit -> The mask's length and sign still told the size and direction.
-- Hiding memos and names -> Lists would read as masks only.
-- The eye -> It already means an item left out of the net worth chart (ADR-058).
-
-**Consequences:**
-- Every new way of showing an amount goes through `Money`, `Percent` or `useMoneyText`.
+Merged into ADR-078.
 
 ### ADR-070: The default excluded categories open from a settings icon (2026-11-25)
 
-Supersedes ADR-056 for where the default list lives; the model is unchanged.
-
-**Context:**
-- Under ADR-056 the default list was a third tab, Réglages, on the Événements page. It is a setting, not a list: on that tab the search, the sort and the count went away, and the + still offered an event or a type. The author asked to take it out of the tab row.
-
-**Decision:**
-- A round settings icon beside the sort, on both tabs, opens the category picker sheet ("Catégories exclues par défaut") directly. It saves when the sheet closes, as before.
-- The explanation, a tooltip before, is a help notice at the top of the sheet: `FormAlert` with a new `help` tone (a grey tint, a ? icon, `role="note"`).
-- The page keeps two tabs, Événements and Types, both lists with the search, the sort and the +.
-
-**Alternatives Considered:**
-- The list above the events -> ADR-055 had it there; ADR-056 moved it out.
-- Only from an event's form -> Changing a rule for every event would mean opening one of them.
-- A "Réglages" sheet linking to the picker -> One more step for a single setting; it can come if a second event setting does.
-
-**Consequences:**
-- The setting is behind an icon, less visible than a tab; it is set rarely.
+Moved 2026-11-25 to [design-decisions.md](../00_briefing/designs/design-decisions.md) (Events): a screen choice.
 
 ### ADR-069: Frankfurter v2 for every currency it has (2026-11-25)
 
@@ -160,20 +126,7 @@ Supersedes ADR-009 for the rates; HexaRate still validates an added currency.
 
 ### ADR-068: A skeleton for text, a spinner for the rest (2026-11-25)
 
-**Context:**
-- The author asked for loaders on the charts, then for text to load as a skeleton, with every loader checked.
-
-**Decision:**
-- Text, a figure or a list of rows on its way shows `Skeleton` (`feedback/skeleton.tsx`) at the text's size and usual width, or `SkeletonRows` for a list, so nothing moves when it arrives: the export's line counts, the heat map's days count, the filter sheet's options, the rate and fee lines of a foreign receipt or transfer, the adjustment's balance and gap.
-- `Spinner` stays for an action under way (in its button), a chart (`ChartContainer` until hydration, the heat map until its year arrives), rows coming at the end of a list, a list refreshing over its old rows, and a page or sheet whose shape is not known yet.
-- A value that failed or is missing reads as itself (a dash, the missing-rate mark), never as a skeleton that does not end.
-
-**Alternatives Considered:**
-- Skeletons for whole pages and sheets -> One per page to draw and keep in step with it; the spinner under the title is enough while the shape is unknown.
-- A skeleton chart -> A chart's shape is its data; a grey bar chart would read as a figure.
-
-**Consequences:**
-- A new value fetched after the page draws gets a skeleton in its place.
+Removed 2026-11-25 (a screen choice): loading states are in [design-decisions.md](../00_briefing/designs/design-decisions.md).
 
 ### ADR-067: The export is one SQL function, zipped by the server (2026-11-24)
 
@@ -269,22 +222,7 @@ Supersedes ADR-009 for the rates; HexaRate still validates an added currency.
 
 ### ADR-062: An investment's row shows its return over the range, deposits left out (2026-11-18)
 
-**Context:**
-- An investment's row showed two look-alike figures: its lifetime profit, which ignored the range, and its change in value over the range, which counted every deposit as growth. The author asked for one figure per row, following the range, measured as a return.
-
-**Decision:**
-- Under an investment's value: its return over the range, the change in value less the money put in plus the money taken out, over the start value plus each flow weighted by its share of the range (modified Dietz). On Tout, past a year, per year and compounded.
-- A holding with no value at the range's start begins at its first money in.
-- `holding_flows()` gives each investment's flows by day in the display currency; the browser computes the return for any range.
-- The lifetime profit leaves the row: Placé, Retiré and Profit total show over the opened chart. Accounts, assets and debts keep their change in value.
-
-**Alternatives Considered:**
-- A time-weighted return chained month by month -> Values are typed months apart, so a deposit reads as a loss, then a jump.
-- The return in SQL per range -> Eight ranges per holding on every load, or a round trip per tab.
-- The lifetime profit in the subtitle with a label -> Two periods on one row.
-
-**Consequences:**
-- The percent is a float, shown only, never summed (ADR-004); the gain amount stays exact.
+Moved 2026-11-25 to [domain-rules.md](domain-rules.md) (Net worth and holdings).
 
 ### ADR-061: One net worth page, the subpages merged into it (2026-11-17)
 
@@ -309,52 +247,15 @@ Supersedes ADR-009 for the rates; HexaRate still validates an added currency.
 
 ### ADR-060: The hub's subpage cards carry no total (2026-11-17)
 
-**Context:**
-- ADR-046 put each subpage's total on its hub card, and ADR-058 kept those totals complete while the rest of the hub leaves the hidden items out.
-- Since the hub groups items by type (credit cards with the debts), the card "Comptes" and the group "Comptes" beside it showed two figures under one name. The author asked to remove the repeat.
-
-**Decision:**
-- The Comptes and Avoirs cards show a name, a count and a chevron. `getNetWorth` returns the counts and the net worth, no per-subpage totals.
-- The net worth, the composition and the item list's group headers are the hub's only figures, all without the hidden items.
-
-**Alternatives Considered:**
-- Renaming the card totals ("Tous les comptes") -> Still two figures for overlapping sets, and the card's total ignored what is hidden.
-- Dropping the cards for links beside the title -> The cards are the hub's only way into the subpages on a phone; kept as links.
-
-**Consequences:**
-- Supersedes ADR-046 and ADR-058 where the hub cards carry a complete total. The rest of both stands.
-- A subpage's total is its drawers' totals; the hub shows no "accounts only" figure.
+Removed 2026-11-25: a screen choice, replaced by ADR-061. The net worth page is in [design-decisions.md](../00_briefing/designs/design-decisions.md).
 
 ### ADR-059: No complete total under the hub's net worth (2026-11-17)
 
-**Context:**
-- ADR-058 showed "X $ (total)" under the net worth while items were hidden. After the hub's redesign the author asked to remove it.
-
-**Decision:**
-- The hub shows only the net worth without the hidden items. The eye beside the title, eye-off while some are hidden, is the one sign that something is left out.
-- The Comptes and Avoirs cards stay complete.
-
-**Alternatives Considered:**
-- Keeping the line -> The author found it clutter under the headline.
-
-**Consequences:**
-- Supersedes ADR-058 where it adds the complete figure under the net worth. The rest of ADR-058 stands.
+Removed 2026-11-25: a screen choice. The rule for hidden items is in [domain-rules.md](domain-rules.md).
 
 ### ADR-058: The hub's net worth leaves out the hidden items (2026-11-17)
 
-**Context:**
-- ADR-048 kept every hub total complete and made leaving items out a chart view. With the total now in the sidebar beside the chart, the author asked for it to follow what is hidden, with the complete figure under it.
-
-**Decision:**
-- Hidden items (the eye beside the page title, per browser) leave the chart, the sidebar's net worth, assets, debts and their changes, and the Détail list. While any are hidden, a line under the net worth reads "X $ (total)", X counting everything open.
-- The Comptes and Avoirs cards stay complete: they total their subpages.
-- Still no flag on the account or holding; the choice stays in the browser.
-
-**Alternatives Considered:**
-- The full total large and the visible one under it (as built on 2026-11-16) -> The author wanted the large figure to match the chart.
-
-**Consequences:**
-- Supersedes ADR-048 where the hub's total always counts everything. The rest of ADR-048 stands.
+Moved 2026-11-25 to [domain-rules.md](domain-rules.md) (Net worth and holdings).
 
 ### ADR-057: The net worth series is per item in SQL, summed in the browser (2026-11-16)
 
@@ -375,36 +276,11 @@ Supersedes ADR-009 for the rates; HexaRate still validates an added currency.
 
 ### ADR-056: An event's excluded categories may be its own empty list (2026-11-14)
 
-**Context:**
-- Under ADR-055 an emptied event list fell back to the default, so an event could not untick every default category. The author asked for the defaults to show ticked in the event and be deselectable, and for the default list to move to a tab.
-
-**Decision:**
-- `events.skips_own`: false follows the default list, true uses the event's `event_skips`, even empty. `save_event` takes null to follow the default.
-- In the event form the defaults show ticked and marked "Par défaut"; a change makes the list the event's own, and picking exactly the defaults follows them again.
-- The default list is the Événements page's Réglages tab, as a list; the explanation is a tooltip. The event field is a sub-field of the link checkbox, shaped like the other fields.
-
-**Alternatives Considered:**
-- Copy the defaults into the event when the link is ticked -> A later change to the default would not reach it; the author chose to follow the default.
-
-**Consequences:**
-- Supersedes ADR-055 where it says an emptied list follows the default and where the default list sits.
+Moved 2026-11-25 to [domain-rules.md](domain-rules.md) (Events), with ADR-055.
 
 ### ADR-055: The link by date skips categories again, with a default list (2026-11-13)
 
-**Context:**
-- Since 2026-11-09 an event links every expense and income in its dates. Salaries, phone bills and insurance landed in trips and were removed one by one (bugs.md). The author asked for the Sauf field back, with a default.
-
-**Decision:**
-- `event_default_skips`: the categories every event skips. `event_skips`: an event's own list, which replaces the default when it has any category; emptied, the event follows the default again.
-- A skipped category takes its sub-categories. A transaction is skipped only when all its splits are in skipped categories.
-- `matching_event` takes the form's category ids, or reads the saved splits, so the form and the save agree. Saving the default list recomputes every automatic link. Manual links ignore the skips.
-- The default list sits above the events on the Événements page; an event's form shows it, marked "Par défaut", until the event has its own.
-
-**Alternatives Considered:**
-- Per event only -> The same salary and phone categories on every trip. A default only -> No trip-specific exception. A flag on categories -> Hides an event rule in the category form.
-
-**Consequences:**
-- An event cannot skip nothing while a default exists.
+Moved 2026-11-25 to [domain-rules.md](domain-rules.md) (Events), with ADR-056.
 
 ### ADR-054: Pages change at the click, lists build what is on screen (2026-11-13)
 
@@ -447,37 +323,13 @@ Supersedes ADR-009 for the rates; HexaRate still validates an added currency.
 
 ### ADR-052: An invited person carries no amount of their own (2026-11-12)
 
-**Context:**
-- "Invited" means the author paid for the person, but the check wanted a part above zero, so a gift (the whole amount on Moi) could only be saved as a With line, which says the person was there, not paid for.
-
-**Decision:**
-- An invited person is "with me, and I paid for them": no amount of their own, a part of 0 allowed, like `me` and `with`. Owes and From lines still need a part (or an unknown amount for owes).
-- Every invited line was set to 0 on 2026-11-12; Moi holds the whole amount, less what others owe back. The form and the import write invited lines at 0.
-
-**Alternatives Considered:**
-- Keep "with" for gifts -> The person page says "with me", not "paid for".
-- A tiny positive part -> Rounds to 0 in some amounts and not others.
-
-**Consequences:**
-- A transaction whose lines are all 0 still fails the sum check (the form prevents it).
+Moved 2026-11-25 to [domain-rules.md](domain-rules.md) (Splits and people).
 
 ---
 
 ### ADR-051: "Avoirs" names the holdings in French (2026-11-12)
 
-**Context:**
-- The French page and each item were called "Placement(s)", and "Placement" was also one of the three natures (placement, actif, dette). The author found it odd for one word to mean two things on the same screens. English already separates them (Holdings; Investment, Asset, Debt).
-
-**Decision:**
-- In French the holdings are "Avoirs" (one item: "un avoir"); the natures keep Placement, Actif and Dette, and the investment category kind stays "Placements". Only labels change: code, tables, routes and the import's file names (`holdings.csv`) keep "holding".
-- The import's "Comptes" tile, which counted holdings, now reads "Avoirs", and the "Contributions" labels read "Contributions externes" as in the app.
-
-**Alternatives Considered:**
-- "Patrimoine" -> No clean singular for one item.
-- "Positions" -> A market term, odd for a house or a mortgage.
-
-**Consequences:**
-- A debt is an "avoir" in the accounting sense only.
+Removed 2026-11-25 (a label choice): in [design-decisions.md](../00_briefing/designs/design-decisions.md) (Accounts).
 
 ---
 
@@ -548,41 +400,13 @@ Supersedes ADR-009 for the rates; HexaRate still validates an added currency.
 
 ### ADR-047: Institutions are managed in Réglages (2026-11-12)
 
-**Context:**
-- Institutions were managed on the accounts page: one group per institution, with edit and delete. Holdings now share them, and the author's holdings sit mostly in other institutions than the accounts. The accounts page showed empty groups, and an institution used only by a holding looked deletable although the database refuses (the in-use check counted accounts only).
-
-**Decision:**
-- A Réglages list, `/settings/institutions`, with the form in a route sheet, replaces the institution routes under `/net-worth/accounts`. The account and holding forms keep the inline picker with "Créer « … »".
-- Delete is blocked while an account or a holding uses the institution. The list shows how many of each.
-- The accounts page groups only the institutions with an open account, plus the accounts with none. Its group header keeps the website icon and loses the form link and the delete.
-- The institution code moves from `accounts` to its own `institutions` folders in `lib/`, `server/` and `components/`.
-
-**Alternatives Considered:**
-- Keep them on the accounts page, hide the empty groups and count holdings in the in-use check -> Where an institution is managed would still depend on whether it has accounts.
-- Separate institutions for accounts and for holdings -> The same bank twice.
-
-**Consequences:**
-- ACC-05 and ACC-06 are reworded. The `/net-worth/accounts/institutions/*` URLs go, with no redirect (ADR-021).
-- An institution with only closed accounts or only holdings is findable only in Réglages.
+Removed 2026-11-25 (a screen choice): in [design-decisions.md](../00_briefing/designs/design-decisions.md) (Accounts).
 
 ---
 
 ### ADR-046: One Net worth tab with the accounts and the holdings as subpages (2026-11-12)
 
-**Context:**
-- Holdings were planned as their own page. Accounts and holdings are both parts of net worth, with different rows, actions and grouping. The author wanted one place for net worth, with the phase 5 chart.
-
-**Decision:**
-- The Comptes tab becomes "Net worth" (English in both languages). `/net-worth` is a hub with a total and a link card per subpage; `/net-worth/accounts` and `/net-worth/holdings` are the subpages, each with a back link to the hub.
-- A missing rate gives a dash per figure (ADR-004). The hub has no schema of its own.
-
-**Alternatives Considered:**
-- `/accounts` and `/holdings` as two more pages -> Nothing ties the totals together.
-- One merged list -> Blurs two models with different actions.
-- A tab for each -> Five tabs on a phone bar.
-
-**Consequences:**
-- The subpages were merged into the hub later (ADR-061).
+Removed 2026-11-25: replaced by ADR-061. The net worth page is in [design-decisions.md](../00_briefing/designs/design-decisions.md).
 
 ---
 
@@ -655,19 +479,7 @@ Supersedes ADR-009 for the rates; HexaRate still validates an added currency.
 
 ### ADR-042: An event can opt out of the automatic link by date (2026-11-11)
 
-**Context:**
-- EVT-07 links every expense and income inside an event's dates. The author wants an event (a visa year) that holds only what is linked by hand.
-
-**Decision:**
-- `events.auto_link` (default true). `matching_event` skips an event with it off, so the form, `save_transaction`, the import and `relink_events` agree.
-- Turning it off hands its automatic links to the next matching event, or to none, and keeps the manual ones. No `event_exclusions` row is written, so turning it back on links the dates again.
-
-**Alternatives Considered:**
-- Tags -> A second way to group, loose names, no dates or total.
-- An event with no dates -> Links by hand only, but has no place on the calendar (EVT-04).
-
-**Consequences:**
-- An event with the link off is never offered for a date on a transaction.
+Moved 2026-11-25 to [domain-rules.md](domain-rules.md) (Events).
 
 ---
 
@@ -879,18 +691,7 @@ Superseded by ADR-028 (design-decisions.md). Kept for the reason it was tried an
 
 ### ADR-022: Until real data exists, the project is the dev database (2026-11-03)
 
-**Context:**
-- ADR-017 made CI on `main` the only way to migrate, after a backup. The project held no real data yet, so a new screen could not run locally until its migration reached `main`.
-
-**Decision:**
-- Until the first real import, `npm run db:push` (from `src/app`) applies migrations from the laptop with no backup step. Work is tried locally before `main`. CI still runs checks and pgTAP.
-- Before the first real import, revisit: a separate dev project, or the backup gate back in front of every push.
-
-**Alternatives Considered:**
-- CI as the only path -> Nothing can be tried before `main`. Push gated on the backup workflow -> Ceremony for an empty database. A second project now -> A second sign-in and TOTP setup for no gain yet.
-
-**Consequences:**
-- Supersedes "migrations only from CI" in ADR-017 until real data exists.
+Merged into ADR-077.
 
 ---
 
@@ -957,40 +758,13 @@ Superseded by ADR-028 (design-decisions.md). Kept for the reason it was tried an
 
 ### ADR-017: One Supabase project for development and real use (2026-10-27)
 
-Partly superseded: the demo account by ADR-021, migrations-only-from-CI by ADR-022.
-
-**Context:**
-- One user, a Canadian project, two free slots. A demo-only dev project plus production (ADR-014, ADR-016) is a second database to keep in step. Migrations cannot be tested locally without Docker.
-
-**Decision:**
-- One project, `money-tracker`, holds real data.
-- Migrations are additive (expand, then contract in a later change): Netlify deploys the app and CI migrates the database independently, so either may land first.
-- Netlify deploy previews are off: a preview runs unreviewed code against real data.
-- The second free slot stays empty for the public demo (DEM-01), which relaxes MFA and must never share a database with real data.
-
-**Alternatives Considered:**
-- Separate dev and production projects -> Safer for experiments, but a second schema to keep in step, and it uses the demo's slot.
-
-**Consequences:**
-- A bad migration reaches real data directly. Defences: pgTAP on a fresh database, the additive rule, a backup taken minutes before.
+Merged into ADR-077.
 
 ---
 
 ### ADR-016: Free plans until a real limit is hit (2026-10-27)
 
-Partly superseded: the two-project layout by ADR-017.
-
-**Decision:**
-- Stay on free Supabase and Netlify plans. The free Supabase plan has no downloadable backups and pauses after a week of inactivity; Netlify functions run in US East (Ohio).
-- **The nightly encrypted dump is the only backup**, so the backup workflow and one tested restore gate the first real import.
-- A pause is accepted: restore it from the dashboard.
-- Upgrade triggers, each a new ADR: the database nears 500 MB, pauses become a real problem, Ohio latency is noticeable, or invitations need more email than the built-in sender (solved with a free custom SMTP, not a plan).
-
-**Alternatives Considered:**
-- Supabase Pro from the start -> Daily backups and no pausing, for a cost the project does not yet need.
-
-**Consequences:**
-- Data loss risk rests on one GitHub Action and one offline key; the restore test makes it real.
+Merged into ADR-077.
 
 ---
 
@@ -1013,19 +787,7 @@ Partly superseded: the two-project layout by ADR-017.
 
 ### ADR-014: Develop against a hosted project; database tests run in CI (2026-10-27)
 
-Partly superseded: the production-on-Pro part by ADR-016, the separate dev project by ADR-017.
-
-**Context:**
-- The development machine (macOS 12, Intel) cannot run current Docker Desktop, so the local Supabase stack is out.
-
-**Decision:**
-- Migrations reach the hosted project with the Supabase CLI. GitHub Actions runs `supabase db start`, `db lint` and `test db` (pgTAP) on every push.
-
-**Alternatives Considered:**
-- An older Docker or Colima -> Unsupported software on a machine holding financial exports.
-
-**Consequences:**
-- pgTAP results come back from CI, not instantly.
+Merged into ADR-077.
 
 ---
 

@@ -6,6 +6,7 @@ Newest first inside each section.
 
 ## Navigation and layout
 
+- **A skeleton in the shape of what is coming, a spinner only for an action** (2026-11-25). Text and figures wait as a skeleton at their size, each page with a loader draws its own skeleton beside its rows (no default body), and a list's end loads as one row. A chart waits as a plain block, never fake bars. A spinner stays for an action in its button and a sheet loading; a missing value reads as itself (a dash). A page whose layout changes updates its skeleton in the same change. Rejected: a stale list dimmed under a spinner, one default skeleton for every page.
 - **Three tabs until budgets are built: Dashboard, Transactions, Net worth** (2026-11-25). The Budget tab only showed a coming-soon card; it comes back with BUD-01. The dashboard is first since 2026-11-20; `/` still opens the transactions list. Everything set up once (categories, merchants, currencies, people, events, import) sits in the Réglages menu, a sheet from the left. Tab labels are one short word; "Dashboard" stays in French because "Tableau de bord" wraps.
 - **Événements waits** (2026-11-24). The author removed the tab: the basic use case is complete without it. It is in commit 45a8260 and improvements.md; `event_totals` and `event_category_totals` stay.
 - **Comparer answers "was this one expensive for its kind?"** (2026-11-23). One column per event in date order, its cost per day stacked by top-level category with their names under the chart, the type's mean as a named dashed line (the author chose the mean over the median), the rows under it holding the figures without a percent. Types as colour-dot tabs, newest first, only the year's events on Année, no cap on rows. Rejected: a bar inside each row, from a centre line or from zero (a bar per row is not a chart), dots over time, a table alone, the total as the default measure (it mostly measures length).
@@ -15,7 +16,8 @@ Newest first inside each section.
 - **Net worth on Tout: the change since the first figure, ×N and the average per year** (2026-11-19). "▲ X $ (56 %) par an depuis 2018" read unclear. The compounded percent per year was dropped: on a net worth built from savings it reads as a return. Item rows keep their per-year figures.
 - **Net worth layout** (2026-11-18). From `xl`, the chart card and the list side by side; narrower, one 48rem column. Each control sits with what it acts on: the eye in the chart card, expand-all, grouping and sort over the list. Groups are cards with their header inside (the transactions' day-header look was tried for a day, and the archived toggle then read as a group). A row's actions sit behind one ⋮ at every width (five icons per holding crowded the row). The sparkline opens the item's chart, in place of a chevron.
 - **Net worth: no composition card, no change legend** (2026-11-18). The composition's bars and group amounts repeated the list's totals, and the Actifs and Dettes figures that replaced it went too. The legend repeated the group colours the tooltip already names. A debt reads as owed, in red, 0 plain; a card in credit reads "+X $" in green under Dettes (a "-X" in red confused the author).
-- **One net worth page** (2026-11-17, ADR-061). The hub already listed every item, so its two subpages (Comptes, Avoirs, ADR-046) merged into it, grouped Par type (the default) or Par institution for the monthly bank-by-bank update round. This also ended the one back link a page had (subpage to hub) and the holdings' grouping by institution only.
+- **The net worth leaves the hidden items out, with no complete total under it** (2026-11-17). The large figure matches the chart; the eye, eye-off while items are hidden, is the one sign. Tried: "X $ (total)" under it (clutter), card totals per subpage (two figures for overlapping sets).
+- **One net worth page** (2026-11-17, ADR-061). The hub already listed every item, so its two subpages (Comptes, Avoirs) merged into it, grouped Par type (the default) or Par institution for the monthly bank-by-bank update round. This also ended the one back link a page had (subpage to hub) and the holdings' grouping by institution only.
 - **The net worth chart is the net worth alone, with what moved it** (2026-11-17). A stacked composition sized the axis to gross assets and debts, so the net worth's slope was flat and one large debt shaped the whole history. Now the line on its own scale with four to six round gridlines, change bars by year (by month on short ranges) split by group, and rows that open their own chart. Tried and replaced: a composition scrubbed with the pointer, a line per item (about twenty tangled lines), a Totaux / Détail toggle, legend chips with a change each, a "Sans n éléments" figure under the total, a custom month range. Rejected when chosen: a waterfall and a bare line. Gross assets and debts over time were given up.
 - **One period for the whole hub** (2026-11-17). Tabs 1M, 3M, 6M, 1A, 3A, 5A, 10A, Tout set the chart and every change; a period menu beside range tabs read as two controls for one idea. 24 mois and 7 ans went to keep one line on a phone. Hiding items is an eye in the chart card (a filter chip was a pattern found nowhere else).
 - **The transactions list follows the net worth hub** (2026-11-17). The hub's 12-column grid (the title at the far left, the filters on 3 columns, the list on 7), the period as tabs, the search on the tabs' row capped at 18rem, pending and owed under the tabs, one look for groups (the header above its card in Inconsolata with its total). Built then removed: a headline of the result's net, spent and received. Declined: monthly bars for the filtered set. On phones the + keeps no side gutter: a gutter would cost a fifth of every row.
@@ -91,9 +93,10 @@ Newest first inside each section.
 
 ## Events
 
+- **The default excluded categories open from a settings icon** beside the sort (2026-11-25), in a sheet with a help notice at its top. Tried before: the list above the events, then a third Réglages tab (a setting is not a list).
 - **An event has no categories** (2026-11-09). It links every expense and income inside its dates; the author removes a link by hand, and that removal is remembered.
 - **Event types have a name and a colour, no icon** (2026-11-09). The tag is a soft tinted pill, readable on any hex.
-- **Dates are optional.** With none, the event links by hand only. The `auto_link` checkbox does the same for an event with dates (2026-11-11, ADR-042).
+- **Dates are optional.** With none, the event links by hand only. The `auto_link` checkbox does the same for an event with dates (2026-11-11; the rule is in domain-rules.md).
 - **Tags were taken out of the plan** (2026-11-05): see improvements.md.
 
 ## Import
@@ -105,6 +108,7 @@ Newest first inside each section.
 
 ## Accounts
 
-- **Institutions are managed in Réglages** (2026-11-12, ADR-047). Accounts and holdings share them, and most holdings sit in other institutions than the accounts.
+- **"Avoirs" names the holdings in French** (2026-11-12), since "Placement" is also a nature. Rejected: "Patrimoine" (no singular), "Positions" (a market term). Code, tables, routes and the import's files keep "holding".
+- **Institutions are managed in Réglages** (2026-11-12). Accounts and holdings share them, and most holdings sit in other institutions than the accounts. The account and holding forms create one inline; delete waits until nothing uses it.
 - **One account per currency for multi-currency providers** (Wise CAD, Wise EUR, under one institution). An account books in one currency (TRX-02), so balances stay exact; the `multi_currency` type was dropped.
 - **A currency's favourite star removed** (2026-11-05): a user keeps a handful, so pinning saved nothing.

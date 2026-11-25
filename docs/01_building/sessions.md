@@ -4,6 +4,17 @@ Short record of each working session: what the author asked, what was decided an
 
 <!-- Newest first: a new session goes directly below this line. Template at the bottom. -->
 
+### 2026-11-25 - Faster sessions, shorter journal
+
+**What We Worked On:**
+- The author asked why code generation is slow and the docs keep growing. Typed ESLint after each edit cost about 20 s; the journal was 56,000 words.
+- ESLint moved from the per-edit hook to a Stop hook over the files changed since its last clean run; Prettier stays per edit.
+- The docs stop hook now asks only for a migration, a dependency or a new route.
+- CLAUDE.md and the dev-journal skill cap entry length, keep a fact in one doc, and reserve ADRs for choices costly to undo.
+- The author asked to apply the new bar to decisions.md: 8 screen-choice ADRs removed, 7 rules moved to domain-rules.md and design-decisions.md, 014/016/017/022 merged into ADR-077 and 071/074 into ADR-078. Old numbers stay as one-line stubs.
+
+---
+
 ### 2026-11-25 - Docs trim
 
 **What We Worked On:**
