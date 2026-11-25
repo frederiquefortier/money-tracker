@@ -4,7 +4,6 @@ import {
   FilterListScreen,
   PeriodScreen,
 } from '#/components/transactions/filters/filter-screens'
-import { useLocalFilters } from '#/hooks/transactions/use-local-filters'
 import { NO_FILTERS } from '#/lib/transactions/transaction-filters'
 import type {
   FilterOptions,
@@ -52,7 +51,6 @@ export function FilterPanel({
   onClose: () => void
 }) {
   const [query, setQuery] = useState('')
-  const [local, setLocal] = useLocalFilters(values, onChange)
   const go = (next: FilterScreen | null) => {
     setQuery('')
     onTab(next)
@@ -68,18 +66,18 @@ export function FilterPanel({
       <FilterListScreen
         {...{ names, period, empty, onClose }}
         screens={tabs}
-        values={local}
+        values={values}
         onTab={go}
-        onClear={() => setLocal(NO_FILTERS)}
+        onClear={() => onChange(NO_FILTERS)}
       />
     )
   return (
     <FilterDetail
       {...{ tab, canGoBack, options, onClose }}
       query={query}
-      values={local}
+      values={values}
       onQuery={setQuery}
-      onChange={setLocal}
+      onChange={onChange}
       onBack={back}
     />
   )

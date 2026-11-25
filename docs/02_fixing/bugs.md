@@ -4,6 +4,12 @@ Track bugs with dates, solutions, and prevention notes. Search this file before 
 
 <!-- Newest first: a new bug goes directly below this line. Template at the bottom. -->
 
+### 2026-11-25 - Filters set together made a request each, and a removed chip waited
+- **Issue**: On the transactions list, each tick, chip ✕, period tab or status bubble sent its own request, and a chip, removed or new, waited for the list to reload.
+- **Root Cause**: The page drew the chips, tabs and sidebar from the loader's query, which trails the address, and every change navigated at once. Chips were named only by the server, with the list. Only the filter sheet held its ticks locally (`useLocalFilters`).
+- **Solution**: `useDraftSearch` holds the page's choice: every change shows at once, and the address follows 400 ms after the last one, so one request covers them. The sheet's own debounce is gone. A new chip takes its name from the choices the sheet already loaded (`useFilterNames`), so it shows before the reload too.
+- **Prevention**: A control on the list reads the draft (`go.shown`), never `data.query`, which only says what the list shows.
+
 ### 2026-11-25 - No exchange rate after 2026-11-02
 - **Issue**: No rate of any kind was stored after 2026-11-02, and CLP and GTQ, added on 2026-11-12, had none at all.
 - **Root Cause**: The Netlify rates function had no `SUPABASE_SECRET_KEY`; the history came from a run of `npm run rates` on the laptop. CLP and GTQ also had no source for past days (ADR-009).

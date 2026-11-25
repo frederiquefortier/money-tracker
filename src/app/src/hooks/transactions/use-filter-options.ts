@@ -5,10 +5,15 @@ import { getEvents } from '#/server/events'
 import { getMerchants } from '#/server/merchants'
 import { getPeople } from '#/server/people'
 import { getFormAccounts } from '#/server/transactions'
+import {
+  FILTER_TABS,
+  withOptionNames,
+} from '#/lib/transactions/transaction-filters'
 import type {
   FilterOptions,
   FilterTab,
 } from '#/lib/transactions/transaction-filters'
+import type { ListFilters } from '#/lib/transactions/transaction-list'
 
 async function fetchOptions(
   tabs: ReadonlyArray<FilterTab>,
@@ -43,4 +48,9 @@ export function useFilterOptions(
   })
   useFailedToast(query.isError)
   return query.data ?? null
+}
+
+/** The list's names, and the sheets' cached choices for a tick the list has not named yet. */
+export function useFilterNames(names: ListFilters | null) {
+  return withOptionNames(names, useFilterOptions(false, FILTER_TABS))
 }

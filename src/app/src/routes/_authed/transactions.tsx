@@ -15,6 +15,8 @@ import { TransactionDayGroup } from '#/components/transactions/list/transaction-
 import { TransactionDaysSkeleton } from '#/components/transactions/list/transaction-skeleton'
 import { useTransactionPages } from '#/hooks/transactions/use-transaction-pages'
 import { usePreloadForm } from '#/hooks/transactions/use-preload-form'
+import { useDraftSearch } from '#/hooks/transactions/use-draft-search'
+import { useFilterNames } from '#/hooks/transactions/use-filter-options'
 import { formatDate, formatMonth } from '#/lib/shared/format'
 import {
   KEPT,
@@ -113,46 +115,45 @@ function useSearchText(sent: string, send: (text: string) => void) {
   return [text, setText] as const
 }
 
+/** Every change goes through the draft, so the page shows it before the list reloads. */
 function useListNavigation() {
   const navigate = Route.useNavigate()
+  const [shown, change] = useDraftSearch(
+    Route.useSearch(),
+    (search, replace) => void navigate({ search, replace }),
+  )
   return {
+    shown,
     period: (c: PeriodChoice) =>
-      void navigate({
-        search: (prev) => ({
-          ...prev,
-          period: c.period,
-          month: c.period === 'month' ? c.month : undefined,
-          year: c.period === 'year' ? c.year : undefined,
-          start: c.period === 'custom' ? c.start : undefined,
-          end: c.period === 'custom' ? c.end : undefined,
-          pending: undefined,
-          owed: undefined,
-        }),
-      }),
+      change((prev) => ({
+        ...prev,
+        period: c.period,
+        month: c.period === 'month' ? c.month : undefined,
+        year: c.period === 'year' ? c.year : undefined,
+        start: c.period === 'custom' ? c.start : undefined,
+        end: c.period === 'custom' ? c.end : undefined,
+        pending: undefined,
+        owed: undefined,
+      })),
     pending: (on: boolean) =>
-      void navigate({
-        search: (prev) => ({ ...prev, pending: on || undefined }),
-      }),
+      change((prev) => ({ ...prev, pending: on || undefined })),
     owed: (on: boolean) =>
-      void navigate({
-        search: (prev) => ({ ...prev, owed: on || undefined }),
-      }),
+      change((prev) => ({ ...prev, owed: on || undefined })),
     filters: (f: FilterValues) =>
-      void navigate({
-        search: (prev) => ({
-          ...prev,
-          kind: f.kinds.length ? f.kinds : undefined,
-          account: f.accountIds.length ? f.accountIds : undefined,
-          category: f.categoryIds.length ? f.categoryIds : undefined,
-          merchant: f.merchantIds.length ? f.merchantIds : undefined,
-          person: f.personIds.length ? f.personIds : undefined,
-          event: f.eventIds.length ? f.eventIds : undefined,
-        }),
-      }),
+      change((prev) => ({
+        ...prev,
+        kind: f.kinds.length ? f.kinds : undefined,
+        account: f.accountIds.length ? f.accountIds : undefined,
+        category: f.categoryIds.length ? f.categoryIds : undefined,
+        merchant: f.merchantIds.length ? f.merchantIds : undefined,
+        person: f.personIds.length ? f.personIds : undefined,
+        event: f.eventIds.length ? f.eventIds : undefined,
+      })),
+    // The field already waited for typing to pause.
     search: (text: string) =>
-      void navigate({
+      change((prev) => ({ ...prev, q: text.trim() || undefined }), {
         replace: true,
-        search: (prev) => ({ ...prev, q: text.trim() || undefined }),
+        now: true,
       }),
   }
 }
@@ -194,14 +195,17 @@ function Transactions() {
   const deps = data.query
   const { displayCurrency } = useMyCurrencies()
   const go = useListNavigation()
+  // What the filters, chips and tabs show: the latest choice, which the list may trail.
+  const shown = listQuery(go.shown)
+  const names = useFilterNames(data.filters)
   usePreloadForm()
   const { days, more, sentinel } = useTransactionPages(data, deps)
   // A filter, period or search the list does not show yet: the reload runs in the
   // background, and the list gives way to its skeleton (the sheet may already be closed).
-  const waiting = queryKey(listQuery(Route.useSearch())) !== queryKey(deps)
+  const waiting = queryKey(shown) !== queryKey(deps)
   // Days are built as they near the screen; older pages load once all are shown.
   const revealed = useRevealed(days, 12)
-  const [text, setText] = useSearchText(deps.search ?? '', go.search)
+  const [text, setText] = useSearchText(shown.search ?? '', go.search)
   const empty = useEmptyText(deps)
 
   return (
@@ -216,20 +220,20 @@ function Transactions() {
     >
       <div className="grid items-start gap-3 lg:grid-cols-12">
         <FilterSidebar
-          values={deps}
-          names={data.filters}
-          period={deps}
+          values={shown}
+          names={names}
+          period={shown}
           onChange={go.filters}
           onPeriod={go.period}
           className="hidden lg:sticky lg:top-20 lg:col-span-3 lg:flex"
         />
         <div className="flex min-w-0 flex-col gap-6 lg:col-span-7 lg:col-start-5">
           <ListHeader
-            choice={deps}
-            filters={deps}
-            names={data.filters}
-            pending={{ count: data.pendingCount, on: deps.pendingOnly }}
-            owed={{ count: data.owedCount, on: deps.owedOnly }}
+            choice={shown}
+            filters={shown}
+            names={names}
+            pending={{ count: data.pendingCount, on: shown.pendingOnly }}
+            owed={{ count: data.owedCount, on: shown.owedOnly }}
             search={text}
             onPeriod={go.period}
             onFilters={go.filters}

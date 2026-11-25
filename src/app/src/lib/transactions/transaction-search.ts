@@ -62,8 +62,10 @@ export const searchSchema = z.object({
     .catch(undefined),
 })
 
+export type TransactionsSearch = z.infer<typeof searchSchema>
+
 /** What the list asks for, from the address. */
-export function listQuery(search: z.infer<typeof searchSchema>) {
+export function listQuery(search: TransactionsSearch) {
   const today = todayIso()
   const month = search.month ?? monthOf(today)
   const year = search.year ?? month.slice(0, 4)

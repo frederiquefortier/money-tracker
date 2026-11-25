@@ -4,6 +4,15 @@ Short record of each working session: what the author asked, what was decided an
 
 <!-- Newest first: a new session goes directly below this line. Template at the bottom. -->
 
+### 2026-11-25 - One request for filters set together
+
+**What We Worked On:**
+- The author asked that filters set close together make a single call, and that a removed bubble go at once, dates included. The transactions page now keeps a draft of its address (`useDraftSearch`): filters, chips, period tabs, the pending and owed bubbles and the search all show the draft, and the address follows once changes pause (bugs.md). The dashboard cuts its period in the browser and makes no call, so it was left as is.
+- The author confirmed the debounce, and asked that a new chip show at once too, since the loading must be visible. Chips now take a name the list has not sent yet from the sheet's cached choices.
+
+**What Could We Do Better:**
+- Not seen in the browser: the list holds real data.
+
 ### 2026-11-25 - Skeletons for pages, charts and transactions
 
 **What We Worked On:**

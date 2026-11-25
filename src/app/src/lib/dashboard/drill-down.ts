@@ -1,14 +1,11 @@
-import type { z } from 'zod'
 import type { DashboardPeriod } from '#/lib/dashboard/dashboard-period'
 import { monthEnd } from '#/lib/shared/months'
-import type { searchSchema } from '#/lib/transactions/transaction-search'
+import type { TransactionsSearch } from '#/lib/transactions/transaction-search'
 
 // From a dashboard figure to the transactions behind it (author, 2026-11-20). Every
 // period is a range the list's calendar names. A category filter takes its sub-categories
 // too, as the list's filter does. Each carries the dashboard's period, for the list's
 // link back to it.
-
-export type TransactionsSearch = z.infer<typeof searchSchema>
 
 /** The dashboard's period as the list's `dashboard` keeps it: a year or "all". */
 const backTo = (period: DashboardPeriod) =>

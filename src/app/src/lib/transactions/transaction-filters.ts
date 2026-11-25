@@ -3,6 +3,7 @@ import type { EventItem, EventType } from '#/lib/events/event'
 import type { Merchant } from '#/lib/merchants/merchant'
 import type { Person, PersonGroup } from '#/lib/people/person'
 import type { FormAccount } from '#/lib/transactions/transaction'
+import type { ListFilters } from '#/lib/transactions/transaction-list'
 
 // The filters of the transactions list: the tabs and what each one holds.
 
@@ -77,3 +78,28 @@ export const idFilters = (search: IdSearch) => ({
   personIds: search.person ?? [],
   eventIds: search.event ?? [],
 })
+
+/**
+ * The chips' names: the list's, then the sheet's choices for what was ticked since the
+ * list last loaded, so a new chip shows before the reload.
+ */
+export function withOptionNames(
+  names: ListFilters | null,
+  options: FilterOptions | null,
+): ListFilters | null {
+  if (!options) return names
+  const add = <T extends { id: string }>(
+    known: Array<T> | undefined,
+    more: Array<T>,
+  ): Array<T> => {
+    const ids = new Set((known ?? []).map((one) => one.id))
+    return [...(known ?? []), ...more.filter((one) => !ids.has(one.id))]
+  }
+  return {
+    accounts: add(names?.accounts, options.accounts),
+    categories: add(names?.categories, options.categories),
+    merchants: add(names?.merchants, options.merchants),
+    people: add(names?.people, options.people),
+    events: add(names?.events, options.events),
+  }
+}
