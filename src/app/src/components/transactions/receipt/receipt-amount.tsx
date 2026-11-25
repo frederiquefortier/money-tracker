@@ -51,7 +51,10 @@ export function AmountInput({
       placeholder="0"
       value={value}
       onChange={(event) => onChange(event.target.value)}
-      className={cn(slipTyped, 'w-0 flex-1 py-1 text-4xl font-semibold')}
+      className={cn(
+        slipTyped,
+        'w-0 flex-1 py-1 text-4xl font-semibold md:text-4xl',
+      )}
     />
   )
 }

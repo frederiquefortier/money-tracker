@@ -3,7 +3,6 @@ import { Dialog as SheetPrimitive } from 'radix-ui'
 import { Icon } from '#/components/display/icon'
 import { cn } from '#/lib/utils'
 import { iconAction } from '#/components/styles'
-import { useVisualViewport } from '#/hooks/app/use-visual-viewport'
 import { isTouchDevice } from '#/lib/shared/touch'
 import {
   OverlayContainerProvider,
@@ -42,7 +41,6 @@ function SheetContent({
   enterDelay?: number
 }) {
   const [panel, setPanel] = React.useState<HTMLElement | null>(null)
-  useVisualViewport(panel)
   const enter = {
     '--sheet-enter-delay': `${enterDelay}ms`,
   } as React.CSSProperties

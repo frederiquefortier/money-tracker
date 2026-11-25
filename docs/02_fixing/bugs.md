@@ -4,6 +4,18 @@ Track bugs with dates, solutions, and prevention notes. Search this file before 
 
 <!-- Newest first: a new bug goes directly below this line. Template at the bottom. -->
 
+### 2026-11-25 - A sheet shrank and moved up when the keyboard opened
+- **Issue**: On an iPhone, tapping a field in a sheet made the sheet shorter and moved it up, so the whole page seemed to jump.
+- **Root Cause**: `useVisualViewport` (2026-11-12) set the sheet's top and height to the visible area at each keyboard move. It was added for two symptoms never confirmed on a device: the first letter lost in a picker and a tap landing below the field.
+- **Solution**: The hook is gone: the sheet keeps the full screen and the keyboard covers its bottom. A picker's list still opens above the keyboard, since Radix measures it against the visible area too.
+- **Prevention**: Retest on an iPhone: type in a picker low in a sheet, tap fields after the keyboard is open. If a tap lands off its field, fix that alone, without resizing the sheet.
+
+### 2026-11-25 - Safari zoomed the page into the slip's fields
+- **Issue**: On an iPhone, tapping Débité, Reçu, a fee or a split amount on the receipt slip zoomed the page. Found while looking at the keyboard moving sheets (above).
+- **Root Cause**: Those fields took the slip line's 14px text, and Safari zooms into any field under 16px when it takes focus.
+- **Solution**: `slipTyped` (`receipt-line.tsx`) is 16px below `md` and 14px above; the big amount keeps its size at both.
+- **Prevention**: A field's text is at least 16px on a phone; `fieldControl` already is.
+
 ### 2026-11-25 - The export's rows were squeezed while loading
 - **Issue**: On opening the Exporter tab, each file's row was one line high, then grew when the line counts arrived.
 - **Root Cause**: The count is the row's second line, left out until `getExportCounts` answers.

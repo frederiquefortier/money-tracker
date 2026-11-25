@@ -9,9 +9,12 @@ export const slipRule = <hr className={slipRuleLine} />
 /** The slip's small text (Taux, notes under a line): a step under its lines. */
 export const slipSmall = 'text-[0.8125rem]'
 
-/** A value typed on the slip: underlined, dashed, right-aligned. */
+/**
+ * A value typed on the slip: underlined, dashed, right-aligned. 16px on a phone, as Safari
+ * zooms the page into a field under that size when it takes focus.
+ */
 export const slipTyped = cn(
-  'min-w-0 border-b-2 border-dashed border-input bg-transparent text-right font-mono tabular-nums aria-invalid:border-destructive',
+  'min-w-0 border-b-2 border-dashed border-input bg-transparent text-right font-mono text-base tabular-nums aria-invalid:border-destructive md:text-sm',
   focusRing,
 )
 

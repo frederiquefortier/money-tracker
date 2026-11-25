@@ -118,8 +118,8 @@ export function ComboboxPopup({
   const panel = useOverlayContainer()
   return (
     <PopoverContent
-      // The list flips and shrinks against the sheet, which follows the visible area
-      // (the keyboard excluded), not the page behind it.
+      // The list flips and shrinks against the sheet and the visible area, so it stays
+      // above a phone's keyboard.
       collisionBoundary={panel ?? undefined}
       collisionPadding={8}
       className={cn('w-(--radix-popper-anchor-width) p-1', fieldSurface)}
