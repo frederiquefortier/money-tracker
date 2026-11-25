@@ -9,30 +9,24 @@ import { NewCategoryRow } from '#/components/transactions/form/new-category-row'
 import { EmptyState } from '#/components/lists/list-card'
 import { SearchField } from '#/components/forms/search-field'
 import { SheetBody, SheetHead } from '#/components/ui/sheet'
-import { CATEGORY_SORTS, categoryPath } from '#/lib/categories/category'
-import type {
-  Category,
-  CategorySort,
-  CategoryKind,
-} from '#/lib/categories/category'
+import { categoryPath } from '#/lib/categories/category'
+import type { Category, CategoryKind } from '#/lib/categories/category'
 import {
   categoryChildren,
   frequentCategories,
 } from '#/lib/categories/category-list'
 import { useFormatLocale } from '#/hooks/app/use-locale'
-import { useStoredState } from '#/hooks/app/use-stored-state'
+import { useCategorySort } from '#/hooks/categories/use-category-sort'
 import { cn } from '#/lib/utils'
 import type { FrequentCategories } from '#/lib/transactions/transaction'
 import { useSheetEscape } from '#/hooks/forms/use-sheet'
-import { indexById, oneOf } from '#/lib/shared/collections'
+import { indexById } from '#/lib/shared/collections'
 import {
   fieldSurface,
   focusRing,
   insetFocus,
   rowHover,
 } from '#/components/styles'
-
-const parseSort = oneOf(CATEGORY_SORTS)
 
 /**
  * CAT-06: the most used ones of this type as a row of round icons under their heading,
@@ -139,12 +133,7 @@ export function CategoryScreen({
   const panelId = useId()
   const [kind, setKind] = useState<CategoryKind>(transactionKind)
   const [query, setQuery] = useState('')
-  // The order chosen on Catégories, without its menu here (decided 2026-11-05).
-  const [sort] = useStoredState<CategorySort>(
-    'categories.sort',
-    'name',
-    parseSort,
-  )
+  const [sort] = useCategorySort()
   const byId = indexById(categories)
   const { childrenOf, open } = categoryChildren(categories, {
     kind,

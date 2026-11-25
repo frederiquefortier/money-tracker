@@ -70,7 +70,7 @@ export function HideItemsSheet({
   const { t } = useTranslation()
   const nodes = useItemNodes(items)
   const hidden = chart.excluded.ids
-  // Ticked is hidden (author, 2026-11-17): the sheet is "Masquer des éléments".
+  // Ticked is hidden: the sheet is "Masquer des éléments".
   const stateOf = (node: CheckNode): CheckState => {
     if (!node.children) return hidden.has(node.id) ? 'on' : 'off'
     const count = node.children.filter((c) => hidden.has(c.id)).length

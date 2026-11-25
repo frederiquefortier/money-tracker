@@ -3,7 +3,7 @@ import { useEffect } from 'react'
 /**
  * Marks `<html data-keyboard>` from a Tab until the next pointer press. Text fields match
  * `:focus-visible` on a click too, so the outline is shown only while it is set
- * (styles.css): keyboard navigation only, never after a click (decided 2026-11-05).
+ * (styles.css): keyboard navigation only, never after a click.
  */
 export function useKeyboardFocus() {
   useEffect(() => {

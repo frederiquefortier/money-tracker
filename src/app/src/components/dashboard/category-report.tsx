@@ -24,7 +24,7 @@ const CHART_ICONS = { stack: 'chart-bar-stacked', donut: 'chart-pie' } as const
 const UNMARKED_COLOR = 'var(--muted-foreground)'
 
 // Needs and wants are both spending: two shades of its red, so they never read as
-// invested or what remains (author, 2026-11-19).
+// invested or what remains.
 const NECESSITY_COLORS: Partial<Record<string, string>> = {
   need: 'var(--flow-spent)',
   want: 'color-mix(in oklch, var(--flow-spent) 50%, var(--card))',
@@ -53,7 +53,7 @@ function useParts(stacks: CategoryStacks): Array<Part> {
   })
 }
 
-/** Stacked by month or the whole as a donut, as two icons (author, 2026-11-20). */
+/** Stacked by month or the whole as a donut, as two icons. */
 function ChartChoice({
   value,
   onChange,
@@ -76,7 +76,7 @@ function ChartChoice({
   )
 }
 
-/** Expenses' split as a menu, as the net worth list's grouping (author, 2026-11-20). */
+/** Expenses' split as a menu, as the net worth list's grouping. */
 function SplitChoice({ view }: { view: ViewChoice }) {
   const { t } = useTranslation()
   const labelOf = (v: SplitView) => t(`dashboard.split.views.${v}`)
@@ -91,7 +91,7 @@ function SplitChoice({ view }: { view: ViewChoice }) {
   )
 }
 
-/** The period's total, beside the title without a label (author, 2026-11-20). */
+/** The period's total, beside the title without a label. */
 function ReportTotal({
   total,
   currency,
@@ -130,7 +130,7 @@ function ReportChart({
   if (parts.length === 0) return <EmptyState>{t('dashboard.empty')}</EmptyState>
   if (chart === 'donut')
     return <SplitDonut parts={parts} period={period} currency={currency} />
-  // No legend: the tooltip names each part (author, 2026-11-20).
+  // No legend: the tooltip names each part.
   return (
     <StackedBars
       series={parts}

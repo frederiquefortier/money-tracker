@@ -41,7 +41,7 @@ type EntryBase = {
   currency: string
   institutionId: string | null
   closedOn: string | null
-  /** In its own currency; a debt as owed. 0 with no value yet (author, 2026-11-18). */
+  /** In its own currency; a debt as owed. 0 with no value yet. */
   value: string
   /** In the display currency, debts negative: what it adds. Null when a rate is missing. */
   worth: string | null

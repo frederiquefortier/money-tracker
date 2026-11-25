@@ -60,7 +60,7 @@ export const dashboardFr = {
         averageYear: 'Moyenne par année',
       },
       sort: {
-        name: 'Nom (A à Z)',
+        nameAsc: 'Nom (A à Z)',
         nameDesc: 'Nom (Z à A)',
         color: 'Couleur',
         amountDesc: 'Montant (plus élevé)',
@@ -80,7 +80,7 @@ export const dashboardFr = {
       smallest: 'Plus petite',
       largest: 'Plus grosse',
       sort: {
-        name: 'Nom (A à Z)',
+        nameAsc: 'Nom (A à Z)',
         nameDesc: 'Nom (Z à A)',
         amountDesc: 'Montant (plus élevé)',
         amountAsc: 'Montant (plus faible)',

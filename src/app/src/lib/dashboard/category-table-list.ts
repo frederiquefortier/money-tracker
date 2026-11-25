@@ -6,7 +6,7 @@ import { compareDecimal } from '#/lib/shared/money'
 // The category table's rows in the chosen order, and which show with groups folded.
 
 export const TABLE_SORTS = [
-  'name',
+  'nameAsc',
   'nameDesc',
   'color',
   'amountDesc',
@@ -43,7 +43,7 @@ export function sortTable(
       ]
       return x[0] - y[0] || x[1] - y[1] || byName(a.category, b.category)
     }
-    if (sort === 'name') return byName(a.category, b.category)
+    if (sort === 'nameAsc') return byName(a.category, b.category)
     if (sort === 'countDesc' || sort === 'countAsc')
       return (
         (sort === 'countDesc' ? b.count - a.count : a.count - b.count) ||

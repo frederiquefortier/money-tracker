@@ -145,8 +145,8 @@ export function ListHeader({
   return (
     <>
       {/* The tabs with the search at their end (under them on phones), then what is
-          pending or owed under the tabs at every width (author, 2026-11-17), as far from
-          them and from the chips as the chips are from the list (author, 2026-11-18). */}
+          pending or owed under the tabs at every width, as far from
+          them and from the chips as the chips are from the list. */}
       <div className="flex flex-wrap items-center gap-3">
         <PeriodTabs
           choice={choice}

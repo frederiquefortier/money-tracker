@@ -14,8 +14,8 @@ type Daily = { days: ReadonlyArray<DaySpent> | null; failed: boolean }
 type State = ReturnType<typeof useDashboard>
 
 /**
- * On a year, income and where it went beside the pace, then the months beside the days
- * (author, 2026-11-20); on everything, the years beside the summary. One column on a phone,
+ * On a year, income and where it went beside the pace, then the months beside the days;
+ * on everything, the years beside the summary. One column on a phone,
  * in that order.
  */
 function FlowCards({
@@ -80,7 +80,7 @@ function FlowCards({
 }
 
 /**
- * Expenses beside income, each stacked by month or as a donut (author, 2026-11-20), then
+ * Expenses beside income, each stacked by month or as a donut, then
  * the categories' table and the merchants' across the page.
  */
 function CategoryCards({
@@ -154,7 +154,7 @@ function CategoryCards({
 }
 
 /**
- * The Argent tab, two cards side by side from `xl` (author, 2026-11-20), from the answer to
+ * The Argent tab, two cards side by side from `xl`, from the answer to
  * the detail: income and where it went, the pace, the months,
  * the days, expenses and income, then the table across. One column, in that order, below.
  */

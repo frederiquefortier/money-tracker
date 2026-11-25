@@ -7,7 +7,7 @@ import {
   OptionContent,
 } from '#/components/combobox/combobox-option'
 import { PopoverContent } from '#/components/ui/popover'
-import { useOverlayContainer } from '#/components/ui/overlay-container'
+import { useOverlayContainer } from '#/hooks/app/use-overlay-container'
 import { treeGuides } from '#/lib/shared/tree-layout'
 import { cn } from '#/lib/utils'
 import { useRevealed } from '#/hooks/app/use-revealed'

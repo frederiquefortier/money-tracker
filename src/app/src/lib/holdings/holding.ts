@@ -221,7 +221,7 @@ export const transferFormSchema = z.object({
   to: z.uuid({ error: 'required' }),
 })
 
-export const transferInputSchema = transferFormSchema
+export const holdingTransferInputSchema = transferFormSchema
   .omit({ to: true })
   .extend({ from: z.uuid(), to: z.uuid() })
 
@@ -260,10 +260,14 @@ export function holdingTypeLabel(
   return inLocale(locale, type.labelFr, type.labelEn)
 }
 
-export type ListedHolding = Holding & {
+/** A value on a date, or money put in. */
+export type HoldingEntryKind = 'snapshot' | 'contribution'
+
+/** A holding with its name, or what stands in for it (ADR-048). */
+export type LabelledHolding = Holding & { label: string }
+
+export type ListedHolding = LabelledHolding & {
   institutionName: string | null
   /** The type in the user's language. */
   typeText: string
-  /** The name, or what stands in for it (ADR-048). */
-  label: string
 }

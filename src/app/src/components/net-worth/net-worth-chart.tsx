@@ -3,7 +3,8 @@ import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from 'recharts'
 import { MissingRate, Money } from '#/components/display/money'
 import { ChartContainer, ChartTooltip } from '#/components/ui/chart'
 import { xTicks } from '#/components/net-worth/chart-lines'
-import { axisTicks, chartRows } from '#/lib/net-worth/net-worth-series'
+import { chartRows } from '#/lib/net-worth/net-worth-series'
+import { axisTicks } from '#/lib/shared/axis-ticks'
 import {
   formatAxisMoney,
   formatDate,

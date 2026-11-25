@@ -8,9 +8,9 @@ import { compareDecimal, ratio, toMinor } from '#/lib/shared/money'
 
 // The income and expense cards: the period's money split three ways (DSH-07, DSH-09), by
 // need or want (CAT-10), by group, or by category as booked, drawn as each month (or
-// year) stacked or as a donut of the whole (author, 2026-11-20). One table feeds both, so
+// year) stacked or as a donut of the whole. One table feeds both, so
 // they always agree. A series' colour follows it whatever the filter. Every series shows,
-// each in its category's colour (author, 2026-11-20: no "Autres").
+// each in its category's colour (no "Autres").
 
 export const SPLIT_VIEWS = ['necessity', 'groups', 'categories'] as const
 export type SplitView = (typeof SPLIT_VIEWS)[number]

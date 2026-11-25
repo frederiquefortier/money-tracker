@@ -32,20 +32,14 @@ export const getInstitutions = createServerFn({ method: 'GET' }).handler(
         supabase.from('holdings').select('institution_id'),
       ])),
     )
-    const count = (rows: ReadonlyArray<{ institution_id: string | null }>) => {
-      const counts = new Map<string, number>()
-      for (const { institution_id: id } of rows)
-        if (id) counts.set(id, (counts.get(id) ?? 0) + 1)
-      return counts
-    }
-    const accountCounts = count(accounts)
-    const holdingCounts = count(holdings)
+    const accountsOf = Map.groupBy(accounts, (a) => a.institution_id)
+    const holdingsOf = Map.groupBy(holdings, (h) => h.institution_id)
     return institutions.map((i) => ({
       id: i.id,
       name: i.name,
       websiteUrl: i.website_url,
-      accountCount: accountCounts.get(i.id) ?? 0,
-      holdingCount: holdingCounts.get(i.id) ?? 0,
+      accountCount: accountsOf.get(i.id)?.length ?? 0,
+      holdingCount: holdingsOf.get(i.id)?.length ?? 0,
     }))
   },
 )

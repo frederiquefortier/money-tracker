@@ -1,11 +1,14 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { TransferFormSheet } from '#/components/holdings/form/transfer-form-sheet'
-import type { ListedHolding } from '#/components/holdings/form/transfer-form-sheet'
 import { TransferList } from '#/components/holdings/form/transfer-list'
 import { RouteSheet } from '#/components/sheet/route-sheet'
 import { SheetBody } from '#/components/ui/sheet'
-import type { HoldingTransfer, HoldingType } from '#/lib/holdings/holding'
+import type {
+  HoldingTransfer,
+  HoldingType,
+  LabelledHolding,
+} from '#/lib/holdings/holding'
 import type { Institution } from '#/lib/institutions/institution'
 
 /**
@@ -19,9 +22,9 @@ export function TransferSheet({
   institutions,
   types,
 }: {
-  source: ListedHolding
+  source: LabelledHolding
   transfers: ReadonlyArray<HoldingTransfer>
-  holdings: ReadonlyArray<ListedHolding>
+  holdings: ReadonlyArray<LabelledHolding>
   institutions: ReadonlyArray<Institution>
   types: ReadonlyArray<HoldingType>
 }) {

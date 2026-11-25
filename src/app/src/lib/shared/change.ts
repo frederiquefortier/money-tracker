@@ -6,7 +6,7 @@ export type Change = {
   amount: string
   /** Percent points over the first value's size; null when it was zero. */
   percent: string | null
-  /** Set when both are per year: Tout, from this date (author, 2026-11-17). */
+  /** Set when both are per year: Tout, from this date. */
   perYearFrom?: string
 }
 

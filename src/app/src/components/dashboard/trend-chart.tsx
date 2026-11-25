@@ -18,7 +18,7 @@ import { cn } from '#/lib/utils'
 // Grey, so the line reads over bars of any colour.
 const LAST_YEAR_COLOR = 'var(--muted-foreground)'
 
-// Paler than the bars, so the year shown stays first (author, 2026-11-20).
+// Paler than the bars, so the year shown stays first.
 const LAST_YEAR_LINE = {
   type: 'linear',
   stroke: LAST_YEAR_COLOR,
@@ -78,7 +78,7 @@ function trendData({
 /**
  * One series over the table's months (or years), opened from its trend: a bar each, in
  * its colour, the one not over yet lighter. On a year, the same months a year earlier as a
- * dashed line (author, 2026-11-20).
+ * dashed line.
  */
 export function TrendChart({
   keys,

@@ -33,9 +33,8 @@ function rangeText(
 }
 
 /**
- * Tout: "▲ 202 516 $ depuis 2018 · ×12,3", then "22 502 $ par an en moyenne" (author,
- * 2026-11-19: the compounded percent per year read as a return, and the multiple moved
- * here from the dashboard).
+ * Tout: "▲ 120 000 $ depuis 2018 · ×4,0", then "15 000 $ par an en moyenne". No
+ * compounded percent per year, which read as a return.
  */
 function SinceStartLines({
   chart,

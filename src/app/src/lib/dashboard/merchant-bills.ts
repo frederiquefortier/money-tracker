@@ -13,7 +13,7 @@ import {
 } from '#/lib/shared/money'
 
 // MER-04, ADR-064: what a merchant's bill costs me and how it changed, at my share as
-// every dashboard figure (author, 2026-11-20).
+// every dashboard figure.
 
 export type MerchantMonth = {
   /** "2026-03" */
@@ -26,7 +26,7 @@ export type MerchantMonth = {
   max: string | null
 }
 
-export type Merchant = { id: string; name: string }
+export type BillMerchant = { id: string; name: string }
 
 export type BillFigures = {
   visits: number
@@ -37,8 +37,8 @@ export type BillFigures = {
   max: string | null
 }
 
-export type MerchantRow = {
-  merchant: Merchant
+export type BillRow = {
+  merchant: BillMerchant
   /** The category table's columns, by key: the total, or the average per month or year. */
   columns: Record<string, string | null>
   figures: BillFigures
@@ -125,9 +125,9 @@ function perColumn(
  */
 export function merchantBills(
   months: ReadonlyArray<MerchantMonth>,
-  merchants: ReadonlyArray<Merchant>,
+  merchants: ReadonlyArray<BillMerchant>,
   columns: ReadonlyArray<TableColumn>,
-): Array<MerchantRow> {
+): Array<BillRow> {
   const period = periodSpan(columns)
   if (!period) return []
   const trend = trendSpans(columns)
@@ -151,7 +151,7 @@ export function merchantBills(
     }
     byMerchant.set(row.merchantId, own)
   }
-  const rows = merchants.flatMap((merchant): Array<MerchantRow> => {
+  const rows = merchants.flatMap((merchant): Array<BillRow> => {
     const own = byMerchant.get(merchant.id)
     const figures = own?.get(period.key)?.figures
     if (!own || !figures) return []
@@ -181,15 +181,15 @@ export function merchantBills(
   return rows
 }
 
-export const MERCHANT_SORTS = [
-  'name',
+export const BILL_SORTS = [
+  'nameAsc',
   'nameDesc',
   'amountDesc',
   'amountAsc',
   'countDesc',
   'countAsc',
 ] as const
-export type MerchantSort = (typeof MERCHANT_SORTS)[number]
+export type BillSort = (typeof BILL_SORTS)[number]
 
 /** Two decimals in order; a missing one last whatever the direction. */
 function byDecimal(x: string | null, y: string | null, desc: boolean): number {
@@ -199,19 +199,18 @@ function byDecimal(x: string | null, y: string | null, desc: boolean): number {
 }
 
 /**
- * As the category table's sorts without the colour, plus the number of transactions
- * (author, 2026-11-20). An amount sort reads the period's total, as the categories'.
+ * As the category table's sorts without the colour, plus the number of transactions.
+ * An amount sort reads the period's total, as the categories'.
  */
-export function sortMerchants(
-  rows: ReadonlyArray<MerchantRow>,
-  sort: MerchantSort,
+export function sortBills(
+  rows: ReadonlyArray<BillRow>,
+  sort: BillSort,
   locale: string,
-): Array<MerchantRow> {
+): Array<BillRow> {
   const names = compareNames(locale)
-  const byName = (a: MerchantRow, b: MerchantRow) =>
-    names(a.merchant, b.merchant)
-  const compare = (a: MerchantRow, b: MerchantRow): number => {
-    if (sort === 'name') return byName(a, b)
+  const byName = (a: BillRow, b: BillRow) => names(a.merchant, b.merchant)
+  const compare = (a: BillRow, b: BillRow): number => {
+    if (sort === 'nameAsc') return byName(a, b)
     if (sort === 'nameDesc') return byName(b, a)
     if (sort === 'countDesc' || sort === 'countAsc') {
       const diff = a.figures.visits - b.figures.visits

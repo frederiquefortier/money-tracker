@@ -4,7 +4,7 @@ import type { HoveredBar } from '#/components/dashboard/chart-parts'
 
 /**
  * The bar part under the pointer, and the handlers that track it on each series' bars. A
- * click opens that part alone: its series and its bucket (author, 2026-11-20).
+ * click opens that part alone: its series and its bucket.
  */
 export function useBarPointer(onOpen: (series: string, key: string) => void) {
   const [hovered, setHovered] = useState<HoveredBar>(null)

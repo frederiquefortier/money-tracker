@@ -7,7 +7,7 @@ import type { ChartItem } from '#/lib/net-worth/net-worth-series'
 /**
  * The hub under its title: the range tabs first, since every figure below is measured
  * over the range. From `xl`, the net worth card on the left and the list on the right,
- * half the page each, the list's controls on the tabs' row (author, 2026-11-18).
+ * half the page each, the list's controls on the tabs' row.
  * Narrower, one column at the width of every list page: the net worth, the list's
  * controls, the list.
  */
@@ -37,7 +37,7 @@ export function NetWorthDashboard({
           <RangeTabs range={chart.range} onChange={chart.setRange} />
         </div>
       )}
-      {/* Over the list: on the tabs' row from `xl` (author, 2026-11-18), under the card
+      {/* Over the list: on the tabs' row from `xl`, under the card
           below it. */}
       <div className="order-1 mt-3 flex flex-wrap items-center justify-end gap-2 xl:order-none xl:col-span-6 xl:col-start-7 xl:row-start-1 xl:mt-0">
         {controls}

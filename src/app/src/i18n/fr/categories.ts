@@ -32,7 +32,7 @@ export const categoriesFr = {
     swatch: 'Couleur {{n}}',
     swatchUsed: 'Couleur {{n}}, déjà utilisée',
     branchName: 'Sous-catégories de “{{name}}”',
-    sort: { name: 'Nom (A à Z)', nameDesc: 'Nom (Z à A)', color: 'Couleur' },
+    sort: { nameAsc: 'Nom (A à Z)', nameDesc: 'Nom (Z à A)', color: 'Couleur' },
     addChildName: 'Ajouter une sous-catégorie à “{{name}}”',
     archived_one: 'Archivée ({{count}})',
     archived_other: 'Archivées ({{count}})',

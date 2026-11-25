@@ -19,7 +19,7 @@ export type SinceStart = {
 
 /**
  * On Tout, the plain change since the first figure, how many times it multiplied and the
- * average per year (author, 2026-11-19: "(56 %) par an" read as a return; a net worth that
+ * average per year ("(56 %) par an" read as a return; a net worth that
  * grows from savings has none to show).
  */
 export function changeSinceStart(

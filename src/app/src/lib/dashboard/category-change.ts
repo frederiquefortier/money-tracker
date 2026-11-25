@@ -9,9 +9,9 @@ import { toMinor } from '#/lib/shared/money'
 // DSH-04: each category against a year earlier, as a percent and as last year's line.
 
 /**
- * What the change column compares (DSH-04, author 2026-11-20): the year so far against the
+ * What the change column compares (DSH-04): the year so far against the
  * same months a year earlier, as the summary does. Null on everything, which compares
- * nothing, as the summary (author, 2026-11-20).
+ * nothing, as the summary.
  */
 export type ChangeSpans = { now: Span; then: Span }
 

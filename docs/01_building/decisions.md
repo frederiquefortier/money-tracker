@@ -4,6 +4,27 @@ Technical and structural choices, with the alternatives that were rejected. Chec
 
 <!-- Newest first: a new ADR goes directly below this line. Template at the bottom. -->
 
+### ADR-076: Shared hooks in `hooks/`, features in `form/` and `list/`, history out of comments (2026-11-25)
+
+**Context:**
+- A review found 33 hooks outside `hooks/`, against ADR-026. Three were used by other files, the rest only by the file that holds them.
+- `merchants`, `institutions` and `currencies` kept flat folders while the other features split into `form/` and `list/`.
+- 88 comments carried "(author, date)" tags, which repeat the journal and age fast.
+
+**Decision:**
+- Supersedes ADR-026's "every hook in `hooks/`": a hook that a second file uses lives in `hooks/`; one used by its own file only may stay there, unexported.
+- A feature's components: its form in `form/`, its list rows, actions and skeleton in `list/`, and what other features use (a picker, a badge) at the feature's root.
+- Code comments say what holds and why, never who asked or when; that stays in sessions.md and git.
+- `tsconfig` targets the ES2024 library, so rows are grouped with `Map.groupBy` instead of a loop per file.
+
+**Alternatives Considered:**
+- Move every hook to `hooks/` -> One-file hooks become files of their own with nothing to share.
+
+**Consequences:**
+- `Map.groupBy` needs Safari 17.4 or later.
+
+---
+
 ### ADR-075: Each list page and list end loads in its own shape (2026-11-25)
 
 **Context:**

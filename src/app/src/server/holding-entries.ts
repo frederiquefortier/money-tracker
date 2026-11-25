@@ -2,7 +2,7 @@ import { createServerFn } from '@tanstack/react-start'
 import {
   contributionInputSchema,
   snapshotInputSchema,
-  transferInputSchema,
+  holdingTransferInputSchema,
 } from '#/lib/holdings/holding'
 import type { HoldingError } from '#/lib/holdings/holding'
 import { deleteRow, saveRow } from '#/lib/server/db.server'
@@ -55,7 +55,7 @@ export const deleteContribution = createServerFn({ method: 'POST' })
 
 /** NW-03: money moved between two holdings, a withdrawal on one and a contribution on the other. */
 export const saveHoldingTransfer = createServerFn({ method: 'POST' })
-  .validator(transferInputSchema)
+  .validator(holdingTransferInputSchema)
   .handler(async ({ data }): Promise<HoldingResult<{ id: string }>> => {
     const { saved, error } = await saveRow('holding_transfers', undefined, {
       from_holding_id: data.from,

@@ -2,7 +2,7 @@ import type { MonthAmount } from '#/lib/dashboard/dashboard'
 import type { DashboardPeriod } from '#/lib/dashboard/dashboard-period'
 import { shiftMonth } from '#/lib/shared/months'
 
-// A hole in the history (author, 2026-11-19): a month of the period with no transaction
+// A hole in the history: a month of the period with no transaction
 // at all, between the first month on record and the last month that is over. This month,
 // not over yet, is never a hole.
 

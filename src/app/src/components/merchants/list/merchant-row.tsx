@@ -1,7 +1,7 @@
 import { CategoryBadge } from '#/components/categories/category-badge'
 import { ListRow } from '#/components/lists/list-row'
-import { MerchantActions } from '#/components/merchants/merchant-actions'
-import { SuggestionTag } from '#/components/merchants/suggestion-tag'
+import { MerchantActions } from '#/components/merchants/list/merchant-actions'
+import { SuggestionTag } from '#/components/merchants/list/suggestion-tag'
 import type { Merchant } from '#/lib/merchants/merchant'
 import { cn } from '#/lib/utils'
 

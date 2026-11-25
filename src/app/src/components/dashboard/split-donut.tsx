@@ -16,7 +16,7 @@ import { cn } from '#/lib/utils'
 /** A series as both charts draw it: its name and colour, its total and share. */
 export type Part = ChartSeries & Omit<StackSeries, 'key'>
 
-// Each edge of the list fades while more parts sit past it (author, 2026-11-20).
+// Each edge of the list fades while more parts sit past it.
 const FADE_LENGTH = '2.5rem'
 
 function fadeMask(above: boolean, below: boolean): string | undefined {
@@ -67,7 +67,7 @@ function Donut({
           nameKey="key"
           innerRadius="60%"
           outerRadius="100%"
-          // From 12 o'clock, clockwise, in the list's order (author, 2026-11-20).
+          // From 12 o'clock, clockwise, in the list's order.
           startAngle={90}
           endAngle={-270}
           stroke="var(--card)"
@@ -163,7 +163,7 @@ function PartRow({
 
 /**
  * The whole as a donut beside its parts, each with its share and amount. The list scrolls
- * past a set height, so a long one never stretches the card (author, 2026-11-20).
+ * past a set height, so a long one never stretches the card.
  */
 export function SplitDonut({
   parts,

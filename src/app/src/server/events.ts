@@ -43,6 +43,12 @@ export const getEvents = createServerFn({ method: 'GET' }).handler(
         supabase.from('event_default_skips').select('category_id'),
       ])),
     )
+    const peopleOf = Map.groupBy(people, (p) => p.event_id)
+    const skipsOf = Map.groupBy(skips, (k) => k.event_id)
+    const eventsOf = Map.groupBy(events, (e) => e.type_id)
+    const counts = new Map(
+      usage.map((u) => [u.event_id, u.transaction_count ?? 0]),
+    )
     return {
       events: events.map((e) => ({
         id: e.id,
@@ -51,18 +57,15 @@ export const getEvents = createServerFn({ method: 'GET' }).handler(
         startsOn: e.starts_on,
         endsOn: e.ends_on,
         autoLink: e.auto_link,
-        personIds: people
-          .filter((p) => p.event_id === e.id)
-          .map((p) => p.person_id),
+        personIds: (peopleOf.get(e.id) ?? []).map((p) => p.person_id),
         skipCategoryIds: e.skips_own
-          ? skips.filter((k) => k.event_id === e.id).map((k) => k.category_id)
+          ? (skipsOf.get(e.id) ?? []).map((k) => k.category_id)
           : null,
-        transactionCount:
-          usage.find((u) => u.event_id === e.id)?.transaction_count ?? 0,
+        transactionCount: counts.get(e.id) ?? 0,
       })),
       types: types.map((type) => ({
         ...type,
-        eventCount: events.filter((e) => e.type_id === type.id).length,
+        eventCount: eventsOf.get(type.id)?.length ?? 0,
       })),
       defaultSkipIds: defaultSkips.map((d) => d.category_id),
     }

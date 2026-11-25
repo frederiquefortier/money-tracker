@@ -5,7 +5,7 @@ import { usePrivacy } from '#/hooks/app/use-privacy'
 
 /**
  * A percentage given as a fraction digit string of percent points, such as "7.5". Whole
- * from 1 up; below, one decimal, so a small share does not read as 0 (author, 2026-11-23).
+ * from 1 up; below, one decimal, so a small share does not read as 0.
  * Bullets in privacy mode (SET-08).
  */
 export function Percent({ points }: { points: string }) {

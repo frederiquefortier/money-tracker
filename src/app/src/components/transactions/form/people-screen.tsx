@@ -63,7 +63,7 @@ function usePeoplePick(
 
 /**
  * who was there, over the whole sheet like the category list. Fréquents, then
- * the people grouped as in the list's filter (decided 2026-11-05): a card per group
+ * the people grouped as in the list's filter: a card per group
  * with its members, "Sans groupe" for the others, flat while searching, each card's
  * "Tout" ticking its members. A new person and the people without a name follow in a
  * card of their own. Archived people and groups show only if already on it.

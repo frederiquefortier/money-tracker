@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { Icon } from '#/components/display/icon'
-import { usePickedOf } from '#/components/transactions/filters/filter-chips'
+import { usePickedOf } from '#/hooks/transactions/use-picked-of'
 import { cardSurface, focusRing, rowHover } from '#/components/styles'
 import { usePeriodLabel } from '#/hooks/transactions/use-period-label'
 import { FILTER_KEYS } from '#/lib/transactions/transaction-filters'
@@ -37,7 +37,7 @@ function useSummary(
 
 /**
  * The filters, each with what is chosen; a row opens it. The sidebar shows a count only,
- * the chips naming the values (author, 2026-11-17). A filter with nothing to choose from
+ * the chips naming the values. A filter with nothing to choose from
  * looks disabled and says why when tapped.
  */
 export function FilterRoot({

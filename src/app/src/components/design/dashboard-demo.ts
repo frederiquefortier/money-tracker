@@ -2,7 +2,10 @@ import type { Category, CategoryKind } from '#/lib/categories/category'
 import type { Necessity } from '#/lib/categories/category-necessity'
 import type { Dashboard, MonthAmount } from '#/lib/dashboard/dashboard'
 import type { DaySpent } from '#/lib/dashboard/daily-spending'
-import type { Merchant, MerchantMonth } from '#/lib/dashboard/merchant-bills'
+import type {
+  BillMerchant,
+  MerchantMonth,
+} from '#/lib/dashboard/merchant-bills'
 
 // Invented categories and amounts for the dashboard's gallery section.
 
@@ -125,7 +128,7 @@ function months(today: string): Array<MonthAmount> {
   return out
 }
 
-const MERCHANTS: Array<Merchant> = [
+const MERCHANTS: Array<BillMerchant> = [
   { id: 'grocer', name: 'Corner Grocer' },
   { id: 'bakery', name: 'Bakery Lune' },
   { id: 'fuel', name: 'Fuel Stop' },

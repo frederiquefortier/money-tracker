@@ -19,7 +19,7 @@ import type {
 /**
  * Mounted while the sheet is open, so the search starts empty each time. One screen at a
  * time (ADR-029, ADR-030): `tab` null is the list of filters, the period being on the
- * page's tabs (2026-11-17) and opened here only from their calendar; a filter has its search over its list, and either has a back arrow to the list
+ * page's tabs and opened here only from their calendar; a filter has its search over its list, and either has a back arrow to the list
  * when the sheet came from it. The footer clears what is shown (the open filter, or all
  * of them in the list) or closes, saying how many rows the list now shows.
  */

@@ -1,7 +1,7 @@
 import { Navigate, createFileRoute } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
-import { InstitutionActions } from '#/components/institutions/institution-actions'
-import { InstitutionForm } from '#/components/institutions/institution-form'
+import { InstitutionActions } from '#/components/institutions/list/institution-actions'
+import { InstitutionForm } from '#/components/institutions/form/institution-form'
 import { RouteSheet } from '#/components/sheet/route-sheet'
 import { useInstitutionsPage } from '#/hooks/app/use-page-data'
 
@@ -28,7 +28,11 @@ function EditInstitution() {
         <InstitutionActions institution={institution} placement="sheet" />
       }
     >
-      <InstitutionForm key={institution.id} institution={institution} />
+      <InstitutionForm
+        key={institution.id}
+        institution={institution}
+        savedText={t('institutions.updated')}
+      />
     </RouteSheet>
   )
 }

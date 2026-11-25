@@ -12,12 +12,10 @@ import { transferFormSchema, transferTargets } from '#/lib/holdings/holding'
 import { todayIso } from '#/lib/shared/format'
 import { saveHoldingTransfer } from '#/server/holding-entries'
 import { formValues } from '#/lib/forms/form-state'
-import type { Holding, HoldingType } from '#/lib/holdings/holding'
+import type { HoldingType, LabelledHolding } from '#/lib/holdings/holding'
 import type { Institution } from '#/lib/institutions/institution'
 
 const TEXT_FIELDS = ['onDate', 'amount'] as const
-
-export type ListedHolding = Holding & { label: string }
 
 /**
  * NW-03: money moved from a holding to another of the same currency on a date, as when
@@ -31,8 +29,8 @@ export function TransferFormSheet({
   types,
   onClosed,
 }: {
-  source: ListedHolding
-  holdings: ReadonlyArray<ListedHolding>
+  source: LabelledHolding
+  holdings: ReadonlyArray<LabelledHolding>
   institutions: ReadonlyArray<Institution>
   types: ReadonlyArray<HoldingType>
   onClosed: () => void

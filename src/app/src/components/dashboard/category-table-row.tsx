@@ -8,9 +8,9 @@ import {
   CountCell,
   FoldButton,
   TrendButton,
-} from '#/components/dashboard/category-table-cells'
-import type { Fold } from '#/components/dashboard/category-table-cells'
-import { TablePanel } from '#/components/dashboard/table-panel'
+} from '#/components/dashboard/table-cells'
+import type { Fold } from '#/components/dashboard/table-cells'
+import { TablePanel } from '#/components/dashboard/table-parts'
 import { TrendChart } from '#/components/dashboard/trend-chart'
 import { TreeGuides } from '#/components/lists/tree-guides'
 import {
@@ -18,6 +18,7 @@ import {
   rowHover,
   tableFigureCell,
   tableNameWidth,
+  tableStickyCell,
 } from '#/components/styles'
 import { isAboveAverage } from '#/lib/dashboard/category-table'
 import type { TableColumn, TableRow } from '#/lib/dashboard/category-table'
@@ -25,12 +26,6 @@ import type { DashboardPeriod } from '#/lib/dashboard/dashboard-period'
 import { periodSearch } from '#/lib/dashboard/drill-down'
 import type { TreeGuide } from '#/lib/shared/tree-layout'
 import { cn } from '#/lib/utils'
-
-// Opaque in the row's colour, hover included, so the sticky column hides what scrolls under it.
-// Its own fade, as the row's: a custom property change alone would swap it at once. Its
-// right border is a shadow: a collapsed table's border stays put while the cell sticks.
-export const STICKY =
-  'sticky left-0 z-10 bg-[var(--row-bg,var(--card))] shadow-[inset_-1px_0_0_var(--border)] transition-colors'
 
 function NameCell({
   row,
@@ -45,7 +40,7 @@ function NameCell({
 }) {
   const { category, depth } = row
   return (
-    <td className={cn(STICKY, tableNameWidth, 'py-1.5 pr-3 pl-3')}>
+    <td className={cn(tableStickyCell, tableNameWidth, 'py-1.5 pr-3 pl-3')}>
       <span
         className={cn(
           'flex items-center gap-2',
@@ -128,7 +123,7 @@ function lastYearOf(row: TableRow, change: RowChange) {
 
 /**
  * A category's row: a group folds its categories; the trend opens the category's chart
- * under the row, as an item's line does on the net worth page (author, 2026-11-19).
+ * under the row, as an item's line does on the net worth page.
  */
 export function CategoryTableRow({
   row,

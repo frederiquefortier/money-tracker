@@ -12,7 +12,8 @@ import { MissingRate, Money } from '#/components/display/money'
 import { ChartContainer, ChartTooltip } from '#/components/ui/chart'
 import { GROUP_COLORS } from '#/components/net-worth/chart-lines'
 import { MONTHLY_UP_TO, periodChanges } from '#/lib/net-worth/net-worth-range'
-import { STACK_KEYS, axisTicks } from '#/lib/net-worth/net-worth-series'
+import { STACK_KEYS } from '#/lib/net-worth/net-worth-series'
+import { axisTicks } from '#/lib/shared/axis-ticks'
 import { formatAxisMoney, formatMonth } from '#/lib/shared/format'
 import { useLocale } from '#/hooks/app/use-locale'
 import { usePrivacy } from '#/hooks/app/use-privacy'
@@ -216,7 +217,7 @@ export function ChangeBars({
   return (
     // Clear of the line's axis above it, so the two charts read apart.
     <section className="mt-6 flex flex-col gap-3">
-      {/* No legend (author, 2026-11-18): the colours are the list's groups, and the
+      {/* No legend: the colours are the list's groups, and the
           tooltip names each group with its change and the net. */}
       <h3 className="text-sm font-semibold">
         {t(byYear ? 'netWorth.changes.byYear' : 'netWorth.changes.byMonth')}

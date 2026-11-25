@@ -58,7 +58,7 @@ export const dashboardEn: typeof dashboardFr = {
         averageYear: 'Yearly average',
       },
       sort: {
-        name: 'Name (A to Z)',
+        nameAsc: 'Name (A to Z)',
         nameDesc: 'Name (Z to A)',
         color: 'Colour',
         amountDesc: 'Amount (highest)',
@@ -78,7 +78,7 @@ export const dashboardEn: typeof dashboardFr = {
       smallest: 'Smallest',
       largest: 'Largest',
       sort: {
-        name: 'Name (A to Z)',
+        nameAsc: 'Name (A to Z)',
         nameDesc: 'Name (Z to A)',
         amountDesc: 'Amount (highest)',
         amountAsc: 'Amount (lowest)',

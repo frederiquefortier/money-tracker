@@ -177,9 +177,9 @@ function chartData(points: Points, lastYear: Points | null, year: string) {
 
 /**
  * The year's income on top of what earlier years left, against what was spent, as two
- * lines that stop at this month (author, 2026-11-19: no fill), and last year's two lines
+ * lines that stop at this month (no fill), and last year's two lines
  * dashed across the whole year: the pace to compare with. Each line is named where it
- * ends, in place of a legend (author, 2026-11-20).
+ * ends, in place of a legend.
  */
 export function CumulativeChart({
   points,

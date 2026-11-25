@@ -6,7 +6,7 @@ const ALL = 'all'
 
 /**
  * DSH-01, DSH-08: everything, the default, then each year from the newest, in one menu
- * (author, 2026-11-20: no ‹ › arrows, none other in the app).
+ * (no ‹ › arrows, none other in the app).
  */
 export function PeriodMenu({
   period,

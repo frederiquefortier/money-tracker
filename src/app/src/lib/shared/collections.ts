@@ -28,8 +28,10 @@ export function newestFirst<T>(dateOf: (item: T) => string | null | undefined) {
 export function byName<T extends { name: string }>(
   items: ReadonlyArray<T>,
   locale: string,
+  descending = false,
 ) {
-  return [...items].sort(compareNames(locale))
+  const sorted = [...items].sort(compareNames(locale))
+  return descending ? sorted.reverse() : sorted
 }
 
 export function indexById<T extends { id: string }>(items: ReadonlyArray<T>) {

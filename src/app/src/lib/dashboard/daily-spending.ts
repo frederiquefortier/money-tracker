@@ -1,7 +1,7 @@
 import type { CategoryKind } from '#/lib/categories/category'
 import { Sum } from '#/lib/dashboard/dashboard'
 
-// The year's heat map (author, 2026-11-19): what I spent each day, my share net of
+// The year's heat map: what I spent each day, my share net of
 // repayments as every dashboard figure (ADR-063), from expense categories only so a day
 // adds up to the month's Dépensé. A refund booked in an expense category lowers its day.
 

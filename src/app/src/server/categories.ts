@@ -66,16 +66,8 @@ export const getCategories = createServerFn({ method: 'GET' }).handler(
     ])
     const [categories, events, periods] = loaded('Categories', ...results)
 
-    const history = new Map<string, Array<CategoryEvent>>()
-    for (const e of events) {
-      const list = history.get(e.category_id) ?? []
-      list.push({
-        status: e.status === 'archived' ? 'archived' : 'active',
-        effectiveOn: e.effective_on,
-        viaId: e.via_category_id,
-      })
-      history.set(e.category_id, list)
-    }
+    const historyOf = Map.groupBy(events, (e) => e.category_id)
+    const periodsOf = Map.groupBy(periods, (p) => p.category_id)
     return categories.map((c) => ({
       id: c.id,
       parentId: c.parent_id,
@@ -86,10 +78,15 @@ export const getCategories = createServerFn({ method: 'GET' }).handler(
       color: c.color,
       colorIsAuto: c.color_is_auto,
       necessity: isNecessity(c.necessity) ? c.necessity : null,
-      history: history.get(c.id) ?? [],
-      periods: periods
-        .filter((p) => p.category_id === c.id)
-        .map((p) => ({ from: p.active_from, to: p.active_to })),
+      history: (historyOf.get(c.id) ?? []).map((e): CategoryEvent => ({
+        status: e.status === 'archived' ? 'archived' : 'active',
+        effectiveOn: e.effective_on,
+        viaId: e.via_category_id,
+      })),
+      periods: (periodsOf.get(c.id) ?? []).map((p) => ({
+        from: p.active_from,
+        to: p.active_to,
+      })),
       isFee: c.id === feeId,
       inUse: used.has(c.id),
     }))

@@ -1,6 +1,4 @@
 import { cn } from '#/lib/utils'
-import { heatLevel } from '#/lib/dashboard/daily-spending'
-import { tagColors } from '#/lib/shared/color'
 
 // The class strings shared by several components: one place to change how they look.
 
@@ -82,8 +80,14 @@ export const rowHover = cn(
 )
 
 // The dashboard's category and merchant tables, one above the other: the same name and
-// figure widths so their first columns line up (author, 2026-11-20). The widths sit inside
+// figure widths so their first columns line up. The widths sit inside
 // the head cells: beside a full-width trend column, a width on the cell itself is ignored.
+/**
+ * The tables' name column, pinned while the figures scroll: opaque in the row's colour,
+ * with its own fade and a shadow for a right border, which a collapsed table would lose.
+ */
+export const tableStickyCell =
+  'sticky left-0 z-10 bg-[var(--row-bg,var(--card))] shadow-[inset_-1px_0_0_var(--border)] transition-colors'
 /** A row's panel, pinned to the visible width while the figures scroll under it, over the fades. */
 export const tablePanel = 'sticky left-0 z-30 w-[100cqw] bg-card px-4 pt-4 pb-3'
 /** On a name cell: long names cut at the width the head sets. */
@@ -130,56 +134,9 @@ export const iconHover = {
 
 // The calendar's header and its round buttons.
 export const roundButton = cn(
-  'grid size-8 shrink-0 place-items-center rounded-full text-muted-foreground hover:bg-secondary hover:text-foreground',
+  'grid size-8 shrink-0 place-items-center rounded-full text-muted-foreground hover:bg-secondary hover:text-foreground disabled:pointer-events-none disabled:opacity-40 data-[disabled]:pointer-events-none data-[disabled]:opacity-40',
   focusRing,
 )
 
 export const pickerHeader = 'flex items-center justify-between'
 export const pickerHeading = 'font-mono font-bold capitalize'
-export const pickerNav = cn(
-  'grid size-9 shrink-0 place-items-center rounded-full text-muted-foreground hover:bg-secondary hover:text-foreground disabled:pointer-events-none disabled:opacity-40 data-[disabled]:pointer-events-none data-[disabled]:opacity-40',
-  focusRing,
-)
-
-// The heat maps' days (author, 2026-11-19): no spending and days to come in one neutral
-// grey, then four steps of the spending red, one hue light to dark; a missing rate darker
-// grey. `soft` is the same scale paled for the calendar's boxes, under text.
-export const heatFills = {
-  none: 'color-mix(in oklch, var(--muted-foreground) 7%, var(--card))',
-  levels: [25, 50, 75, 100].map(
-    (p) => `color-mix(in oklch, var(--flow-spent) ${p}%, var(--card))`,
-  ),
-  soft: [7, 13, 20, 28].map(
-    (p) => `color-mix(in oklch, var(--flow-spent) ${p}%, var(--card))`,
-  ),
-  missing: 'color-mix(in oklch, var(--muted-foreground) 50%, var(--card))',
-}
-
-/** A day's fill for what it cost; undefined spent is a day without spending. */
-export function heatFill(
-  spent: string | null | undefined,
-  steps: ReadonlyArray<number>,
-  scale: 'levels' | 'soft' = 'levels',
-): string {
-  if (spent === null) return heatFills.missing
-  const level = heatLevel(Number(spent ?? 0), steps)
-  return level === 0 ? heatFills.none : heatFills[scale][level - 1]
-}
-
-// An event's tint, a soft pill readable on any hex (EventTag, the calendar's bars): the
-// classes, and the style that sets their colours from the type's.
-export const tagTint =
-  'bg-(--tag-bg) text-(--tag-text) dark:bg-(--tag-bg-dark) dark:text-(--tag-text-dark)'
-
-export function tagTintStyle(
-  color: string | null,
-): React.CSSProperties | undefined {
-  if (!color) return undefined
-  const colors = tagColors(color)
-  return {
-    '--tag-bg': colors.light.background,
-    '--tag-text': colors.light.text,
-    '--tag-bg-dark': colors.dark.background,
-    '--tag-text-dark': colors.dark.text,
-  } as React.CSSProperties
-}

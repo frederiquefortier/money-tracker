@@ -26,8 +26,7 @@ function typedPart(value: string, line: PersonLine): string | null {
 }
 
 /**
- * What each line counts for, so an empty field never stops the save (decided
- * 2026-11-08): an empty Me doit is not known yet; an empty Moi or Invité takes what is
+ * What each line counts for, so an empty field never stops the save: an empty Me doit is not known yet; an empty Moi or Invité takes what is
  * left: 1 part in Parts, an equal share of what the typed lines leave in Montant and %.
  * In Montant, with a part not known yet and nothing else empty, Moi takes what is left.
  * `filled` holds the lines counted that way; `over` is set when the typed lines already

@@ -112,7 +112,7 @@ function FlowFigure({
   const share = shareOfIncome(flows, flow)
   return (
     // Four rows shared across the figures, so each change sits on one line even where a
-    // share of income wraps (author, 2026-11-19).
+    // share of income wraps.
     <li className="row-span-4 grid min-w-0 grid-rows-subgrid gap-y-0.5">
       <Label flow={flow}>{t(`dashboard.flows.${flow}`)}</Label>
       <Figure
@@ -182,9 +182,9 @@ function AverageBand({
 
 /**
  * The period at a glance: income as the headline and as the whole bar, cut into what was
- * spent, invested and what remains (author, 2026-11-19: the full bar reads as income), each
+ * spent, invested and what remains (the full bar reads as income), each
  * with its share of income and its change from the same stretch a year earlier; then each
- * flow per month or per year at the foot (author, 2026-11-20).
+ * flow per month or per year at the foot.
  */
 export function FlowSummary({
   flows,

@@ -6,13 +6,32 @@ import { EmptyState } from '#/components/lists/list-card'
 import { Skeleton } from '#/components/feedback/skeleton'
 import { DayGrid, DaysCount } from '#/components/dashboard/day-grid'
 import { useLocale } from '#/hooks/app/use-locale'
-import { heatSteps } from '#/lib/dashboard/daily-spending'
-import { heatFill, heatFills } from '#/components/styles'
+import { heatLevel, heatSteps } from '#/lib/dashboard/daily-spending'
 import { daySearch } from '#/lib/dashboard/drill-down'
 import type { DaySpent } from '#/lib/dashboard/daily-spending'
 import { formatDay } from '#/lib/shared/format'
 import { daysGoneBy, monthsOf } from '#/lib/shared/months'
 import { cn } from '#/lib/utils'
+
+// No spending and days to come in one neutral grey, then four steps of the spending red,
+// one hue light to dark; a missing rate darker grey.
+const HEAT_FILLS = {
+  none: 'color-mix(in oklch, var(--muted-foreground) 7%, var(--card))',
+  levels: [25, 50, 75, 100].map(
+    (p) => `color-mix(in oklch, var(--flow-spent) ${p}%, var(--card))`,
+  ),
+  missing: 'color-mix(in oklch, var(--muted-foreground) 50%, var(--card))',
+}
+
+/** A day's fill for what it cost; undefined spent is a day without spending. */
+function heatFill(
+  spent: string | null | undefined,
+  steps: ReadonlyArray<number>,
+): string {
+  if (spent === null) return HEAT_FILLS.missing
+  const level = heatLevel(Number(spent ?? 0), steps)
+  return level === 0 ? HEAT_FILLS.none : HEAT_FILLS.levels[level - 1]
+}
 
 /** The hovered day and what it cost, or nothing yet. */
 function Caption({
@@ -43,7 +62,7 @@ function Caption({
 }
 
 /**
- * The year as a heat map of what I spent each day (author, 2026-11-19): the darker, the
+ * The year as a heat map of what I spent each day: the darker, the
  * more, in steps at the year's quartiles. Hovering a day names it and its amount.
  */
 export function SpendingHeatmap({
@@ -103,7 +122,7 @@ export function SpendingHeatmap({
               months={monthsOf(range)}
               today={today}
               fillOf={(day, future) =>
-                future ? heatFills.none : heatFill(byDay.get(day), steps)
+                future ? HEAT_FILLS.none : heatFill(byDay.get(day), steps)
               }
               onHover={setHovered}
               onOpen={(day) =>

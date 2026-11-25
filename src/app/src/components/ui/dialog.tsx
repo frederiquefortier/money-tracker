@@ -3,10 +3,8 @@ import { Dialog as DialogPrimitive } from 'radix-ui'
 import { Icon } from '#/components/display/icon'
 import { cn } from '#/lib/utils'
 import { iconAction } from '#/components/styles'
-import {
-  OverlayContainerProvider,
-  inAriaOverlay,
-} from '#/components/ui/overlay-container'
+import { OverlayContainer } from '#/hooks/app/use-overlay-container'
+import { inAriaOverlay } from '#/lib/shared/aria-overlay'
 
 // shadcn's dialog, as a bottom sheet on phones and a centred card from sm up.
 function Dialog(props: React.ComponentProps<typeof DialogPrimitive.Root>) {
@@ -43,9 +41,7 @@ function DialogContent({
           props.onEscapeKeyDown?.(event)
         }}
       >
-        <OverlayContainerProvider value={panel}>
-          {children}
-        </OverlayContainerProvider>
+        <OverlayContainer value={panel}>{children}</OverlayContainer>
         <DialogPrimitive.Close
           className={cn(iconAction(), 'absolute top-3 right-3')}
         >

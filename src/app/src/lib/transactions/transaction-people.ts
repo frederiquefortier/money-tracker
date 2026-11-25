@@ -53,7 +53,7 @@ function startValue(
 }
 
 /**
- * An empty field means not known yet (decided 2026-11-08). An empty Me doit part is set
+ * An empty field means not known yet. An empty Me doit part is set
  * by its reimbursement, in every mode; empty Moi or Invité lines take what is left.
  */
 export const isUnknown = (line: PersonLine) =>

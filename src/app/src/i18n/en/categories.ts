@@ -33,7 +33,11 @@ export const categoriesEn: typeof categoriesFr = {
     swatch: 'Colour {{n}}',
     swatchUsed: 'Colour {{n}}, already used',
     branchName: 'Subcategories of “{{name}}”',
-    sort: { name: 'Name (A to Z)', nameDesc: 'Name (Z to A)', color: 'Colour' },
+    sort: {
+      nameAsc: 'Name (A to Z)',
+      nameDesc: 'Name (Z to A)',
+      color: 'Colour',
+    },
     addChildName: 'Add a subcategory to “{{name}}”',
     archived_one: 'Archived ({{count}})',
     archived_other: 'Archived ({{count}})',

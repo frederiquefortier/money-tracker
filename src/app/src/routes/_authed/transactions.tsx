@@ -3,7 +3,6 @@ import {
   createFileRoute,
   retainSearchParams,
 } from '@tanstack/react-router'
-import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { FloatingAddLink } from '#/components/layout/floating-add-button'
 import { EmptyState } from '#/components/lists/list-card'
@@ -15,22 +14,19 @@ import { TransactionDayGroup } from '#/components/transactions/list/transaction-
 import { TransactionDaysSkeleton } from '#/components/transactions/list/transaction-skeleton'
 import { useTransactionPages } from '#/hooks/transactions/use-transaction-pages'
 import { usePreloadForm } from '#/hooks/transactions/use-preload-form'
-import { useDraftSearch } from '#/hooks/transactions/use-draft-search'
 import { useFilterNames } from '#/hooks/transactions/use-filter-options'
-import { formatDate, formatMonth } from '#/lib/shared/format'
+import { useEmptyText } from '#/hooks/transactions/use-empty-text'
+import { useListNavigation } from '#/hooks/transactions/use-list-navigation'
+import { useSearchText } from '#/hooks/transactions/use-search-text'
 import {
   KEPT,
   listQuery,
   queryKey,
   searchSchema,
 } from '#/lib/transactions/transaction-search'
-import type { Query } from '#/lib/transactions/transaction-search'
-import { useLocale } from '#/hooks/app/use-locale'
 import { useMyCurrencies } from '#/hooks/currencies/use-my-currencies'
 import { listTransactions } from '#/server/transaction-list'
 import { getFeeCategory } from '#/server/transfers'
-import type { FilterValues } from '#/lib/transactions/transaction-filters'
-import type { PeriodChoice } from '#/lib/transactions/transaction-list'
 import { listPagePending } from '#/components/layout/page-pending'
 import { useRevealed } from '#/hooks/app/use-revealed'
 import { ListEnd } from '#/components/lists/list-end'
@@ -46,8 +42,9 @@ function TransactionsPending() {
   )
 }
 
-// The query the loader last asked for, in the browser only.
-let requested: string | null = null
+// The query key the loader last asked for, in the browser only: `shouldReload` compares
+// the address with it, since the loader has no deps (see below).
+let lastRequestedKey: string | null = null
 
 export const Route = createFileRoute('/_authed/transactions')({
   validateSearch: searchSchema,
@@ -61,11 +58,11 @@ export const Route = createFileRoute('/_authed/transactions')({
   // page, its search field included, gave way to the loading one). One match reloads in
   // the background instead, and the list says which query it shows.
   shouldReload: ({ location }) =>
-    queryKey(listQuery(searchSchema.parse(location.search))) !== requested ||
-    undefined,
+    queryKey(listQuery(searchSchema.parse(location.search))) !==
+      lastRequestedKey || undefined,
   loader: async ({ location }) => {
     const query = listQuery(searchSchema.parse(location.search))
-    if (typeof window !== 'undefined') requested = queryKey(query)
+    if (typeof window !== 'undefined') lastRequestedKey = queryKey(query)
     const [page, feeCategory] = await Promise.all([
       listTransactions({ data: query }),
       getFeeCategory(),
@@ -74,89 +71,6 @@ export const Route = createFileRoute('/_authed/transactions')({
   },
   component: Transactions,
 })
-
-function useEmptyText(deps: Query) {
-  const { t } = useTranslation()
-  const locale = useLocale()
-  const { period } = deps
-  const filtered =
-    deps.kinds.length +
-    deps.accountIds.length +
-    deps.categoryIds.length +
-    deps.merchantIds.length +
-    deps.personIds.length +
-    deps.eventIds.length
-  if (deps.search || filtered || deps.pendingOnly || deps.owedOnly)
-    return t('common.noMatch')
-  if (period === 'month')
-    return t('transactions.list.empty.month', {
-      period: formatMonth(deps.month, locale),
-    })
-  if (period === 'year')
-    return t('transactions.list.empty.year', { period: deps.year })
-  if (period === 'custom')
-    return t('transactions.list.empty.custom', {
-      start: formatDate(deps.start, locale, 'medium'),
-      end: formatDate(deps.end, locale, 'medium'),
-    })
-  return t('transactions.list.empty.all')
-}
-
-/** The search as typed, sent to the address once typing pauses. */
-function useSearchText(sent: string, send: (text: string) => void) {
-  const [text, setText] = useState(sent)
-  const latest = useRef(send)
-  latest.current = send
-  useEffect(() => {
-    if (text.trim() === sent) return
-    const timer = setTimeout(() => latest.current(text), 300)
-    return () => clearTimeout(timer)
-  }, [text, sent])
-  return [text, setText] as const
-}
-
-/** Every change goes through the draft, so the page shows it before the list reloads. */
-function useListNavigation() {
-  const navigate = Route.useNavigate()
-  const [shown, change] = useDraftSearch(
-    Route.useSearch(),
-    (search, replace) => void navigate({ search, replace }),
-  )
-  return {
-    shown,
-    period: (c: PeriodChoice) =>
-      change((prev) => ({
-        ...prev,
-        period: c.period,
-        month: c.period === 'month' ? c.month : undefined,
-        year: c.period === 'year' ? c.year : undefined,
-        start: c.period === 'custom' ? c.start : undefined,
-        end: c.period === 'custom' ? c.end : undefined,
-        pending: undefined,
-        owed: undefined,
-      })),
-    pending: (on: boolean) =>
-      change((prev) => ({ ...prev, pending: on || undefined })),
-    owed: (on: boolean) =>
-      change((prev) => ({ ...prev, owed: on || undefined })),
-    filters: (f: FilterValues) =>
-      change((prev) => ({
-        ...prev,
-        kind: f.kinds.length ? f.kinds : undefined,
-        account: f.accountIds.length ? f.accountIds : undefined,
-        category: f.categoryIds.length ? f.categoryIds : undefined,
-        merchant: f.merchantIds.length ? f.merchantIds : undefined,
-        person: f.personIds.length ? f.personIds : undefined,
-        event: f.eventIds.length ? f.eventIds : undefined,
-      })),
-    // The field already waited for typing to pause.
-    search: (text: string) =>
-      change((prev) => ({ ...prev, q: text.trim() || undefined }), {
-        replace: true,
-        now: true,
-      }),
-  }
-}
 
 /** The marks at the list's end: the next days to build, then the next page to load. */
 function OlderDays({
@@ -173,7 +87,7 @@ function OlderDays({
   return null
 }
 
-/** Opened from a dashboard figure: back to the dashboard on its period (author, 2026-11-20). */
+/** Opened from a dashboard figure: back to the dashboard on its period. */
 function DashboardBack() {
   const { t } = useTranslation()
   const { dashboard } = Route.useSearch()
@@ -209,9 +123,7 @@ function Transactions() {
   const empty = useEmptyText(deps)
 
   return (
-    // The net worth hub's grid (2026-11-17): the title at the far left, and from `lg` the
-    // filters on 3 of 12 columns, staying in view as the list scrolls on 7, an empty
-    // column on each side of it (author).
+    // From `lg`, the filters on 3 of 12 columns stay in view as the list scrolls on 7.
     <ListPage
       title={t('nav.transactions')}
       count={data.total}

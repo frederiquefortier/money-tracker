@@ -1,7 +1,7 @@
 import { Navigate, createFileRoute } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
-import { MerchantActions } from '#/components/merchants/merchant-actions'
-import { MerchantForm } from '#/components/merchants/merchant-form'
+import { MerchantActions } from '#/components/merchants/list/merchant-actions'
+import { MerchantForm } from '#/components/merchants/form/merchant-form'
 import { RouteSheet } from '#/components/sheet/route-sheet'
 import { useMerchantsPage } from '#/hooks/app/use-page-data'
 

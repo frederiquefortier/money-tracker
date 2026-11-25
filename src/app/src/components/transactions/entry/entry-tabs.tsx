@@ -1,8 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import { TabList } from '#/components/lists/tab-list'
-
-export const ENTRY_KINDS = ['expense', 'income', 'transfer'] as const
-export type EntryKind = (typeof ENTRY_KINDS)[number]
+import { ENTRY_KINDS } from '#/lib/transactions/transaction'
+import type { EntryKind } from '#/lib/transactions/transaction'
 
 /**
  * The kind first: Dépense, Revenu, Transfert. A saved transaction keeps its

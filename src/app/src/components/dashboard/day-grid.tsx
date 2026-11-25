@@ -50,7 +50,7 @@ function MonthName({ month, withYear }: { month: string; withYear: boolean }) {
 
 /**
  * Months as small calendars, six across (three on a phone), so a year is no taller than
- * the chart beside it (author, 2026-11-20); weeks start on the locale's first day, without
+ * the chart beside it; weeks start on the locale's first day, without
  * weekday letters. A history starting mid-year leaves its earlier months as blank places,
  * so each year keeps its rows.
  */

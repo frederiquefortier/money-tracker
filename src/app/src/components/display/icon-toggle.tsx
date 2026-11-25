@@ -3,7 +3,7 @@ import type { IconName } from '#/components/display/icon'
 import { ToggleGroup, ToggleGroupItem } from '#/components/ui/toggle-group'
 
 /**
- * A short choice drawn as icons, like a list or grid view switch (author, 2026-11-20).
+ * A short choice drawn as icons, like a list or grid view switch.
  * Each icon carries its name as its label and title.
  */
 export function IconToggle<TValue extends string>({

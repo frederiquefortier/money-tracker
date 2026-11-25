@@ -13,13 +13,13 @@ import {
   focusRing,
   pickerHeader,
   pickerHeading,
-  pickerNav,
+  roundButton,
 } from '#/components/styles'
 import { cn } from '#/lib/utils'
 
 // The calendar's month and year: arrows step month by month, and "novembre 2026" between
 // them opens the months and the years side by side in place of the grid, as iOS's date
-// input does (author, 2026-11-17, replacing one list each).
+// input does.
 
 /** The calendar's state, whichever kind of calendar this grid is in. */
 function useCalendarState() {
@@ -183,7 +183,7 @@ export function MonthYearHeader({
   const { focused, nameOf } = useMonthYear()
   const name = `${nameOf(focused.month)} ${focused.year}`
   // Hidden, not removed, while the lists are open, so the name stays in place.
-  const arrow = cn(pickerNav, open && 'invisible')
+  const arrow = cn(roundButton, 'size-9', open && 'invisible')
   // Only set while the lists are open: a false here would override the calendar's own
   // limit (no month past maxValue).
   const blocked = open ? true : undefined

@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next'
-import { InstitutionActions } from '#/components/institutions/institution-actions'
+import { InstitutionActions } from '#/components/institutions/list/institution-actions'
 import { ListRow } from '#/components/lists/list-row'
 import type { InstitutionRow } from '#/lib/institutions/institution'
 

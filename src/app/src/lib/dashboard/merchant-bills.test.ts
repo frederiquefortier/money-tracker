@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { tableColumns } from '#/lib/dashboard/category-table'
-import { merchantBills, sortMerchants } from '#/lib/dashboard/merchant-bills'
+import { merchantBills, sortBills } from '#/lib/dashboard/merchant-bills'
 import type { MerchantMonth } from '#/lib/dashboard/merchant-bills'
 
 const today = '2026-11-19'
@@ -62,9 +62,9 @@ describe('merchant bills on a year', () => {
   })
 
   it('sorts by name, average bill or number of transactions', () => {
-    const ids = (sort: Parameters<typeof sortMerchants>[1]) =>
-      sortMerchants(rows, sort, 'fr').map((r) => r.merchant.id)
-    expect(ids('name')).toEqual(['cafe', 'grocer'])
+    const ids = (sort: Parameters<typeof sortBills>[1]) =>
+      sortBills(rows, sort, 'fr').map((r) => r.merchant.id)
+    expect(ids('nameAsc')).toEqual(['cafe', 'grocer'])
     expect(ids('nameDesc')).toEqual(['grocer', 'cafe'])
     expect(ids('amountDesc')).toEqual(['grocer', 'cafe'])
     expect(ids('amountAsc')).toEqual(['cafe', 'grocer'])

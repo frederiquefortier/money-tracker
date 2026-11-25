@@ -7,7 +7,7 @@ import {
   slipLine,
   slipRuleLine,
 } from '#/components/styles'
-import type { MerchantRow } from '#/lib/dashboard/merchant-bills'
+import type { BillRow } from '#/lib/dashboard/merchant-bills'
 import { cn } from '#/lib/utils'
 
 function SlipLine({
@@ -44,7 +44,7 @@ function Amount({
 }
 
 /**
- * A merchant's typical bill as the transaction form's slip (author, 2026-11-20): the
+ * A merchant's typical bill as the transaction form's slip: the
  * average first, the smallest and largest bill, then a year earlier's average and the
  * change on its line. The name, the count and the total are in the row above.
  */
@@ -53,7 +53,7 @@ export function MerchantReceipt({
   compared,
   currency,
 }: {
-  row: MerchantRow
+  row: BillRow
   /** The year the change compares with, "2025". */
   compared: string | null
   currency: string

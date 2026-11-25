@@ -1,4 +1,4 @@
-import { useActionState, useId, useState } from 'react'
+import { useId, useState } from 'react'
 import { Link } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { SheetForm } from '#/components/sheet/sheet-form'
@@ -8,23 +8,19 @@ import {
   NoteField,
 } from '#/components/transactions/entry/entry-fields'
 import { EntryTabs } from '#/components/transactions/entry/entry-tabs'
-import type { EntryKind } from '#/components/transactions/entry/entry-tabs'
 import { TransferReceipt } from '#/components/transactions/entry/transfer-receipt'
 import { SheetBody } from '#/components/ui/sheet'
-import type { FieldErrors } from '#/lib/forms/form-state'
 import { validateTransfer } from '#/lib/transfers/transfer-draft'
 import type { TransferDraft } from '#/lib/transfers/transfer-draft'
-import type { TransactionFormData } from '#/lib/transactions/transaction'
+import type {
+  EntryKind,
+  TransactionFormData,
+} from '#/lib/transactions/transaction'
 import { useRate } from '#/hooks/currencies/use-rate'
 import { saveTransfer } from '#/server/transfers'
-import { useToast } from '#/hooks/app/use-toast'
-import {
-  useFocusFirstError,
-  useValidationMessage,
-} from '#/hooks/forms/use-validation'
-import { useCloseSheet, useMarkChanged } from '#/hooks/forms/use-sheet'
-
-type State = { errors: FieldErrors; failed: boolean; submitted: boolean }
+import { useDraftSubmit } from '#/hooks/forms/use-draft-submit'
+import { useValidationMessage } from '#/hooks/forms/use-validation'
+import { useMarkChanged } from '#/hooks/forms/use-sheet'
 
 /** The draft, both accounts' currencies, and that day's rate when they differ. */
 function useTransferDraft(
@@ -49,32 +45,6 @@ function useTransferDraft(
     setDraft((d) => ({ ...d, ...changes }))
   }
   return { draft, update, currencies, rate }
-}
-
-function useSubmit({
-  check,
-  savedText,
-  onSaved,
-}: {
-  check: () => ReturnType<typeof validateTransfer>
-  savedText: string
-  onSaved?: (accountId: string) => void
-}) {
-  const toast = useToast()
-  const closeSheet = useCloseSheet()
-  return useActionState(
-    async (): Promise<State> => {
-      const { input, errors } = check()
-      if (!input) return { errors, failed: false, submitted: true }
-      const result = await saveTransfer({ data: input }).catch(() => null)
-      if (!result?.ok) return { errors: {}, failed: true, submitted: true }
-      onSaved?.(input.fromAccountId)
-      toast({ text: savedText, tone: 'success' })
-      closeSheet()
-      return { errors: {}, failed: false, submitted: true }
-    },
-    { errors: {}, failed: false, submitted: false },
-  )
 }
 
 /** With fewer than two accounts, a transfer cannot be made. */
@@ -167,21 +137,20 @@ function useTransferForm(props: TransferFormProps) {
       rate: rate ?? null,
       feeCategorySet: props.feeCategoryId !== null,
     })
-  const [state, submit, pending] = useSubmit({
+  const { submit, pending, failed, errors, formRef } = useDraftSubmit({
     check,
+    save: (input) => saveTransfer({ data: input }),
+    accountOf: (input) => input.fromAccountId,
     savedText: props.savedText,
     onSaved: props.onSaved,
   })
-  // After a first submit, errors follow the fields as they are corrected.
-  const errors = state.submitted ? (check().errors ?? {}) : {}
-  const formRef = useFocusFirstError(state.errors)
   return {
     draft,
     update,
     currencies,
     rate,
     error: (name: string) => message(errors[name]),
-    failed: state.failed,
+    failed,
     form: { action: submit, formRef, pending },
   }
 }

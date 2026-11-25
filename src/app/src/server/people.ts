@@ -44,27 +44,26 @@ export const getPeople = createServerFn({ method: 'GET' }).handler(
         supabase.from('person_usage').select('person_id, transaction_count'),
       ])),
     )
+    const membersOf = Map.groupBy(members, (m) => m.group_id)
+    const groupsOf = Map.groupBy(members, (m) => m.person_id)
+    const aliasesOf = Map.groupBy(aliases, (a) => a.person_id)
+    const counts = new Map(
+      usage.map((u) => [u.person_id, u.transaction_count ?? 0]),
+    )
     return {
       people: people.map((p) => ({
         id: p.id,
         name: p.name,
         archivedOn: p.archived_on,
-        groupIds: members
-          .filter((m) => m.person_id === p.id)
-          .map((m) => m.group_id),
-        aliases: aliases
-          .filter((a) => a.person_id === p.id)
-          .map((a) => a.alias),
-        transactionCount:
-          usage.find((u) => u.person_id === p.id)?.transaction_count ?? 0,
+        groupIds: (groupsOf.get(p.id) ?? []).map((m) => m.group_id),
+        aliases: (aliasesOf.get(p.id) ?? []).map((a) => a.alias),
+        transactionCount: counts.get(p.id) ?? 0,
       })),
       groups: groups.map((g) => ({
         id: g.id,
         name: g.name,
         archivedOn: g.archived_on,
-        memberIds: members
-          .filter((m) => m.group_id === g.id)
-          .map((m) => m.person_id),
+        memberIds: (membersOf.get(g.id) ?? []).map((m) => m.person_id),
       })),
     }
   },

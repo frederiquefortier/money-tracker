@@ -48,7 +48,7 @@ function chartItems(
     ...accounts.map((a) => ({
       id: a.id,
       closed: a.closed_on !== null,
-      // A credit card is a debt in the chart, however short (author, 2026-11-17).
+      // A credit card is a debt in the chart, however short.
       group:
         a.type === 'credit_card' ? ('debts' as const) : ('accounts' as const),
       type: 'account' as const,

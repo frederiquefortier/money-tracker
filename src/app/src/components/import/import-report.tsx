@@ -5,7 +5,7 @@ import { Button } from '#/components/ui/button'
 import { cardSurface } from '#/components/styles'
 import { useLocale } from '#/hooks/app/use-locale'
 import { formatCount } from '#/lib/shared/format'
-import type { ImportDone as Done } from '#/lib/import/import'
+import type { ImportDone } from '#/lib/import/import'
 import { cn } from '#/lib/utils'
 
 const CREATED = [
@@ -30,11 +30,11 @@ const HOLDING_KINDS = [
 ] as const
 
 /** How it ended: what was written, line by line, and where to look. */
-export function ImportDone({
+export function ImportReport({
   done,
   onAnother,
 }: {
-  done: Done
+  done: ImportDone
   onAnother: () => void
 }) {
   const { t } = useTranslation()

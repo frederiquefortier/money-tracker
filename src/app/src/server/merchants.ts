@@ -43,14 +43,13 @@ export const getMerchants = createServerFn({ method: 'GET' }).handler(
     const suggestions = new Map(
       suggested.map((s) => [s.merchant_id, s.category_id]),
     )
+    const aliasesOf = Map.groupBy(aliases, (a) => a.merchant_id)
     return merchants.map((m) => ({
       id: m.id,
       name: m.name,
       defaultCategoryId: m.default_category_id,
       suggestedCategoryId: suggestions.get(m.id) ?? null,
-      aliases: aliases
-        .filter((a) => a.merchant_id === m.id)
-        .map((a) => a.alias),
+      aliases: (aliasesOf.get(m.id) ?? []).map((a) => a.alias),
       transactionCount: counts.get(m.id) ?? 0,
     }))
   },

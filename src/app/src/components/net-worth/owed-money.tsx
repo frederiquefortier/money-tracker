@@ -4,7 +4,7 @@ import { cn } from '#/lib/utils'
 
 /**
  * A debt as the amount owed: red when something is owed, plain at 0, and a card in
- * credit as "+50,00 $" in green, since that money is the user's (author, 2026-11-18).
+ * credit as "+50,00 $" in green, since that money is the user's.
  */
 export function OwedMoney({
   owed,

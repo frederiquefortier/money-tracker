@@ -20,9 +20,9 @@ import type {
 import { cn } from '#/lib/utils'
 
 /**
- * The filters beside the list from `lg` up (2026-11-16): each filter by name, with how
- * many are chosen (the chips name them), always in view, without a heading of its own
- * (2026-11-17). A row opens the sheet from the left on that filter alone, where the long
+ * The filters beside the list from `lg` up: each filter by name, with how
+ * many are chosen (the chips name them), always in view, without a heading of its own.
+ * A row opens the sheet from the left on that filter alone, where the long
  * lists have their search. The period is on the list's tabs.
  */
 export function FilterSidebar({

@@ -166,7 +166,7 @@ export type PeriodChoice = {
 }
 
 /**
- * The period tabs above the list (author, 2026-11-17): the last 1, 3, 6 or 12 months to
+ * The period tabs above the list: the last 1, 3, 6 or 12 months to
  * today, and everything. Each is a custom range, so the calendar shows it; any other
  * range is the calendar's.
  */

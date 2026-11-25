@@ -54,7 +54,7 @@ function Figures({
 
 /**
  * A change as an arrow for its direction and a colour for good or bad: a debt going down is
- * ▼ in green (author, 2026-11-17). Amounts and percents are shown unsigned; on Tout both
+ * ▼ in green. Amounts and percents are shown unsigned; on Tout both
  * are per year.
  */
 export function ChangeText({

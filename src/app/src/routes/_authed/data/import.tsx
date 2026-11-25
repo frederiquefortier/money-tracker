@@ -2,14 +2,14 @@ import { useEffect } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { ExportCard } from '#/components/import/export-card'
-import { ImportDone } from '#/components/import/import-done'
+import { ImportReport } from '#/components/import/import-report'
 import { ImportErrors } from '#/components/import/import-errors'
 import { ImportFilesCard } from '#/components/import/import-files-card'
 import { ImportHistory } from '#/components/import/import-history'
 import { ImportSteps } from '#/components/import/import-steps'
 import { ImportSummary } from '#/components/import/import-summary'
 import { ListPage } from '#/components/layout/list-page'
-import { TabList } from '#/components/lists/tab-list'
+import { TabList, TabPanel } from '#/components/lists/tab-list'
 import { useStoredState } from '#/hooks/app/use-stored-state'
 import { useToast } from '#/hooks/app/use-toast'
 import { useImportDecisions } from '#/hooks/import/use-import-decisions'
@@ -59,14 +59,9 @@ function DataPage() {
         idPrefix="data-tab"
         onSelect={setTab}
       />
-      <div
-        id={PANEL_ID}
-        role="tabpanel"
-        aria-labelledby={`data-tab-${tab}`}
-        className="flex flex-col gap-4"
-      >
+      <TabPanel id={PANEL_ID} idPrefix="data-tab" tab={tab}>
         {tab === 'import' ? <ImportTab /> : <ExportCard />}
-      </div>
+      </TabPanel>
     </ListPage>
   )
 }
@@ -145,7 +140,7 @@ function ImportTab() {
         />
       )}
       {run.done && (
-        <ImportDone
+        <ImportReport
           done={run.done}
           onAnother={() => {
             run.dismissDone()

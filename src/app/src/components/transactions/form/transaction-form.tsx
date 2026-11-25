@@ -1,4 +1,4 @@
-import { useActionState, useId, useState } from 'react'
+import { useId, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { SheetForm } from '#/components/sheet/sheet-form'
 import { CategoryScreen } from '#/components/transactions/form/category-screen'
@@ -6,10 +6,9 @@ import { EntryTabs } from '#/components/transactions/entry/entry-tabs'
 import { ReceiptAmount } from '#/components/transactions/receipt/receipt-amount'
 import { PeopleScreen } from '#/components/transactions/form/people-screen'
 import { TransactionDetails } from '#/components/transactions/form/transaction-details'
-import type { FieldErrors } from '#/lib/forms/form-state'
 import { withHoldingRule } from '#/lib/holdings/holding-link'
 import { validateDraft, withPicked } from '#/lib/transactions/transaction-draft'
-import { peopleForKind } from '#/lib/transactions/transaction-source'
+import { kindChanges } from '#/lib/transactions/transaction-source'
 import type {
   FormAccount,
   TransactionFormData,
@@ -18,16 +17,11 @@ import { useMatchedEvent } from '#/hooks/transactions/use-matched-event'
 import { useMyCurrencies } from '#/hooks/currencies/use-my-currencies'
 import { useRate } from '#/hooks/currencies/use-rate'
 import { saveTransaction } from '#/server/transactions'
-import { useToast } from '#/hooks/app/use-toast'
-import {
-  useFocusFirstError,
-  useValidationMessage,
-} from '#/hooks/forms/use-validation'
-import { useCloseSheet, useMarkChanged } from '#/hooks/forms/use-sheet'
+import { useDraftSubmit } from '#/hooks/forms/use-draft-submit'
+import { useValidationMessage } from '#/hooks/forms/use-validation'
+import { useMarkChanged } from '#/hooks/forms/use-sheet'
 import type { TransactionDraft } from '#/lib/transactions/transaction-draft-types'
 import type { PickTarget } from '#/components/transactions/receipt/receipt-line'
-
-type State = { errors: FieldErrors; failed: boolean; submitted: boolean }
 
 /** The draft, the account it books on, and that day's rate when the currencies differ. */
 function useDraft(
@@ -48,32 +42,6 @@ function useDraft(
   const setEvent = (eventId: string | null) =>
     setDraft((d) => (d.eventId === eventId ? d : { ...d, eventId }))
   return { draft, update, setEvent, accountCurrency, rate }
-}
-
-function useSubmit({
-  check,
-  savedText,
-  onSaved,
-}: {
-  check: () => ReturnType<typeof validateDraft>
-  savedText: string
-  onSaved?: (accountId: string) => void
-}) {
-  const toast = useToast()
-  const closeSheet = useCloseSheet()
-  return useActionState(
-    async (): Promise<State> => {
-      const { input, errors } = check()
-      if (!input) return { errors, failed: false, submitted: true }
-      const result = await saveTransaction({ data: input }).catch(() => null)
-      if (!result?.ok) return { errors: {}, failed: true, submitted: true }
-      onSaved?.(input.accountId)
-      toast({ text: savedText, tone: 'success' })
-      closeSheet()
-      return { errors: {}, failed: false, submitted: true }
-    },
-    { errors: {}, failed: false, submitted: false },
-  )
 }
 
 /** What is open over the form: the category list for a target, or the people list. */
@@ -160,18 +128,21 @@ export function TransactionForm({
   useMatchedEvent(draft, id, setEvent)
   const check = () =>
     validateDraft(draft, { id, accountCurrency, rate: rate ?? null })
-  const [state, submit, pending] = useSubmit({ check, savedText, onSaved })
-  // After a first submit, errors follow the fields as they are corrected.
-  const errors = state.submitted ? (check().errors ?? {}) : {}
+  const { submit, pending, failed, errors, formRef } = useDraftSubmit({
+    check,
+    save: (input) => saveTransaction({ data: input }),
+    accountOf: (input) => input.accountId,
+    savedText,
+    onSaved,
+  })
   const error = (name: string) => message(errors[name])
-  const formRef = useFocusFirstError(state.errors)
 
   return (
     <SheetForm
       action={submit}
       formRef={formRef}
       pending={pending}
-      error={state.failed && t('common.saveFailed')}
+      error={failed && t('common.saveFailed')}
     >
       <Layers
         layer={layer}
@@ -187,12 +158,7 @@ export function TransactionForm({
         onChange={(kind) =>
           kind === 'transfer'
             ? onTransfer?.(draft)
-            : update({
-                kind,
-                ...peopleForKind(draft, kind),
-                // An income names who it came from instead of a seller.
-                ...(kind === 'income' ? { sellerId: null } : {}),
-              })
+            : update(kindChanges(draft, kind))
         }
       />
       <div id={panelId} className="flex flex-col gap-5">

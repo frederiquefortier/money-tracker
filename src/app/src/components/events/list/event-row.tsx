@@ -9,7 +9,7 @@ import type { EventItem, EventType } from '#/lib/events/event'
 import type { Person } from '#/lib/people/person'
 
 /** The dates of an event: none, one day, a range, or open at the start ("Jusqu'au …"). */
-export function useDateRange(event: Pick<EventItem, 'startsOn' | 'endsOn'>) {
+function useDateRange(event: Pick<EventItem, 'startsOn' | 'endsOn'>) {
   const { t } = useTranslation()
   const locale = useLocale()
   const format = (date: string) => formatDate(date, locale, 'medium')

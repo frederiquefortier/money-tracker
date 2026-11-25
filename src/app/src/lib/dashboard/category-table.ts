@@ -13,7 +13,7 @@ import { treeOrder } from '#/lib/shared/tree-layout'
 import { divideRounded, fromMinor, toMinor } from '#/lib/shared/money'
 
 // The sheet's table: each group and its categories. On a year, this month, the year so far
-// and the monthly average over that same stretch (author, 2026-11-19: everything from the
+// and the monthly average over that same stretch (everything from the
 // year shown, so in November the year is divided by 11). A past year counts to its
 // December, the current one to this month, and a history that starts within the year
 // from its first month. On everything, a total per year, the whole history's total and the
@@ -188,7 +188,7 @@ export function categoryTable(
       category = category.parentId ? byId.get(category.parentId) : undefined
     }
   }
-  // Only a category with a transaction in the period, or under it (author, 2026-11-20).
+  // Only a category with a transaction in the period, or under it.
   // Last year's figures alone do not show a category.
   const shown = categories.filter(
     (c) =>

@@ -11,7 +11,6 @@ import { fieldCard, focusRing, rowHover } from '#/components/styles'
 import type { Result } from '#/lib/shared/result'
 import { Revealed } from '#/components/lists/revealed'
 
-export type EntryKind = 'snapshot' | 'contribution'
 type Row = { id: string; onDate: string; amount: string; label?: string | null }
 
 function EntryRow({

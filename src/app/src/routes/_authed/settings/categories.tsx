@@ -1,6 +1,7 @@
 import { Outlet, createFileRoute } from '@tanstack/react-router'
 import { useId, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { TabPanel } from '#/components/lists/tab-list'
 import { ArchivedCategories } from '#/components/categories/list/archived-categories'
 import { CategoryTree } from '#/components/categories/list/category-tree'
 import { EmptyState } from '#/components/lists/list-card'
@@ -30,6 +31,7 @@ import { archivedTree, categoryContext } from '#/lib/categories/category-tree'
 import { matchesInTree } from '#/lib/categories/category-list'
 import { useLocale } from '#/hooks/app/use-locale'
 import { useStoredState } from '#/hooks/app/use-stored-state'
+import { useCategorySort } from '#/hooks/categories/use-category-sort'
 import { getCategories } from '#/server/categories'
 import { indexById, oneOf } from '#/lib/shared/collections'
 import { foldForSearch } from '#/lib/shared/search'
@@ -45,7 +47,6 @@ export const Route = createFileRoute('/_authed/settings/categories')({
 })
 
 const parseKind = oneOf(KINDS)
-const parseSort = oneOf(CATEGORY_SORTS)
 
 /**
  * One kind's active tree in the chosen order, its archived tree, each row's context, and
@@ -125,11 +126,7 @@ function useView() {
     'expense',
     parseKind,
   )
-  const [sort, setSort] = useStoredState<CategorySort>(
-    'categories.sort',
-    'name',
-    parseSort,
-  )
+  const [sort, setSort] = useCategorySort()
   return { kind, setKind, sort, setSort }
 }
 
@@ -177,12 +174,7 @@ function Categories() {
         <SearchField value={query} onChange={setQuery} />
       )}
       <KindTabs kind={kind} panelId={panelId} onChange={setKind} />
-      <div
-        id={panelId}
-        role="tabpanel"
-        aria-labelledby={`tab-${kind}`}
-        className="flex flex-col gap-4"
-      >
+      <TabPanel id={panelId} idPrefix="tab" tab={kind}>
         {ofKind.length === 0 && (
           <EmptyState>{t('categories.empty')}</EmptyState>
         )}
@@ -207,7 +199,7 @@ function Categories() {
           onToggle={branches.toggle}
           open={found !== null}
         />
-      </div>
+      </TabPanel>
       <AddCategoryButton kind={kind} />
       {/* The category form opens here as a sheet, over the tree. */}
       <Outlet />

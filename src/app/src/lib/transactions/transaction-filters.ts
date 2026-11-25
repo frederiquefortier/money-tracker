@@ -79,6 +79,21 @@ export const idFilters = (search: IdSearch) => ({
   eventIds: search.event ?? [],
 })
 
+const someOrNone = <T>(list: Array<T>) => (list.length ? list : undefined)
+
+/** The filters as the address writes them, the inverse of `idFilters`. */
+export const filterSearch = (f: FilterValues): IdSearch => ({
+  kind: someOrNone(f.kinds),
+  account: someOrNone(f.accountIds),
+  category: someOrNone(f.categoryIds),
+  merchant: someOrNone(f.merchantIds),
+  person: someOrNone(f.personIds),
+  event: someOrNone(f.eventIds),
+})
+
+export const anyFilter = (f: FilterValues) =>
+  FILTER_TABS.some((tab) => f[FILTER_KEYS[tab]].length > 0)
+
 /**
  * The chips' names: the list's, then the sheet's choices for what was ticked since the
  * list last loaded, so a new chip shows before the reload.

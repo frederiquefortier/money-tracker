@@ -57,7 +57,7 @@ function CategoryFilter({ categories, picked, onChange, onClose }: Props) {
 
 /**
  * DSH-02: the categories the Argent tab counts; a ticked one takes its branch. The
- * transactions' categories filter: its title, search and footer (author, 2026-11-23).
+ * transactions' categories filter: its title, search and footer.
  */
 export function CategoryFilterSheet({
   open,

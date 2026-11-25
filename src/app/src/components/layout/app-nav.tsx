@@ -5,7 +5,7 @@ import type { IconName } from '#/components/display/icon'
 import { cn } from '#/lib/utils'
 import { focusRing } from '#/components/styles'
 
-// The dashboard first (author, 2026-11-20).
+// The dashboard first.
 const TABS = [
   {
     to: '/dashboard',

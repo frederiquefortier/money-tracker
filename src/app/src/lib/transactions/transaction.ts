@@ -78,7 +78,7 @@ export type Transaction = {
     headCount: number
     value: string
     amountUnknown: boolean
-    /** Left empty: takes what the other lines leave (decided 2026-11-08). */
+    /** Left empty: takes what the other lines leave. */
     fillsRest: boolean
     /** What came back for an owed line. */
     back: Array<{ amount: string; date: string }>
@@ -135,3 +135,7 @@ export const transactionInputSchema = z
 export type TransactionInput = z.input<typeof transactionInputSchema>
 
 export type TransactionError = 'notFound' | 'holdingInvalid' | 'failed'
+
+/** The form's first choice: Dépense, Revenu, Transfert. */
+export const ENTRY_KINDS = ['expense', 'income', 'transfer'] as const
+export type EntryKind = (typeof ENTRY_KINDS)[number]

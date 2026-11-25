@@ -38,7 +38,7 @@ const categories = [
 const options = {
   kind: 'expense' as const,
   query: '',
-  sort: 'name' as const,
+  sort: 'nameAsc' as const,
   locale: 'fr',
   date: '2026-11-04',
 }

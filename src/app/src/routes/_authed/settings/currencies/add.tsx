@@ -1,6 +1,6 @@
 import { createFileRoute, useLoaderData } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
-import { AddCurrencyForm } from '#/components/currencies/add-currency-form'
+import { AddCurrencyForm } from '#/components/currencies/form/add-currency-form'
 import { RouteSheet } from '#/components/sheet/route-sheet'
 import { useMyCurrencies } from '#/hooks/currencies/use-my-currencies'
 

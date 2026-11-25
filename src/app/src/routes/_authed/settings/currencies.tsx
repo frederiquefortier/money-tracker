@@ -3,12 +3,12 @@ import { useTranslation } from 'react-i18next'
 import {
   AddCurrencyButton,
   CurrencyManager,
-} from '#/components/currencies/currency-manager'
+} from '#/components/currencies/list/currency-manager'
 import { ListPage } from '#/components/layout/list-page'
 import { useMyCurrencies } from '#/hooks/currencies/use-my-currencies'
 import { getCurrencySettings } from '#/server/currencies'
 import { listPagePending } from '#/components/layout/page-pending'
-import { CurrenciesSkeleton } from '#/components/currencies/currencies-skeleton'
+import { CurrenciesSkeleton } from '#/components/currencies/list/currencies-skeleton'
 
 export const Route = createFileRoute('/_authed/settings/currencies')({
   ...listPagePending((t) => t('currencies.title'), {

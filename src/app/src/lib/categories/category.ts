@@ -22,7 +22,7 @@ export type CategoryEvent = {
 }
 
 /** `[from, to)`, null bounds open (the view `category_active_periods`). */
-export type DateRange = { from: string | null; to: string | null }
+export type ActivePeriod = { from: string | null; to: string | null }
 
 export type Category = {
   id: string
@@ -37,7 +37,7 @@ export type Category = {
   necessity: Necessity | null
   /** Newest first. */
   history: Array<CategoryEvent>
-  periods: Array<DateRange>
+  periods: Array<ActivePeriod>
   /** The one category of every fee, conversion and transaction (TRX-04, CUR-08). */
   isFee?: boolean
   /** A transaction has a split in it, so it cannot be deleted. */
@@ -56,7 +56,7 @@ export function isActiveOn(category: Pick<Category, 'periods'>, date: string) {
   )
 }
 
-// Quick picks: clean, saturated colours around the five the author chose (ruby, yellow,
+// Quick picks: clean, saturated colours around five chosen ones (ruby, yellow,
 // green, royal, purple), deep ones with a white icon and bright ones with a dark icon,
 // each far enough from the others to tell apart, in rainbow order.
 export const SWATCHES = [
@@ -134,17 +134,12 @@ export function childrenByParent<T extends Pick<Category, 'parentId' | 'name'>>(
   categories: ReadonlyArray<T>,
   locale: string,
 ) {
-  const map = new Map<string | null, Array<T>>()
-  for (const category of categories) {
-    const list = map.get(category.parentId) ?? []
-    list.push(category)
-    map.set(category.parentId, list)
-  }
+  const map = Map.groupBy(categories, (c) => c.parentId)
   for (const list of map.values()) list.sort(compareNames(locale))
   return map
 }
 
-export const CATEGORY_SORTS = ['name', 'nameDesc', 'color'] as const
+export const CATEGORY_SORTS = ['nameAsc', 'nameDesc', 'color'] as const
 export type CategorySort = (typeof CATEGORY_SORTS)[number]
 
 // Rainbow order from red; greys last, darker first.
@@ -159,7 +154,7 @@ export function sortSiblings<T extends Pick<Category, 'name' | 'color'>>(
   sort: CategorySort,
   locale: string,
 ) {
-  if (sort === 'name') return children
+  if (sort === 'nameAsc') return children
   if (sort === 'nameDesc')
     return new Map(
       [...children].map(([id, list]) => [id, [...list].reverse()] as const),

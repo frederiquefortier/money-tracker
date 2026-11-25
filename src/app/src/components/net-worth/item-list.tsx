@@ -38,7 +38,7 @@ function Subtotal({
         className="text-lg font-semibold"
       />
     )
-  // A group's total without cents, as the dashboard's totals (author, 2026-11-20); its
+  // A group's total without cents, as the dashboard's totals; its
   // items keep theirs.
   return (
     <Money
@@ -146,8 +146,7 @@ function Archived({
 
 /**
  * Every account and holding (spec 20, ADR-061), in groups by type or by institution, each
- * a card with its header inside, as the accounts and holdings pages had (author,
- * 2026-11-18), and what it adds to the net worth at the far right. A row opens the
+ * a card with its header inside, and what it adds to the net worth at the far right. A row opens the
  * item's form; its line opens its chart at its own scale.
  * Hidden items stay listed, marked, and leave the totals (NW-05). The archived ones last,
  * muted, with their line and chart over their whole history.

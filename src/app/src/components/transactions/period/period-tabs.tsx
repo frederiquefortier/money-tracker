@@ -17,7 +17,7 @@ import type {
 const CUSTOM = 'custom'
 
 /**
- * The list's period as tabs, as the net worth hub's range (author, 2026-11-17): the last
+ * The list's period as tabs, as the net worth hub's range: the last
  * 1, 3 or 6 months or the last year (1A) to today, Tout, and the calendar for any other period, which then
  * names it.
  */
@@ -37,7 +37,7 @@ export function PeriodTabs({
   const labelOf = (one: PeriodPreset) => {
     if (one === 'all') return { short: t('transactions.list.all') }
     const count = presetMonths(one)
-    // Twelve months read as a year, as on the net worth hub's tabs (author, 2026-11-17).
+    // Twelve months read as a year, as on the net worth hub's tabs.
     if (count === 12)
       return {
         short: t('transactions.list.yearShort'),

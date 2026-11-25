@@ -1,14 +1,14 @@
 import type { TFunction } from 'i18next'
 import { Cell } from 'recharts'
 import { Figure } from '#/components/dashboard/dashboard-card'
-import { axisTicks } from '#/lib/dashboard/axis-ticks'
+import { axisTicks } from '#/lib/shared/axis-ticks'
 import { formatAxisMoney, formatMonth } from '#/lib/shared/format'
 import type { Locale } from '#/i18n/locales'
 import { cn } from '#/lib/utils'
 
 export const CHART_MARGIN = { top: 8, right: 4, bottom: 0, left: 4 }
 
-/** The money flows' colours, the same in every card (author, 2026-11-19). */
+/** The money flows' colours, the same in every card. */
 export const FLOW_COLORS = {
   earned: 'var(--flow-earned)',
   spent: 'var(--flow-spent)',
@@ -21,7 +21,7 @@ const IN_PROGRESS_OPACITY = 0.45
 
 /**
  * A bar's cells, the bucket not over yet lighter, the hovered one outlined: a click opens
- * that one part (author, 2026-11-20). Called, not rendered, for Recharts.
+ * that one part. Called, not rendered, for Recharts.
  */
 export function progressCells(
   rows: ReadonlyArray<{ key: string }>,
@@ -87,7 +87,11 @@ export function moneyAxis(
     figuresHidden,
   }: { currency: string; locale: Locale; figuresHidden: boolean },
 ) {
-  const ticks = axisTicks(values.filter((v): v is number => v !== null))
+  const drawn = values.filter((v): v is number => v !== null)
+  const min = Math.min(0, ...drawn)
+  const max = Math.max(0, ...drawn)
+  // From zero, about four steps; nothing drawn is a lone zero.
+  const ticks = min === max ? [0] : axisTicks(min, max, 5)
   return {
     width: 60,
     tickLine: false,

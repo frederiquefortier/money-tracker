@@ -20,7 +20,7 @@ function useStickyWidth(box: HTMLElement | null) {
 
 /**
  * A table that scrolls sideways on a phone, each edge fading while more columns sit past
- * it (author, 2026-11-23); the left one after the sticky name column. The container a
+ * it; the left one after the sticky name column. The container a
  * row's panel takes its width from: a panel stacks above the fades (`tablePanel`).
  * Last in its card, flush with the card's sides and bottom.
  */

@@ -108,7 +108,7 @@ export const getYearActivity = createServerFn({ method: 'GET' })
       details.map((d) => ({
         id: d.id,
         merchantId: d.merchant_id,
-        // Everyone on it, whatever their role, the seller included (author, 2026-11-23).
+        // Everyone on it, whatever their role, the seller included.
         personIds: [
           ...new Set([
             ...d.transaction_people.flatMap((p) =>

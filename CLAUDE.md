@@ -36,9 +36,9 @@ root keeps only `README.md`, `CLAUDE.md`, `.gitignore`, `.github/`, `.claude/` a
 
 Inside `src/app/src/`, where a file goes ([ADR-026](docs/01_building/decisions.md)): no file
 at the root of `components/`; shared pieces in a role folder (`layout`, `forms`, `sheet`,
-`combobox`, `lists`, `feedback`, `display`), a feature's own in its folder; every hook in
-`hooks/`; `lib/<feature>/` holds `<entity>.ts` (model), `<entity>-draft.ts` and
-`<entity>-list.ts`; `server/` holds server functions only, so types come from `lib/`;
+`combobox`, `lists`, `feedback`, `display`), a feature's own in its folder (`form/`, `list/`,
+what other features use at its root); every shared hook in `hooks/` (ADR-076);
+`lib/<feature>/` holds `<entity>.ts` (model), `<entity>-draft.ts` and `<entity>-list.ts`; `server/` holds server functions only, so types come from `lib/`;
 shared class strings go in `components/styles.ts`.
 
 **Every command runs from `src/app/`**, including the Supabase CLI:

@@ -1,7 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { ColumnHead } from '#/components/dashboard/category-table-head'
-import { STICKY } from '#/components/dashboard/category-table-row'
+import { ColumnHead } from '#/components/dashboard/table-parts'
 import { DashboardCard } from '#/components/dashboard/dashboard-card'
 import { MerchantTableRow } from '#/components/dashboard/merchant-table-row'
 import { SearchField } from '#/components/forms/search-field'
@@ -9,12 +8,16 @@ import { EmptyState } from '#/components/lists/list-card'
 import { Revealed } from '#/components/lists/revealed'
 import { SortMenu } from '#/components/lists/sort-menu'
 import { TableScroll } from '#/components/lists/table-scroll'
-import { tableFigureHead, tableNameHead } from '#/components/styles'
+import {
+  tableFigureHead,
+  tableNameHead,
+  tableStickyCell,
+} from '#/components/styles'
 import { changeSpans, changeYear } from '#/lib/dashboard/category-change'
 import type { TableColumn } from '#/lib/dashboard/category-table'
 import type { DashboardPeriod } from '#/lib/dashboard/dashboard-period'
-import { MERCHANT_SORTS } from '#/lib/dashboard/merchant-bills'
-import type { MerchantRow, MerchantSort } from '#/lib/dashboard/merchant-bills'
+import { BILL_SORTS } from '#/lib/dashboard/merchant-bills'
+import type { BillRow, BillSort } from '#/lib/dashboard/merchant-bills'
 import { matcher } from '#/lib/shared/search'
 import { cn } from '#/lib/utils'
 
@@ -23,14 +26,14 @@ const HEAD = 'py-2 pl-6 text-right font-semibold whitespace-nowrap'
 
 type SortedBy = { column: 'name' | 'amount' | 'count'; desc: boolean }
 
-function sortedBy(sort: MerchantSort): SortedBy {
+function sortedBy(sort: BillSort): SortedBy {
   const desc = sort.endsWith('Desc')
   if (sort.startsWith('name')) return { column: 'name', desc }
   if (sort.startsWith('count')) return { column: 'count', desc }
   return { column: 'amount', desc }
 }
 
-/** A head the list is sorted by says so to screen readers only (author, 2026-11-20). */
+/** A head the list is sorted by says so to screen readers only. */
 function SortedHead({
   sorted,
   className,
@@ -55,7 +58,7 @@ function MerchantTableHead({
 }: {
   columns: ReadonlyArray<TableColumn>
   whole: boolean
-  sort: MerchantSort
+  sort: BillSort
 }) {
   const { t } = useTranslation()
   const { column: by, desc } = sortedBy(sort)
@@ -70,7 +73,7 @@ function MerchantTableHead({
       <tr className="border-b text-left text-xs text-muted-foreground">
         <SortedHead
           sorted={on('name')}
-          className={cn(STICKY, 'py-2 pr-3 pl-4 font-semibold')}
+          className={cn(tableStickyCell, 'py-2 pr-3 pl-4 font-semibold')}
         >
           <span className={tableNameHead}>
             {t('dashboard.merchants.merchant')}
@@ -104,8 +107,8 @@ function MerchantTableHead({
 }
 
 type MerchantTableProps = {
-  rows: ReadonlyArray<MerchantRow>
-  sort: MerchantSort
+  rows: ReadonlyArray<BillRow>
+  sort: BillSort
   /** The category table's columns, whose stretch and comparison this card shares. */
   columns: ReadonlyArray<TableColumn>
   trendKeys: ReadonlyArray<string>
@@ -125,8 +128,8 @@ function MerchantTable({
   currency,
 }: MerchantTableProps) {
   const [open, setOpen] = useState<string | null>(null)
-  // Totals only: no average per month or year (author, 2026-11-20).
-  // On everything, the whole history's total after the years (author, 2026-11-20).
+  // Totals only: no average per month or year.
+  // On everything, the whole history's total after the years.
   const whole = columns.some((c) => c.kind === 'year')
   // Its own whole-history column sorts by amount, so the table's is left out.
   const totals = columns.filter(
@@ -177,13 +180,13 @@ function MerchantTable({
 /**
  * MER-04: each merchant's totals in the category table's columns (and the whole history's
  * on everything), its transactions and its trend, at my share, sorted as the category
- * table plus by count, found by name, built as they near the screen (author, 2026-11-20).
+ * table plus by count, found by name, built as they near the screen.
  * A row's chevron or trend opens its bill as a receipt beside its total per month.
  */
 export function MerchantTableCard({
   onSort,
   ...table
-}: MerchantTableProps & { onSort: (sort: MerchantSort) => void }) {
+}: MerchantTableProps & { onSort: (sort: BillSort) => void }) {
   const { t } = useTranslation()
   const [query, setQuery] = useState('')
   const { rows } = table
@@ -208,7 +211,7 @@ export function MerchantTableCard({
           )}
           <SortMenu
             sort={table.sort}
-            options={MERCHANT_SORTS}
+            options={BILL_SORTS}
             labelOf={(option) => t(`dashboard.merchants.sort.${option}`)}
             onChange={onSort}
           />

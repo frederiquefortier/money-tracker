@@ -13,7 +13,7 @@ import {
 import { saveContribution, saveSnapshot } from '#/server/holding-entries'
 import { amountForInput } from '#/lib/shared/money'
 import { useLocale } from '#/hooks/app/use-locale'
-import type { EntryKind } from '#/components/holdings/form/entry-lists'
+import type { HoldingEntryKind } from '#/lib/holdings/holding'
 
 export type EntryValues = {
   onDate: string
@@ -112,7 +112,7 @@ export function EntrySheet({
   today,
   onClosed,
 }: {
-  kind: EntryKind
+  kind: HoldingEntryKind
   /** The row being edited; null for a new one. */
   entry: {
     id: string

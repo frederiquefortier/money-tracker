@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 
 /**
  * Whether a scrolling box hides more before or after its edges, to fade each edge as a cue
- * that it scrolls (author, 2026-11-20): top and bottom on `y`, left and right on `x`. Give
+ * that it scrolls: top and bottom on `y`, left and right on `x`. Give
  * `ref` to the box; it updates on scroll and when the box or its content resizes.
  */
 export function useScrollMore<T extends HTMLElement>(axis: 'x' | 'y' = 'y') {

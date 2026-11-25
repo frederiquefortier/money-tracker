@@ -52,7 +52,7 @@ const SetSlot = createContext<(slot: HTMLElement | null) => void>(() => {})
 
 /**
  * Each page draws its own +, but it is rendered at `AddButtonTarget`, the start of the
- * page's content, so it is the content's first stop when tabbing (decided 2026-11-05).
+ * page's content, so it is the content's first stop when tabbing.
  * It is fixed in place, so where it sits in the document changes nothing on screen.
  */
 export function AddButtonSlot({ children }: { children: React.ReactNode }) {

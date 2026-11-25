@@ -8,7 +8,7 @@ import { ExpandAllButton } from '#/components/lists/expand-all-button'
 import { TableScroll } from '#/components/lists/table-scroll'
 import { EmptyState } from '#/components/lists/list-card'
 import { SortMenu } from '#/components/lists/sort-menu'
-import { TabList } from '#/components/lists/tab-list'
+import { TabList, TabPanel } from '#/components/lists/tab-list'
 import { useStoredIds } from '#/hooks/app/use-stored-state'
 import { KINDS } from '#/lib/categories/category'
 import type { CategoryKind } from '#/lib/categories/category'
@@ -21,14 +21,14 @@ import { treeGuides } from '#/lib/shared/tree-layout'
 
 const PANEL = 'category-table'
 
-// Each type in its flow's colour, as the summary (author, 2026-11-20).
+// Each type in its flow's colour, as the summary.
 const KIND_COLORS: Record<CategoryKind, string> = {
   expense: FLOW_COLORS.spent,
   income: FLOW_COLORS.earned,
   investment: FLOW_COLORS.invested,
 }
 
-/** Expand-all, the sort, and the type as three colour dots (author, 2026-11-20). */
+/** Expand-all, the sort, and the type as three colour dots. */
 function TableControls({
   kind,
   onKind,
@@ -78,8 +78,8 @@ function TableControls({
 /**
  * The sheet's table, figures only: each group folding its categories, then on a year this
  * month, the year so far and the monthly average; on everything, a total per year, the
- * whole history's total and the yearly average; the trend last, across what is left, opening its chart (author,
- * 2026-11-20: the figures beside their names). Spending well above its average this month
+ * whole history's total and the yearly average; the trend last, across what is left,
+ * opening its chart, so the figures sit beside their names. Spending well above its average this month
  * is marked. A category's name opens its transactions over the period.
  */
 export function CategoryTableCard({
@@ -129,7 +129,7 @@ export function CategoryTableCard({
         />
       }
     >
-      <div id={PANEL} role="tabpanel" aria-labelledby={`table-kind-${kind}`}>
+      <TabPanel id={PANEL} idPrefix="table-kind" tab={kind} className="">
         {rows.length === 0 ? (
           <EmptyState>{t('dashboard.empty')}</EmptyState>
         ) : (
@@ -146,7 +146,7 @@ export function CategoryTableCard({
             currency={currency}
           />
         )}
-      </div>
+      </TabPanel>
     </DashboardCard>
   )
 }

@@ -2,14 +2,14 @@ import { Outlet, createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { FloatingAddButton } from '#/components/layout/floating-add-button'
-import { EmptyState, ListCard } from '#/components/lists/list-card'
+import { EmptyState } from '#/components/lists/list-card'
 import { ListPage } from '#/components/layout/list-page'
 import { ArchivedOn } from '#/components/people/list/archived-on'
-import { CollapsedSection } from '#/components/lists/collapsed-section'
+import { SplitList } from '#/components/lists/split-list'
 import { PeopleRow } from '#/components/people/list/people-row'
 import { SearchField } from '#/components/forms/search-field'
 import { SortMenu } from '#/components/lists/sort-menu'
-import { TabList } from '#/components/lists/tab-list'
+import { TabList, TabPanel } from '#/components/lists/tab-list'
 import {
   PEOPLE_SORTS,
   PEOPLE_TABS,
@@ -32,7 +32,6 @@ import { matcher } from '#/lib/shared/search'
 import type { Balance } from '#/lib/people/owed'
 import { listPagePending } from '#/components/layout/page-pending'
 import { PeopleSkeleton } from '#/components/people/list/people-skeleton'
-import { Revealed } from '#/components/lists/revealed'
 
 export const Route = createFileRoute('/_authed/settings/people')({
   ...listPagePending((t) => t('people.title'), { body: PeopleSkeleton }),
@@ -117,7 +116,7 @@ function GroupRows({
 }
 
 /** One tab's list: the active rows, then the archived ones collapsed under them. */
-function TabPanel<T extends { name: string; archivedOn: string | null }>({
+function ArchivableList<T extends { name: string; archivedOn: string | null }>({
   all,
   query,
   sort,
@@ -136,11 +135,11 @@ function TabPanel<T extends { name: string; archivedOn: string | null }>({
   const locale = useFormatLocale()
   if (all.length === 0) return <EmptyState>{empty}</EmptyState>
   const matches = matcher(query)
-  const sorted = byName(
+  const shown = byName(
     all.filter((item) => matches(item.name)),
     locale,
+    sort === 'nameDesc',
   )
-  const shown = sort === 'nameDesc' ? sorted.reverse() : sorted
   const active = shown.filter((item) => !item.archivedOn)
   // The last archived first; the same day keeps the chosen sort.
   const archived = shown
@@ -148,21 +147,14 @@ function TabPanel<T extends { name: string; archivedOn: string | null }>({
     .sort(newestFirst((item) => item.archivedOn))
   if (shown.length === 0) return <EmptyState>{t('common.noMatch')}</EmptyState>
   return (
-    <>
-      {active.length > 0 && (
-        <ListCard>
-          <Revealed items={active}>{rows}</Revealed>
-        </ListCard>
-      )}
-      {archived.length > 0 && (
-        <CollapsedSection
-          label={t('people.archived', { count: archived.length })}
-          storageKey={storageKey}
-        >
-          <Revealed items={archived}>{rows}</Revealed>
-        </CollapsedSection>
-      )}
-    </>
+    <SplitList
+      main={active}
+      rest={archived}
+      restLabel={t('people.archived', { count: archived.length })}
+      storageKey={storageKey}
+    >
+      {rows}
+    </SplitList>
   )
 }
 
@@ -194,7 +186,9 @@ function People() {
         />
       }
     >
-      <SearchField value={query} onChange={setQuery} />
+      {people.length + groups.length > 0 && (
+        <SearchField value={query} onChange={setQuery} />
+      )}
       <TabList
         label={t('people.tabsLabel')}
         tabs={PEOPLE_TABS}
@@ -204,14 +198,9 @@ function People() {
         idPrefix="people-tab"
         onSelect={setTab}
       />
-      <div
-        id={PANEL_ID}
-        role="tabpanel"
-        aria-labelledby={`people-tab-${tab}`}
-        className="flex flex-col gap-4"
-      >
+      <TabPanel id={PANEL_ID} idPrefix="people-tab" tab={tab}>
         {tab === 'people' ? (
-          <TabPanel
+          <ArchivableList
             all={people}
             query={query}
             sort={sort}
@@ -222,7 +211,7 @@ function People() {
             )}
           />
         ) : (
-          <TabPanel
+          <ArchivableList
             all={groups}
             query={query}
             sort={sort}
@@ -231,7 +220,7 @@ function People() {
             rows={(items) => <GroupRows groups={items} people={people} />}
           />
         )}
-      </div>
+      </TabPanel>
       <AddMenu />
       {/* The person and group forms open here as sheets. */}
       <Outlet />

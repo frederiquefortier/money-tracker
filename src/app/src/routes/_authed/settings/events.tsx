@@ -1,14 +1,14 @@
 import { Outlet, createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { CollapsedSection } from '#/components/lists/collapsed-section'
+import { SplitList } from '#/components/lists/split-list'
 import { EventRow, TypeRow } from '#/components/events/list/event-row'
 import { FloatingAddButton } from '#/components/layout/floating-add-button'
 import { EmptyState, ListCard } from '#/components/lists/list-card'
 import { ListPage } from '#/components/layout/list-page'
 import { SearchField } from '#/components/forms/search-field'
 import { SortMenu } from '#/components/lists/sort-menu'
-import { TabList } from '#/components/lists/tab-list'
+import { TabList, TabPanel } from '#/components/lists/tab-list'
 import {
   EVENT_SORTS,
   EVENT_TABS,
@@ -28,7 +28,7 @@ import { getEvents } from '#/server/events'
 import { getPeople } from '#/server/people'
 import { getCategories } from '#/server/categories'
 import { DefaultSkipsButton } from '#/components/events/list/default-skips'
-import { byName, oneOf } from '#/lib/shared/collections'
+import { byName, indexById, oneOf } from '#/lib/shared/collections'
 import { todayIso } from '#/lib/shared/format'
 import { matcher } from '#/lib/shared/search'
 import { listPagePending } from '#/components/layout/page-pending'
@@ -93,33 +93,27 @@ function EventList({ query, sort }: { query: string; sort: EventSort }) {
   )
   if (shown.length === 0) return <EmptyState>{t('common.noMatch')}</EmptyState>
   const today = todayIso()
+  const typeById = indexById(types)
   const rows = (list: ReadonlyArray<EventItem>) =>
     list.map((event) => (
       <EventRow
         key={event.id}
         event={event}
-        type={types.find((x) => x.id === event.typeId)}
+        type={event.typeId ? typeById.get(event.typeId) : undefined}
         people={people}
       />
     ))
   const current = shown.filter((e) => !isPast(e, today))
   const past = shown.filter((e) => isPast(e, today))
   return (
-    <>
-      {current.length > 0 && (
-        <ListCard>
-          <Revealed items={current}>{rows}</Revealed>
-        </ListCard>
-      )}
-      {past.length > 0 && (
-        <CollapsedSection
-          label={t('events.pastEvents', { count: past.length })}
-          storageKey="events.pastExpanded"
-        >
-          <Revealed items={past}>{rows}</Revealed>
-        </CollapsedSection>
-      )}
-    </>
+    <SplitList
+      main={current}
+      rest={past}
+      restLabel={t('events.pastEvents', { count: past.length })}
+      storageKey="events.pastExpanded"
+    >
+      {rows}
+    </SplitList>
   )
 }
 
@@ -130,11 +124,11 @@ function TypeList({ query, sort }: { query: string; sort: TypeSort }) {
   if (types.length === 0)
     return <EmptyState>{t('events.emptyTypes')}</EmptyState>
   const matches = matcher(query)
-  const named = byName(
+  const shown = byName(
     types.filter((type) => matches(type.name)),
     locale,
+    sort === 'nameDesc',
   )
-  const shown = sort === 'nameDesc' ? named.reverse() : named
   if (shown.length === 0) return <EmptyState>{t('common.noMatch')}</EmptyState>
   return (
     <ListCard>
@@ -216,7 +210,9 @@ function Events() {
         </>
       }
     >
-      <SearchField value={query} onChange={setQuery} />
+      {events.length + types.length > 0 && (
+        <SearchField value={query} onChange={setQuery} />
+      )}
       <TabList
         label={t('events.tabsLabel')}
         tabs={EVENT_TABS}
@@ -226,15 +222,10 @@ function Events() {
         idPrefix="events-tab"
         onSelect={setTab}
       />
-      <div
-        id={PANEL_ID}
-        role="tabpanel"
-        aria-labelledby={`events-tab-${tab}`}
-        className="flex flex-col gap-4"
-      >
+      <TabPanel id={PANEL_ID} idPrefix="events-tab" tab={tab}>
         {tab === 'events' && <EventList query={query} sort={sort} />}
         {tab === 'types' && <TypeList query={query} sort={typeSort} />}
-      </div>
+      </TabPanel>
       <AddMenu />
       {/* The event and type forms open here as sheets. */}
       <Outlet />

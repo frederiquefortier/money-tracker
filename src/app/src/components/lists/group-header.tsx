@@ -1,6 +1,6 @@
 /**
  * A group's name over its card, with its total on the right: a day of transactions, a
- * group of net worth items (one look for both, author 2026-11-17). `color` puts a dot
+ * group of net worth items (one look for both). `color` puts a dot
  * before the name, for a group drawn in a chart.
  */
 export function GroupHeader({

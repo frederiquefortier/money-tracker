@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { FloatingAddLink } from '#/components/layout/floating-add-button'
 import { EmptyState, ListCard } from '#/components/lists/list-card'
-import { MerchantRow } from '#/components/merchants/merchant-row'
+import { MerchantRow } from '#/components/merchants/list/merchant-row'
 import { SearchField } from '#/components/forms/search-field'
 import { ListPage } from '#/components/layout/list-page'
 import { SortMenu } from '#/components/lists/sort-menu'
@@ -18,9 +18,8 @@ import { getMerchants } from '#/server/merchants'
 import { indexById, oneOf } from '#/lib/shared/collections'
 import { matcher } from '#/lib/shared/search'
 import { listPagePending } from '#/components/layout/page-pending'
-import { MerchantsSkeleton } from '#/components/merchants/merchants-skeleton'
-import { useRevealed } from '#/hooks/app/use-revealed'
-import { ListEnd } from '#/components/lists/list-end'
+import { MerchantsSkeleton } from '#/components/merchants/list/merchants-skeleton'
+import { Revealed } from '#/components/lists/revealed'
 
 export const Route = createFileRoute('/_authed/settings/merchants')({
   ...listPagePending((t) => t('merchants.title'), { body: MerchantsSkeleton }),
@@ -60,28 +59,30 @@ function MerchantList({
   tree: ReturnType<typeof categoryLookup>
 }) {
   const { t } = useTranslation()
-  const revealed = useRevealed(shown)
   if (shown.length === 0) return <EmptyState>{t('common.noMatch')}</EmptyState>
   return (
     <ListCard>
-      {revealed.shown.map((merchant) => (
-        <MerchantRow
-          key={merchant.id}
-          merchant={merchant}
-          merchants={merchants}
-          category={
-            merchant.defaultCategoryId
-              ? tree.rows.get(merchant.defaultCategoryId)
-              : undefined
-          }
-          suggestion={
-            merchant.suggestedCategoryId
-              ? tree.rows.get(merchant.suggestedCategoryId)
-              : undefined
-          }
-        />
-      ))}
-      {revealed.more && <ListEnd sentinel={revealed.sentinel} as="li" />}
+      <Revealed items={shown}>
+        {(revealed) =>
+          revealed.map((merchant) => (
+            <MerchantRow
+              key={merchant.id}
+              merchant={merchant}
+              merchants={merchants}
+              category={
+                merchant.defaultCategoryId
+                  ? tree.rows.get(merchant.defaultCategoryId)
+                  : undefined
+              }
+              suggestion={
+                merchant.suggestedCategoryId
+                  ? tree.rows.get(merchant.suggestedCategoryId)
+                  : undefined
+              }
+            />
+          ))
+        }
+      </Revealed>
     </ListCard>
   )
 }

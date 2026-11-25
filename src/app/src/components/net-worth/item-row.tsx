@@ -51,7 +51,7 @@ function ItemChange({
 
 /**
  * The item's line over the range, as a button outside the row's link: it opens the item's
- * chart under the row (author, 2026-11-18).
+ * chart under the row.
  */
 function SparklineToggle({
   open,
@@ -134,7 +134,7 @@ function ClosedOn({ date }: { date: string }) {
 
 /**
  * An item with its line, its value, and its chart under it on demand. An archived one
- * (author, 2026-11-18) draws its whole history, whatever the range, and gives its closing
+ * draws its whole history, whatever the range, and gives its closing
  * date for a value: its line ends at 0, so a change would only read its closing.
  */
 export function ItemRow({
@@ -161,7 +161,7 @@ export function ItemRow({
         label={label}
         hidden={chart.excluded.ids.has(entry.id)}
         trailing={
-          // The line before the value (author, 2026-11-18); the value, under the row's
+          // The line before the value; the value, under the row's
           // stretched link, still opens the form.
           <>
             {drawn ? (

@@ -1,12 +1,12 @@
 import { Outlet, createFileRoute } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
-import { InstitutionRowView } from '#/components/institutions/institution-row'
+import { InstitutionRowView } from '#/components/institutions/list/institution-row'
 import { FloatingAddLink } from '#/components/layout/floating-add-button'
 import { ListPage } from '#/components/layout/list-page'
 import { EmptyState, ListCard } from '#/components/lists/list-card'
 import { getInstitutions } from '#/server/institutions'
 import { listPagePending } from '#/components/layout/page-pending'
-import { InstitutionsSkeleton } from '#/components/institutions/institutions-skeleton'
+import { InstitutionsSkeleton } from '#/components/institutions/list/institutions-skeleton'
 import { Revealed } from '#/components/lists/revealed'
 
 export const Route = createFileRoute('/_authed/settings/institutions')({

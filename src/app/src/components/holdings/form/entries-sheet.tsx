@@ -1,13 +1,12 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { EntryList } from '#/components/holdings/form/entry-lists'
-import type { EntryKind } from '#/components/holdings/form/entry-lists'
 import { EntrySheet } from '#/components/holdings/form/entry-sheet'
 import { RouteSheet } from '#/components/sheet/route-sheet'
 import { SheetBody } from '#/components/ui/sheet'
 import { todayIso } from '#/lib/shared/format'
 import { deleteContribution, deleteSnapshot } from '#/server/holding-entries'
-import type { HoldingDetail } from '#/lib/holdings/holding'
+import type { HoldingDetail, HoldingEntryKind } from '#/lib/holdings/holding'
 
 /**
  * A holding's values or external contributions, in a sheet of their own over the holdings.
@@ -17,7 +16,7 @@ export function EntriesSheet({
   kind,
   holding,
 }: {
-  kind: EntryKind
+  kind: HoldingEntryKind
   holding: HoldingDetail
 }) {
   const { t } = useTranslation()

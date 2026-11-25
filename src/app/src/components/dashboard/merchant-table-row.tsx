@@ -5,22 +5,22 @@ import {
   CountCell,
   FoldButton,
   TrendButton,
-} from '#/components/dashboard/category-table-cells'
+} from '#/components/dashboard/table-cells'
 import { drawn } from '#/components/dashboard/chart-parts'
-import { STICKY } from '#/components/dashboard/category-table-row'
 import { MerchantReceipt } from '#/components/dashboard/merchant-receipt'
-import { TablePanel } from '#/components/dashboard/table-panel'
+import { TablePanel } from '#/components/dashboard/table-parts'
 import { TrendChart } from '#/components/dashboard/trend-chart'
 import {
   focusRing,
   rowHover,
   tableFigureCell,
   tableNameWidth,
+  tableStickyCell,
 } from '#/components/styles'
 import type { DashboardPeriod } from '#/lib/dashboard/dashboard-period'
 import { periodSearch } from '#/lib/dashboard/drill-down'
 import type { TableColumn } from '#/lib/dashboard/category-table'
-import type { MerchantRow } from '#/lib/dashboard/merchant-bills'
+import type { BillRow } from '#/lib/dashboard/merchant-bills'
 import { cn } from '#/lib/utils'
 
 export type MerchantChart = {
@@ -34,7 +34,7 @@ export type MerchantChart = {
 const FIGURE = cn(tableFigureCell, 'font-semibold')
 
 // The app's purple, for the trend and the bars: the spending red read as an alarm on every
-// merchant (author, 2026-11-20).
+// merchant.
 const BAR_COLOR = 'var(--primary)'
 
 /** The slip of the merchant's typical bill beside what it cost each month (or year). */
@@ -45,7 +45,7 @@ function MerchantPanel({
   lastYear,
   currency,
 }: {
-  row: MerchantRow
+  row: BillRow
   chart: MerchantChart
   compared: string | null
   lastYear: string | null
@@ -80,14 +80,14 @@ function NameCell({
   panel,
   period,
 }: {
-  row: MerchantRow
+  row: BillRow
   chart: MerchantChart
   panel: string
   period: DashboardPeriod
 }) {
   const { merchant } = row
   return (
-    <td className={cn(STICKY, tableNameWidth, 'py-1.5 pr-3 pl-3')}>
+    <td className={cn(tableStickyCell, tableNameWidth, 'py-1.5 pr-3 pl-3')}>
       <span className="flex items-center gap-2">
         <FoldButton
           fold={{ folds: true, open: chart.open, onToggle: chart.onToggle }}
@@ -109,8 +109,8 @@ function NameCell({
 /**
  * A merchant's row: its chevron or its trend opens the slip of its typical bill beside its
  * total per month, as a category's trend opens its chart; its name opens its transactions
- * over the period. A month without a visit is a zero on the line, never a break
- * (author, 2026-11-20); only a missing rate breaks it.
+ * over the period. A month without a visit is a zero on the line, never a break;
+ * only a missing rate breaks it.
  */
 export function MerchantTableRow({
   row,
@@ -122,7 +122,7 @@ export function MerchantTableRow({
   period,
   currency,
 }: {
-  row: MerchantRow
+  row: BillRow
   columns: ReadonlyArray<TableColumn>
   /** On everything: a column with the whole history's total. */
   whole: boolean

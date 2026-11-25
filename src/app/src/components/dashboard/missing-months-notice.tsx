@@ -17,7 +17,7 @@ function runsOf(months: ReadonlyArray<string>): Array<[string, string]> {
 
 /**
  * The period's holes in the history, months without a single transaction, as a tag beside
- * the page title like the net worth page's (author, 2026-11-20).
+ * the page title like the net worth page's.
  */
 export function MissingMonthsNotice({
   months,

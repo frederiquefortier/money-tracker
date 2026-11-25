@@ -8,8 +8,8 @@ import type { SeriesPoint } from '#/lib/net-worth/net-worth-series'
 const DIGITS = 4
 
 /**
- * The hub's one period: what the charts draw and what every change is measured over
- * (author, 2026-11-17). Months or years back from this month's start, or everything.
+ * The hub's one period: what the charts draw and what every change is measured over.
+ * Months or years back from this month's start, or everything.
  */
 export const RANGE_PRESETS = [
   'm1',

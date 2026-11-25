@@ -13,7 +13,7 @@ import type { TransactionKind } from '#/lib/transactions/transaction'
  */
 export const ANONYMOUS = 'anonymous'
 
-/** An income's one source (decided 2026-11-05): their line takes the whole amount. */
+/** An income's one source: their line takes the whole amount. */
 export function withSource(source: string | null): PeopleChanges {
   if (source === null) return { people: [] }
   return {
@@ -55,4 +55,13 @@ export function peopleForKind(
   return withPeople({ ...draft, kind, people: [] }, [
     source === ANONYMOUS ? null : source,
   ])
+}
+
+/** What a new kind changes: its people, and an income names who it came from instead of a seller. */
+export function kindChanges(draft: TransactionPeople, kind: TransactionKind) {
+  return {
+    kind,
+    ...peopleForKind(draft, kind),
+    ...(kind === 'income' ? { sellerId: null } : {}),
+  }
 }

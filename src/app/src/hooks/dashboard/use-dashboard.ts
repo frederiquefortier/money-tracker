@@ -22,11 +22,11 @@ import type { TableColumn } from '#/lib/dashboard/category-table'
 import { TABLE_SORTS, sortTable } from '#/lib/dashboard/category-table-list'
 import type { TableSort } from '#/lib/dashboard/category-table-list'
 import {
-  MERCHANT_SORTS,
+  BILL_SORTS,
   merchantBills,
-  sortMerchants,
+  sortBills,
 } from '#/lib/dashboard/merchant-bills'
-import type { MerchantSort } from '#/lib/dashboard/merchant-bills'
+import type { BillSort } from '#/lib/dashboard/merchant-bills'
 import { missingMonths } from '#/lib/dashboard/missing-months'
 import type { Dashboard } from '#/lib/dashboard/dashboard'
 import { bucketsOf } from '#/lib/dashboard/dashboard-period'
@@ -44,7 +44,7 @@ const parseKind = oneOf(KINDS)
 const parseView = oneOf(SPLIT_VIEWS)
 const parseChart = oneOf(CHART_KINDS)
 const parseSort = oneOf(TABLE_SORTS)
-const parseMerchantSort = oneOf(MERCHANT_SORTS)
+const parseMerchantSort = oneOf(BILL_SORTS)
 const parseIds = (v: unknown) =>
   Array.isArray(v) && v.every((x) => typeof x === 'string') ? v : undefined
 
@@ -94,10 +94,10 @@ function useDashboardChoices() {
   )
   const [tableSort, setTableSort] = useStoredState<TableSort>(
     'dashboard.tableSort',
-    'name',
+    'nameAsc',
     parseSort,
   )
-  const [merchantSort, setMerchantSort] = useStoredState<MerchantSort>(
+  const [merchantSort, setMerchantSort] = useStoredState<BillSort>(
     'dashboard.merchantSort',
     'amountDesc',
     parseMerchantSort,
@@ -126,14 +126,14 @@ function useDashboardChoices() {
 function useMerchants(
   data: Dashboard,
   columns: ReadonlyArray<TableColumn>,
-  sort: MerchantSort,
+  sort: BillSort,
 ) {
   const locale = useFormatLocale()
   const rows = useMemo(
     () => merchantBills(data.merchantMonths, data.merchants, columns),
     [data, columns],
   )
-  return useMemo(() => sortMerchants(rows, sort, locale), [rows, sort, locale])
+  return useMemo(() => sortBills(rows, sort, locale), [rows, sort, locale])
 }
 
 /** The Argent tab's figures for the period. */

@@ -20,7 +20,7 @@ import { todayIso } from '#/lib/shared/format'
 import { getDashboard } from '#/server/dashboard'
 
 // The spreadsheet's dashboard (DSH, spec 22). The year in review (EVT-04, 05, YR-02..05)
-// waits in improvements.md (author, 2026-11-24).
+// waits in improvements.md.
 export const Route = createFileRoute('/_authed/dashboard')({
   ...listPagePending((t) => t('nav.dashboard'), {
     wide: true,

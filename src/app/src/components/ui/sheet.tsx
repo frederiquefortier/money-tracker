@@ -5,10 +5,8 @@ import { cn } from '#/lib/utils'
 import { iconAction } from '#/components/styles'
 import { isTouchDevice } from '#/lib/shared/touch'
 import { usePageLock } from '#/hooks/app/use-page-lock'
-import {
-  OverlayContainerProvider,
-  inAriaOverlay,
-} from '#/components/ui/overlay-container'
+import { OverlayContainer } from '#/hooks/app/use-overlay-container'
+import { inAriaOverlay } from '#/lib/shared/aria-overlay'
 
 // Based on shadcn's sheet: full screen on phones, a panel from md up, sliding in from the
 // right at every width (from the left with side="left"), its animations in
@@ -92,9 +90,7 @@ function SheetContent({
             <Icon name="close" label={closeLabel} className="size-5" />
           </SheetPrimitive.Close>
         </header>
-        <OverlayContainerProvider value={panel}>
-          {children}
-        </OverlayContainerProvider>
+        <OverlayContainer value={panel}>{children}</OverlayContainer>
       </SheetPrimitive.Content>
     </SheetPrimitive.Portal>
   )
@@ -102,8 +98,7 @@ function SheetContent({
 
 /**
  * What stays put above a sheet's scrolling body: its search, and tabs when it has them.
- * Every sheet with a search uses it, so the search is always in reach (decided
- * 2026-11-05).
+ * Every sheet with a search uses it, so the search is always in reach.
  */
 function SheetHead({ className, ...props }: React.ComponentProps<'div'>) {
   return (

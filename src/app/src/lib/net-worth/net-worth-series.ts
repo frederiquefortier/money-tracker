@@ -12,7 +12,7 @@ import type { Locale } from '#/i18n/locales'
 const DIGITS = 4
 const ZERO = '0.0000'
 
-/** Each group's figure at a date; debts negative. Credit cards are debts (author, 2026-11-17). */
+/** Each group's figure at a date; debts negative. Credit cards are debts. */
 export const STACK_KEYS = {
   accounts: 'stack:accounts',
   investments: 'stack:investments',
@@ -88,7 +88,7 @@ function byDate(
   return [...dates].sort(([a], [b]) => (a < b ? -1 : 1))
 }
 
-/** A debt as the amount owed: shown positive, it subtracts from the total (author, 2026-11-17). */
+/** A debt as the amount owed: shown positive, it subtracts from the total. */
 function owed(amount: string | null): string | null {
   const minor = amount === null ? null : toMinor(amount, DIGITS)
   return minor === null ? null : fromMinor(-minor, DIGITS)
@@ -195,31 +195,6 @@ export function chartRows(
       }),
     ),
   }))
-}
-
-// Four to six gridlines on a round step, held to the figures so the line fills the chart
-// (2026-11-17, replacing a fixed step of the composition chart).
-const STEPS = [1, 2, 2.5, 5]
-const MAX_LINES = 6
-
-/** The y-axis ticks over `min` to `max`, on the smallest round step giving at most six. */
-export function axisTicks(min: number, max: number): Array<number> {
-  // A flat line gets a band around it, so it sits mid-chart.
-  const pad = min === max ? Math.abs(min) / 10 || 1 : 0
-  const low = Math.min(min, max) - pad
-  const high = Math.max(min, max) + pad
-  const count = (step: number) =>
-    Math.ceil(high / step) - Math.floor(low / step) + 1
-  let step = 1
-  for (let power = 1; count(step) > MAX_LINES; power *= 10)
-    step =
-      STEPS.map((s) => s * power).find((s) => count(s) <= MAX_LINES) ??
-      10 * power
-  const first = Math.floor(low / step)
-  return Array.from(
-    { length: Math.ceil(high / step) - first + 1 },
-    (_, i) => (first + i) * step,
-  )
 }
 
 const isSeriesKind = isOneOf<SeriesRow['kind']>(['account', ...HOLDING_KINDS])

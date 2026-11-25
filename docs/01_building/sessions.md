@@ -4,6 +4,26 @@ Short record of each working session: what the author asked, what was decided an
 
 <!-- Newest first: a new session goes directly below this line. Template at the bottom. -->
 
+### 2026-11-25 - Code review and consistency pass
+
+**What We Worked On:**
+- The author asked for a senior review of the whole app, then for every fix it listed. Names exported twice now have one home each (merchant bills, `axisTicks`, holding transfer schema, entry kinds); transactions and transfers share `useDraftSubmit`; `SplitList`, `TabPanel` and `useCategorySort` replace copies; server loaders group with `Map.groupBy`; merchants, institutions and currencies follow `form/` and `list/`; author and date tags left the comments (ADR-076).
+- The proposal to split `TabList` was dropped: its three unused options were removed instead, which kept one keyboard handler.
+
+**What Could We Do Better:**
+- The dashboard axes now use the net worth tick rule with five lines at most; the tests match, but other figures may step differently. Worth a look on /design.
+
+---
+
+### 2026-11-25 - Portfolio README
+
+**What We Worked On:**
+- The author asked to rewrite the README into their portfolio structure (highlights, overview, problem, goals, architecture, challenges, decisions, future work, lessons), drawn from the brief, ADRs, learnings and bugs. The docs table gave way to a link to the brief.
+- The author corrected the first draft: the spreadsheet's real history (2018 to 2022, then Aspire from 2023 without envelopes, net worth in the same file), the spreadsheet already retired, budgets a nice-to-have. Challenges and decisions now describe the author's part (architecture, guiding and instructing the assistant, design, QA, data preparation) instead of technical gotchas the assistant met; the AI highlight became design and languages.
+
+**What Could We Do Better:**
+- No hero media yet: a placeholder comment names the shots, to take from invented data only.
+
 ### 2026-11-25 - CI's end-to-end job
 
 **What We Worked On:**

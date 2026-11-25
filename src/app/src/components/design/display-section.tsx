@@ -11,11 +11,11 @@ import {
   SkeletonRows,
 } from '#/components/feedback/skeleton'
 import { Spinner } from '#/components/feedback/spinner'
-import { MerchantsSkeleton } from '#/components/merchants/merchants-skeleton'
+import { MerchantsSkeleton } from '#/components/merchants/list/merchants-skeleton'
 import { PeopleSkeleton } from '#/components/people/list/people-skeleton'
 import { EventsSkeleton } from '#/components/events/list/events-skeleton'
-import { InstitutionsSkeleton } from '#/components/institutions/institutions-skeleton'
-import { CurrenciesSkeleton } from '#/components/currencies/currencies-skeleton'
+import { InstitutionsSkeleton } from '#/components/institutions/list/institutions-skeleton'
+import { CurrenciesSkeleton } from '#/components/currencies/list/currencies-skeleton'
 import { CategoriesSkeleton } from '#/components/categories/list/categories-skeleton'
 import { ImportSkeleton } from '#/components/import/import-skeleton'
 

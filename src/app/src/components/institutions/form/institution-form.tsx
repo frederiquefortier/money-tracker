@@ -9,8 +9,10 @@ import type { Institution } from '#/lib/institutions/institution'
 /** ACC-05, in the same sheet as the account form. */
 export function InstitutionForm({
   institution,
+  savedText,
 }: {
   institution: Institution | null
+  savedText: string
 }) {
   const { t } = useTranslation()
   const form = useSheetForm({
@@ -20,7 +22,7 @@ export function InstitutionForm({
       websiteUrl: institution?.websiteUrl ?? '',
     },
     save: (data) => saveInstitution({ data: { ...data, id: institution?.id } }),
-    savedText: t('institutions.saved'),
+    savedText,
   })
 
   return (
