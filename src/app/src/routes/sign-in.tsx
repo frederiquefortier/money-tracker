@@ -1,10 +1,5 @@
 import { useActionState } from 'react'
-import {
-  Link,
-  createFileRoute,
-  redirect,
-  useRouter,
-} from '@tanstack/react-router'
+import { Link, createFileRoute, redirect } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { AuthShell } from '#/components/layout/auth-shell'
 import { FormAlert, FormField } from '#/components/forms/form-field'
@@ -18,6 +13,7 @@ import {
 } from '#/hooks/forms/use-validation'
 import { signInSchema } from '#/lib/auth/auth-schema'
 import { Spinner } from '#/components/feedback/spinner'
+import { useSessionReload } from '#/hooks/app/use-refresh'
 
 export const Route = createFileRoute('/sign-in')({
   beforeLoad: ({ context }) => {
@@ -34,7 +30,7 @@ const initial: State = { email: '', errors: {}, failure: null }
 
 function SignIn() {
   const { t } = useTranslation()
-  const router = useRouter()
+  const reloadSession = useSessionReload()
 
   const [state, submit, pending] = useActionState(
     async (_: State, form: FormData): Promise<State> => {
@@ -45,8 +41,7 @@ function SignIn() {
       const result = await signIn({ data })
       if (!result.ok)
         return { email: values.email, errors: {}, failure: result.error }
-      await router.invalidate()
-      await router.navigate({ to: '/mfa' })
+      await reloadSession({ to: '/mfa' })
       return initial
     },
     initial,

@@ -1,5 +1,5 @@
 import { useActionState } from 'react'
-import { createFileRoute, redirect, useRouter } from '@tanstack/react-router'
+import { createFileRoute, redirect } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { AuthShell } from '#/components/layout/auth-shell'
 import { FormAlert, FormField } from '#/components/forms/form-field'
@@ -13,6 +13,7 @@ import {
 } from '#/hooks/forms/use-validation'
 import { newPasswordSchema } from '#/lib/auth/auth-schema'
 import { Spinner } from '#/components/feedback/spinner'
+import { useSessionReload } from '#/hooks/app/use-refresh'
 
 export const Route = createFileRoute('/set-password')({
   beforeLoad: ({ context }) => {
@@ -32,7 +33,7 @@ const initial: State = { errors: {}, serverError: null }
 
 function SetPassword() {
   const { t } = useTranslation()
-  const router = useRouter()
+  const reloadSession = useSessionReload()
   const { session } = Route.useRouteContext()
 
   const [state, submit, pending] = useActionState(
@@ -45,8 +46,7 @@ function SetPassword() {
 
       const result = await setPassword({ data: { password: data.password } })
       if (!result.ok) return { errors: {}, serverError: result.error }
-      await router.invalidate()
-      await router.navigate({ to: session.hasTotp ? '/' : '/mfa' })
+      await reloadSession({ to: session.hasTotp ? '/' : '/mfa' })
       return initial
     },
     initial,

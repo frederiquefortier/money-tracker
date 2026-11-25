@@ -54,7 +54,9 @@ encrypted dump is the only backup.
 
 1. **The browser never talks to the database.** Server functions call Supabase with the
    user's session, so RLS applies (ADR-006). The browser's 5-minute session cache (ADR-053)
-   only decides which screens show.
+   only decides which screens show. The TanStack Query cache (ADR-073) is made per router,
+   so per request on the server, and emptied on every sign-in and sign-out
+   (`useSessionReload`).
 2. **Every server function validates input with Zod** and takes the user from the session,
    never from the payload.
 3. **The secret key** (`SUPABASE_SECRET_KEY`) is only for scheduled jobs (rates, recurring

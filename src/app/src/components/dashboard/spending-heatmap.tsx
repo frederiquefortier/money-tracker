@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next'
 import { DashboardCard, Figure } from '#/components/dashboard/dashboard-card'
 import { EmptyState } from '#/components/lists/list-card'
 import { Skeleton } from '#/components/feedback/skeleton'
-import { Spinner } from '#/components/feedback/spinner'
 import { DayGrid, DaysCount } from '#/components/dashboard/day-grid'
 import { useLocale } from '#/hooks/app/use-locale'
 import { heatSteps } from '#/lib/dashboard/daily-spending'
@@ -89,33 +88,31 @@ export function SpendingHeatmap({
         <EmptyState>{t('dashboard.heatmap.failed')}</EmptyState>
       ) : (
         <>
-          <div className="relative">
-            <div
-              role="img"
-              aria-label={t('dashboard.heatmap.label', { year, count })}
-              className={cn(!days && 'opacity-50')}
-            >
-              <DayGrid
-                months={monthsOf(range)}
-                today={today}
-                fillOf={(day, future) =>
-                  future ? heatFills.none : heatFill(byDay.get(day), steps)
-                }
-                onHover={setHovered}
-                onOpen={(day) =>
-                  void navigate({
-                    to: '/transactions',
-                    search: daySearch({ unit: 'year', year }, day),
-                  })
-                }
-              />
-            </div>
-            {!days && (
-              <Spinner
-                label={t('common.loading')}
-                className="absolute inset-0 m-auto size-6 text-muted-foreground"
-              />
-            )}
+          {/* While the days load, the empty grid pulses as their skeleton. */}
+          <div
+            role="img"
+            aria-busy={!days}
+            aria-label={
+              days
+                ? t('dashboard.heatmap.label', { year, count })
+                : t('common.loading')
+            }
+            className={cn(!days && 'animate-pulse motion-reduce:animate-none')}
+          >
+            <DayGrid
+              months={monthsOf(range)}
+              today={today}
+              fillOf={(day, future) =>
+                future ? heatFills.none : heatFill(byDay.get(day), steps)
+              }
+              onHover={setHovered}
+              onOpen={(day) =>
+                void navigate({
+                  to: '/transactions',
+                  search: daySearch({ unit: 'year', year }, day),
+                })
+              }
+            />
           </div>
           {/* Room kept for the hovered day, so the card never changes height. */}
           <p className="h-5 truncate text-xs leading-5">

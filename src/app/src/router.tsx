@@ -1,3 +1,4 @@
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { createRouter as createTanStackRouter } from '@tanstack/react-router'
 import type { ParsedLocation } from '@tanstack/react-router'
 import { getGlobalStartContext } from '@tanstack/react-start'
@@ -17,6 +18,15 @@ export function getRouter() {
       .matchRoutes(location)
       .some((match) => match.staticData.sheet === true)
 
+  // One per router, so one per request on the server: no cached read crosses users. The
+  // pages' data stays in the loaders; Query holds what a component fetches itself (ADR-073).
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      // The loaders' stale time; every save invalidates both (useRefresh).
+      queries: { staleTime: 30_000, retry: false },
+    },
+  })
+
   const router = createTanStackRouter({
     routeTree,
     scrollRestoration: ({ location }) => !opensSheet(location),
@@ -29,6 +39,9 @@ export function getRouter() {
     defaultErrorComponent: RouteError,
     defaultNotFoundComponent: RouteNotFound,
     ssr: { nonce: getNonce() },
+    Wrap: ({ children }) => (
+      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    ),
   })
 
   return router

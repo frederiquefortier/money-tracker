@@ -4,6 +4,45 @@ Technical and structural choices, with the alternatives that were rejected. Chec
 
 <!-- Newest first: a new ADR goes directly below this line. Template at the bottom. -->
 
+### ADR-073: TanStack Query caches the reads made outside loaders (2026-11-25)
+
+**Context:**
+- The heat map showed its skeleton on every visit while the charts showed at once. The charts come from the dashboard's loader, which the router caches; the heat map fetches one year at a time from the component, with a hand-made cache that dropped the current year after each answer.
+- Nine reads work that way (the heat map, the filter options and empty filters, a rate, the matched event, the adjustment's balance, owed lines in two places, the export counts), each a `useEffect` with its own guard against late answers and no cache. ADR-011 had chosen loaders over TanStack Query; the author asked to adopt it for all nine.
+
+**Decision:**
+- Supersedes ADR-011's line on data loading and cache for these reads. Pages keep their router loaders.
+- A `QueryClient` per router, given by the router's `Wrap`, with the loaders' 30 s stale time and no retry. Each read is a `useQuery` keyed by what it asks (`['year-activity', year]`, `['rate', from, to, date]`); a past year of the heat map stays fresh for the visit.
+- `useRefresh`, which every save calls, marks every query stale with the router: those on screen load again behind their last answer, the others when next shown. `useSessionReload` empties the cache on sign-in and sign-out.
+
+**Alternatives Considered:**
+- A key carrying the transaction count (`heatmap-{year}-{count}`) -> The browser would ask for the count on each visit, and an edit keeps the count.
+- A hand-made cache in the heat map's hook -> The same work again for the eight other reads.
+- Query for the loaders too -> Two ways to load a page; the loaders already cache and preload on hover.
+
+**Consequences:**
+- A read already seen shows its last answer at once, and its skeleton only the first time.
+- A new read outside a loader is a `useQuery`, never a `useEffect`.
+
+### ADR-072: Pages, charts and transactions load as skeletons (2026-11-25)
+
+**Context:**
+- ADR-068 kept a spinner for charts, the transactions list and pages loading. The author asked for skeletons there instead: a spinner tells nothing of what is coming, and the page jumps when it arrives.
+
+**Decision:**
+- Supersedes ADR-068's spinner for charts, pages and the transactions list; its text skeletons stand.
+- A page with a loader shows its title and a skeleton of its body (`listPagePending`'s `body`): `DashboardSkeleton` (the cards' grid), `NetWorthSkeleton` (the chart's card beside the list), `TransactionDaysSkeleton` (days of rows), `SkeletonRows` for the other pages.
+- A chart waits as a plain block in its own space (`SkeletonCard`, `ChartContainer` until hydration), with no bars or lines drawn, so it never reads as a figure. The heat map's empty grid pulses while its year loads.
+- The transactions list gives way to its skeleton while a filter, period or search reloads, and the next days at its end load as one skeleton day (`ListEnd`'s `placeholder`).
+- `Spinner` stays for an action under way in its button, a sheet loading, and the ends of the other lists.
+
+**Alternatives Considered:**
+- Keep the stale list dimmed under a spinner while it reloads -> Rows that are about to change still read as the answer.
+- Fake bars or lines in a chart skeleton -> They would read as data (ADR-068's reason, kept).
+
+**Consequences:**
+- A page whose layout changes must update its skeleton in the same change.
+
 ### ADR-071: Privacy mode hides figures in a fixed shape, saved in a cookie (2026-11-25)
 
 **Context:**
@@ -1006,6 +1045,7 @@ Dependencies that stay:
 | shadcn/ui (Radix) and Tailwind | Accessible combobox, dialog, popover, menu; added one component at a time |
 | class-variance-authority, clsx, tailwind-merge, tw-animate-css | What shadcn components are written with (`cn` in `src/lib/utils.ts`) |
 | TanStack devtools (dev only) | Router inspector, stripped from the build |
+| @tanstack/react-query | The cache for reads a component makes itself, outside the loaders (ADR-073) |
 | i18next, react-i18next | Plurals, interpolation, server-rendered language switch (ADR-008) |
 | Recharts (via shadcn charts) | Line, bar, area, donut charts |
 | react-aria-components, react-aria, @internationalized/date | The date field and its calendar: typed segments, range calendar, tooltips (design-decisions.md) |

@@ -1,5 +1,5 @@
 import { useActionState, useState, useTransition } from 'react'
-import { createFileRoute, redirect, useRouter } from '@tanstack/react-router'
+import { createFileRoute, redirect } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { z } from 'zod'
 import { AuthShell } from '#/components/layout/auth-shell'
@@ -14,6 +14,7 @@ import {
 } from '#/hooks/forms/use-validation'
 import { totpFormSchema } from '#/lib/auth/auth-schema'
 import { Spinner } from '#/components/feedback/spinner'
+import { useSessionReload } from '#/hooks/app/use-refresh'
 
 // An allowlist: `next` cannot become an open redirect.
 const NEXT = ['/', '/set-password'] as const
@@ -34,7 +35,7 @@ const initial: State = { errors: {}, rejected: false }
 
 function Mfa() {
   const { t } = useTranslation()
-  const router = useRouter()
+  const reloadSession = useSessionReload()
   const { session } = Route.useRouteContext()
   const { next } = Route.useSearch()
   const [enrollment, setEnrollment] = useState<Enrollment | null>(null)
@@ -63,8 +64,7 @@ function Mfa() {
         data: { factorId: enrollment?.factorId, code: data.code },
       })
       if (!result.ok) return { errors: {}, rejected: true }
-      await router.invalidate()
-      await router.navigate({ to: next ?? '/' })
+      await reloadSession({ to: next ?? '/' })
       return initial
     },
     initial,

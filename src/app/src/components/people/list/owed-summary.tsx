@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react'
 import { Link } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { ListCard } from '#/components/lists/list-card'
@@ -7,8 +6,8 @@ import { formatDate } from '#/lib/shared/format'
 import { useLocale } from '#/hooks/app/use-locale'
 import { useMoneyText } from '#/hooks/app/use-privacy'
 import { cn } from '#/lib/utils'
-import { getOwedLines } from '#/server/owed'
-import type { Balance, OwedLine } from '#/lib/people/owed'
+import { useOwedLines } from '#/hooks/people/use-owed-lines'
+import type { Balance } from '#/lib/people/owed'
 import { fieldSurface, focusRing, rowHover } from '#/components/styles'
 
 /** PPL-05, on a person's row: "Me doit 45,00 $", "+ inconnu" past a known part. */
@@ -35,16 +34,8 @@ export function OwedTag({ balance }: { balance: Balance | undefined }) {
 export function OwedLines({ personId }: { personId: string }) {
   const { t } = useTranslation()
   const locale = useLocale()
-  const [lines, setLines] = useState<Array<OwedLine> | null>(null)
-  useEffect(() => {
-    let current = true
-    getOwedLines({ data: { personId } })
-      .then((found) => current && setLines(found))
-      .catch(() => current && setLines([]))
-    return () => {
-      current = false
-    }
-  }, [personId])
+  // A failed load shows nothing, as no lines do.
+  const { data: lines } = useOwedLines(personId)
   if (!lines?.length) return null
   return (
     <section className="flex flex-col gap-2">

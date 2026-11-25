@@ -1,4 +1,4 @@
-import { useEffect, useId, useState } from 'react'
+import { useId } from 'react'
 import { useTranslation } from 'react-i18next'
 import { CategoryBadge } from '#/components/categories/category-badge'
 import { CheckList } from '#/components/forms/check-list'
@@ -9,29 +9,11 @@ import type { Category } from '#/lib/categories/category'
 import { formatDate } from '#/lib/shared/format'
 import { sourceOf } from '#/lib/transactions/transaction-source'
 import { useLocale } from '#/hooks/app/use-locale'
-import { getOwedLines } from '#/server/owed'
-import { useToast } from '#/hooks/app/use-toast'
+import { useFailedToast } from '#/hooks/app/use-failed-toast'
+import { useOwedLines } from '#/hooks/people/use-owed-lines'
 import { useMarkChanged } from '#/hooks/forms/use-sheet'
 import type { OwedLine } from '#/lib/people/owed'
 import type { TransactionDraft } from '#/lib/transactions/transaction-draft-types'
-
-/** The person's owed lines, loaded again when the income's source changes. */
-function useOwedLines(personId: string | null, incomeId: string | undefined) {
-  const { t } = useTranslation()
-  const toast = useToast()
-  const [lines, setLines] = useState<Array<OwedLine>>([])
-  useEffect(() => {
-    if (!personId) return setLines([])
-    let current = true
-    getOwedLines({ data: { personId, incomeId } })
-      .then((found) => current && setLines(found))
-      .catch(() => toast({ text: t('common.genericError'), tone: 'error' }))
-    return () => {
-      current = false
-    }
-  }, [personId, incomeId, toast, t])
-  return lines
-}
 
 /** The expense's category icon, as on its row; an empty circle without one. */
 function LineBadge({ category }: { category: Category | undefined }) {
@@ -66,7 +48,9 @@ export function ReimbursesField({
   const locale = useLocale()
   const markChanged = useMarkChanged()
   const labelId = useId()
-  const lines = useOwedLines(sourceOf(draft), id)
+  const owed = useOwedLines(sourceOf(draft), id)
+  useFailedToast(owed.isError, 'error')
+  const lines = owed.data ?? []
   if (lines.length === 0) return null
 
   function toggle(line: OwedLine) {

@@ -10,6 +10,7 @@ import { ExpandAllButton } from '#/components/lists/expand-all-button'
 import { SortMenu } from '#/components/lists/sort-menu'
 import { ItemList } from '#/components/net-worth/item-list'
 import { NetWorthDashboard } from '#/components/net-worth/net-worth-dashboard'
+import { NetWorthSkeleton } from '#/components/net-worth/net-worth-skeleton'
 import { focusRing } from '#/components/styles'
 import { FORMAT_LOCALE } from '#/i18n/locales'
 import { useLocale } from '#/hooks/app/use-locale'
@@ -31,7 +32,10 @@ import { getNetWorth } from '#/server/net-worth'
 // The hub and every account and holding in one page (ADR-061). The forms open as sheets
 // over it, under /net-worth/accounts/… and /net-worth/holdings/….
 export const Route = createFileRoute('/_authed/net-worth')({
-  ...listPagePending((t) => t('netWorth.title'), { wide: 'xl' }),
+  ...listPagePending((t) => t('netWorth.title'), {
+    wide: 'xl',
+    body: NetWorthSkeleton,
+  }),
   loader: async () => {
     const [netWorth, accounts, holdings] = await Promise.all([
       getNetWorth(),

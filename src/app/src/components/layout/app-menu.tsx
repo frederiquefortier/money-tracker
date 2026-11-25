@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link, useRouter } from '@tanstack/react-router'
+import { Link } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { Icon } from '#/components/display/icon'
 import type { IconName } from '#/components/display/icon'
@@ -10,6 +10,7 @@ import { cn } from '#/lib/utils'
 import { signOut } from '#/server/session'
 import { forgetSession } from '#/lib/auth/session'
 import { cardSurface, rowHover, focusRing } from '#/components/styles'
+import { useSessionReload } from '#/hooks/app/use-refresh'
 
 // The lists set up once and rarely opened; a row appears once its screen exists.
 const SCREENS = [
@@ -37,14 +38,13 @@ const row = cn(
 
 export function AppMenu() {
   const { t } = useTranslation()
-  const router = useRouter()
+  const reloadSession = useSessionReload()
   const [open, setOpen] = useState(false)
 
   async function leave() {
     await signOut()
     forgetSession()
-    await router.invalidate()
-    await router.navigate({ to: '/sign-in' })
+    await reloadSession({ to: '/sign-in' })
   }
 
   return (

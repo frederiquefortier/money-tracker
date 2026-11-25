@@ -12,6 +12,7 @@ import { ListPage } from '#/components/layout/list-page'
 import { FilterSidebar } from '#/components/transactions/filters/filter-sidebar'
 import { ListHeader } from '#/components/transactions/list/list-header'
 import { TransactionDayGroup } from '#/components/transactions/list/transaction-day'
+import { TransactionDaysSkeleton } from '#/components/transactions/list/transaction-skeleton'
 import { useTransactionPages } from '#/hooks/transactions/use-transaction-pages'
 import { usePreloadForm } from '#/hooks/transactions/use-preload-form'
 import { formatDate, formatMonth } from '#/lib/shared/format'
@@ -28,11 +29,20 @@ import { listTransactions } from '#/server/transaction-list'
 import { getFeeCategory } from '#/server/transfers'
 import type { FilterValues } from '#/lib/transactions/transaction-filters'
 import type { PeriodChoice } from '#/lib/transactions/transaction-list'
-import { Spinner } from '#/components/feedback/spinner'
-import { PagePending } from '#/components/layout/page-pending'
+import { listPagePending } from '#/components/layout/page-pending'
 import { useRevealed } from '#/hooks/app/use-revealed'
 import { ListEnd } from '#/components/lists/list-end'
-import { cn } from '#/lib/utils'
+
+/** The list's column of the page's grid, its days loading. */
+function TransactionsPending() {
+  return (
+    <div className="grid items-start gap-3 lg:grid-cols-12">
+      <div className="min-w-0 lg:col-span-7 lg:col-start-5">
+        <TransactionDaysSkeleton />
+      </div>
+    </div>
+  )
+}
 
 // The query the loader last asked for, in the browser only.
 let requested: string | null = null
@@ -41,9 +51,10 @@ export const Route = createFileRoute('/_authed/transactions')({
   validateSearch: searchSchema,
   // The forms open over the list and close back to the same period, filters and search.
   search: { middlewares: [retainSearchParams([...KEPT])] },
-  pendingComponent: PagePending,
-  pendingMs: 0,
-  pendingMinMs: 0,
+  ...listPagePending((t) => t('nav.transactions'), {
+    wide: true,
+    body: TransactionsPending,
+  }),
   // No loaderDeps: a filter or a search would make a new match, which loads blocking (the
   // page, its search field included, gave way to the loading one). One match reloads in
   // the background instead, and the list says which query it shows.
@@ -154,8 +165,10 @@ function OlderDays({
   revealed: { more: boolean; sentinel: (el: HTMLElement | null) => void }
   pages: { more: boolean; sentinel: (el: HTMLElement | null) => void }
 }) {
-  if (revealed.more) return <ListEnd sentinel={revealed.sentinel} />
-  if (pages.more) return <ListEnd sentinel={pages.sentinel} />
+  const day = <TransactionDaysSkeleton days={1} />
+  if (revealed.more)
+    return <ListEnd sentinel={revealed.sentinel} placeholder={day} />
+  if (pages.more) return <ListEnd sentinel={pages.sentinel} placeholder={day} />
   return null
 }
 
@@ -184,7 +197,7 @@ function Transactions() {
   usePreloadForm()
   const { days, more, sentinel } = useTransactionPages(data, deps)
   // A filter, period or search the list does not show yet: the reload runs in the
-  // background, so the list says it is coming (the sheet may already be closed).
+  // background, and the list gives way to its skeleton (the sheet may already be closed).
   const waiting = queryKey(listQuery(Route.useSearch())) !== queryKey(deps)
   // Days are built as they near the screen; older pages load once all are shown.
   const revealed = useRevealed(days, 12)
@@ -224,28 +237,26 @@ function Transactions() {
             onOwed={go.owed}
             onSearch={setText}
           />
-          <div
-            aria-busy={waiting}
-            className={cn('flex flex-col gap-4', waiting && 'opacity-50')}
-          >
-            {waiting && (
-              <Spinner label={t('common.loading')} className="mx-auto size-6" />
-            )}
-            {days.length === 0 ? (
-              <EmptyState>{empty}</EmptyState>
-            ) : (
-              revealed.shown.map((day) => (
-                <TransactionDayGroup
-                  key={day.date}
-                  day={day}
-                  displayCurrency={displayCurrency}
-                  filtered={deps.accountIds.length > 0}
-                  feeCategory={data.feeCategory}
-                />
-              ))
-            )}
-            <OlderDays revealed={revealed} pages={{ more, sentinel }} />
-          </div>
+          {waiting ? (
+            <TransactionDaysSkeleton />
+          ) : (
+            <div className="flex flex-col gap-4">
+              {days.length === 0 ? (
+                <EmptyState>{empty}</EmptyState>
+              ) : (
+                revealed.shown.map((day) => (
+                  <TransactionDayGroup
+                    key={day.date}
+                    day={day}
+                    displayCurrency={displayCurrency}
+                    filtered={deps.accountIds.length > 0}
+                    feeCategory={data.feeCategory}
+                  />
+                ))
+              )}
+              <OlderDays revealed={revealed} pages={{ more, sentinel }} />
+            </div>
+          )}
           <FloatingAddLink
             to="/transactions/new"
             label={t('transactions.add')}

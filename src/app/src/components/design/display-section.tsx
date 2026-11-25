@@ -4,7 +4,11 @@ import { CurrencyCode } from '#/components/display/currency-code'
 import { IconBubble } from '#/components/display/icon-bubble'
 import { Money } from '#/components/display/money'
 import { Tag } from '#/components/display/tag'
-import { Skeleton, SkeletonRows } from '#/components/feedback/skeleton'
+import {
+  Skeleton,
+  SkeletonCard,
+  SkeletonRows,
+} from '#/components/feedback/skeleton'
 import { Spinner } from '#/components/feedback/spinner'
 
 // Invented colours, as an event type would carry.
@@ -53,6 +57,9 @@ export function DisplaySection() {
         <Skeleton className="w-24 text-sm" />
         <div className="w-full">
           <SkeletonRows count={3} />
+        </div>
+        <div className="w-full max-w-md">
+          <SkeletonCard chart="h-40" />
         </div>
       </Specimen>
     </GallerySection>

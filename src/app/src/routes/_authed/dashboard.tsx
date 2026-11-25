@@ -1,5 +1,6 @@
 import { createFileRoute, redirect } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
+import { DashboardSkeleton } from '#/components/dashboard/dashboard-skeleton'
 import { MissingMonthsNotice } from '#/components/dashboard/missing-months-notice'
 import { MoneyOverview } from '#/components/dashboard/money-overview'
 import { PeriodMenu } from '#/components/dashboard/period-menu'
@@ -21,7 +22,10 @@ import { getDashboard } from '#/server/dashboard'
 // The spreadsheet's dashboard (DSH, spec 22). The year in review (EVT-04, 05, YR-02..05)
 // waits in improvements.md (author, 2026-11-24).
 export const Route = createFileRoute('/_authed/dashboard')({
-  ...listPagePending((t) => t('nav.dashboard'), { wide: true }),
+  ...listPagePending((t) => t('nav.dashboard'), {
+    wide: true,
+    body: DashboardSkeleton,
+  }),
   validateSearch: dashboardSearchSchema,
   // Coming back from another page (the nav has no year) opens the period last picked. In
   // the browser only: the server has no storage, and a reload keeps the year in the URL.
@@ -44,11 +48,10 @@ function MoneyTab({
   today: string
 }) {
   const { dashboard } = Route.useLoaderData()
-  const activity = useYearActivity(period.unit === 'year' ? [period.year] : [])
-  const year = activity[period.year]
+  const activity = useYearActivity(period.unit === 'year' ? period.year : null)
   const daily = {
-    days: year && year !== 'failed' ? year.days : null,
-    failed: year === 'failed',
+    days: activity.data?.days ?? null,
+    failed: activity.isError,
   }
   return (
     <MoneyOverview

@@ -1,7 +1,8 @@
-import { useEffect, useState, useTransition } from 'react'
+import { useTransition } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
+import { useFailedToast } from '#/hooks/app/use-failed-toast'
 import { useToast } from '#/hooks/app/use-toast'
-import type { ExportCounts } from '#/lib/import/export-files'
 import type { ImportFileName } from '#/lib/import/import'
 import { todayIso } from '#/lib/shared/format'
 import { exportData, getExportCounts } from '#/server/export'
@@ -44,13 +45,10 @@ export function useExport() {
 
 /** The rows of each file, fetched when the Exporter tab opens; null until then. */
 export function useExportCounts() {
-  const { t } = useTranslation()
-  const toast = useToast()
-  const [counts, setCounts] = useState<ExportCounts | null>(null)
-  useEffect(() => {
-    getExportCounts()
-      .then(setCounts)
-      .catch(() => toast({ text: t('common.genericError') }))
-  }, [toast, t])
-  return counts
+  const query = useQuery({
+    queryKey: ['export-counts'],
+    queryFn: () => getExportCounts(),
+  })
+  useFailedToast(query.isError)
+  return query.data ?? null
 }

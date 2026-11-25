@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { Spinner } from '#/components/feedback/spinner'
+import { Skeleton } from '#/components/feedback/skeleton'
 import { useHydrated } from '#/hooks/app/use-hydrated'
 import { cn } from '#/lib/utils'
 import * as RechartsPrimitive from 'recharts'
@@ -74,7 +74,7 @@ function ChartContainer({
       >
         <ChartStyle id={chartId} config={config} />
         {/* Recharts draws at its initial size until the browser measures the box, so
-            the chart waits for hydration behind a spinner in its own space. */}
+            the chart waits for hydration as a block filling its own space. */}
         {hydrated ? (
           <RechartsPrimitive.ResponsiveContainer
             initialDimension={initialDimension}
@@ -82,9 +82,9 @@ function ChartContainer({
             {children}
           </RechartsPrimitive.ResponsiveContainer>
         ) : (
-          <Spinner
+          <Skeleton
             label={t('common.loading')}
-            className="size-6 self-center text-muted-foreground"
+            className="block size-full rounded-lg"
           />
         )}
       </div>

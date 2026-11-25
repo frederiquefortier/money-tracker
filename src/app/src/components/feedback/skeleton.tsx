@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next'
-import { fieldCard } from '#/components/styles'
+import { cardSurface, fieldCard } from '#/components/styles'
 import { cn } from '#/lib/utils'
 
 /**
@@ -40,6 +40,16 @@ export function SkeletonRows({ count = 5 }: { count?: number }) {
           </li>
         ))}
       </ul>
+    </div>
+  )
+}
+
+/** A chart's card while it loads: its title, then a block at the chart's height. */
+export function SkeletonCard({ chart = 'h-64' }: { chart?: string }) {
+  return (
+    <div className={cn(cardSurface, 'flex flex-col gap-4 p-4')} aria-hidden>
+      <Skeleton className="w-32" />
+      <Skeleton className={cn('block w-full rounded-lg', chart)} />
     </div>
   )
 }

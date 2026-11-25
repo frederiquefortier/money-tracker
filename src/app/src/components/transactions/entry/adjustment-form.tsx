@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { FixedCurrency } from '#/components/display/currency-chip'
 import { FieldMessage } from '#/components/forms/form-field'
@@ -42,29 +43,16 @@ function useAppBalance(
   date: string,
   adjustmentId: string | undefined,
 ) {
-  const key = accountId && date ? `${accountId}:${date}` : null
-  const [loaded, setLoaded] = useState<{
-    key: string
-    balance: string | null
-  }>()
-
-  useEffect(() => {
-    if (!key) return
-    let current = true
-    getAdjustmentBalance({ data: { accountId, on: date, adjustmentId } })
-      .then((balance) => {
-        if (current) setLoaded({ key, balance })
-      })
-      .catch(() => {
-        if (current) setLoaded({ key, balance: null })
-      })
-    return () => {
-      current = false
-    }
-  }, [key, accountId, date, adjustmentId])
-
-  if (!key) return null
-  return loaded?.key === key ? loaded.balance : undefined
+  const enabled = Boolean(accountId && date)
+  const { data } = useQuery({
+    queryKey: ['adjustment-balance', accountId, date, adjustmentId ?? null],
+    queryFn: () =>
+      getAdjustmentBalance({
+        data: { accountId, on: date, adjustmentId },
+      }).catch(() => null),
+    enabled,
+  })
+  return enabled ? data : null
 }
 
 /** A computed amount on the slip: a skeleton while it loads, a dash when it is not known. */

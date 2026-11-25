@@ -4,6 +4,7 @@ import { FilterSidebar } from '#/components/transactions/filters/filter-sidebar'
 import { ListEnd } from '#/components/lists/list-end'
 import { ListHeader } from '#/components/transactions/list/list-header'
 import { TransactionDayGroup } from '#/components/transactions/list/transaction-day'
+import { TransactionDaysSkeleton } from '#/components/transactions/list/transaction-skeleton'
 import { NO_FILTERS } from '#/lib/transactions/transaction-filters'
 import type { FilterValues } from '#/lib/transactions/transaction-filters'
 import type {
@@ -140,7 +141,10 @@ function DemoList() {
             />
           ))}
           {/* The end of a list with more to load. */}
-          <ListEnd sentinel={() => {}} />
+          <ListEnd
+            sentinel={() => {}}
+            placeholder={<TransactionDaysSkeleton days={1} />}
+          />
         </div>
       </div>
     </div>
@@ -155,6 +159,14 @@ export function TransactionsSection() {
         source="transactions/list/, transactions/filters/, lists/list-end"
       >
         <DemoList />
+      </Specimen>
+      <Specimen
+        name="TransactionDaysSkeleton"
+        source="transactions/list/transaction-skeleton.tsx"
+      >
+        <div className="w-full max-w-2xl">
+          <TransactionDaysSkeleton />
+        </div>
       </Specimen>
     </GallerySection>
   )

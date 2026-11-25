@@ -4,6 +4,15 @@ Short record of each working session: what the author asked, what was decided an
 
 <!-- Newest first: a new session goes directly below this line. Template at the bottom. -->
 
+### 2026-11-25 - Skeletons for pages, charts and transactions
+
+**What We Worked On:**
+- The author asked for skeleton loading almost everywhere, charts and transactions first. This reverses ADR-068's spinners for charts and pages (ADR-072). Pages with a loader show their title over a skeleton of their body: the dashboard's cards, the net worth chart beside its list, days of transaction rows, rows for the settings pages. `ChartContainer` waits as a block, the heat map's grid pulses, and the transactions list shows its skeleton while a filter reloads and at its end. New pieces are in the gallery.
+- The author asked why the charts were kept and not the heat map. The charts come from the dashboard's loader; the heat map fetched its year from the component and dropped the current year after each answer. The author suggested React Query with a key like `heatmap-{year}-{count}`; the app did not use it (ADR-011), and the assistant proposed a key on the year cleared by each save, with a hand-made cache. The author asked whether other places would benefit: eight other reads had the same hand-written fetch. The author chose TanStack Query for all nine (ADR-073): a client per router, invalidated by `useRefresh`, emptied on sign-in and sign-out.
+
+**What Could We Do Better:**
+- Not seen in the browser: the Playwright browser was not signed in.
+
 ### 2026-11-25 - Privacy mode
 
 **What We Worked On:**
