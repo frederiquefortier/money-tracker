@@ -4,6 +4,14 @@ Short record of each working session: what the author asked, what was decided an
 
 <!-- Newest first: a new session goes directly below this line. Template at the bottom. -->
 
+### 2026-11-25 - Page under a sheet when the keyboard opens
+
+**What We Worked On:**
+- The author sent iPhone captures: with the keyboard open, the list showed under a sheet's footer. Proposed bringing back the sheet that follows the visible area, or moving it without shrinking it; the author chose to lock the page behind the sheet instead (`usePageLock`, bugs.md).
+
+**What Could We Do Better:**
+- Not tried on a device: Safari's keyboard behaviour only shows on an iPhone.
+
 ### 2026-11-25 - Skeletons at the end of lists and on each page
 
 **What We Worked On:**

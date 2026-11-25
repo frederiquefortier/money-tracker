@@ -4,6 +4,12 @@ Track bugs with dates, solutions, and prevention notes. Search this file before 
 
 <!-- Newest first: a new bug goes directly below this line. Template at the bottom. -->
 
+### 2026-11-25 - The page showed under a sheet's footer when the keyboard opened
+- **Issue**: On an iPhone, tapping a field in a sheet moved the sheet up and showed the list behind it between the footer and the keyboard. A picker's list flipped above its field.
+- **Root Cause**: Once `useVisualViewport` was removed (above), Safari scrolled the page under the sheet to bring the field above the keyboard, past the bottom of the fixed sheet. Radix's `overflow: hidden` on the body does not stop that scroll on iOS.
+- **Solution**: `usePageLock` fixes the body in place while a sheet is open on a touch screen, so the page has nothing to scroll; the scroll position comes back on close. The sheet keeps its full height.
+- **Prevention**: Retest on an iPhone: a field low in a sheet (Note), and a picker. iOS 26 has open WebKit bugs on fixed elements and the keyboard (WebKit 300523), so a gap may remain there.
+
 ### 2026-11-25 - Collapsed net worth groups opened, then closed, on load
 - **Issue**: Opening the net worth page showed every group open, and the collapsed ones closed only once the chart had drawn.
 - **Root Cause**: `useStoredState` read local storage in an effect, so the first render always used the default, and the effect ran after the whole page, chart included, had rendered.

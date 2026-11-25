@@ -4,6 +4,7 @@ import { Icon } from '#/components/display/icon'
 import { cn } from '#/lib/utils'
 import { iconAction } from '#/components/styles'
 import { isTouchDevice } from '#/lib/shared/touch'
+import { usePageLock } from '#/hooks/app/use-page-lock'
 import {
   OverlayContainerProvider,
   inAriaOverlay,
@@ -41,6 +42,7 @@ function SheetContent({
   enterDelay?: number
 }) {
   const [panel, setPanel] = React.useState<HTMLElement | null>(null)
+  usePageLock()
   const enter = {
     '--sheet-enter-delay': `${enterDelay}ms`,
   } as React.CSSProperties
