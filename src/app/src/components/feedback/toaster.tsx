@@ -6,7 +6,7 @@ import { ALERT_TONES } from '#/components/forms/form-field'
 import { ToastContext } from '#/hooks/app/use-toast'
 import type { ToastOptions } from '#/hooks/app/use-toast'
 import { cn } from '#/lib/utils'
-import { focusRing } from '#/components/styles'
+import { focusRing, glassSurface } from '#/components/styles'
 
 type Shown = ToastOptions & { id: number }
 
@@ -31,7 +31,10 @@ export function Toaster({ children }: { children: React.ReactNode }) {
             onOpenChange={(open) => {
               if (!open) setToast(null)
             }}
-            className="rounded-lg bg-card shadow-md data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:animate-in data-[state=open]:slide-in-from-top-2"
+            className={cn(
+              'rounded-lg shadow-md data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:animate-in data-[state=open]:slide-in-from-top-2',
+              glassSurface,
+            )}
           >
             <ToastBody toast={toast} closeLabel={t('common.close')} />
           </Toast.Root>

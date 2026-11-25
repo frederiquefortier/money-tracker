@@ -18,6 +18,8 @@ import {
 } from '#/components/layout/privacy-switch'
 import { Logo } from '#/components/layout/logo'
 import { Toaster } from '#/components/feedback/toaster'
+import { glassSurface } from '#/components/styles'
+import { cn } from '#/lib/utils'
 import { getMyCurrencies } from '#/server/currencies'
 import { usePreloadPages } from '#/hooks/app/use-preload-pages'
 
@@ -46,7 +48,12 @@ function AuthedLayout() {
       <Toaster>
         <div className="min-h-dvh pb-[calc(4.5rem+env(safe-area-inset-bottom))] md:pb-0">
           <AddButtonSlot>
-            <header className="sticky top-0 z-20 border-b bg-card/80 pt-[env(safe-area-inset-top)] backdrop-blur">
+            <header
+              className={cn(
+                'sticky top-0 z-20 border-b pt-[env(safe-area-inset-top)]',
+                glassSurface,
+              )}
+            >
               <div className="flex items-center justify-between gap-4 px-4 py-3 md:px-6">
                 <div className="flex min-w-0 items-center gap-2">
                   <AppMenu />
@@ -66,7 +73,12 @@ function AuthedLayout() {
               <AddButtonTarget />
               <Outlet key={page} />
             </main>
-            <div className="fixed inset-x-0 bottom-0 z-20 border-t bg-card/95 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden">
+            <div
+              className={cn(
+                'fixed inset-x-0 bottom-0 z-20 border-t pb-[env(safe-area-inset-bottom)] md:hidden',
+                glassSurface,
+              )}
+            >
               <AppNav variant="bottom" />
             </div>
           </AddButtonSlot>

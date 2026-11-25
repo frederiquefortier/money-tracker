@@ -4,6 +4,14 @@ Short record of each working session: what the author asked, what was decided an
 
 <!-- Newest first: a new session goes directly below this line. Template at the bottom. -->
 
+### 2026-11-25 - The header's frosted glass elsewhere
+
+**What We Worked On:**
+- The author asked to reuse the header's look without costing performance. Proposed it only on small bars over scrolling content, never on the sheet backdrop, list rows or the add button; the author chose the header, the tab bar (now 80% opaque, as the header) and toasts, through one `glassSurface` in `styles.ts`.
+
+**What Could We Do Better:**
+- Not seen in the browser: the gallery needs a signed-in session.
+
 ### 2026-11-25 - Page under a sheet when the keyboard opens
 
 **What We Worked On:**

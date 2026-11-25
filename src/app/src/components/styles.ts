@@ -11,6 +11,13 @@ export const pageColumn = cn(
   pageWidth,
 )
 
+/**
+ * Frosted glass for a small bar over content that scrolls: the header, the tab bar, a
+ * toast. The blur is redrawn as the page moves under it, so never on a full-screen layer,
+ * a list's rows or anything that slides.
+ */
+export const glassSurface = 'bg-card/80 backdrop-blur'
+
 /** The red tint of an error message, a badge or a destructive row hover. */
 export const errorTint = 'bg-destructive/10 text-destructive'
 
