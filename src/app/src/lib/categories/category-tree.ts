@@ -5,13 +5,14 @@ import {
   isArchived,
 } from '#/lib/categories/category'
 import type { Category } from '#/lib/categories/category'
-import { indexById } from '#/lib/shared/collections'
+import { indexById, newestFirst } from '#/lib/shared/collections'
 
 // How a category sits among the others: its archived branches and its row context.
 
 /**
  * CAT-05: archived categories as a tree. One whose parent is still active starts a branch
- * at the top, where it shows with its path, so the roots are in path order.
+ * at the top, where it shows with its path. The roots go the last archived first, then in
+ * path order.
  */
 export function archivedTree(
   archived: ReadonlyArray<Category>,
@@ -22,12 +23,17 @@ export function archivedTree(
   const underArchived = (c: Category) =>
     c.parentId !== null && ids.has(c.parentId)
   const children = childrenByParent(archived.filter(underArchived), locale)
+  const byDate = newestFirst((c: Category) => c.history[0]?.effectiveOn)
   children.set(
     null,
     archived
       .filter((c) => !underArchived(c))
       .map((category) => ({ category, path: categoryPath(category, byId) }))
-      .sort((a, b) => a.path.localeCompare(b.path, locale))
+      .sort(
+        (a, b) =>
+          byDate(a.category, b.category) ||
+          a.path.localeCompare(b.path, locale),
+      )
       .map(({ category }) => category),
   )
   return children

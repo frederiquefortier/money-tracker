@@ -1733,6 +1733,7 @@ export type Database = {
           category_id: string
           display_amount: string
           month: string
+          transaction_count: number
         }[]
       }
       net_worth_series: {

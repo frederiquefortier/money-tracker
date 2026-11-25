@@ -39,6 +39,25 @@ describe('the archived tree', () => {
     expect(tree.get('e')?.map((c) => c.id)).toEqual(['p'])
   })
 
+  it('puts the last archived branch first', () => {
+    const later = archived.map((c) =>
+      c.id === 'x'
+        ? {
+            ...c,
+            history: [
+              {
+                status: 'archived' as const,
+                effectiveOn: '2025-03-01',
+                viaId: null,
+              },
+            ],
+          }
+        : c,
+    )
+    const tree = archivedTree(later, byId, 'fr-CA')
+    expect(tree.get(null)?.map((c) => c.id)).toEqual(['x', 'm', 'a'])
+  })
+
   it('names the archived parents from the top down', () => {
     expect(
       archivedParents(category('p', 'Plomberie', 'e'), byId).map((c) => c.id),

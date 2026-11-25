@@ -3,7 +3,8 @@ import { Figure } from '#/components/dashboard/dashboard-card'
 import { ChangeText } from '#/components/display/change-text'
 import { Icon } from '#/components/display/icon'
 import { Sparkline } from '#/components/display/sparkline'
-import { focusRing } from '#/components/styles'
+import { focusRing, tableFigureCell, zeroFigure } from '#/components/styles'
+import { useFormatLocale } from '#/hooks/app/use-locale'
 import type { Change } from '#/lib/shared/change'
 import { cn } from '#/lib/utils'
 
@@ -80,9 +81,27 @@ export function Cell({
       <Figure
         amount={amount}
         currency={currency}
-        className={zero ? 'text-muted-foreground' : undefined}
+        className={zero ? zeroFigure : undefined}
       />
     </span>
+  )
+}
+
+/** A transaction count, in the figures' monospace; a zero as pale as theirs. */
+export function CountCell({
+  count,
+  className,
+}: {
+  count: number
+  className?: string
+}) {
+  const locale = useFormatLocale()
+  return (
+    <td className={cn(tableFigureCell, className)}>
+      <span className={cn('font-mono tabular-nums', count === 0 && zeroFigure)}>
+        {count.toLocaleString(locale)}
+      </span>
+    </td>
   )
 }
 
@@ -135,7 +154,7 @@ export function ChangeCell({
   currency: string
 }) {
   return (
-    <td className="py-1.5 pl-6 text-right">
+    <td className={tableFigureCell}>
       {change && (
         <ChangeText
           change={change}

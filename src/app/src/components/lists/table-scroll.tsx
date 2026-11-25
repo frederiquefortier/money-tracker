@@ -22,13 +22,14 @@ function useStickyWidth(box: HTMLElement | null) {
  * A table that scrolls sideways on a phone, each edge fading while more columns sit past
  * it (author, 2026-11-23); the left one after the sticky name column. The container a
  * row's panel takes its width from: a panel stacks above the fades (`tablePanel`).
+ * Last in its card, flush with the card's sides and bottom.
  */
 export function TableScroll({ children }: { children: React.ReactNode }) {
   const [box, setBox] = useState<HTMLDivElement | null>(null)
   const scroll = useScrollMore<HTMLDivElement>('x')
   const sticky = useStickyWidth(box)
   return (
-    <div className="relative -mx-4 @container">
+    <div className="relative -mx-4 -mb-4 @container">
       <div
         ref={(node) => {
           setBox(node)

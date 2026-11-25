@@ -4,6 +4,12 @@ Track bugs with dates, solutions, and prevention notes. Search this file before 
 
 <!-- Newest first: a new bug goes directly below this line. Template at the bottom. -->
 
+### 2026-11-25 - Collapsed net worth groups opened, then closed, on load
+- **Issue**: Opening the net worth page showed every group open, and the collapsed ones closed only once the chart had drawn.
+- **Root Cause**: `useStoredState` read local storage in an effect, so the first render always used the default, and the effect ran after the whole page, chart included, had rendered.
+- **Solution**: The folded groups moved to a cookie read with the page's data (ADR-074), so the server renders them closed. The other stored choices (sorts, tabs, open branches) now read storage through `useSyncExternalStore`: right away on a page opened from inside the app, right after hydration on a full load.
+- **Prevention**: Read per-browser state on the first render, never in an effect; a cookie when a full load must render it.
+
 ### 2026-11-25 - Filters set together made a request each, and a removed chip waited
 - **Issue**: On the transactions list, each tick, chip ✕, period tab or status bubble sent its own request, and a chip, removed or new, waited for the list to reload.
 - **Root Cause**: The page drew the chips, tabs and sidebar from the loader's query, which trails the address, and every change navigated at once. Chips were named only by the server, with the list. Only the filter sheet held its ticks locally (`useLocalFilters`).

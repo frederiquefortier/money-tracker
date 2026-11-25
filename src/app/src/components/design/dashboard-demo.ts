@@ -113,7 +113,13 @@ function months(today: string): Array<MonthAmount> {
     if (month === '2026-02') continue
     for (const [categoryId, amount] of MONTHLY) {
       const value = amount(i)
-      if (value !== 0) out.push({ month, categoryId, amount: value.toFixed(4) })
+      if (value !== 0)
+        out.push({
+          month,
+          categoryId,
+          amount: value.toFixed(4),
+          count: 1 + (i % 4),
+        })
     }
   }
   return out

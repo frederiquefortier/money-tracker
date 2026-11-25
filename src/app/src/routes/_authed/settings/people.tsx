@@ -27,7 +27,7 @@ import { useStoredState } from '#/hooks/app/use-stored-state'
 import { getBalances } from '#/server/owed'
 import { getPeople } from '#/server/people'
 import { OwedTag } from '#/components/people/list/owed-summary'
-import { byName, oneOf } from '#/lib/shared/collections'
+import { byName, newestFirst, oneOf } from '#/lib/shared/collections'
 import { matcher } from '#/lib/shared/search'
 import type { Balance } from '#/lib/people/owed'
 import { listPagePending } from '#/components/layout/page-pending'
@@ -121,7 +121,6 @@ function TabPanel<T extends { name: string; archivedOn: string | null }>({
   query,
   sort,
   empty,
-  archivedLabel,
   storageKey,
   rows,
 }: {
@@ -129,7 +128,6 @@ function TabPanel<T extends { name: string; archivedOn: string | null }>({
   query: string
   sort: PeopleSort
   empty: string
-  archivedLabel: (count: number) => string
   storageKey: string
   rows: (items: ReadonlyArray<T>) => React.ReactNode
 }) {
@@ -143,7 +141,10 @@ function TabPanel<T extends { name: string; archivedOn: string | null }>({
   )
   const shown = sort === 'nameDesc' ? sorted.reverse() : sorted
   const active = shown.filter((item) => !item.archivedOn)
-  const archived = shown.filter((item) => item.archivedOn)
+  // The last archived first; the same day keeps the chosen sort.
+  const archived = shown
+    .filter((item) => item.archivedOn)
+    .sort(newestFirst((item) => item.archivedOn))
   if (shown.length === 0) return <EmptyState>{t('common.noMatch')}</EmptyState>
   return (
     <>
@@ -154,7 +155,7 @@ function TabPanel<T extends { name: string; archivedOn: string | null }>({
       )}
       {archived.length > 0 && (
         <CollapsedSection
-          label={archivedLabel(archived.length)}
+          label={t('people.archived', { count: archived.length })}
           storageKey={storageKey}
         >
           <Revealed items={archived}>{rows}</Revealed>
@@ -214,7 +215,6 @@ function People() {
             query={query}
             sort={sort}
             empty={t('people.empty')}
-            archivedLabel={(count) => t('people.archivedPeople', { count })}
             storageKey="people.archivedExpanded"
             rows={(items) => (
               <PersonRows people={items} groups={groups} balances={balances} />
@@ -226,7 +226,6 @@ function People() {
             query={query}
             sort={sort}
             empty={t('people.emptyGroups')}
-            archivedLabel={(count) => t('people.archivedGroups', { count })}
             storageKey="people.archivedGroupsExpanded"
             rows={(items) => <GroupRows groups={items} people={people} />}
           />

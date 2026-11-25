@@ -4,6 +4,24 @@ Technical and structural choices, with the alternatives that were rejected. Chec
 
 <!-- Newest first: a new ADR goes directly below this line. Template at the bottom. -->
 
+### ADR-074: The net worth hub's folded groups are saved in a cookie (2026-11-25)
+
+**Context:**
+- The hub's groups kept their folded state in browser storage (ACC-07). The server cannot read it, so a page load rendered every group open until hydration, then closed the folded ones. The author asked for a cookie, as privacy mode has (ADR-071).
+
+**Decision:**
+- An httpOnly `net-worth-collapsed` cookie holds the folded group keys as JSON. `getNetWorth` reads it with the page's data, so the server renders the groups already folded. A toggle shows at once (`useCollapsedGroups`); `setCollapsedGroups` writes the cookie after, one save at a time.
+- The keys are checked on both sides: at most 100, each a type, an institution's id or empty (no institution).
+- The other stored choices (sorts, tabs, open category branches) stay in browser storage.
+
+**Alternatives Considered:**
+- Browser storage read on the first render -> Fixed a page opened from inside the app, not a full load.
+- A cookie written by the browser -> Not httpOnly, unlike every other cookie of the app (security.md).
+- Every stored choice in cookies -> They would ride on every request; the author asked for the drawers.
+
+**Consequences:**
+- Each fold or unfold is a small request. The choice is per browser and lost with the cookies; the earlier browser-stored state is not carried over.
+
 ### ADR-073: TanStack Query caches the reads made outside loaders (2026-11-25)
 
 **Context:**

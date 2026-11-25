@@ -13,12 +13,9 @@ import { useStoredIds } from '#/hooks/app/use-stored-state'
 import { KINDS } from '#/lib/categories/category'
 import type { CategoryKind } from '#/lib/categories/category'
 import { changeSpans, changeYear } from '#/lib/dashboard/category-change'
-import { TABLE_SORTS, shownRows } from '#/lib/dashboard/category-table'
-import type {
-  TableColumn,
-  TableRow,
-  TableSort,
-} from '#/lib/dashboard/category-table'
+import type { TableColumn, TableRow } from '#/lib/dashboard/category-table'
+import { TABLE_SORTS, shownRows } from '#/lib/dashboard/category-table-list'
+import type { TableSort } from '#/lib/dashboard/category-table-list'
 import type { DashboardPeriod } from '#/lib/dashboard/dashboard-period'
 import { treeGuides } from '#/lib/shared/tree-layout'
 
@@ -80,8 +77,8 @@ function TableControls({
 
 /**
  * The sheet's table, figures only: each group folding its categories, then on a year this
- * month, the year so far and the monthly average; on everything, a total per year and the
- * yearly average; the trend last, across what is left, opening its chart (author,
+ * month, the year so far and the monthly average; on everything, a total per year, the
+ * whole history's total and the yearly average; the trend last, across what is left, opening its chart (author,
  * 2026-11-20: the figures beside their names). Spending well above its average this month
  * is marked. A category's name opens its transactions over the period.
  */

@@ -14,13 +14,13 @@ import {
 } from '#/lib/dashboard/category-stacks'
 import type { ChartKind, SplitView } from '#/lib/dashboard/category-stacks'
 import {
-  TABLE_SORTS,
   categoryTable,
-  sortTable,
   tableColumns,
   trendSpans,
 } from '#/lib/dashboard/category-table'
-import type { TableColumn, TableSort } from '#/lib/dashboard/category-table'
+import type { TableColumn } from '#/lib/dashboard/category-table'
+import { TABLE_SORTS, sortTable } from '#/lib/dashboard/category-table-list'
+import type { TableSort } from '#/lib/dashboard/category-table-list'
 import {
   MERCHANT_SORTS,
   merchantBills,

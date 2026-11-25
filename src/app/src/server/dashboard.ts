@@ -39,6 +39,7 @@ export const getDashboard = createServerFn({ method: 'GET' }).handler(
         month: m.month.slice(0, 7),
         categoryId: m.category_id,
         amount: m.display_amount,
+        count: m.transaction_count,
       })),
       categories,
       merchantMonths: bills.map((b) => ({

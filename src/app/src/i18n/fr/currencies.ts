@@ -19,8 +19,7 @@ export const currenciesFr = {
       'La validation des taux est indisponible. Réessayez dans un moment.',
     unknown: 'Le service de taux ne connaît pas {{code}}.',
     ratesFrom: 'Taux disponibles à partir du {{date}}',
-    ratesPending:
-      'Taux disponibles après la prochaine mise à jour quotidienne.',
+    ratesPending: 'Taux disponibles après la prochaine mise à jour quotidienne',
     removeConfirm: 'Retirer {{code}}',
     currency: 'Devise',
     added: '{{code}} ajoutée.',

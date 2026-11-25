@@ -2,10 +2,9 @@ import { describe, expect, it } from 'vitest'
 import {
   categoryTable,
   isAboveAverage,
-  shownRows,
-  sortTable,
   tableColumns,
 } from '#/lib/dashboard/category-table'
+import { shownRows, sortTable } from '#/lib/dashboard/category-table-list'
 import { changeSpans } from '#/lib/dashboard/category-change'
 import { at, categories } from '#/lib/dashboard/dashboard-fixtures.test-utils'
 
@@ -70,6 +69,8 @@ describe('category table on a year', () => {
     expect(ids('amountDesc')).toEqual(['fun', 'home', 'rent'])
     expect(ids('amountAsc')).toEqual(['home', 'rent', 'fun'])
     expect(ids('nameDesc')).toEqual(['home', 'rent', 'fun'])
+    expect(ids('countDesc')).toEqual(['home', 'rent', 'fun'])
+    expect(ids('countAsc')).toEqual(['fun', 'home', 'rent'])
   })
 
   it("draws each row over the year's months to this one", () => {
@@ -78,6 +79,26 @@ describe('category table on a year', () => {
     expect(trend?.[0]).toBe('0.0000')
     expect(trend?.[3]).toBe('1000.0000')
     expect(trend?.[10]).toBe('1000.0000')
+  })
+})
+
+describe('transaction counts', () => {
+  const history = [
+    { ...at('2026-11', 'rent', '-1000.0000'), count: 2 },
+    { ...at('2026-03', 'rent', '-500.0000'), count: 1 },
+    { ...at('2025-06', 'rent', '-900.0000'), count: 4 },
+  ]
+  const count = (unit: 'year' | 'all', id: string) =>
+    categoryTable(history, categories, {
+      kind: 'expense',
+      columns: tableColumns({ unit, year: '2026' }, { today, firstYear: 2025 }),
+      locale: 'fr',
+    }).find((r) => r.category.id === id)?.count
+
+  it('counts the year so far, or the whole history, a group adding its categories', () => {
+    expect(count('year', 'rent')).toBe(3)
+    expect(count('year', 'home')).toBe(3)
+    expect(count('all', 'rent')).toBe(7)
   })
 })
 
@@ -112,16 +133,23 @@ describe('category table on everything', () => {
   })
   const of = (id: string) => rows.find((r) => r.category.id === id)?.figures
 
-  it('gives a total per year and the yearly average', () => {
-    expect(columns.map((c) => c.key)).toEqual(['2025', '2026', 'averageYear'])
+  it('gives a total per year, the whole total and the yearly average', () => {
+    expect(columns.map((c) => c.key)).toEqual([
+      '2025',
+      '2026',
+      'total',
+      'averageYear',
+    ])
     expect(of('fun')).toEqual({
       2025: '1119.0000',
       2026: '0.0000',
+      total: '1119.0000',
       averageYear: '559.5000',
     })
     expect(of('rent')).toEqual({
       2025: '0.0000',
       2026: '3000.0000',
+      total: '3000.0000',
       averageYear: '1500.0000',
     })
   })

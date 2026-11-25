@@ -44,4 +44,5 @@ export const at = (
   month,
   categoryId,
   amount,
+  count: 1,
 })

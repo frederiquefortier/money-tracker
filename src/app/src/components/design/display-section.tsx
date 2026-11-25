@@ -7,6 +7,7 @@ import { Tag } from '#/components/display/tag'
 import {
   Skeleton,
   SkeletonCard,
+  SkeletonDrawers,
   SkeletonRows,
 } from '#/components/feedback/skeleton'
 import { Spinner } from '#/components/feedback/spinner'
@@ -57,6 +58,9 @@ export function DisplaySection() {
         <Skeleton className="w-24 text-sm" />
         <div className="w-full">
           <SkeletonRows count={3} />
+        </div>
+        <div className="w-full max-w-md">
+          <SkeletonDrawers rows={[2, 1]} />
         </div>
         <div className="w-full max-w-md">
           <SkeletonCard chart="h-40" />

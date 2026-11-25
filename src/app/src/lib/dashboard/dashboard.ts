@@ -13,6 +13,8 @@ export type MonthAmount = {
   categoryId: string
   /** Signed like the transactions; null when a rate is missing. */
   amount: string | null
+  /** Its transactions, a split counted once. */
+  count: number
 }
 
 export type Dashboard = {

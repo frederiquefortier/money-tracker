@@ -1,8 +1,16 @@
 import { createServerFn } from '@tanstack/react-start'
+import { getCookie, setCookie } from '@tanstack/react-start/server'
+import { z } from 'zod'
 import { seriesRows } from '#/lib/net-worth/net-worth-series'
 import { allRows, loaded } from '#/lib/server/db.server'
 import { getSupabase } from '#/lib/server/supabase.server'
-import { todayTotal } from '#/lib/net-worth/net-worth'
+import {
+  COLLAPSED_GROUPS_COOKIE,
+  groupKeysSchema,
+  parseGroupKeys,
+  todayTotal,
+} from '#/lib/net-worth/net-worth'
+import type { Result } from '#/lib/shared/result'
 import type { NetWorth } from '#/lib/net-worth/net-worth'
 import type {
   ChartItem,
@@ -119,6 +127,21 @@ export const getNetWorth = createServerFn({ method: 'GET' }).handler(
       series: seriesRows(series),
       items: chartItems(accounts, holdings),
       flows: flowRows(flows),
+      collapsed: parseGroupKeys(getCookie(COLLAPSED_GROUPS_COOKIE)),
     }
   },
 )
+
+/** Per browser, as the sorts: which groups of the hub's list are folded. */
+export const setCollapsedGroups = createServerFn({ method: 'POST' })
+  .validator(z.object({ keys: groupKeysSchema }))
+  .handler(async ({ data }): Promise<Result<never>> => {
+    setCookie(COLLAPSED_GROUPS_COOKIE, JSON.stringify(data.keys), {
+      path: '/',
+      maxAge: 60 * 60 * 24 * 365,
+      httpOnly: true,
+      secure: !import.meta.env.DEV,
+      sameSite: 'lax',
+    })
+    return { ok: true }
+  })

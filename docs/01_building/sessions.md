@@ -4,6 +4,23 @@ Short record of each working session: what the author asked, what was decided an
 
 <!-- Newest first: a new session goes directly below this line. Template at the bottom. -->
 
+### 2026-11-25 - Drawers on load, archived order, pending rates
+
+**What We Worked On:**
+- The author saw the net worth drawers open on load and close once the chart showed, and asked why their skeleton had checkboxes. `useStoredState` now reads storage on the first render (bugs.md), and the hub's skeleton draws group cards, a header with its total over rows with an amount (`SkeletonDrawers`, in the gallery).
+- The author asked to order every archived list by date: net worth, categories and people now list the last archived first, then by name (CAT-05, PPL-02).
+- The author asked that "Rates available after the next daily update" be a warning tag, as the unlinked transactions one, then that it sit beside the currency's name and wrap on a phone.
+- The fix left a full load rendering the drawers open until hydration; the author asked for a cookie, as privacy mode has (ADR-074).
+- The author asked for one archived label: "Catégories archivées", "Proches archivés" and "Groupes archivés" became "Archivées" and "Archivés", as on the net worth page.
+
+- On the dashboard, the author asked for a total column on Tout, the table's bottom flush with its card, far paler zeros, a transaction count per category, and the same figure style in the merchant table. The count needs `my_monthly` to return one (migration `20261125120000`); a group adds its categories' counts, so a transaction split between two of them counts twice there. Both tables now share `tableFigureCell` and `CountCell`. The sort and folding helpers moved to `category-table-list.ts` (file length).
+- The push stopped: the dev database held two budgets migrations (`20261125100000`, `20261125110000`) not in this checkout, pushed from elsewhere. The author asked to remove them: their tables were empty, so their objects and history rows were dropped, and the count migration (renamed `20261125120000`) was pushed.
+- The author asked that the category table also sort by transactions, as the merchant table does.
+- The merchant amounts read lighter than the categories': a top-level category row is semibold, so every merchant row's figures now are too.
+
+**What Could We Do Better:**
+- Not seen in the browser.
+
 ### 2026-11-25 - One request for filters set together
 
 **What We Worked On:**

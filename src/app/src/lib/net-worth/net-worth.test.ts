@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest'
-import { summarizeHoldings, sumAmounts } from '#/lib/net-worth/net-worth'
+import {
+  parseGroupKeys,
+  summarizeHoldings,
+  sumAmounts,
+} from '#/lib/net-worth/net-worth'
 
 describe('sumAmounts', () => {
   it('adds in four decimals', () => {
@@ -45,5 +49,20 @@ describe('summarizeHoldings', () => {
       counts: { investment: 0, asset: 0, debt: 0 },
       updatedOn: null,
     })
+  })
+})
+
+describe('parseGroupKeys', () => {
+  it('reads the folded groups, the no-institution one included', () => {
+    expect(parseGroupKeys('["debts","","a1b2-c3"]')).toEqual([
+      'debts',
+      '',
+      'a1b2-c3',
+    ])
+  })
+  it('is empty for no cookie, broken JSON or an odd key', () => {
+    expect(parseGroupKeys(undefined)).toEqual([])
+    expect(parseGroupKeys('["debts"')).toEqual([])
+    expect(parseGroupKeys('["<b>"]')).toEqual([])
   })
 })

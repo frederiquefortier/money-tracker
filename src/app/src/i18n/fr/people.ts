@@ -25,8 +25,8 @@ export const peopleFr = {
     personUpdated: 'Proche enregistré.',
     groupCreated: 'Groupe créé.',
     groupUpdated: 'Groupe enregistré.',
-    archivedPeople: 'Proches archivés ({{count}})',
-    archivedGroups: 'Groupes archivés ({{count}})',
+    archived_one: 'Archivé ({{count}})',
+    archived_other: 'Archivés ({{count}})',
     archivedOn: 'Archivé le {{date}}',
     archivedOnField: 'Date d’archivage',
     deleteKeeps_one:

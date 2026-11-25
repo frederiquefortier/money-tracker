@@ -2,6 +2,7 @@ import { useId } from 'react'
 import { Link } from '@tanstack/react-router'
 import {
   Cell,
+  CountCell,
   FoldButton,
   TrendButton,
 } from '#/components/dashboard/category-table-cells'
@@ -10,8 +11,12 @@ import { STICKY } from '#/components/dashboard/category-table-row'
 import { MerchantReceipt } from '#/components/dashboard/merchant-receipt'
 import { TablePanel } from '#/components/dashboard/table-panel'
 import { TrendChart } from '#/components/dashboard/trend-chart'
-import { focusRing, rowHover, tableNameWidth } from '#/components/styles'
-import { useFormatLocale } from '#/hooks/app/use-locale'
+import {
+  focusRing,
+  rowHover,
+  tableFigureCell,
+  tableNameWidth,
+} from '#/components/styles'
 import type { DashboardPeriod } from '#/lib/dashboard/dashboard-period'
 import { periodSearch } from '#/lib/dashboard/drill-down'
 import type { TableColumn } from '#/lib/dashboard/category-table'
@@ -25,7 +30,8 @@ export type MerchantChart = {
   current: string
 }
 
-const CELL = 'py-1.5 pl-6 text-right whitespace-nowrap tabular-nums'
+// Semibold, as the category table's top-level rows: every merchant is one.
+const FIGURE = cn(tableFigureCell, 'font-semibold')
 
 // The app's purple, for the trend and the bars: the spending red read as an alarm on every
 // merchant (author, 2026-11-20).
@@ -129,14 +135,13 @@ export function MerchantTableRow({
   currency: string
 }) {
   const panel = useId()
-  const locale = useFormatLocale()
   const { merchant, figures } = row
   return (
     <>
       <tr className={cn('border-b last:border-0', rowHover)}>
         <NameCell row={row} chart={chart} panel={panel} period={period} />
         {columns.map((column) => (
-          <td key={column.key} className={CELL}>
+          <td key={column.key} className={FIGURE}>
             <Cell
               amount={row.columns[column.key] ?? null}
               above={false}
@@ -145,13 +150,11 @@ export function MerchantTableRow({
           </td>
         ))}
         {whole && (
-          <td className={CELL}>
+          <td className={FIGURE}>
             <Cell amount={figures.total} above={false} currency={currency} />
           </td>
         )}
-        <td className={cn(CELL, 'font-mono')}>
-          {figures.visits.toLocaleString(locale)}
-        </td>
+        <CountCell count={figures.visits} className="font-semibold" />
         <td className="py-1 pr-4 pl-6">
           <TrendButton
             name={merchant.name}

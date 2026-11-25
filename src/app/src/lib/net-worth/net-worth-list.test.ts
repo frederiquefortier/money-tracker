@@ -138,6 +138,20 @@ describe('groupEntries', () => {
     expect(assets?.entries.map((e) => e.id)).toEqual(['demo-art'])
     expect(closedEntries(closed, 'en').map((e) => e.id)).toEqual(['demo-house'])
   })
+  it('puts the last archived item first', () => {
+    const closedOn: Record<string, string> = {
+      'demo-house': '2024-01-31',
+      'demo-art': '2025-06-30',
+    }
+    const closed = entries.map((e) => ({
+      ...e,
+      closedOn: closedOn[e.id] ?? e.closedOn,
+    }))
+    expect(closedEntries(closed, 'en').map((e) => e.id)).toEqual([
+      'demo-art',
+      'demo-house',
+    ])
+  })
 })
 
 describe('groupWorth', () => {

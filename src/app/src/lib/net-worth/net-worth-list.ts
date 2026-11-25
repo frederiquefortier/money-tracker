@@ -2,7 +2,7 @@ import { typeLabel } from '#/lib/accounts/account'
 import { inLocale } from '#/i18n/locales'
 import { sumAmounts } from '#/lib/net-worth/net-worth'
 import { ITEM_GROUPS, chartItemLabel } from '#/lib/net-worth/net-worth-series'
-import { compareNames } from '#/lib/shared/collections'
+import { compareNames, newestFirst } from '#/lib/shared/collections'
 import { compareDecimal, negateDecimal } from '#/lib/shared/money'
 import type { Account, AccountsPage } from '#/lib/accounts/account'
 import type { Holding, HoldingsPage } from '#/lib/holdings/holding'
@@ -227,13 +227,16 @@ export function groupWorth(
   )
 }
 
-/** The archived items, A to Z. */
+/** The archived items, the last archived first, then A to Z. */
 export function closedEntries(
   entries: ReadonlyArray<NetWorthEntry>,
   locale: string,
 ): Array<NetWorthEntry> {
   const byName = compareNames(locale)
+  const byDate = newestFirst((e: NetWorthEntry) => e.closedOn)
   return entries
     .filter((e) => e.closedOn)
-    .sort((a, b) => byName({ name: a.label }, { name: b.label }))
+    .sort(
+      (a, b) => byDate(a, b) || byName({ name: a.label }, { name: b.label }),
+    )
 }

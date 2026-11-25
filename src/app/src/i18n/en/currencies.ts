@@ -20,7 +20,7 @@ export const currenciesEn: typeof currenciesFr = {
     hexaRateDown: 'Rate validation is unavailable. Try again in a moment.',
     unknown: 'The rate service does not know {{code}}.',
     ratesFrom: 'Rates available from {{date}}',
-    ratesPending: 'Rates available after the next daily update.',
+    ratesPending: 'Rates available after the next daily update',
     removeConfirm: 'Remove {{code}}',
     currency: 'Currency',
     added: '{{code}} added.',

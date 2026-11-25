@@ -5,6 +5,7 @@ import { drawn } from '#/components/dashboard/chart-parts'
 import {
   Cell,
   ChangeCell,
+  CountCell,
   FoldButton,
   TrendButton,
 } from '#/components/dashboard/category-table-cells'
@@ -12,7 +13,12 @@ import type { Fold } from '#/components/dashboard/category-table-cells'
 import { TablePanel } from '#/components/dashboard/table-panel'
 import { TrendChart } from '#/components/dashboard/trend-chart'
 import { TreeGuides } from '#/components/lists/tree-guides'
-import { focusRing, rowHover, tableNameWidth } from '#/components/styles'
+import {
+  focusRing,
+  rowHover,
+  tableFigureCell,
+  tableNameWidth,
+} from '#/components/styles'
 import { isAboveAverage } from '#/lib/dashboard/category-table'
 import type { TableColumn, TableRow } from '#/lib/dashboard/category-table'
 import type { DashboardPeriod } from '#/lib/dashboard/dashboard-period'
@@ -82,10 +88,7 @@ function FigureCells({
   return columns.map((column) => (
     <td
       key={column.key}
-      className={cn(
-        'py-1.5 pl-6 text-right whitespace-nowrap',
-        row.depth === 0 && 'font-semibold',
-      )}
+      className={cn(tableFigureCell, row.depth === 0 && 'font-semibold')}
     >
       <Cell
         amount={row.figures[column.key] ?? null}
@@ -163,6 +166,10 @@ export function CategoryTableRow({
           markAbove={markAbove}
           currency={currency}
         />
+        <CountCell
+          count={row.count}
+          className={cn(row.depth === 0 && 'font-semibold')}
+        />
         {change.shown && (
           <ChangeCell
             change={row.change}
@@ -184,7 +191,7 @@ export function CategoryTableRow({
       {chart.open && (
         <TablePanel
           id={panel}
-          colSpan={columns.length + (change.shown ? 3 : 2)}
+          colSpan={columns.length + (change.shown ? 4 : 3)}
         >
           <TrendChart
             keys={chart.keys}

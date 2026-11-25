@@ -84,6 +84,10 @@ export const tableNameWidth = 'max-w-48 sm:max-w-56'
 /** Inside the name head, after its padding: the column at `sm:max-w-56`. */
 export const tableNameHead = 'block sm:w-[12.25rem]'
 export const tableFigureHead = 'block min-w-20'
+/** A figure's cell in the dashboard's tables, right-aligned after the name. */
+export const tableFigureCell = 'py-1.5 pl-6 text-right whitespace-nowrap'
+/** A zero: far paler than a figure, so the amounts stand out. */
+export const zeroFigure = 'text-muted-foreground/45'
 
 /** The gap between stacked icons (a split's categories, a group's members): the row's colour. */
 export const stackRing = 'ring-2 ring-[var(--row-bg,var(--card))]'

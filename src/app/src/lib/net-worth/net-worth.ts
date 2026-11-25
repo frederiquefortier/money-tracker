@@ -1,3 +1,4 @@
+import { z } from 'zod'
 import { fromMinor, toMinor } from '#/lib/shared/money'
 import { HOLDING_KINDS } from '#/lib/holdings/holding'
 import { isOneOf } from '#/lib/shared/collections'
@@ -80,6 +81,27 @@ export type NetWorth = {
   items: Array<ChartItem>
   /** Each investment's deposits and withdrawals, for its return (ADR-062). */
   flows: Array<FlowRow>
+  /** The list's collapsed groups, from this browser's cookie. */
+  collapsed: Array<string>
+}
+
+/**
+ * The hub's collapsed groups, kept in a cookie so a page load renders them closed from the
+ * server. A group's key is its type or an institution's id, empty for no institution.
+ */
+export const COLLAPSED_GROUPS_COOKIE = 'net-worth-collapsed'
+export const groupKeysSchema = z
+  .array(z.string().regex(/^[\w-]{0,64}$/))
+  .max(100)
+
+export function parseGroupKeys(cookie: string | undefined): Array<string> {
+  if (!cookie) return []
+  try {
+    const parsed = groupKeysSchema.safeParse(JSON.parse(cookie))
+    return parsed.success ? parsed.data : []
+  } catch {
+    return []
+  }
 }
 
 const isKind = isOneOf<HoldingKind>(HOLDING_KINDS)

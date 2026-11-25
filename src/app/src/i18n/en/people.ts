@@ -26,8 +26,8 @@ export const peopleEn: typeof peopleFr = {
     personUpdated: 'Person saved.',
     groupCreated: 'Group created.',
     groupUpdated: 'Group saved.',
-    archivedPeople: 'Archived people ({{count}})',
-    archivedGroups: 'Archived groups ({{count}})',
+    archived_one: 'Archived ({{count}})',
+    archived_other: 'Archived ({{count}})',
     archivedOn: 'Archived on {{date}}',
     archivedOnField: 'Archive date',
     deleteKeeps_one:

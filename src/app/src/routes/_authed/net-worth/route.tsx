@@ -14,7 +14,8 @@ import { NetWorthSkeleton } from '#/components/net-worth/net-worth-skeleton'
 import { focusRing } from '#/components/styles'
 import { FORMAT_LOCALE } from '#/i18n/locales'
 import { useLocale } from '#/hooks/app/use-locale'
-import { useStoredIds, useStoredState } from '#/hooks/app/use-stored-state'
+import { useStoredState } from '#/hooks/app/use-stored-state'
+import { useCollapsedGroups } from '#/hooks/net-worth/use-collapsed-groups'
 import { useNetWorthChart } from '#/hooks/net-worth/use-net-worth-chart'
 import {
   GROUP_BYS,
@@ -153,7 +154,7 @@ function NetWorthHub() {
     'type',
     parseGroupBy,
   )
-  const collapsed = useStoredIds('netWorth.collapsed')
+  const collapsed = useCollapsedGroups(data.collapsed)
 
   const entries = useMemo(
     () => netWorthEntries({ accounts, holdings, items, locale }),

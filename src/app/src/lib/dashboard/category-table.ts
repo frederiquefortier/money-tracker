@@ -1,5 +1,4 @@
 import type { Category, CategoryKind } from '#/lib/categories/category'
-import { rainbowKey } from '#/lib/categories/category'
 import { DIGITS, Sum, readSign } from '#/lib/dashboard/dashboard'
 import type { MonthAmount } from '#/lib/dashboard/dashboard'
 import type { DashboardPeriod } from '#/lib/dashboard/dashboard-period'
@@ -10,25 +9,19 @@ import {
 } from '#/lib/dashboard/category-change'
 import type { Change } from '#/lib/shared/change'
 import { monthOf, shiftMonth } from '#/lib/shared/months'
-import { compareNames } from '#/lib/shared/collections'
 import { treeOrder } from '#/lib/shared/tree-layout'
-import {
-  compareDecimal,
-  divideRounded,
-  fromMinor,
-  toMinor,
-} from '#/lib/shared/money'
+import { divideRounded, fromMinor, toMinor } from '#/lib/shared/money'
 
 // The sheet's table: each group and its categories. On a year, this month, the year so far
 // and the monthly average over that same stretch (author, 2026-11-19: everything from the
 // year shown, so in November the year is divided by 11). A past year counts to its
 // December, the current one to this month, and a history that starts within the year
-// from its first month. On everything, a total per year and the yearly average over every
-// year shown, this one included. Each row carries its trend over the same months, or
+// from its first month. On everything, a total per year, the whole history's total and the
+// yearly average over every year shown, this one included. Each row carries its trend over the same months, or
 // each year.
 
 export type TableColumnKind =
-  'thisMonth' | 'thisYear' | 'year' | 'averageMonth' | 'averageYear'
+  'thisMonth' | 'thisYear' | 'year' | 'total' | 'averageMonth' | 'averageYear'
 
 /** First and last month counted, "2026-05" to "2026-11". */
 export type Span = { key: string; from: string; to: string }
@@ -50,6 +43,8 @@ export type TableRow = {
   lastYearTrend: Array<string | null> | null
   /** Against a year earlier (ChangeSpans); null without a figure on either side. */
   change: Change | null
+  /** Transactions over the period: the year so far, or the whole history. */
+  count: number
 }
 
 export function tableColumns(
@@ -95,6 +90,13 @@ export function tableColumns(
       to: `${year}-12`,
       divisor: 1,
     })),
+    {
+      key: 'total',
+      kind: 'total',
+      from: `${first}-01`,
+      to: `${last}-12`,
+      divisor: 1,
+    },
     {
       key: 'averageYear',
       kind: 'averageYear',
@@ -159,13 +161,23 @@ export function categoryTable(
   const byId = new Map(categories.map((c) => [c.id, c]))
   const sign = readSign(kind)
   const sums = new Map<string, Map<string, Sum>>()
+  const period = columns.find(
+    (c) => c.kind === 'thisYear' || c.kind === 'total',
+  )
+  const counts = new Map<string, number>()
   for (const row of months) {
     let category = byId.get(row.categoryId)
     if (category?.kind !== kind) continue
     const hits = spans.filter((c) => row.month >= c.from && row.month <= c.to)
     if (hits.length === 0) continue
-    // A category's figures include its sub-categories'.
+    const counted =
+      period && row.month >= period.from && row.month <= period.to
+        ? row.count
+        : 0
+    // A category's figures include its sub-categories'. Its count adds theirs, so one
+    // transaction split across two of them counts twice there.
     while (category) {
+      counts.set(category.id, (counts.get(category.id) ?? 0) + counted)
       const own = sums.get(category.id) ?? new Map<string, Sum>()
       for (const column of hits) {
         const sum = own.get(column.key) ?? new Sum()
@@ -196,65 +208,9 @@ export function categoryTable(
           ? lastYear.map((t) => figureOf(own?.get(t.key), 1))
           : null,
       change: compared ? changeOf(own, compared) : null,
+      count: counts.get(item.id) ?? 0,
     }
   })
-}
-
-export const TABLE_SORTS = [
-  'name',
-  'nameDesc',
-  'color',
-  'amountDesc',
-  'amountAsc',
-] as const
-export type TableSort = (typeof TABLE_SORTS)[number]
-
-/**
- * The table's rows with each group's siblings in the chosen order, a group always over its
- * categories. An amount sort reads the last column, the period's average, which ranks as
- * its total; a missing figure goes last.
- */
-export function sortTable(
-  rows: ReadonlyArray<TableRow>,
-  sort: TableSort,
-  locale: string,
-): Array<TableRow> {
-  const byName = compareNames(locale)
-  const amountOf = (row: TableRow) => Object.values(row.figures).at(-1) ?? null
-  const byAmount = (a: TableRow, b: TableRow) => {
-    const [x, y] = [amountOf(a), amountOf(b)]
-    if (x === null || y === null)
-      return (x === null ? 1 : 0) - (y === null ? 1 : 0)
-    return sort === 'amountDesc' ? compareDecimal(y, x) : compareDecimal(x, y)
-  }
-  const compare = (a: TableRow, b: TableRow) => {
-    if (sort === 'nameDesc') return byName(b.category, a.category)
-    if (sort === 'color') {
-      const [x, y] = [
-        rainbowKey(a.category.color),
-        rainbowKey(b.category.color),
-      ]
-      return x[0] - y[0] || x[1] - y[1] || byName(a.category, b.category)
-    }
-    if (sort === 'name') return byName(a.category, b.category)
-    return byAmount(a, b) || byName(a.category, b.category)
-  }
-  const ids = new Set(rows.map((r) => r.category.id))
-  const children = new Map<string | null, Array<TableRow>>()
-  for (const row of rows) {
-    const parent = row.category.parentId
-    const key = parent && ids.has(parent) ? parent : null
-    children.set(key, [...(children.get(key) ?? []), row])
-  }
-  const out: Array<TableRow> = []
-  const walk = (parent: string | null) => {
-    for (const row of [...(children.get(parent) ?? [])].sort(compare)) {
-      out.push(row)
-      walk(row.category.id)
-    }
-  }
-  walk(null)
-  return out
 }
 
 /**
@@ -268,22 +224,4 @@ export function isAboveAverage(figures: TableRow['figures']): boolean {
   const a = toMinor(month, DIGITS)
   const b = toMinor(average, DIGITS)
   return a !== null && b !== null && b > 0n && a * 10n > b * 11n
-}
-
-/**
- * The rows to draw with groups folded: a top-level row always, the rows under it only
- * when its group is open. `folds` marks a top-level row with rows under it.
- */
-export function shownRows(
-  rows: ReadonlyArray<TableRow>,
-  open: ReadonlySet<string>,
-): Array<{ row: TableRow; folds: boolean }> {
-  let group = ''
-  return rows.flatMap((row, i) => {
-    if (row.depth === 0) {
-      group = row.category.id
-      return [{ row, folds: (rows[i + 1]?.depth ?? 0) > 0 }]
-    }
-    return open.has(group) ? [{ row, folds: false }] : []
-  })
 }

@@ -1,7 +1,7 @@
 begin;
 create extension if not exists pgtap with schema extensions;
 
-select plan(19);
+select plan(20);
 
 insert into auth.users (id, email) values
   ('11111111-1111-1111-1111-111111111111', 'alice@example.test'),
@@ -172,6 +172,12 @@ select is(
    join public.categories c on c.id = m.category_id
    where m.month = '2026-03-01' and c.name = 'Restaurants'),
   '-70.0000', 'a month sums its lines per category: my half of e1, e3, and a repayment counting nothing'
+);
+select is(
+  (select m.transaction_count from public.my_monthly() m
+   join public.categories c on c.id = m.category_id
+   where m.month = '2026-03-01' and c.name = 'Restaurants'),
+  3, 'a month counts the category''s transactions, the repayment included'
 );
 select is(
   (select m.display_amount from public.my_monthly() m

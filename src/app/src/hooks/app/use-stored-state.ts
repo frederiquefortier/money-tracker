@@ -1,34 +1,66 @@
-import { useEffect, useState } from 'react'
+import { useMemo, useState, useSyncExternalStore } from 'react'
+import { idSet } from '#/lib/shared/collections'
+
+// What was set this session, so blocked storage still keeps a choice until reload.
+const written = new Map<string, string>()
+const listeners = new Map<string, Set<() => void>>()
+
+function read(key: string) {
+  if (written.has(key)) return written.get(key) ?? null
+  try {
+    return localStorage.getItem(key)
+  } catch {
+    return null
+  }
+}
+
+function write(key: string, raw: string) {
+  written.set(key, raw)
+  try {
+    localStorage.setItem(key, raw)
+  } catch {
+    // Blocked storage: the choice lasts until reload.
+  }
+  listeners.get(key)?.forEach((notify) => notify())
+}
 
 /**
- * State kept per browser (ACC-07). Read after mount, so the server render and the first
- * client render agree. Storage can be missing or blocked; the state then lives in memory.
+ * State kept per browser (ACC-07). Read on the first render of a page opened from inside
+ * the app, so a collapsed group never shows open first; the server render and hydration
+ * use `initial`, and the stored value follows right after hydration.
  */
 export function useStoredState<T>(
   key: string,
   initial: T,
   parse: (stored: unknown) => T | undefined,
 ) {
-  const [value, setValue] = useState(initial)
-
-  useEffect(() => {
+  const [fallback] = useState(initial)
+  const subscribe = useMemo(
+    () => (notify: () => void) => {
+      const set = listeners.get(key) ?? new Set()
+      set.add(notify)
+      listeners.set(key, set)
+      return () => set.delete(notify)
+    },
+    [key],
+  )
+  const raw = useSyncExternalStore(
+    subscribe,
+    () => read(key),
+    () => null,
+  )
+  const value = useMemo(() => {
+    if (raw === null) return fallback
     try {
-      const stored = localStorage.getItem(key)
-      const parsed = stored === null ? undefined : parse(JSON.parse(stored))
-      if (parsed !== undefined) setValue(parsed)
+      return parse(JSON.parse(raw)) ?? fallback
     } catch {
-      // Unreadable: keep the initial value.
+      return fallback
     }
-    // Read once per key; parse is the caller's pure validator.
-  }, [key])
+    // parse is the caller's pure validator.
+  }, [raw, fallback])
 
   function update(next: T) {
-    setValue(next)
-    try {
-      localStorage.setItem(key, JSON.stringify(next))
-    } catch {
-      // Blocked storage: the choice lasts until reload.
-    }
+    write(key, JSON.stringify(next))
   }
 
   return [value, update] as const
@@ -37,23 +69,8 @@ export function useStoredState<T>(
 const parseIds = (v: unknown) =>
   Array.isArray(v) && v.every((x) => typeof x === 'string') ? v : undefined
 
-/** A set of ids kept per browser: open branches, collapsed groups. */
+/** A set of ids kept per browser: open branches. */
 export function useStoredIds(key: string) {
   const [list, setList] = useStoredState<Array<string>>(key, [], parseIds)
-  const ids = new Set(list)
-  return {
-    ids,
-    toggle: (id: string) =>
-      setList(ids.has(id) ? list.filter((x) => x !== id) : [...list, id]),
-    add: (id: string) => {
-      if (!ids.has(id)) setList([...list, id])
-    },
-    /** Puts all of `group` in, or takes it all out; ids outside the group stay. */
-    setAll: (group: ReadonlyArray<string>, included: boolean) =>
-      setList(
-        included
-          ? [...new Set([...list, ...group])]
-          : list.filter((id) => !group.includes(id)),
-      ),
-  }
+  return idSet(list, setList)
 }

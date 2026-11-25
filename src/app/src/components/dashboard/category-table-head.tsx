@@ -12,6 +12,7 @@ export function ColumnHead({ column }: { column: TableColumn }) {
   const locale = useLocale()
   const now = column.to === todayIso().slice(0, 7)
   if (column.kind === 'year') return column.key
+  if (column.kind === 'total') return t('dashboard.period.all')
   if (column.kind === 'thisMonth' && !now)
     return <span className="capitalize">{formatMonth(column.to, locale)}</span>
   if (column.kind === 'thisYear' && !now) return column.to.slice(0, 4)
@@ -43,6 +44,9 @@ export function CategoryTableHead({
             </span>
           </th>
         ))}
+        <th className="py-2 pl-6 text-right font-semibold whitespace-nowrap">
+          {t('dashboard.table.transactions')}
+        </th>
         {compared && (
           <th className="py-2 pl-6 text-right font-semibold whitespace-nowrap">
             {t('dashboard.table.change', { year: compared })}

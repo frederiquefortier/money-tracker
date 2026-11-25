@@ -93,7 +93,7 @@ function MerchantTableHead({
           </SortedHead>
         )}
         <SortedHead sorted={on('count')} className={HEAD}>
-          {t('dashboard.merchants.transactions')}
+          {t('dashboard.table.transactions')}
         </SortedHead>
         <th className="w-full py-2 pr-4 pl-6 text-right font-semibold">
           {t('dashboard.table.trend')}
@@ -128,8 +128,12 @@ function MerchantTable({
   // Totals only: no average per month or year (author, 2026-11-20).
   // On everything, the whole history's total after the years (author, 2026-11-20).
   const whole = columns.some((c) => c.kind === 'year')
+  // Its own whole-history column sorts by amount, so the table's is left out.
   const totals = columns.filter(
-    (c) => c.kind !== 'averageMonth' && c.kind !== 'averageYear',
+    (c) =>
+      c.kind !== 'averageMonth' &&
+      c.kind !== 'averageYear' &&
+      c.kind !== 'total',
   )
   const spans = changeSpans(columns)
   const compared = spans ? changeYear(spans) : null
