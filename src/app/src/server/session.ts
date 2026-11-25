@@ -1,5 +1,6 @@
 import { createServerFn } from '@tanstack/react-start'
 import {
+  deleteCookie,
   getCookie,
   getRequestHeader,
   setCookie,
@@ -11,6 +12,7 @@ import type { Result } from '#/lib/shared/result'
 import { SIGNED_OUT, updateProfile } from '#/lib/server/db.server'
 import { getSupabase } from '#/lib/server/supabase.server'
 import { signInSchema, totpCodeSchema } from '#/lib/auth/auth-schema'
+import { FIGURES_HIDDEN_COOKIE } from '#/lib/auth/session'
 import type { Session } from '#/lib/auth/session'
 
 const ONE_YEAR = 60 * 60 * 24 * 365
@@ -31,13 +33,15 @@ export const getSession = createServerFn({ method: 'GET' }).handler(
       getCookie(LOCALE_COOKIE),
       getRequestHeader('accept-language'),
     )
+    const figuresHidden = getCookie(FIGURES_HIDDEN_COOKIE) === '1'
     const supabase = getSupabase()
 
     // Checked locally against the JWKS (ADR-018). A session revoked elsewhere stays valid
     // until jwt_expiry.
     const { data } = await supabase.auth.getClaims()
     const claims = data?.claims
-    if (!claims) return { locale, user: null, aal: null, hasTotp: false }
+    if (!claims)
+      return { locale, user: null, aal: null, hasTotp: false, figuresHidden }
 
     const aal = claims.aal === 'aal2' ? 'aal2' : 'aal1'
     // aal2 implies a verified TOTP; only aal1 has to ask Auth.
@@ -45,7 +49,13 @@ export const getSession = createServerFn({ method: 'GET' }).handler(
       aal === 'aal2' ||
       ((await supabase.auth.mfa.listFactors()).data?.totp.length ?? 0) > 0
 
-    return { locale, user: { email: claims.email ?? '' }, aal, hasTotp }
+    return {
+      locale,
+      user: { email: claims.email ?? '' },
+      aal,
+      hasTotp,
+      figuresHidden,
+    }
   },
 )
 
@@ -57,6 +67,22 @@ export const setLocale = createServerFn({ method: 'POST' })
     const { error } = await updateProfile({ locale: data.locale })
     if (error && error !== SIGNED_OUT)
       console.error('[profile] locale not saved:', error.code)
+    return { ok: true }
+  })
+
+/** Per browser, like the language: a screen shared in public is a device's concern. */
+export const setFiguresHidden = createServerFn({ method: 'POST' })
+  .validator(z.object({ hidden: z.boolean() }))
+  .handler(async ({ data }): Promise<Result<never>> => {
+    if (data.hidden)
+      setCookie(FIGURES_HIDDEN_COOKIE, '1', {
+        path: '/',
+        maxAge: ONE_YEAR,
+        httpOnly: true,
+        secure: !import.meta.env.DEV,
+        sameSite: 'lax',
+      })
+    else deleteCookie(FIGURES_HIDDEN_COOKIE, { path: '/' })
     return { ok: true }
   })
 

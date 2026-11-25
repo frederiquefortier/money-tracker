@@ -4,14 +4,10 @@ import { DeleteDialog } from '#/components/feedback/delete-dialog'
 import { IconActions, IconButton } from '#/components/display/icon-button'
 import type { ActionPlacement } from '#/components/display/icon-button'
 import { accountLabel } from '#/lib/accounts/account'
-import {
-  formatDate,
-  formatMoney,
-  formatQuoted,
-  formatQuotedList,
-} from '#/lib/shared/format'
+import { formatDate, formatQuoted, formatQuotedList } from '#/lib/shared/format'
 import { absDecimal } from '#/lib/shared/money'
 import { useLocale } from '#/hooks/app/use-locale'
+import { useMoneyText } from '#/hooks/app/use-privacy'
 import { deleteTransaction } from '#/server/transactions'
 
 /** What tells one transaction from another before deleting it. */
@@ -32,16 +28,13 @@ export type TransactionSummary = {
 function useDeleteText(summary: TransactionSummary) {
   const { t } = useTranslation()
   const locale = useLocale()
+  const moneyText = useMoneyText()
   const { merchant, categories } = summary
   return {
     title: t(
       merchant ? 'transactions.deleteTitleAt' : 'transactions.deleteTitleOn',
       {
-        amount: formatMoney(
-          absDecimal(summary.amount),
-          summary.currency,
-          locale,
-        ),
+        amount: moneyText(absDecimal(summary.amount), summary.currency),
         date: formatDate(summary.occurredOn, locale),
         merchant,
       },

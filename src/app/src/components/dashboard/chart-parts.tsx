@@ -78,11 +78,14 @@ export function bucketTitle(locale: Locale, current: string, t: TFunction) {
   }
 }
 
-/** A money axis in round steps over the values drawn. */
+/** A money axis in round steps over the values drawn; hidden, it keeps its width unlabelled. */
 export function moneyAxis(
   values: ReadonlyArray<number | null>,
-  currency: string,
-  locale: Locale,
+  {
+    currency,
+    locale,
+    figuresHidden,
+  }: { currency: string; locale: Locale; figuresHidden: boolean },
 ) {
   const ticks = axisTicks(values.filter((v): v is number => v !== null))
   return {
@@ -92,7 +95,8 @@ export function moneyAxis(
     ticks,
     domain: [ticks[0], ticks[ticks.length - 1]] as [number, number],
     interval: 0 as const,
-    tickFormatter: (v: number) => formatAxisMoney(v, currency, locale),
+    tickFormatter: (v: number) =>
+      figuresHidden ? '' : formatAxisMoney(v, currency, locale),
   }
 }
 

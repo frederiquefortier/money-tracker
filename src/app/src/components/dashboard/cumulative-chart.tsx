@@ -20,6 +20,7 @@ import type { ChartSeries } from '#/components/dashboard/chart-parts'
 import { DashboardCard } from '#/components/dashboard/dashboard-card'
 import { ChartContainer, ChartTooltip } from '#/components/ui/chart'
 import { useLocale } from '#/hooks/app/use-locale'
+import { usePrivacy } from '#/hooks/app/use-privacy'
 import type { CumulativePoint } from '#/lib/dashboard/money-flows'
 
 type Points = ReadonlyArray<CumulativePoint>
@@ -196,12 +197,12 @@ export function CumulativeChart({
 }) {
   const { t } = useTranslation()
   const locale = useLocale()
+  const { figuresHidden } = usePrivacy()
   const series = useSeries(Number(year), lastYear !== null)
   const { rows, figuresOf } = chartData(points, lastYear, year)
   const axis = moneyAxis(
     rows.flatMap((r) => [r.income, r.spent, r.lastIncome, r.lastSpent]),
-    currency,
-    locale,
+    { currency, locale, figuresHidden },
   )
   const shifts = gutterShifts(rows, axis.domain)
   return (

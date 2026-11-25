@@ -27,6 +27,10 @@ export const shellEn: typeof shellFr = {
     events: 'Events',
     data: 'Data management',
   },
+  privacy: {
+    hideFigures: 'Hide amounts',
+    hiddenAmount: 'Hidden amount, in {{currency}}',
+  },
   displayCurrency: {
     label: 'Display currency: {{code}}',
   },

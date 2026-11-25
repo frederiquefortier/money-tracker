@@ -12,6 +12,10 @@ import {
 } from '#/components/layout/floating-add-button'
 import { DisplayCurrencySwitcher } from '#/components/layout/display-currency-switcher'
 import { LocaleSwitcher } from '#/components/layout/locale-switcher'
+import {
+  PrivacyProvider,
+  PrivacySwitch,
+} from '#/components/layout/privacy-switch'
 import { Logo } from '#/components/layout/logo'
 import { Toaster } from '#/components/feedback/toaster'
 import { getMyCurrencies } from '#/server/currencies'
@@ -38,33 +42,36 @@ function AuthedLayout() {
   const page = useChildMatches({ select: (matches) => matches[0]?.routeId })
   usePreloadPages()
   return (
-    <Toaster>
-      <div className="min-h-dvh pb-[calc(4.5rem+env(safe-area-inset-bottom))] md:pb-0">
-        <AddButtonSlot>
-          <header className="sticky top-0 z-20 border-b bg-card/80 pt-[env(safe-area-inset-top)] backdrop-blur">
-            <div className="flex items-center justify-between gap-4 px-4 py-3 md:px-6">
-              <div className="flex min-w-0 items-center gap-2">
-                <AppMenu />
-                <Logo className="min-w-0" />
+    <PrivacyProvider>
+      <Toaster>
+        <div className="min-h-dvh pb-[calc(4.5rem+env(safe-area-inset-bottom))] md:pb-0">
+          <AddButtonSlot>
+            <header className="sticky top-0 z-20 border-b bg-card/80 pt-[env(safe-area-inset-top)] backdrop-blur">
+              <div className="flex items-center justify-between gap-4 px-4 py-3 md:px-6">
+                <div className="flex min-w-0 items-center gap-2">
+                  <AppMenu />
+                  <Logo className="min-w-0" />
+                </div>
+                <div className="hidden md:block">
+                  <AppNav variant="top" />
+                </div>
+                <div className="flex shrink-0 items-center gap-2">
+                  <PrivacySwitch />
+                  <DisplayCurrencySwitcher />
+                  <LocaleSwitcher />
+                </div>
               </div>
-              <div className="hidden md:block">
-                <AppNav variant="top" />
-              </div>
-              <div className="flex shrink-0 items-center gap-2">
-                <DisplayCurrencySwitcher />
-                <LocaleSwitcher />
-              </div>
+            </header>
+            <main className="px-4 py-6 md:px-6">
+              <AddButtonTarget />
+              <Outlet key={page} />
+            </main>
+            <div className="fixed inset-x-0 bottom-0 z-20 border-t bg-card/95 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden">
+              <AppNav variant="bottom" />
             </div>
-          </header>
-          <main className="px-4 py-6 md:px-6">
-            <AddButtonTarget />
-            <Outlet key={page} />
-          </main>
-          <div className="fixed inset-x-0 bottom-0 z-20 border-t bg-card/95 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden">
-            <AppNav variant="bottom" />
-          </div>
-        </AddButtonSlot>
-      </div>
-    </Toaster>
+          </AddButtonSlot>
+        </div>
+      </Toaster>
+    </PrivacyProvider>
   )
 }

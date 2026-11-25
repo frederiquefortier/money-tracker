@@ -1,14 +1,16 @@
 import { useTranslation } from 'react-i18next'
 import { ThinGap } from '#/components/display/thin-gap'
 import { Icon } from '#/components/display/icon'
-import { moneyFormat } from '#/lib/shared/format'
+import { hiddenMoneyParts, moneyFormat } from '#/lib/shared/format'
 import { useLocale } from '#/hooks/app/use-locale'
+import { usePrivacy } from '#/hooks/app/use-privacy'
 import { cn } from '#/lib/utils'
 
 /**
  * An amount in its currency. `signed` shows the plus of an income. `converted` marks a
  * total that mixes currencies with ≈ (CUR-09); a converted row shows its original amount
  * instead. `detail` is the hover text and the screen readers' name. `whole` drops the cents.
+ * In privacy mode (SET-08) the digits never reach the page, nor does `detail`.
  */
 export function Money({
   amount,
@@ -33,16 +35,21 @@ export function Money({
     signDisplay: signed ? 'exceptZero' : 'auto',
     whole,
   })
-  const parts = format.formatToParts(amount as Intl.StringNumericLiteral)
+  const { figuresHidden } = usePrivacy()
+  const shown = format.formatToParts(amount as Intl.StringNumericLiteral)
+  const parts = figuresHidden ? hiddenMoneyParts(currency, locale) : shown
   const text = parts.map((part) => part.value).join('')
-  const label =
-    detail ??
-    (converted ? t('money.converted', { amount: text, currency }) : text)
+  const label = figuresHidden
+    ? t('privacy.hiddenAmount', { currency })
+    : (detail ??
+      (converted ? t('money.converted', { amount: text, currency }) : text))
 
   return (
     <span
       className={cn('font-mono whitespace-nowrap tabular-nums', className)}
-      title={detail ?? (converted ? label : undefined)}
+      title={
+        figuresHidden ? undefined : (detail ?? (converted ? label : undefined))
+      }
       aria-label={label}
     >
       <span aria-hidden="true">

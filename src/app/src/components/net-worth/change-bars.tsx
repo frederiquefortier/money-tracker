@@ -15,6 +15,7 @@ import { MONTHLY_UP_TO, periodChanges } from '#/lib/net-worth/net-worth-range'
 import { STACK_KEYS, axisTicks } from '#/lib/net-worth/net-worth-series'
 import { formatAxisMoney, formatMonth } from '#/lib/shared/format'
 import { useLocale } from '#/hooks/app/use-locale'
+import { usePrivacy } from '#/hooks/app/use-privacy'
 import type { ChartLine } from '#/components/net-worth/chart-lines'
 import type { Locale } from '#/i18n/locales'
 import type { PeriodChange } from '#/lib/net-worth/net-worth-range'
@@ -115,6 +116,7 @@ function BarsChart({
   groups: ReadonlyArray<ItemGroup>
 }) {
   const { changes, byYear, currency, locale } = drawing
+  const { figuresHidden } = usePrivacy()
   const { rows, y } = drawnRows(
     changes,
     groups.map((g) => STACK_KEYS[g]),
@@ -144,7 +146,7 @@ function BarsChart({
           tickLine={false}
           axisLine={false}
           tickFormatter={(value: number) =>
-            formatAxisMoney(value, currency, locale)
+            figuresHidden ? '' : formatAxisMoney(value, currency, locale)
           }
         />
         <ReferenceLine y={0} stroke="var(--border)" strokeWidth={1.5} />

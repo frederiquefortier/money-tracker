@@ -12,6 +12,7 @@ import {
 import type { ChartSeries } from '#/components/dashboard/chart-parts'
 import { ChartContainer, ChartTooltip } from '#/components/ui/chart'
 import { useLocale } from '#/hooks/app/use-locale'
+import { usePrivacy } from '#/hooks/app/use-privacy'
 import { useBarPointer } from '#/hooks/dashboard/use-bar-pointer'
 import type { CategoryStacks } from '#/lib/dashboard/category-stacks'
 
@@ -50,6 +51,7 @@ export function StackedBars({
 }) {
   const { t } = useTranslation()
   const locale = useLocale()
+  const { figuresHidden } = usePrivacy()
   const { handlers, hoveredIn } = useBarPointer(onOpen)
   const byBucket = new Map(stackRows.map((r) => [r.bucket, r.values]))
   const rows = stackRows.map((r) => ({
@@ -74,7 +76,9 @@ export function StackedBars({
           minTickGap={4}
           tickFormatter={bucketTick(locale, current)}
         />
-        <YAxis {...moneyAxis(stackExtent(rows), currency, locale)} />
+        <YAxis
+          {...moneyAxis(stackExtent(rows), { currency, locale, figuresHidden })}
+        />
         <ChartTooltip
           cursor={false}
           content={tooltipFor({

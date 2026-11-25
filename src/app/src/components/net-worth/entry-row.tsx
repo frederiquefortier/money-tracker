@@ -8,8 +8,7 @@ import { Money } from '#/components/display/money'
 import { HoldingActions } from '#/components/holdings/list/holding-actions'
 import { ListRow } from '#/components/lists/list-row'
 import { compareDecimal } from '#/lib/shared/money'
-import { formatMoney } from '#/lib/shared/format'
-import { useLocale } from '#/hooks/app/use-locale'
+import { useMoneyText } from '#/hooks/app/use-privacy'
 import { cn } from '#/lib/utils'
 import type { NetWorthEntry } from '#/lib/net-worth/net-worth-list'
 
@@ -34,7 +33,7 @@ function Flag({ icon, label }: { icon: IconName; label: string }) {
  */
 function Extras({ entry }: { entry: NetWorthEntry }) {
   const { t } = useTranslation()
-  const locale = useLocale()
+  const moneyText = useMoneyText()
   if (entry.type === 'account') {
     const { pending, currency } = entry.account
     if (compareDecimal(pending, '0') === 0) return null
@@ -42,7 +41,7 @@ function Extras({ entry }: { entry: NetWorthEntry }) {
       <>
         {' · '}
         {t('accounts.pending', {
-          amount: formatMoney(pending, currency, locale),
+          amount: moneyText(pending, currency),
         })}
       </>
     )

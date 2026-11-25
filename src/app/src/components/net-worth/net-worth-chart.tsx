@@ -11,6 +11,7 @@ import {
   todayIso,
 } from '#/lib/shared/format'
 import { useLocale } from '#/hooks/app/use-locale'
+import { usePrivacy } from '#/hooks/app/use-privacy'
 import { cn } from '#/lib/utils'
 import type { Locale } from '#/i18n/locales'
 import type { SeriesPoint } from '#/lib/net-worth/net-worth-series'
@@ -78,6 +79,7 @@ export function NetWorthChart({
   className?: string
 }) {
   const locale = useLocale()
+  const { figuresHidden } = usePrivacy()
   const gradient = useId()
   const { ticks, tick } = xTicks(points, locale)
   const rows = chartRows(points, [dataKey])
@@ -117,7 +119,7 @@ export function NetWorthChart({
           tickLine={false}
           axisLine={false}
           tickFormatter={(value: number) =>
-            formatAxisMoney(value, currency, locale)
+            figuresHidden ? '' : formatAxisMoney(value, currency, locale)
           }
         />
         <ChartTooltip

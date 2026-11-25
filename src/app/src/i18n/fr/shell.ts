@@ -25,6 +25,10 @@ export const shellFr = {
     events: 'Événements',
     data: 'Gestion des données',
   },
+  privacy: {
+    hideFigures: 'Masquer les montants',
+    hiddenAmount: 'Montant masqué, en {{currency}}',
+  },
   displayCurrency: {
     label: 'Devise d’affichage: {{code}}',
   },

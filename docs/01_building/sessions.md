@@ -4,6 +4,16 @@ Short record of each working session: what the author asked, what was decided an
 
 <!-- Newest first: a new session goes directly below this line. Template at the bottom. -->
 
+### 2026-11-25 - Privacy mode
+
+**What We Worked On:**
+- The author asked to "add the privacy log"; nothing by that name existed, and the author chose the privacy mode idea (improvements.md, 2026-11-12). The author chose figures and percents (not memos or names), a mask keeping the currency, and a cookie so nothing flashes on load. Built (SET-08, ADR-071): a button in the top bar, `PrivacyProvider`, masks in `Money`, `Percent`, the text amounts of dialogs and tags, and blank chart axes.
+- The assistant first masked the digits with bullets; the author asked for `#` and a fixed shape, "##.##" for any amount and "##" for any percent, so neither size nor sign shows.
+- The author asked whether the eye was right, since it already hides items from the net worth chart. The assistant suggested moving the net worth items to the filter icon and keeping the eye for privacy; the author chose a shield for privacy mode instead (`shield` and `shield-off` added to the icons).
+
+**What Could We Do Better:**
+- Not seen in the browser: the Playwright browser was not signed in.
+
 ### 2026-11-25 - The excluded categories leave the tab row
 
 **What We Worked On:**

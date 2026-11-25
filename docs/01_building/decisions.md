@@ -4,6 +4,28 @@ Technical and structural choices, with the alternatives that were rejected. Chec
 
 <!-- Newest first: a new ADR goes directly below this line. Template at the bottom. -->
 
+### ADR-071: Privacy mode hides figures in a fixed shape, saved in a cookie (2026-11-25)
+
+**Context:**
+- The author uses the app where others can see the screen (improvements.md, 2026-11-12) and asked for privacy mode (SET-08).
+
+**Decision:**
+- A shield button in the top bar: crossed out while figures show, whole while they are hidden. On, every amount shows as "##,## $" / "$##.##" and every percent as "## %", whatever its size or sign, so the shape gives nothing away. The currency stays. The digits never reach the page: `Money`, `Percent` and `useMoneyText` (amounts in dialogs and tags) render the mask, and `Money` drops its hover detail. Chart axes keep their width without labels; tooltips go through `Money`.
+- Saved per browser in an httpOnly `figures-hidden` cookie, read with the session, so a page load renders hidden from the server. The switch acts at once in a React context; the cookie follows.
+- Forms being filled, memos, names and the tab title stay shown.
+
+**Alternatives Considered:**
+- Browser storage, as ACC-07 sorts -> Read after mount, so the real figures would flash on every load.
+- On the profile -> The concern is the screen in front of the author, a device, as the language cookie is.
+- A CSS blur -> The number stays in the page text, readable on copy or by a screen reader.
+- Bullets in place of the digits, one per figure -> A "-" or a short mask still said which way and roughly how much.
+- Hiding memos and names too -> Lists would read as masks only; left for later.
+- The eye, as banking apps use -> On the net worth page it already means an item left out of the chart (ADR-058), so two eyes would do different things there.
+
+**Consequences:**
+- A chart still shows proportions and trends, without any figure.
+- Every new way of showing an amount has to go through `Money`, `Percent` or `useMoneyText`.
+
 ### ADR-070: The default excluded categories open from a settings icon (2026-11-25)
 
 Supersedes ADR-056 for where the default list lives; the model is unchanged.

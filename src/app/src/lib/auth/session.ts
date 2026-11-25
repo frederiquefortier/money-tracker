@@ -5,7 +5,12 @@ export type Session = {
   user: { email: string } | null
   aal: 'aal1' | 'aal2' | null
   hasTotp: boolean
+  /** Privacy mode (SET-08): figures show as bullets. */
+  figuresHidden: boolean
 }
+
+/** Set while privacy mode is on, so the server renders the page already hidden. */
+export const FIGURES_HIDDEN_COOKIE = 'figures-hidden'
 
 // The root's beforeLoad asked the server before every page and every refresh. A signed-in
 // session is kept in the browser for a few minutes instead. It only gates the screens:

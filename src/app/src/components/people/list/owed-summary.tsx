@@ -3,8 +3,9 @@ import { Link } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { ListCard } from '#/components/lists/list-card'
 import { Money } from '#/components/display/money'
-import { formatDate, formatMoney } from '#/lib/shared/format'
+import { formatDate } from '#/lib/shared/format'
 import { useLocale } from '#/hooks/app/use-locale'
+import { useMoneyText } from '#/hooks/app/use-privacy'
 import { cn } from '#/lib/utils'
 import { getOwedLines } from '#/server/owed'
 import type { Balance, OwedLine } from '#/lib/people/owed'
@@ -13,11 +14,11 @@ import { fieldSurface, focusRing, rowHover } from '#/components/styles'
 /** PPL-05, on a person's row: "Me doit 45,00 $", "+ inconnu" past a known part. */
 export function OwedTag({ balance }: { balance: Balance | undefined }) {
   const { t } = useTranslation()
-  const locale = useLocale()
+  const moneyText = useMoneyText()
   if (!balance || (balance.amounts.length === 0 && balance.unknown === 0))
     return null
   const amounts = balance.amounts
-    .map((a) => formatMoney(a.amount, a.currency, locale))
+    .map((a) => moneyText(a.amount, a.currency))
     .join(' · ')
   const text = amounts
     ? t('people.owes', { amount: amounts }) +

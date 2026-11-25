@@ -22,6 +22,7 @@ import type { ChartSeries } from '#/components/dashboard/chart-parts'
 import { DashboardCard } from '#/components/dashboard/dashboard-card'
 import { ChartContainer, ChartTooltip } from '#/components/ui/chart'
 import { useLocale } from '#/hooks/app/use-locale'
+import { usePrivacy } from '#/hooks/app/use-privacy'
 import type { Flows } from '#/lib/dashboard/money-flows'
 import { useBarPointer } from '#/hooks/dashboard/use-bar-pointer'
 import type { DashboardPeriod } from '#/lib/dashboard/dashboard-period'
@@ -173,6 +174,7 @@ export function MonthlyChart({
 }) {
   const { t } = useTranslation()
   const locale = useLocale()
+  const { figuresHidden } = usePrivacy()
   const { deficits, gaps } = shadings(buckets, missing, current)
   const flows = useSeries()
   const { rows, figuresOf } = chartData(buckets)
@@ -201,8 +203,7 @@ export function MonthlyChart({
           <YAxis
             {...moneyAxis(
               rows.flatMap((r) => [r.earned, r.spent]),
-              currency,
-              locale,
+              { currency, locale, figuresHidden },
             )}
           />
           <ChartTooltip

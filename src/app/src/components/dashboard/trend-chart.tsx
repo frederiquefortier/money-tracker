@@ -12,6 +12,7 @@ import {
 import type { ChartSeries } from '#/components/dashboard/chart-parts'
 import { ChartContainer, ChartTooltip } from '#/components/ui/chart'
 import { useLocale } from '#/hooks/app/use-locale'
+import { usePrivacy } from '#/hooks/app/use-privacy'
 import { cn } from '#/lib/utils'
 
 // Grey, so the line reads over bars of any colour.
@@ -102,6 +103,7 @@ export function TrendChart({
 }) {
   const { t } = useTranslation()
   const locale = useLocale()
+  const { figuresHidden } = usePrivacy()
   const { series, byKey, rows } = trendData({
     keys,
     values,
@@ -127,8 +129,7 @@ export function TrendChart({
         <YAxis
           {...moneyAxis(
             rows.flatMap((r) => [r.value, r.lastYear]),
-            currency,
-            locale,
+            { currency, locale, figuresHidden },
           )}
         />
         <ChartTooltip

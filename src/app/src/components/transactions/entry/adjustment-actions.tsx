@@ -4,8 +4,9 @@ import { DeleteDialog } from '#/components/feedback/delete-dialog'
 import { IconActions, IconButton } from '#/components/display/icon-button'
 import type { ActionPlacement } from '#/components/display/icon-button'
 import { accountLabel } from '#/lib/accounts/account'
-import { formatDate, formatMoney, formatQuoted } from '#/lib/shared/format'
+import { formatDate, formatQuoted } from '#/lib/shared/format'
 import { useLocale } from '#/hooks/app/use-locale'
+import { useMoneyText } from '#/hooks/app/use-privacy'
 import { deleteAdjustment } from '#/server/adjustments'
 
 export type AdjustmentSummary = {
@@ -26,6 +27,7 @@ export function AdjustmentActions({
 }) {
   const { t } = useTranslation()
   const locale = useLocale()
+  const moneyText = useMoneyText()
   const [confirming, setConfirming] = useState(false)
 
   return (
@@ -38,7 +40,7 @@ export function AdjustmentActions({
       <DeleteDialog
         open={confirming}
         title={t('transactions.adjustment.deleteTitle', {
-          amount: formatMoney(summary.amount, summary.currency, locale),
+          amount: moneyText(summary.amount, summary.currency),
           date: formatDate(summary.occurredOn, locale),
         })}
         description={t('transactions.adjustment.deleteText', {

@@ -6,6 +6,9 @@ import type { Locale } from '#/i18n/locales'
 /** What a figure that cannot be worked out shows (a missing rate, ADR-004): an em dash, escaped for the no-em-dash check. */
 export const NO_FIGURE = '\u2014'
 
+const joinParts = (parts: ReadonlyArray<Intl.NumberFormatPart>) =>
+  parts.map((part) => part.value).join('')
+
 const numberFormats = new Map<string, Intl.NumberFormat>()
 const dateFormats = new Map<string, Intl.DateTimeFormat>()
 
@@ -55,6 +58,38 @@ export function formatMoney(
   return moneyFormat(currency, locale).format(
     amount as Intl.StringNumericLiteral,
   )
+}
+
+// Privacy mode (SET-08): every amount and percent has the same shape, so neither its
+// size nor its sign shows. The currency and the locale's separators stay.
+export const HIDDEN_DIGITS = '##'
+
+const hide = (parts: ReadonlyArray<Intl.NumberFormatPart>) =>
+  parts.map((part) =>
+    part.type === 'integer' || part.type === 'fraction'
+      ? { ...part, value: HIDDEN_DIGITS }
+      : part,
+  )
+
+/** "##,## $" / "$##.##", whatever the amount. */
+export function hiddenMoneyParts(currency: string, locale: Locale) {
+  return hide(
+    numberFormat(locale, {
+      style: 'currency',
+      currency,
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).formatToParts(0),
+  )
+}
+
+export function formatHiddenMoney(currency: string, locale: Locale): string {
+  return joinParts(hiddenMoneyParts(currency, locale))
+}
+
+/** "## %" / "##%", whatever the percent. */
+export function hiddenPercentParts(locale: Locale) {
+  return hide(percentFormat(locale, 0).formatToParts(0))
 }
 
 /** A chart axis: "48 k$". A number, for the drawing only; figures shown in text stay strings. */

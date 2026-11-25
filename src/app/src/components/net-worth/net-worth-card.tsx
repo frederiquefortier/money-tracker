@@ -10,6 +10,8 @@ import { cardSurface } from '#/components/styles'
 import { rangeChange, rangeMonths } from '#/lib/net-worth/net-worth-range'
 import { changeSinceStart } from '#/lib/net-worth/net-worth-since'
 import { useFormatLocale } from '#/hooks/app/use-locale'
+import { usePrivacy } from '#/hooks/app/use-privacy'
+import { HIDDEN_DIGITS } from '#/lib/shared/format'
 import { cn } from '#/lib/utils'
 import type { NetWorthChartState } from '#/hooks/net-worth/use-net-worth-chart'
 import type { SeriesRange } from '#/lib/net-worth/net-worth-range'
@@ -44,6 +46,7 @@ function SinceStartLines({
 }) {
   const { t } = useTranslation()
   const locale = useFormatLocale()
+  const { figuresHidden } = usePrivacy()
   const since = changeSinceStart(chart.points, 'total')
   if (!since) return null
   return (
@@ -56,9 +59,11 @@ function SinceStartLines({
         {since.multiple !== null && (
           <span className="text-xs font-semibold">
             {t('netWorth.change.multiple', {
-              multiple: new Intl.NumberFormat(locale, {
-                maximumFractionDigits: 1,
-              }).format(Number(since.multiple)),
+              multiple: figuresHidden
+                ? HIDDEN_DIGITS
+                : new Intl.NumberFormat(locale, {
+                    maximumFractionDigits: 1,
+                  }).format(Number(since.multiple)),
             })}
           </span>
         )}

@@ -166,7 +166,7 @@ Ideas not built and not decided against. Review during planning to pick the next
 **Status:**
 - [x] Proposed
 - [ ] In Progress
-- [ ] Completed
+- [x] Completed (2026-11-25, SET-08: amounts, percents and chart axes; memos, names and the tab title stay shown)
 - [ ] Deferred
 
 ### 2026-11-12 - Relationship view on the Proches page

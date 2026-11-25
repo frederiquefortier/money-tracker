@@ -10,7 +10,7 @@ Every icon in the app comes from [coolicons](https://icon-sets.iconify.design/co
 To add an icon, find its name on the site, add it to the list, and regenerate the file:
 
 ```
-curl -sSf "https://api.iconify.design/coolicons.json?icons=archive,arrow-left,arrow-left-right,arrow-right,bank,calendar,chart-bar-stacked,chart-line,chart-line-fill,chart-pie,chart-pie-fill,check,chevron-down,chevron-left,chevron-right,circle-check,circle-info,circle-slash,circle-warning,clock,close,coins,copy,external-link,eye,eye-off,filter,house-check,import,key,loading,lock,log-in,log-out,mail,menu,merge,minus,more-vertical,pencil,pig-fill,plus,receipt,receipt-fill,scale,search,shield-check,sort-ascending,split,store,tags,target,target-fill,trash-full,undo,unfold-less,unfold-more,user,users,wallet,wallet-fill,settings,circle-help" -o src/icons/ui-icons.json
+curl -sSf "https://api.iconify.design/coolicons.json?icons=archive,arrow-left,arrow-left-right,arrow-right,bank,calendar,chart-bar-stacked,chart-line,chart-line-fill,chart-pie,chart-pie-fill,check,chevron-down,chevron-left,chevron-right,circle-check,circle-info,circle-slash,circle-warning,clock,close,coins,copy,external-link,eye,eye-off,filter,house-check,import,key,loading,lock,log-in,log-out,mail,menu,merge,minus,more-vertical,pencil,pig-fill,plus,receipt,receipt-fill,scale,search,shield-check,sort-ascending,split,store,tags,target,target-fill,trash-full,undo,unfold-less,unfold-more,user,users,wallet,wallet-fill,settings,circle-help,shield,shield-off" -o src/icons/ui-icons.json
 ```
 
 The `IconName` type follows the file, so a name that is not in it fails type-checking.

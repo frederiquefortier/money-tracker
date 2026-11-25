@@ -3,8 +3,10 @@ import {
   formatCount,
   formatDate,
   formatDay,
+  formatHiddenMoney,
   formatMonth,
   formatMoney,
+  hiddenPercentParts,
   moneyFormat,
   todayIso,
 } from '#/lib/shared/format'
@@ -91,5 +93,21 @@ describe('formatCount', () => {
   it('groups thousands the locale way', () => {
     expect(formatCount(1284, 'fr')).toBe('1\u00a0284')
     expect(formatCount(1284, 'en')).toBe('1,284')
+  })
+})
+
+describe('privacy mode', () => {
+  const join = (parts: Array<Intl.NumberFormatPart>) =>
+    plain(parts.map((p) => p.value).join(''))
+
+  it('gives every amount the same shape, its currency kept', () => {
+    expect(plain(formatHiddenMoney('CAD', 'fr'))).toBe('##,## $')
+    expect(formatHiddenMoney('CAD', 'en')).toBe('$##.##')
+    expect(formatHiddenMoney('JPY', 'en')).toBe('JP¥##.##')
+  })
+
+  it('gives every percent the same shape', () => {
+    expect(join(hiddenPercentParts('fr'))).toBe('## %')
+    expect(join(hiddenPercentParts('en'))).toBe('##%')
   })
 })
