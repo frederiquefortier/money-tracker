@@ -55,7 +55,7 @@ export const transactionsEn: typeof transactionsFr = {
       'It was recorded in the {{account}} account and split between the {{categories}} categories.',
     adjustment: {
       newTitle: 'Adjust a balance',
-      editTitle: 'Edit the adjustment of “{{name}}”',
+      editTitle: 'Edit adjustment',
       appBalance: 'Balance in the app',
       realBalance: 'Real balance',
       gap: 'Difference',

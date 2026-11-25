@@ -24,6 +24,7 @@ import {
   adjustmentGap,
 } from '#/lib/adjustments/adjustment'
 import type { FormAccount } from '#/lib/transactions/transaction'
+import { accountLabel } from '#/lib/accounts/account'
 import { cn } from '#/lib/utils'
 import { getAdjustmentBalance, saveAdjustment } from '#/server/adjustments'
 import { NO_FIGURE } from '#/lib/shared/format'
@@ -91,6 +92,7 @@ function SlipAmount({
 function AdjustmentReceipt({
   realBalance,
   appBalance,
+  account,
   currency,
   error,
   autoFocus,
@@ -98,6 +100,8 @@ function AdjustmentReceipt({
 }: {
   realBalance: string
   appBalance: string | null | undefined
+  /** A saved adjustment's account, which it keeps: named on the slip. */
+  account?: string
   currency: string | null
   error: string | undefined
   autoFocus: boolean
@@ -139,6 +143,11 @@ function AdjustmentReceipt({
       </div>
       {error && <FieldMessage>{error}</FieldMessage>}
       {slipRule}
+      {account && (
+        <ReceiptLine label={t('transactions.account')}>
+          <span className="text-right whitespace-normal">{account}</span>
+        </ReceiptLine>
+      )}
       <ReceiptLine label={t('transactions.adjustment.appBalance')}>
         <SlipAmount amount={appBalance} currency={currency} loading={loading} />
       </ReceiptLine>
@@ -182,6 +191,9 @@ export function AdjustmentForm({
       <AdjustmentReceipt
         realBalance={values.realBalance}
         appBalance={account && appBalance}
+        account={
+          id !== undefined && account ? accountLabel(account) : undefined
+        }
         currency={account?.currency ?? null}
         error={form.field('realBalance').error}
         autoFocus={id === undefined && values.accountId !== ''}

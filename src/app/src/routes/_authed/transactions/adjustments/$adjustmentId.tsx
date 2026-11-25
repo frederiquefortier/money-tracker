@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next'
 import { RouteSheet } from '#/components/sheet/route-sheet'
 import { AdjustmentActions } from '#/components/transactions/entry/adjustment-actions'
 import { AdjustmentForm } from '#/components/transactions/entry/adjustment-form'
-import { accountLabel } from '#/lib/accounts/account'
 import { balanceWith } from '#/lib/adjustments/adjustment'
 import { amountForInput } from '#/lib/shared/money'
 import { useLocale } from '#/hooks/app/use-locale'
@@ -47,9 +46,7 @@ function EditAdjustment() {
   return (
     <RouteSheet
       to="/transactions"
-      title={t('transactions.adjustment.editTitle', {
-        name: accountLabel(account),
-      })}
+      title={t('transactions.adjustment.editTitle')}
       actions={
         <AdjustmentActions
           placement="sheet"

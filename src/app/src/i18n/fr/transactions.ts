@@ -54,7 +54,7 @@ export const transactionsFr = {
       'Elle a été notée dans le compte {{account}} et répartie entre les catégories {{categories}}.',
     adjustment: {
       newTitle: 'Ajuster un solde',
-      editTitle: 'Modifier l’ajustement de “{{name}}”',
+      editTitle: 'Modifier l’ajustement',
       appBalance: 'Solde dans l’app',
       realBalance: 'Solde réel',
       gap: 'Écart',
