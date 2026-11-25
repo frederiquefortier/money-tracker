@@ -1,7 +1,6 @@
 # Import
 
-How a user's existing history gets into the app (IMP-01..06, ADR-010, ADR-033). Rewritten
-from scratch on 2026-11-10, once accounts, categories, merchants, people and events existed.
+How a user's existing history gets into the app (IMP-01..06, ADR-010, ADR-033).
 
 **One fixed CSV format.** The user prepares their data in it before importing. The app
 validates, shows a summary, and commits. There is no source picker and no mapping step;
@@ -33,11 +32,10 @@ nothing, or `{ok: false, errors}` where each error has its file, line and a code
 screen translates. The merge choices are applied by the server, by renaming in the rows
 before the call. `import_undo(batch)` undoes a batch.
 
-The call has the API's 8 seconds, and a function cannot ask for more: a `SET statement_timeout`
-on it was tried and the running statement was still cancelled. The author's first file (4,800 transactions, 3,772
-splits, 765 people lines) takes about 2 s to check and 4.5 to 5 s to import (an expense shared only with guests has its parts written in bulk, the others go through `save_transaction`). If a larger file
-ever times out, split it by year and import the parts one after the other: a `ref` already
-in is skipped, so each part is safe to repeat.
+The call has the API's 8 seconds, and a function cannot ask for more (a `SET
+statement_timeout` on it does not help). About 5,000 transactions import in about 5 s. A
+larger file that times out is split by year and imported part by part: a `ref` already in
+is skipped, so each part is safe to repeat.
 
 ## Matching and creating
 

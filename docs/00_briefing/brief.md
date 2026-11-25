@@ -37,7 +37,6 @@ A first prototype was built on Lovable in early 2026 as a proof of concept. Test
 - A month of new transactions is entered in the app and not in the sheet.
 - The dashboard and budgets answer what the Aspire dashboard answered.
 - A second test user sees none of the owner's data (pgTAP), and MFA is enforced.
-- The public demo runs on invented data.
 
 ## Non-goals (for now)
 - Bank connections. CSV import only.

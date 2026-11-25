@@ -50,8 +50,9 @@ laptop with `npm run db:push` and try work locally before it reaches `main` (ADR
 - Requirements have IDs (`TRX-04`). Reference them in ADRs and commits; when a requirement
   changes, edit [requirements.md](docs/00_briefing/requirements.md), never the raw notes in
   `docs/00_briefing/notes/`, which are kept verbatim.
-- Log bug fixes in [bugs.md](docs/02_fixing/bugs.md), new concepts in
-  [learnings.md](docs/01_building/learnings.md), AI sessions in
+- Log bug fixes in [bugs.md](docs/02_fixing/bugs.md), what the author learned in
+  [learnings.md](docs/01_building/learnings.md) (a concept explained to the author, never
+  the assistant's own findings, which go in code comments, ADRs or bugs.md), AI sessions in
   [sessions.md](docs/01_building/sessions.md), and ideas in
   [improvements.md](docs/03_planning/improvements.md).
 - Keep each doc in the format defined at the bottom of its file. New entries go at the top,

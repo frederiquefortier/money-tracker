@@ -51,7 +51,7 @@ docs/
     ├── 00_briefing/           # Project briefing and context
     ├── 01_building/           # Active development records
     │   ├── decisions.md       # Architectural Decision Records
-    │   ├── learnings.md       # New concepts and knowledge gained
+    │   ├── learnings.md       # What the user learned (concepts explained to them)
     │   └── sessions.md        # AI session summaries and reflections
     ├── 02_fixing/             # Bug tracking and solutions
     │   └── bugs.md            # Bug log with solutions
@@ -156,7 +156,7 @@ Track AI-assisted development sessions with summaries, successes, challenges, an
 ```markdown
 # Learnings
 
-Document new concepts, techniques, and knowledge gained. Reference this file to build on past learning and find resources for deeper understanding.
+What the user learned while building: a concept explained in teacher mode, the answer to "how does this work?", or a lesson from their own mistake. Technical findings the assistant made along the way are not learnings: they go in code comments, ADRs or the bug log.
 
 <!-- Newest first: a new entry goes directly below this line. Template at the bottom. -->
 
@@ -243,7 +243,7 @@ This project maintains a development journal in `docs/` for consistency across s
 
 - **01_building/decisions.md** - Architectural Decision Records with context and trade-offs
 - **01_building/sessions.md** - AI session summaries with successes and friction points
-- **01_building/learnings.md** - New concepts, techniques, and knowledge with sources
+- **01_building/learnings.md** - What the user learned, with sources and follow-up questions
 - **02_fixing/bugs.md** - Bug log with dates, solutions, and prevention notes
 - **03_planning/improvements.md** - Future enhancements and feature ideas
 
@@ -264,10 +264,10 @@ This project maintains a development journal in `docs/` for consistency across s
 - Include what worked well, friction points, and key takeaways
 - Note patterns for future sessions
 
-**When learning new concepts or techniques:**
-- Document in `docs/01_building/learnings.md` with sources and key points
-- Include links to documentation and resources for deeper learning
-- Note how the concept was applied in practice
+**When the user learns something (teacher mode):**
+- Document in `docs/01_building/learnings.md` from the user's side: what they asked or hit, the key points in plain words, sources
+- "Where to Learn More" holds follow-up questions to explore next
+- Never log a gotcha the assistant met while coding: that goes in a code comment, an ADR or the bug log
 
 **When identifying future improvements:**
 - Log ideas in `docs/03_planning/improvements.md` with motivation and approach
@@ -499,7 +499,7 @@ User: "Document what we worked on today"
 ### Scenario 4: Recording New Learning
 
 ```
-User: "Add what we learned about React Server Components to our learnings"
+User: "Add what you just explained about React Server Components to my learnings"
 -> Read docs/01_building/learnings.md
 -> Add new entry below the top marker, with concept, key points, sources, and resources
 -> Confirm addition to user
@@ -533,7 +533,7 @@ The dev-journal skill complements other skills:
 - **requirements-documenter**: Requirements → Decisions (ADRs reference requirements)
 - **root-cause-debugger**: Bug diagnosis → Bug log (document solutions after fixes)
 - **code-quality-reviewer**: Quality issues → Decisions (document quality standards)
-- **docs-sync-editor**: Code changes → Learnings (document new patterns discovered)
+- **docs-sync-editor**: Code changes → Decisions (document new patterns as ADRs)
 
 When using these skills together, consider updating journal files as a follow-up action.
 
@@ -551,6 +551,6 @@ This skill is successfully deployed when:
 - User can easily request journal updates ("add this to learnings", "log this session")
 - Journal files look like standard engineering documentation, not AI artifacts
 - Sessions are regularly documented with reflections and takeaways
-- Learning moments are captured with sources for future reference
+- The user's learning moments are captured with sources and follow-up questions
 - Future improvements are tracked with priority and status
 - The workflow (brief → build → fix → plan) is clear and intuitive

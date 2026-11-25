@@ -7,7 +7,7 @@ Ideas not built and not decided against. Review during planning to pick the next
 ### 2026-11-24 - Bring back the year in review (Événements)
 
 **Description:**
-- The dashboard's Événements tab: events by day on Dépenses par jour's grid, four highlight slips (top days, who I spent with, most events, who owes me), Comparer (an event type's events as columns of their cost per day cut by top-level category, the mean as a named line, a sortable list), and the sticky-month calendar. EVT-04, 05, YR-01..05; spec in [22-dashboard.md](../00_briefing/designs/22-dashboard.md).
+- The dashboard's Événements tab: events by day on Dépenses par jour's grid, four highlight slips (top days, who I spent with, most events, who owes me), Comparer (an event type's events as columns of their cost per day cut by top-level category, the mean as a named line, a sortable list), and the sticky-month calendar. EVT-04, 05, YR-01..05; its spec, `22-dashboard.md`, is in the same commit.
 
 **Motivation:**
 - Built on 2026-11-23, then removed on 2026-11-24: the author's basic use case is complete without it, and Comparer had not settled.
@@ -92,31 +92,6 @@ Ideas not built and not decided against. Review during planning to pick the next
 - [ ] Completed
 - [ ] Deferred
 
-### 2026-11-12 - Import: invited people with no part
-
-**Description:**
-- The import still gives an invited person a share of the expense (its bulk path writes shares, and its call to `save_transaction` does too). Since ADR-052 an invited person has no amount of their own, so a new import would split an expense with invited people again.
-
-**Motivation:**
-- The import is driven only by the columns of `people.csv` (role, person, head_count, amount, reimburses), never by words from the converter. The shares come from the import function in the database, not from the file.
-
-**Potential Approach:**
-- A migration replacing the import function so an invited line is written with a part of 0, and a test in `17_import.test.sql`. The function is large and cannot be tried locally (no Docker), so it needs a careful copy.
-
-**Priority:**
-- [ ] High - Critical improvement
-- [x] Medium - Nice to have
-- [ ] Low - Future consideration
-
-**Dependencies:**
-- ADR-052 (applied).
-
-**Status:**
-- [x] Proposed
-- [ ] In Progress
-- [x] Completed (2026-11-12, migration `20261112150000_import_invited_without_part.sql`)
-- [ ] Deferred
-
 ### 2026-11-12 - First run
 
 **Description:**
@@ -140,33 +115,6 @@ Ideas not built and not decided against. Review during planning to pick the next
 - [x] Proposed
 - [ ] In Progress
 - [ ] Completed
-- [ ] Deferred
-
-### 2026-11-12 - Privacy mode
-
-**Description:**
-- A toggle that replaces every amount with `####` so the screen can be shown or used in public.
-- Beyond amounts, the same toggle would also cover: balances and net worth, chart axes and tooltips, memos and names typed by the user, and the browser tab title and page text a screenshot would catch.
-
-**Motivation:**
-- The author works in places where others can see the screen.
-
-**Potential Approach:**
-- One setting read by `Money`, `Percent` and the chart components, kept in the browser (not the database). Charts hide values and tooltips, not only the numbers in text.
-- The toggle sits in the top bar so it is one tap away.
-
-**Priority:**
-- [ ] High - Critical improvement
-- [x] Medium - Nice to have
-- [ ] Low - Future consideration
-
-**Dependencies:**
-- None. Easier once every amount goes through `Money`.
-
-**Status:**
-- [x] Proposed
-- [ ] In Progress
-- [x] Completed (2026-11-25, SET-08: amounts, percents and chart axes; memos, names and the tab title stay shown)
 - [ ] Deferred
 
 ### 2026-11-12 - Relationship view on the Proches page

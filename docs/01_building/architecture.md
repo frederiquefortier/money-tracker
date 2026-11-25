@@ -20,7 +20,7 @@
 |---|---|---|
 | Database and auth | Supabase (Postgres + Auth) | ADR-001 |
 | Backend | TanStack Start server functions, running on Node in Netlify Functions | ADR-002 |
-| UI | React 19, TanStack Router (loaders, no separate query cache), shadcn/ui on Tailwind, Recharts for charts | ADR-003, ADR-011 |
+| UI | React 19, TanStack Router loaders, TanStack Query for reads outside loaders, shadcn/ui on Tailwind, Recharts for charts | ADR-003, ADR-011, ADR-073 |
 | Forms | Native React 19 form actions; Zod validates every server function input | ADR-003, ADR-011 |
 | Money | `numeric` in Postgres, strings over the wire, `BigInt` minor units for the rare TypeScript calculation | ADR-004, ADR-011 |
 | Exchange rates | Frankfurter for history and daily rates, HexaRate to validate new currencies | ADR-009, ADR-069 |

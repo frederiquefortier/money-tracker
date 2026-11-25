@@ -87,9 +87,10 @@ encrypted dump is the only backup.
 - **Password changes** need `aal2` once a factor exists, and send a notification email.
 - Access tokens last 15 minutes with refresh rotation, verified locally (ADR-018), which needs
   an asymmetric JWT signing key on the project.
-- **Open before a second user:** a per-IP and per-email sign-in throttle of our own (Supabase
-  sees only the server's IP), a custom SMTP sender (the built-in one only reaches the
-  organization's members), and self-service MFA recovery. Until then, enrol the TOTP secret
+- **Open before a second user:** a per-IP and per-email sign-in throttle in Postgres
+  (Supabase sees only the server's IP), a custom SMTP sender in `[auth.email.smtp]` (the
+  built-in one only reaches the organization's members, a few times an hour; a free-tier
+  provider and a domain of our own), and self-service MFA recovery. Until then, enrol the TOTP secret
   in two apps; a user who loses both is unlocked from the dashboard after checking out of
   band.
 

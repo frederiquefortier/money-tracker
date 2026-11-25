@@ -39,7 +39,7 @@ English; this file is in English like every other meta-doc.
 | ACC-03 | An account can be closed (keeps history, gone from pickers). | v1, ai | 1 |
 | ACC-04 | An account can be hidden from new transactions without being closed. | v1 | 1 |
 | ACC-05 | Institutions are reusable records with a name and an optional website URL, shared by accounts and holdings. CRUD in Réglages; the account and holding forms can also create one inline. | add, C1 | 1 |
-| ACC-06 | The net worth page can group open accounts and holdings by institution (only institutions with an open item, then the items with none): collapsible sections, a link to the institution's site, per-institution total. Grouping by type is the default (ADR-061, author 2026-11-17). | add, C1 | 1 |
+| ACC-06 | The net worth page can group open accounts and holdings by institution (only institutions with an open item, then the items with none): collapsible sections, a link to the institution's site, per-institution total. Grouping by type is the default (ADR-061). | add, C1 | 1 |
 | ACC-07 | Sort accounts and holdings within each group by name, type, currency, value ascending, value descending. The choice persists per browser. | add, C2 | 1 |
 | ACC-08 | Each account shows when it was last reconciled and when its last transaction was. | sheet | 4 |
 
@@ -47,7 +47,7 @@ English; this file is in English like every other meta-doc.
 
 | ID | Requirement | Source | Phase |
 |---|---|---|---|
-| TRX-01 | Add an expense or an income, with a date. A calendar date only, no time: a date typed as 17.08.2026 reads 17.08.2026 everywhere, never shifted by a time zone. The optional time was dropped on 2026-11-04. | v1, ai, misc | 1 |
+| TRX-01 | Add an expense or an income, with a date. A calendar date only, no time, so no time zone shifts it. | v1, ai, misc | 1 |
 | TRX-02 | Currency is required on every transaction, prefilled from the account. The amount booked is always in the account's currency; choosing another currency records it as the original price (CUR-08). | add, C6 | 1 |
 | TRX-03 | Balance adjustment: set an account to a known balance; the app records the difference. | v1, ai | 1 |
 | TRX-04 | Transfer between two accounts. Optional fee, recorded as an expense on the source account in the category chosen once in settings. Edit and delete act on all legs together, with a confirmation before delete. List shows "Transfert: A → B". | add, C5 | 1 |
@@ -59,8 +59,8 @@ English; this file is in English like every other meta-doc.
 | TRX-10 | A transaction can carry a free-text note (the memo). | sheet | 1 |
 | TRX-11 | A transfer between accounts in different currencies records what left one and what arrived in the other; the gap against that day's market rate shows as the conversion cost, which counts as spending. | net-worth data (CAD to CHF) | 1 |
 | TRX-12 | Search transactions by text in anything a row shows: merchant, note, categories, account and institution (both sides of a transfer), ignoring case and accents. | author | 1 |
-| TRX-13 | The transactions list shows a chosen period: everything (loaded as you scroll), a year, a month, or custom days from a start to an end, picked as tabs (the last 1, 3 or 6 months, the last year, Tout) or a calendar (2026-11-17). Each day shows its net. Totals by category belong to the dashboard. | author | 1 |
-| TRX-14 | Filter the transactions list by type (expense, income, transfer), accounts, categories (sub-categories included, a split matching on any of its categories) and merchants, several of each at once. A filter narrowed to one value is the default of a transaction added from the list (2026-11-16). | author | 1 |
+| TRX-13 | The transactions list shows a chosen period: everything (loaded as you scroll), a year, a month, or custom days from a start to an end, picked as tabs (the last 1, 3 or 6 months, the last year, Tout) or a calendar. Each day shows its net. Totals by category belong to the dashboard. | author | 1 |
+| TRX-14 | Filter the transactions list by type (expense, income, transfer), accounts, categories (sub-categories included, a split matching on any of its categories) and merchants, several of each at once. A filter narrowed to one value is the default of a transaction added from the list. | author | 1 |
 
 ## 4. Multi-currency (`CUR`)
 
@@ -68,7 +68,7 @@ English; this file is in English like every other meta-doc.
 |---|---|---|---|
 | CUR-01 | Each user has a list of usable currencies. Defaults, sorted alphabetically: CAD, CHF, EUR, GBP, USD. | ai, C3 | 1 |
 | CUR-02 | Adding a currency validates it against HexaRate. If the provider is down, adding fails with a retry; existing currencies keep working. | ai, add, C3 | 1 |
-| CUR-03 | Currency pickers list the user's currencies by code; they are searchable and show "CODE - Nom" and the symbol. (Favourites were dropped on 2026-11-05: a user keeps a handful of currencies, so pinning saved nothing.) | v1, ai, C3 | 1 |
+| CUR-03 | Currency pickers list the user's currencies by code; they are searchable and show "CODE - Nom" and the symbol. | v1, ai, C3 | 1 |
 | CUR-04 | Removing a currency in use asks for confirmation and names how many transactions use it. The default currency and a currency used by an open account cannot be removed. Adding a removed currency back skips the HexaRate check. | C3 | 1 |
 | CUR-05 | A default currency, used to prefill forms. | ai | 1 |
 | CUR-06 | A display currency switchable from any page (header dropdown, like a language switcher). Every amount re-renders in it. | ai, add, C4 | 1 |
@@ -85,7 +85,7 @@ English; this file is in English like every other meta-doc.
 | CAT-03 | Archive a category from a chosen date; reactivate from a chosen date. A past archived period (two dates) can be added afterwards, from the archive action. The full history is viewable as a timeline. Archiving a parent archives its branch; reactivating a sub-category reactivates its archived parents from the same date. | v1, ai, add, C10 | 1 |
 | CAT-04 | Archived categories are absent from every picker. Editing an old transaction still shows its archived category with a badge and lets you change it. | add, C8 | 1 |
 | CAT-05 | The category page shows active categories first and archived ones in a collapsed section with a count and "archivée depuis [date]", drawn as a tree, the last archived first. | add, C9 | 1 |
-| CAT-06 | The picker starts with a "Fréquents" group (first "Fréquentes", then "Fréquemment utilisées", "Fréquents" since 2026-11-05): the most used categories of the transaction's type, worked out from recent transactions and shown as "Parent > Enfant". They also keep their place in the tree below, which lists categories as the category page draws them. Hand-picked favourites were dropped on 2026-11-04. | v1, ai, add, C7, author | 1 (with the transaction form) |
+| CAT-06 | The picker starts with a "Fréquents" group: the most used categories of the transaction's type, worked out from recent transactions and shown as "Parent > Enfant". They also keep their place in the tree below, drawn as the category page draws it. | v1, ai, add, C7, author | 1 (with the transaction form) |
 | CAT-07 | A category has a coolicons icon, chosen in a searchable picker of a curated subset of the set (ADR-020). A default is suggested from the name; picking the suggested icon returns to it. Each category has its own colour, chosen freely; a sub-category starts from a variation of its parent's colour. | v1, ai, add, C11 | 1 |
 | CAT-08 | A category can be excluded from the emergency-fund calculation. | v1, ai | 4 |
 | CAT-09 | The category tree sorts by name or by colour (rainbow order), kept per browser. One button opens or closes every branch, in every tab. A search filters the open tab by name, keeping each match's parents and its sub-categories, here and in the transaction's category picker. | author | 1 |
@@ -97,10 +97,10 @@ English; this file is in English like every other meta-doc.
 |---|---|---|---|
 | MER-01 | A merchant can have a default category, prefilled on new transactions. | v1, ai | 1 |
 | MER-02 | A merchant has aliases, other spellings of its name, so an import finds it by name or alias. A merge (MER-05) and an import merge keep the source's name and aliases as aliases of the target. The merchant form edits them. The list does not show them. | v1, ai | 3 |
-| MER-07 | ~~A merchant can be a person.~~ Replaced on 2026-11-11 by PPL-09: the seller is a person field on the transaction, and the merchant has no person (ADR-040, which supersedes ADR-038). | author | 3 |
+| MER-07 | ~~A merchant can be a person.~~ Replaced by PPL-09 (ADR-040). | author | 3 |
 | MER-03 | A merchant has a country of origin. | v1 | later |
-| MER-04 | For one merchant, see how the bill has changed over time, in percent. On the dashboard, a Par marchand card lists the merchants with a transaction in the period, at my share (ADR-064), its totals in the category table's columns without the average (Ce mois-ci and Cette année, or each year then Tout on Tout), Transactions and its trend; found by name, sorted by name, amount or number of transactions (kept per browser), more rows built as the list scrolls. A row's chevron or trend opens its bill as a receipt slip (the average, smallest, largest, last year's average with the change) beside its total per month, last year dashed (author, 2026-11-20). | v1, ai, author | 4 |
-| MER-06 | The merchant list sorts by name (A–Z, Z–A) or by category, kept per browser. The default category filter was removed on 2026-11-18: the category sort does its job. | author | 1 |
+| MER-04 | For one merchant, see how the bill has changed over time. The dashboard's Par marchand card lists the merchants of the period at my share (ADR-064) with their totals, count and trend, searchable and sortable; a row opens its bill (average, smallest, largest, last year's average and the change) beside its total per month. | v1, ai, author | 4 |
+| MER-06 | The merchant list sorts by name (A–Z, Z–A) or by category, kept per browser. | author | 1 |
 | MER-08 | On the merchants list, a merchant with no default category shows the category its own transactions use most (ties go to the one used last) in a faded badge and italic path, with a "Suggérée" tag and a sparkle, the mark the app uses for what it did by itself (as for an event link made by the rule). Clicking the tag makes the suggestion the default category. The merchant's sheet also opens with it filled in. | author | 1 |
 | MER-05 | Merge two merchants: the transactions of one move to the other, which keeps its name and default category; the source's name becomes an alias (MER-02). | author | 1 |
 
@@ -118,7 +118,7 @@ English; this file is in English like every other meta-doc.
 |---|---|---|---|
 | PPL-01 | People have a name and, for now, its first letter as their icon; they can be grouped, and a group shows its members' avatars. | v1, ai, author | 2 |
 | PPL-02 | A person or a group can be archived and hidden. Archived ones are listed the last archived first. | ai | 2 |
-| PPL-03 | An expense can be linked to people or groups (a group adds its members; searching a group's name lists it with its members, 2026-11-13), each in a role: invited (I paid for them, the default) or owes (they will pay me back), beside my own part. Their part is set by amount, share or percentage, and an invited person's part can be 0 (a gift: the whole amount on me, ADR-052). An income names the one person it came from. | v1, ai, author | 2 |
+| PPL-03 | An expense can be linked to people or groups (a group adds its members; searching a group's name lists it with its members), each in a role: invited (I paid for them, the default) or owes (they will pay me back), beside my own part. Their part is set by amount, share or percentage, and an invited person's part can be 0 (a gift: the whole amount on me, ADR-052). An income names the one person it came from. | v1, ai, author | 2 |
 | PPL-04 | Without naming anyone: tick "I treated someone" with an amount and a head count, or "I expect a reimbursement" with an amount. | v1 | 2 |
 | PPL-05 | What each person owes me, at a glance: on their row and in their sheet, and the owed bubble on Transactions. Money I owe others is out of scope. | misc, author | 2 |
 | PPL-06 | A person can have aliases, other spellings of their name, so the import finds them by name or alias, ignoring case and accents. A name or an alias points to one person only. | author | 2 |
@@ -133,25 +133,25 @@ English; this file is in English like every other meta-doc.
 | EVT-01 | User-defined event types, each with a name and a colour. | ai, author | 2 |
 | EVT-02 | An event has a name, optional dates (one day or a range), an optional type and optional people. | v1, ai | 2 |
 | EVT-03 | Transactions can be linked to an event, by hand or automatically (EVT-07). The event shows as a tag on the transaction. | v1, ai, author | 2 |
-| EVT-04 | Calendar view of events with the total spent on each: the dashboard's Événements tab shows each month of the period as a full-height calendar whose day boxes hold the day's spending, its events as bars, its first transactions and the people on them, each month's events listed with what each cost me (author, 2026-11-18; redesigned 2026-11-23). Built in the dashboard's Événements tab, then removed until later (author, 2026-11-24: the basic use case is complete without it; restorable from commit 45a8260). | v1, ai | later |
-| EVT-05 | Compare events of the same type: every event of the chosen type over every year, newest first or sorted by date, name or cost per day, its cost per day as a column in date order, cut into its top-level categories, against the type's mean over every year (a dashed line), then a row each with its figures; on a year, only that year's events (author, 2026-11-23). Built in the dashboard's Événements tab, then removed until later (author, 2026-11-24: the basic use case is complete without it; restorable from commit 45a8260). | ai | later |
-| EVT-06 | Give an event a budget and follow it live. Moved to phase 4 with the other budgets, built once on the shared `budgets` table (author, 2026-11-08). | ai, author | 4 |
-| EVT-07 | In its dates, an event attaches itself to every expense and income (categories skipped since 2026-11-13, ADR-055: a default list for every event behind the Événements page's settings icon, shown ticked in the event and deselectable there, ADR-056, ADR-070). With no dates, only by hand. Automatic links are marked as such and can be removed or changed by hand; a removed one stays removed. An event can turn the automatic link off (2026-11-11, ADR-042): it then holds only the transactions linked by hand, and its automatic links are removed. | ai (was TAG-02), author | 2 |
+| EVT-04 | Calendar view of events with the total spent on each: each month a calendar whose days hold the day's spending, its events, its first transactions and the people on them. Removed until later (see YR). | v1, ai | later |
+| EVT-05 | Compare events of the same type: each event's cost per day, cut into its top-level categories, against the type's mean. Removed until later (see YR). | ai | later |
+| EVT-06 | Give an event a budget and follow it live, on the shared `budgets` table. | ai, author | 4 |
+| EVT-07 | In its dates, an event attaches itself to every expense and income, except in skipped categories: a default list, which an event can replace with its own (ADR-055, ADR-056, ADR-070). With no dates, only by hand. Automatic links are marked as such and can be removed or changed by hand; a removed one stays removed. An event can turn the automatic link off (ADR-042). | ai (was TAG-02), author | 2 |
 
 ## 10. Dashboard and reports (`DSH`)
 
 | ID | Requirement | Source | Phase |
 |---|---|---|---|
-| DSH-01 | Period: everything (the default) or a calendar year, both in one menu (author, 2026-11-20; 2026-11-19: no 6 or 12 months, no custom). A year counts by month, everything by year. The period last picked comes back with the page, per browser (author, 2026-11-23). | v1, ai | 4 |
+| DSH-01 | Period: everything (the default) or a calendar year, in one menu. A year counts by month, everything by year. The period last picked comes back with the page, per browser. | v1, ai | 4 |
 | DSH-02 | The income and the expense reports each filter by category, a ticked category taking its sub-categories. Tags were dropped (TAG-01). | v1, ai | 4 |
 | DSH-03 | An archived category is hidden from charts when the range does not overlap its active period. | v1, ai | 4 |
-| DSH-04 | The sheet's table: each group folding its categories, each row with its trend opening the category's chart, then this month, the year so far and its monthly average, everything from the year shown (author, 2026-11-19: in November the year is divided by 11; the last 6 and 12 months dropped), to today on the current year and to December on a past one; spending more than 10 % over its average this month is marked. On everything, a total per year, the whole history's total (author, 2026-11-25) and the yearly average (author, 2026-11-19; replaced count, mean and median). Each row counts its transactions over the period, as the merchant table does (author, 2026-11-25). Only categories with a transaction in the period show, sorted by name, colour, amount (author, 2026-11-20) or transactions (author, 2026-11-25). On a year, an Évolution column gives each category's change in percent: the year so far against the same months a year earlier. Everything has no comparison (author, 2026-11-20). On a year, a row's chart draws last year's same months as a paler dashed line (author, 2026-11-20). | v1, ai | 4 |
-| DSH-05 | Every figure counts a shared expense at my share, net of what was repaid (ADR-063). The pending and owed bubbles live on the transactions list only (author, 2026-11-19). | v1, ai | 4 |
-| DSH-06 | The period at a glance, as the sheet's figures: income as the headline and as one bar cut into spent, invested and remaining (earned less spent and invested), each with its share of income and its change from the same stretch a year earlier. Months without any transaction are named in a warning tag beside the page title (author, 2026-11-20). The net worth stays on its own page (author, 2026-11-19: its tile was removed). | sheet | 4 |
-| DSH-07 | Charts as the sheet, in forms that read better (author, 2026-11-19): earned and spent per month (per year on everything) as paired bars, a month where spending passed income shaded red, one without any transaction grey; income on top of what earlier years left against spending, as two lines that stop at this month, with last year's two lines dashed; expenses split by need and want, by group or by category, and income by group, each card switching between the months stacked and a donut of the whole with its list (author, 2026-11-20). The month or year not over yet is drawn lighter. Earned is green, spent red, invested yellow, what remains pale. | sheet | 4 |
-| DSH-08 | One full-width page with views switched by icons beside the period: Argent (the sheet's dashboard), Événements (EVT-04, 05), and the yearly review's social view to come (YR-01). A category, a month or a day on the dashboard opens its transactions (author, 2026-11-20). | misc | 4 |
+| DSH-04 | The sheet's table, by category with groups folding: on a year, this month, the year so far, its monthly average and the change against the same months a year earlier, with spending more than 10 % over its average marked; on everything, a total per year, the whole total and the yearly average. Each row counts its transactions and has a trend opening its chart. Only categories with a transaction in the period show, sorted by name, colour, amount or transactions. | v1, ai | 4 |
+| DSH-05 | Every figure counts a shared expense at my share, net of what was repaid (ADR-063). The pending and owed bubbles live on the transactions list only. | v1, ai | 4 |
+| DSH-06 | The period at a glance, as the sheet's figures: income as the headline and as one bar cut into spent, invested and remaining (earned less spent and invested), each with its share of income and its change from the same stretch a year earlier. Months without any transaction are named in a warning tag. The net worth stays on its own page. | sheet | 4 |
+| DSH-07 | Charts as the sheet, in forms that read better: earned and spent per month as paired bars; income on top of what earlier years left against spending, as cumulative lines with last year's dashed; expenses split by need and want, group or category, and income by group, as stacked months or a donut. | sheet | 4 |
+| DSH-08 | One full-width page. A category, a month or a day on the dashboard opens its transactions. | misc | 4 |
 | DSH-09 | Needs, wants and savings over the range: expenses by their need or want mark (CAT-10), unclassified ones apart, and investments as savings, in amounts and as shares of income. | author | 4 |
-| DSH-10 | A heat map of the year: what I spent each day, darker for more, in steps at the year's quartiles, a day without spending grey as a day to come; hovering a day names it and its amount (author, 2026-11-19); the days with spending over the days gone by (author, 2026-11-20). | author | 4 |
+| DSH-10 | A heat map of the year: what I spent each day, darker for more, in steps at the year's quartiles, with the count of days with spending. | author | 4 |
 
 ## 11. Budget (`BUD`)
 
@@ -170,10 +170,10 @@ English; this file is in English like every other meta-doc.
 | ID | Requirement | Source | Phase |
 |---|---|---|---|
 | NW-01 | Holdings: investment accounts, debts and other assets. Each has a country, a type (predefined by country, or typed with a kind), an optional name (otherwise type, institution and currency name it), an institution and a currency. | v1, ai, author (2026-11-12) | 2 |
-| NW-02 | Dated value snapshots per holding. A month with no snapshot keeps the last value in the chart (author, 2026-11-16). | v1, ai | 2 |
-| NW-03 | Contributions per holding, split between my money (transactions linked to the holding) and external money (employer, government; entered on the holding). Money can be transferred from one holding to another on a date. Holdings sort as accounts do (ACC-07). Shows amount placed (never reduced by a withdrawal), amount withdrawn, and profit in amount and percent; on the hub an investment's row shows its return over the range, and its opened chart shows placed, withdrawn and profit (ADR-062, author 2026-11-18). | v1, ai, net-worth data, author (2026-11-12) | 2 |
-| NW-04 | Net worth chart (total, investments, debts) and percent change over a range of 1, 3, 5, 7 or 10 years or everything; default is account start to today. The chart draws the net worth alone, with bars of what moved it by year (by month on a short range) split by group; assets count accounts, debts count credit cards. A list gives every account and holding with its own trend, as the spreadsheet did; a row opens the item's page and its chevron opens its own chart (author, 2026-11-17). The net worth and each item show their change over the same range (assets and debts no longer have figures of their own, author 2026-11-18), per year on everything, which also takes 1, 3 or 6 months (author, 2026-11-16 and 17); the net worth's own headline on everything reads its change since the first figure, how many times it multiplied and the average per year (author, 2026-11-19). An investment's change is its return, without the money put in or taken out (ADR-062, author 2026-11-18). | v1, ai, author | 5 |
-| NW-05 | Chosen holdings and accounts can be hidden, to simulate (the life insurance "with/without" line): they leave the chart, the hub's net worth and the group totals, and stay listed, marked (ADR-058, ADR-059, ADR-061). The choice is remembered per browser. | net-worth data, author (2026-11-12) | 5 |
+| NW-02 | Dated value snapshots per holding. A month with no snapshot keeps the last value in the chart. | v1, ai | 2 |
+| NW-03 | Contributions per holding, split between my money (transactions linked to the holding) and external money (employer, government; entered on the holding). Money can be transferred from one holding to another on a date. Shows amount placed (never reduced by a withdrawal), amount withdrawn, and profit in amount and percent; an investment's row shows its return over the range (ADR-062). | v1, ai, net-worth data, author (2026-11-12) | 2 |
+| NW-04 | Net worth chart over 1, 3 or 6 months, 1, 3, 5 or 10 years or everything (the default): the net worth alone, with bars of what moved it split by group. Every account and holding has its own trend. The net worth and each item show their change over the range, per year on everything; an investment's change is its return (ADR-062). | v1, ai, author | 5 |
+| NW-05 | Chosen holdings and accounts can be hidden, to simulate (the life insurance "with/without" line): they leave the chart, the net worth and the group totals, and stay listed, marked (ADR-058, ADR-059). The choice is remembered per browser. | net-worth data, author (2026-11-12) | 5 |
 | NW-06 | Projections at fixed growth rates (5, 7, 10 %) or custom inputs. | v1, ai | later |
 | NW-07 | Goal solver: "to reach X in N years at r %, invest Y per year", with r defaulting to my actual return. | v1, ai | later |
 | NW-08 | "If this continues, in N years I'll have X." | v1, ai | later |
@@ -182,13 +182,15 @@ English; this file is in English like every other meta-doc.
 
 ## 13. Yearly review (`YR`)
 
+YR-01..05, EVT-04 and EVT-05 were built in the dashboard's Événements tab, then removed on 2026-11-24: the basic use case is complete without them. Restorable from commit 45a8260.
+
 | ID | Requirement | Source | Phase |
 |---|---|---|---|
-| YR-01 | Toggle between a money view and a social view: the dashboard's Argent and Événements tabs; the social figures live in Événements, with no third tab (author, 2026-11-23). Built in the dashboard's Événements tab, then removed until later (author, 2026-11-24: the basic use case is complete without it; restorable from commit 45a8260). | ai, misc | later |
-| YR-02 | Layout: a timeline with sticky months on the left, a calendar on the right that scrolls with it. In Événements, every month of the period on Tout too, built as it nears the screen; a row of month chips on a phone (author, 2026-11-23). Built in the dashboard's Événements tab, then removed until later (author, 2026-11-24: the basic use case is complete without it; restorable from commit 45a8260). | ai, misc | later |
-| YR-03 | Top 3 most expensive days. Built in the dashboard's Événements tab, then removed until later (author, 2026-11-24: the basic use case is complete without it; restorable from commit 45a8260). | ai | later |
-| YR-04 | Who I spent the most with, the least with, and who I shared the most events with. Everyone on an expense counts, whatever their role, the seller included (author, 2026-11-23). Built in the dashboard's Événements tab, then removed until later (author, 2026-11-24: the basic use case is complete without it; restorable from commit 45a8260). | ai, misc | later |
-| YR-05 | Who owes me, at a glance. Whom I owe stays out of scope, as in PPL-05 (author, 2026-11-23). Built in the dashboard's Événements tab, then removed until later (author, 2026-11-24: the basic use case is complete without it; restorable from commit 45a8260). | ai | later |
+| YR-01 | Toggle between a money view and a social view: the dashboard's Argent and Événements tabs. | ai, misc | later |
+| YR-02 | Layout: a timeline with sticky months on the left, a calendar on the right that scrolls with it; a row of month chips on a phone. | ai, misc | later |
+| YR-03 | Top 3 most expensive days. | ai | later |
+| YR-04 | Who I spent the most with, the least with, and who I shared the most events with. Everyone on an expense counts, whatever their role, the seller included. | ai, misc | later |
+| YR-05 | Who owes me, at a glance. Whom I owe stays out of scope, as in PPL-05. | ai | later |
 | YR-06 | Share of purchases made at local merchants. | v1 | later |
 | YR-07 | Export the review as charts in several formats. | ai | 6 |
 
@@ -207,7 +209,7 @@ The "Canada" section, generalised because the data already spans Canada and Swit
 |---|---|---|---|
 | IMP-01 | Import from one fixed, documented CSV format: accounts, transactions, splits, and optionally people lines (roles, head counts, reimbursement links) and aliases. The user prepares their data beforehand. See [import.md](../01_building/import.md). | sheet, ADR-010, ADR-033 | 3 |
 | IMP-02 | Net-worth history through the same format: optional files for holdings, their values, external contributions and transfers between holdings, checked and undone with the rest of the batch. | net-worth data, author (2026-11-12) | 3 |
-| IMP-03 | Import from a source in its own format (a bank CSV), with column mapping and saved source profiles. The author's own import is the fixed format (IMP-01), with the conversion done outside the app; what the "wizard" was meant to add for the first import (alias matching, merges, suggested pairs) is IMP-06 and MER-02, so this is only for other sources. | v1 misc ("Csv importer visual"), author 2026-11-10 | later |
+| IMP-03 | Import from a source in its own format (a bank CSV), with column mapping and saved source profiles. Only for other sources: the author's own import is IMP-01, IMP-06 and MER-02. | v1 misc ("Csv importer visual"), author 2026-11-10 | later |
 | IMP-04 | Export my data in the import format; export then import reproduces it. This is the export half of SEC-04. | ADR-010, SEC-04 | 3 |
 | IMP-05 | Each import is one all-or-nothing batch that can be undone in one action. Re-importing a row with a known `ref` is skipped. | ADR-010 | 3 |
 | IMP-06 | Anything an import names that does not exist yet is created: currencies, accounts, institutions, categories, merchants, people and events. Before it commits, each new category, merchant, person and event can be merged into another name, and each new merchant, person and event can be edited (another name, or none, with some of its text sent to the note) or removed. The choices apply to that import only, but a merge of a merchant or person is kept as an alias (MER-02, PPL-06). | author, ADR-033, ADR-037 | 3 |
@@ -237,49 +239,28 @@ Not in the notes, required by the brief. Details in [security.md](../01_building
 
 ## How the sources were reconciled
 
-- **Display currency vs. base currency.** v1 had one base currency per date range and
-  converted everything into it. `ai` and C4 replaced that with a display currency the user
-  can switch at any time. Kept: the display currency only (CUR-06), with conversion at the
-  transaction date (CUR-07). The v1 base-currency history is dropped (Q1); CUR-09 makes up
-  for it by marking which amounts were converted.
-- **"Favourite" vs. "default" currencies.** C3 marks the five starting currencies
-  `is_default`; `ai` also has favourites. They are two different flags: default means "came
-  with the account", favourite means "pin to top". Favourites were dropped on 2026-11-05
-  (CUR-03).
-- **Transfers.** C5 stores a transfer as two transactions pointing at each other. The schema
-  uses a shared `transfer_id` on the legs instead; same behaviour, no circular foreign keys.
-  See [database.md](../01_building/database.md).
-- **Transfer fee category.** C5 auto-created "Frais bancaires". With categories built by the
-  user, the fee category is a setting instead (`profiles.transfer_fee_category_id`).
-- **Category icons.** C11 asks for an emoji picker in Google's style. Replaced by coolicons,
-  the set the logo comes from, so the interface has one visual language (ADR-020).
+- **Display currency, no base currency.** v1 had one base currency per date range; `ai` and
+  C4 replaced it with a display currency switchable at any time (CUR-06), converted at the
+  transaction date (CUR-07), with converted amounts marked (CUR-09).
+- **Transfers** share a `transfer_id` on their legs, where C5 had two rows pointing at each
+  other: same behaviour, no circular foreign keys.
+- **Transfer fee category** is a setting (`profiles.transfer_fee_category_id`), where C5
+  auto-created "Frais bancaires".
+- **Category icons** are coolicons, where C11 asked for emoji (ADR-020).
 - **"Canada"** became region packs (`LOC`), since 2026 data is Swiss.
-- **Tags and events.** Both could hold a trip: a tag with a date range and categories, or
-  an event. On 2026-11-05 the author kept events, the more defined idea, gave them the
-  automatic linking (EVT-07) and shows the event as a tag on the transaction. Tags moved
-  to later.
-- **v1 "account hidden for future transactions"** was dropped from `ai`, probably by
-  accident. Kept as ACC-04; delete it if the drop was deliberate.
-- **v1 "anonymous" treat/reimbursement** (PPL-04) was also dropped from `ai`. Kept for the
-  same reason.
+- **Tags and events** could both hold a trip; events were kept (2026-11-05), with the
+  automatic linking (EVT-07).
+- **ACC-04 and PPL-04** were in v1 and missing from `ai`; both were kept.
 
 ## Resolved questions
 
-- **Q1. Home currency over time** (2026-10-27): no. The display currency is enough. An
-  amount already in the display currency is shown as is, and converted amounts are marked
-  (CUR-07, CUR-09).
-- **Q2. Rates provider** (2026-10-27): HexaRate validates a currency when it is added;
-  Frankfurter provides the historical rates for conversion, from the ECB and other central
-  banks (ADR-069).
-- **Q3. "Projections comme suisse"** (2026-10-27): projections are not v1. NW-06..08 and
-  BUD-07 move to improvements.md.
+- **Q1. Home currency over time** (2026-10-27): no. The display currency is enough (CUR-07, CUR-09).
+- **Q2. Rates provider**: HexaRate validates a currency when it is added; Frankfurter
+  provides the historical rates (ADR-069).
+- **Q3. "Projections comme suisse"** (2026-10-27): projections are not v1 (NW-06..08, BUD-07).
 - **Q4. "Stat qui a été plus vue"** (2026-10-27): "who I saw the most", counted from shared
   events (YR-04).
 - **Q5. Splits and people together** (2026-10-27): a person's share comes off each split
-  proportionally, and the dashboard shows my share by default.
+  proportionally, and the dashboard shows my share.
 - **Q6. Event budget vs. category budget** (2026-10-27): one `budgets` table whose target is
   a category or an event.
-
-## Open questions
-
-None right now.

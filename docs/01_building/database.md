@@ -90,8 +90,10 @@ transactions, the last used on a tie (MER-08); the list offers it when there is 
 - `list_transactions` returns whole days (about 150 rows a page), every amount converted at
   the rate of its date, as text. A transfer is one row without an account filter and one row
   per chosen account's leg with it; the fee rides on the departure row. `total` counts rows
-  before paging. `kinds` keeps expenses, incomes or transfers; an adjustment is in none. Usage views (`merchant_usage`, `merchant_suggested_category`, `frequent_categories`) count in SQL because
-  PostgREST returns at most 1,000 rows. It is plpgsql planned per call (ADR-053).
+  before paging. `kinds` keeps expenses, incomes or transfers; an adjustment is in none. It is
+  plpgsql planned per call (ADR-053).
+- Usage views (`merchant_usage`, `merchant_suggested_category`, `frequent_categories`) count
+  in SQL because PostgREST returns at most 1,000 rows.
 - `used_category_ids()`, `used_account_ids()` and `holdings_with_history()` return the ids
   in use (security invoker); those are archived, not deleted.
 - `reimbursements` link an income to `owes` lines of an expense, each taking at most what it
@@ -111,11 +113,9 @@ members, never a line. Deleting a person keeps their lines as lines without a na
 `merge_people` refuses a transaction both people share (ADR-039). The seller of an expense is
 `transactions.seller_person_id` (ADR-040).
 
-**Events.** A transaction has one event and an `event_source` (`manual` or `auto`).
-Automatic links are recomputed when an event's dates or `auto_link` change and when a
-transaction's date or kind changes; manual links are never touched. Two matching events: the
-narrower range wins, then the earlier created. `event_exclusions` remember an automatic link
-removed by hand so it never comes back. `event_default_skips` and `event_skips` are the
+**Events.** A transaction has one event and an `event_source` (`manual` or `auto`); the
+linking rules are in [domain-rules.md](domain-rules.md#events). `event_exclusions` remember an
+automatic link removed by hand. `event_default_skips` and `event_skips` are the
 categories the link skips (an event with `skips_own` uses its own list, even empty, instead of the default, ADR-056; a category takes its
 sub-categories, a transaction is skipped only when all its splits are, ADR-055).
 `matching_event` links one transaction (the form, `save_transaction`); `relink_events`
@@ -152,4 +152,3 @@ investment's return over the range from it and the series (ADR-062).
 | `budgets` | `category_id` or `event_id` (exactly one), period, `metric` (amount/count), `direction` (max/min), `value`. BUD-01, 02, EVT-06. |
 | `budget_settings` | Expected monthly income, emergency fund months and account. BUD-03, 04. |
 | `employers`, `salaries` | NW-09. |
-| Tags | Decided against, see [improvements.md](../03_planning/improvements.md#decided-against). |

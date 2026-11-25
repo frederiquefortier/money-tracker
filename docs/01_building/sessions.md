@@ -4,6 +4,18 @@ Short record of each working session: what the author asked, what was decided an
 
 <!-- Newest first: a new session goes directly below this line. Template at the bottom. -->
 
+### 2026-11-25 - Docs trim
+
+**What We Worked On:**
+- The author asked what in the docs could go, keeping the process clear; the assistant proposed six cuts outside the journal and the author asked for all of them, after reading the journal files too.
+- The specs of built screens (18 to 22) and the TravelSpend layout reference were deleted; their rules that the code does not say moved to domain-rules.md and design-decisions.md. 02-screens.md now says a spec is deleted once its screen is built.
+- design-decisions.md lost its superseded entries (each now a line of what was tried) and the long review stories; requirement rows lost their dates and history; reference-sheets.md and setup.md were cut to what is still used. Stale lines fixed: TanStack Query in architecture.md, the demo in the brief, "before a second user" kept in security.md only.
+
+- The author then asked to trim the journal files too: eight sessions entries over about 350 words rewritten, the two completed ideas removed from improvements.md, and eleven ADRs over about 300 words cut to their decision and rejected options. ADR-011 keeps its dependency tables; bugs.md was already short.
+- The author found most learnings were the assistant's own findings, where the file is meant for what the author learns in teacher mode (the author's Arduino journal as the model). Kept: the password in a URL and the return without deposits; added: encryption at rest and why the heat map reloaded, both asked by the author. The 15 others are covered by code comments, migrations, ADRs, security.md and setup.md. CLAUDE.md and the dev-journal skill now say what goes in learnings.md.
+
+---
+
 ### 2026-11-25 - Code review and consistency pass
 
 **What We Worked On:**
@@ -20,6 +32,8 @@ Short record of each working session: what the author asked, what was decided an
 **What We Worked On:**
 - The author asked to rewrite the README into their portfolio structure (highlights, overview, problem, goals, architecture, challenges, decisions, future work, lessons), drawn from the brief, ADRs, learnings and bugs. The docs table gave way to a link to the brief.
 - The author corrected the first draft: the spreadsheet's real history (2018 to 2022, then Aspire from 2023 without envelopes, net worth in the same file), the spreadsheet already retired, budgets a nice-to-have. Challenges and decisions now describe the author's part (architecture, guiding and instructing the assistant, design, QA, data preparation) instead of technical gotchas the assistant met; the AI highlight became design and languages.
+- The author disliked the second draft too and pointed to two of their own READMEs as the model. The third draft is about the product first, in their voice: highlights as what the app does, a table of people's roles, challenges from shared money, data cleanup, design and steering the assistant, and decisions with the alternative each rejected.
+- Then: a categories and merchants highlight, security and privacy merged, events linked by hand to any transaction (the date rule only automates it), the status line out, the problem rewritten in an impersonal voice, goals on my share and need or want instead of languages and people. The bank decision now gives the author's reason: reviewing every transaction by hand catches mistakes and suspicious charges and keeps each expense a considered choice. The privacy mask decision was dropped.
 
 **What Could We Do Better:**
 - No hero media yet: a placeholder comment names the shots, to take from invented data only.
@@ -113,11 +127,10 @@ Short record of each working session: what the author asked, what was decided an
 ### 2026-11-25 - Loaders, skeletons, the adjustment sheet and Safari
 
 **What We Worked On:**
-- The author asked for a loader on every chart, and on the export's line counts, which squeezed the rows while they loaded. `ChartContainer` shows a spinner in the chart's own space until the page has hydrated (`useHydrated`), since Recharts draws at a guessed size before that; the heat map has the same spinner while its year loads; each export row shows a spinner in place of its count.
-- The author then asked for text to load as a skeleton and for every loader to be checked. `Skeleton` and `SkeletonRows` came in (ADR-068), in the gallery. Text now waits as a skeleton: the export counts, the heat map's days count, the filter sheet's options, the rate and fee on a foreign receipt or transfer, the adjustment's balance and gap (which also stops showing a dash while it loads, and shows one on an error instead of nothing). The spinners left are buttons, charts, the list end, the transactions list refreshing, and pending pages and sheets.
-- The author asked to fix the adjustment sheet, too long on a phone. The sheet is full screen there, so the length was its title, "Modifier l’ajustement de “compte (institution)”" in capitals beside two buttons. It is now "Modifier l’ajustement", like the other edit sheets, and the account is named on the slip, above the balances.
-- The author asked to fix Safari moving the page when a field takes focus. The assistant first fixed a zoom: the slip's typed fields were 14px, which Safari zooms into, and are 16px on a phone now. The author said the problem was the sheet moving up and getting shorter, and that the keyboard should cover it. `useVisualViewport` did that and was removed. The author asked why it had been added: the 2026-11-12 iPhone pass, for a first letter lost in pickers and taps landing below fields, both never confirmed on a device. Not tried on an iPhone.
-- The author asked about the missing CLP and GTQ rates and when rates update. Found on the dev database: no rate of any kind after 2026-11-02, and no HexaRate row ever, so the daily Netlify job (17:00 UTC) has not run or fails at start; Frankfurter and HexaRate both answer. CLP and GTQ are not ECB currencies, so ADR-009 gives them HexaRate from the day they are added, with no history. Frankfurter's v2 API has both from 1999 (central banks beyond the ECB). The author chose Frankfurter v2 (ADR-069): the job asks it for the currencies in use and those kept, each from its own last day, a year per call, HexaRate only for what it lacks. A laptop run filled CLP and GTQ from 2018. The author found the Netlify function ran with no secret key; it reads `SUPABASE_SECRET_KEY`, never the publishable key.
+- The author asked for a loader on every chart and on the export's counts: `ChartContainer` waits until the page has hydrated (`useHydrated`), since Recharts draws at a guessed size before that. Then for text to wait as a skeleton: `Skeleton` and `SkeletonRows` (ADR-068), in the gallery.
+- The adjustment sheet was too long on a phone because of its title; it is now "Modifier l’ajustement", with the account named on the slip.
+- Safari moved the page when a field took focus. A zoom on 14px fields was fixed first (16px on phones); the author meant the sheet shrinking, so `useVisualViewport`, added in an earlier iPhone pass for problems never confirmed on a device, was removed.
+- CLP and GTQ had no rates: nothing had been stored since 2026-11-02, so the daily job was not running, and neither currency is an ECB one. The author chose Frankfurter v2 (ADR-069), HexaRate only for what it lacks; a laptop run filled both from 2018. The Netlify function was missing its secret key.
 
 **What Could We Do Better:**
 - Not seen in the browser: the Playwright browser was held by another session.
@@ -144,31 +157,26 @@ Short record of each working session: what the author asked, what was decided an
 ### 2026-11-23 - Comparer rebuilt
 
 **What We Worked On:**
-- The author found the dashboard's event comparator poor and asked the assistant, as a senior designer, for a proposal. The assistant proposed comparing each event's cost per day with its type's usual one, as a bar from a centre line with a percent, types as tabs, newest first, the year shown highlighted, eight rows then all, and later a split by category. The author asked for it built on the page itself.
-- Built: `typeComparison` returning the median and each event's gap, `comparableTypes`, tests; `eventSearch` in `drill-down.ts` so a row opens the event's transactions; the card rewritten without the measure menu; more invented trips in the gallery's demo.
-- The author then asked for the card beside Événements par jour (the slips moved under both, four in a row), only the year's events on Année instead of the other years paled, the type tabs as colour dots, and no cap on the rows. The type's name moved beside the title, since a dot alone does not name it.
-- Then the header's figures were replaced by the type's tag, the year dropped from each row on Année, and a label added above the bars naming the centre line as the mean; the median became a mean to match. The author also asked why not a chart; the assistant kept the rows (they are a bar chart on its side) and offered a dot chart over time on Tout.
-- A sort, as elsewhere: the events list's date and name orders plus the cost per day (`sortCompared`, with a test). The rows moved to `compared-list.tsx` to keep the card's file under the line limit.
-- The author rejected the bars in the rows twice (the diverging one, then a plain one from zero): a bar per row means nothing. Asked with three sketches, the author picked columns over time: `compared-chart.tsx` on Recharts as Argent's monthly chart, the mean a named dashed `ReferenceLine`, the rows below without a bar.
-- The author dropped the percent from the rows and asked to compare categories inside a trip. The server only had a total per event, so: `event_category_totals()` (migration, pgTAP 35 with another user seeing nothing, pushed to the dev database, types regenerated), `eventParts` folding leaf totals into top-level groups per day (`lib/events/event-parts.ts`, with a test), stacked columns with the category names under them, a part opening the event's transactions in its category. The unused gap to the mean was removed.
-- The author then removed the whole Événements tab and moved it to improvements: the basic use case is complete without it. The assistant asked to commit first, since most of the tab was untracked (commit 45a8260), then removed the toggle, the overview components, the gallery demo, `getEventsOverview`, `event-calendar.ts`, `event-parts.ts`, the tab's hooks and strings, and helpers only it used (`dayRangeOf`, `ShareBar`, the day grid's month jump and live future days, `year-activity`'s rankings). `monthsOf` and `monthWeeks` moved to `lib/shared/months.ts` for Dépenses par jour. The database functions stay.
+- The author found the dashboard's event comparator poor and asked the assistant, as a senior designer, for a proposal: each event's cost per day against its type's usual one, as a diverging bar with a percent, types as tabs, newest first. Built on the page at the author's request (`typeComparison`, `comparableTypes`, `eventSearch` to open an event's transactions).
+- The author then put the card beside Événements par jour, showed only the year's events on Année, made the type tabs colour dots, removed the cap on rows, put the type's tag in the header and chose the mean over the median. A sort followed (`sortCompared`).
+- The author rejected bars in the rows twice and picked, from three sketches, columns over time with the mean as a named dashed line. To compare categories inside a trip: `event_category_totals()` (migration, pgTAP 35, pushed, types regenerated) and columns stacked by top-level category.
+- The author then moved the whole Événements tab to improvements: the basic use case is complete without it. Committed first (45a8260), then the tab, its components, hooks, strings and the helpers only it used were removed; `monthsOf` and `monthWeeks` moved to `lib/shared/months.ts`. The database functions stay.
 
 **What Could We Do Better:**
-- The gallery could not be checked: the Playwright browser was held by another session and `/design` needs a signed-in session. The card needs a look at desktop and phone width.
-- The assistant defended its diverging bar for two rounds after the author questioned it; showing sketches of real charts at the first doubt would have saved them.
-
+- The gallery could not be checked: the Playwright browser was held by another session.
+- The assistant defended its diverging bar for two rounds; sketches of real charts at the first doubt would have saved them.
 
 ### 2026-11-23 - Événements as the year in review
 
 **What We Worked On:**
-- The author asked the assistant, as a senior UX and UI designer, to fix the dashboard's Événements tab from a brief: a calendar of events with their cost, the comparison by type, a sticky-month timeline, the top three days, who I spent the most and least with, who shared the most events, who owes whom, an export, a heat map of the events and every transaction, and a full-screen month per screen on desktop whose days hold the transactions, events and people.
-- The assistant reviewed the tab (no money on the calendar, 96 grids on Tout, spending and events apart, a list repeating the calendar, no social figures) and proposed Aperçu, highlights, Comparer, then the timeline calendar. The author chose the social figures in Événements (no Social tab), who owes me only (PPL-05 keeps "I owe" out), every month on Tout, and the export in phase 6.
-- Built: `getYearActivity` replacing `getDailySpending` (ADR-066), `lib/dashboard/year-activity.ts` with tests, the overview, the highlight cards, the month rail and chips, the month grid and the phone's agenda, a measure switch and the average on Comparer, and a gallery specimen with invented events. `heatFills` and the event tag's tint moved to `styles.ts`.
-- The author then asked for everyone on a transaction to count in "Avec qui j'ai dépensé" whatever their role (the assistant had left out the seller and an income's payer), the highlight cards as receipt slips (`slipLine` and `slipLabel` moved to `styles.ts`), a way to hide an event so a year-long one does not overwhelm the calendar (the assistant first hid whole types; the author asked for every event listed, grouped by type, as "Masquer des éléments" on the net worth page, since a type alone was not useful), and no empty months before the data starts in August 2018 (`dayRangeOf`). The calendar helpers moved to `lib/dashboard/calendar-days.ts`. The author also had the event tags under each month's title removed, and Aperçu renamed Événements par jour, as Argent's Dépenses par jour. The assistant first changed only the title; the author pointed out the card should be built like Dépenses par jour, its day counter included. Built: `DayGrid` and `DaysCount` (`components/dashboard/day-grid.tsx`), shared by both cards, days in their event's colour, the card half width beside the slips, `daysGoneBy` in `lib/shared/months.ts`.
+- The author asked the assistant, as a senior UX and UI designer, to rework the Événements tab from a brief: a calendar of events with their cost, a comparison by type, a sticky-month timeline, the top days, who I spent with, who owes whom, an export, and full-screen months.
+- The assistant reviewed the tab (no money on the calendar, 96 grids on Tout, a list repeating the calendar, no social figures) and proposed an overview, highlights, Comparer and a timeline calendar. The author chose the social figures here (no Social tab), who owes me only (PPL-05), every month on Tout, and the export in phase 6.
+- Built: `getYearActivity` (ADR-066), `lib/dashboard/year-activity.ts` with tests, the cards, the month rail and chips, and the phone's agenda.
+- Then, at the author's request: everyone on an expense counting in "Avec qui j'ai dépensé", the highlights as receipt slips, an eye hiding single events listed under their type, no empty months before the data starts, and Événements par jour built on Dépenses par jour's component (`DayGrid`, `DaysCount`).
 
 **What Could We Do Better:**
-- "Like the expenses one" meant the same card, not the same name; asking or comparing the two cards would have saved a round.
-- The gallery could not be checked: the Playwright browser was held by another session. The layout still needs a look at desktop and phone width, the chips' sticky offset under the header in particular.
+- "Like the expenses one" meant the same card, not the same name; comparing the two cards would have saved a round.
+- The gallery could not be checked: the Playwright browser was held by another session.
 
 ### 2026-11-23 - Showing a move between countries on the dashboard
 
@@ -182,15 +190,12 @@ Short record of each working session: what the author asked, what was decided an
 ### 2026-11-23 - Currency switch loader, table row hover
 
 **What We Worked On:**
-- The author asked for a loader while the display currency changes. The assistant first put a spinner in the currency chip; the author found it went away before the amounts changed, added a new kind of loader, and asked whether all loaders should be the same. The assistant proposed one loader per situation, a write's refresh showing the page bar as a page change does (ADR-065). Built: `useRefresh`, used by every write.
-- The author reported the dashboard tables' names changing colour before the rest of the row on hover (bugs.md).
-- The author asked for a gradient where a table's columns continue past its edge: `TableScroll` (`components/lists/table-scroll.tsx`) fades each edge while more columns sit past it, the left one after the sticky name column; `useScrollMore` takes the axis. Then a border on the sticky name column's right edge, drawn as a shadow so it moves with the cell.
-- The author asked for the dashboard's category filter to match the transactions page's, the source of truth: the chip reads "Filtres" (`FilterButton`, shared), the sheet is titled Filtres, has the categories' search, and Effacer and Voir les résultats in its footer (`FilterFooter`, moved to `components/sheet/`), where it had "Tout effacer" at the top.
-- The author asked for the dashboard to keep its year when left and opened again. The other choices were already kept per browser; the year, in the URL, was lost from the nav. The page now stores the period picked and opens on it when the URL has no year (DSH-01).
-- The author asked for the chart's missing months in the warning's colour (`--warning` at 15%, as the notice) and the expense red as #c30839 in light mode. The new red sits closer to the green in lightness (0.52 against 0.42, from 0.63).
-- The author renamed "aucune transaction" to "transactions manquantes" for a missing month, in the chart and in the notice.
-- The author set the invested colour to rgb(255, 204, 0) and the earned green to rgb(33, 139, 48) in light mode. The green and the red are now close in lightness (0.56 and 0.52); the assistant pointed it out for colour-blind readers.
-- The author asked for every percent rounded to a whole number, except below 1. `Percent` does it for every figure; the conversion fee's rate and the percent left to split keep their decimals, being typed or matched exactly.
+- A loader while the display currency changes: the spinner in the chip ended before the amounts changed, so the author asked for one loader per situation; a write's refresh now shows the page bar (ADR-065, `useRefresh`).
+- The dashboard tables' names changed colour before the rest of the row on hover (bugs.md).
+- `TableScroll` fades each edge while more columns sit past it, with a border on the sticky name column.
+- The dashboard's category filter now matches the transactions page's (`FilterButton`, `FilterFooter`), and the dashboard opens on the period last picked (DSH-01).
+- Colours set by the author: missing months in the warning colour, the expense red, the invested yellow and the earned green. The assistant pointed out the green and the red are now close in lightness for colour-blind readers. A missing month reads "transactions manquantes".
+- Every percent is rounded to a whole number, except below 1; typed or exact rates keep their decimals.
 
 ### 2026-11-20 - Par marchand card review
 
@@ -232,32 +237,23 @@ Short record of each working session: what the author asked, what was decided an
 ### 2026-11-19 - Dashboard design review
 
 **What We Worked On:**
-- The author asked the assistant, as a senior dashboard designer, to review the Argent tab and suggest improvements. The review, done on the design gallery with invented figures, found figures with nothing to compare to, a card repeating the tiles, colours meaning different things side by side, cents everywhere, the month in progress drawn as finished, a donut past a few slices, and a table pairing this month with totals (design-decisions.md).
-- The author asked for every change, with earned green, spent red, invested yellow and what remains pale; the pending and owed bubbles removed, as the transactions list has them; both the percent and the ×N kept on the net worth. The table counting back from today on a past year was a bug, not intended (bugs.md).
-- Built: the summary (Reste as the headline, the income bar, changes against the same stretch a year earlier, the net worth line), flow colour tokens checked with the dataviz palette validator, whole amounts, round axis steps, the month in progress lighter, deficit months shaded, last year's spending pace, the net worth chart on Tout, ranked bars for the split, the table's trend, average beside this month, above-average mark and fixed first column, a year stepper. Checked in the gallery at desktop and phone width.
-
-- After trying it, the author asked for a second pass: flag months without any transaction, a true red for spending, Gagné's change aligned with the others, last year's income dashed in the cumulative chart with "Revenus + reste 20xx" labels, the table's groups folding and its trend opening a chart, only this month, this year and the monthly average, a lone filter group open by default, and a donut back for needs and wants. Asked whether to remove the net worth tile as its figure differed from the net worth page, the assistant traced it to the series' last date against today's balances and kept the tile on the page's own figure (bugs.md).
-
-- A third pass: a heat map of each day's spending (from `my_lines` for the year shown, loaded with the year, no schema change); income as the headline over the full bar; the net worth tile removed from the dashboard, its ×N moved to the net worth page, whose Tout headline the assistant rewrote as the change since the first figure, ×N and the average per year, dropping the compounded percent; the table's average over the year shown only, divided by the months counted.
-
-- The author reported that ticking several expenses on a repayment kept only one. The cause was the part not known yet taking all the income (bugs.md). The author chose: known parts first, then the unknown ones share equally; and approved pushing the migration (20261119120000, pgTAP 36).
-
-- On 2026-11-20 the author asked for every dashboard card at half width; the heat map moved to month calendars to fill its card, then six across to match the monthly chart's height, with the cumulative chart beside the summary and the count as "290/365". Then Dépenses and its split merged into one card beside Revenus, each switching between stacked months and a donut, and the table back across the page; every series shown without Autres, and the missing-months warning as a tag beside the title.
+- The author asked the assistant, as a senior dashboard designer, to review the Argent tab. The review, on the design gallery with invented figures, found figures with nothing to compare to, a card repeating the tiles, colours with two meanings side by side, cents everywhere, the month in progress drawn as finished, and a table pairing this month with totals (design-decisions.md). The author asked for every change; a table counting back from today on a past year was a bug (bugs.md).
+- A second pass after trying it: months without any transaction flagged, a true red for spending, last year's income dashed in the cumulative chart, the table's groups folding with a chart per row, a donut back for needs and wants. The net worth tile differed from the net worth page because it read the series' last date (bugs.md).
+- A third pass: a heat map of each day's spending, income as the headline, the net worth tile moved to the net worth page with its ×N, the table's average over the year shown only.
+- A repayment ticking several expenses kept only one (bugs.md). The author chose known parts first, then the unknown ones sharing equally (migration 20261119120000, pgTAP 36).
+- On 2026-11-20: every card at half width, the heat map as month calendars, Dépenses and its split in one card beside Revenus, every series shown without Autres.
 
 **What Could We Do Better:**
-- Changing the heat map's count to "290/365" with a regex also rewrote the events tab's "{{count}} jours" strings; caught while removing Autres, before any commit. Scope a translation edit to its own block.
-- A dry run of `npm run db:push` passed `--dry-run` to the shell wrapper instead of the CLI, so it pushed for real. The push had been approved, but a preview was meant.
-- A new sparkline overwrote the existing `components/display/sparkline.tsx`; caught by the type check, restored from Git and extended instead. Search the layout's folders before writing a file.
-
+- A regex changing the heat map's count also rewrote the events tab's strings; caught before any commit. Scope a translation edit to its own block.
+- A dry run of `npm run db:push` passed `--dry-run` to the shell wrapper, so it pushed for real (the push was approved; a preview was meant).
+- A new sparkline overwrote `components/display/sparkline.tsx`; restored from Git. Search the layout's folders before writing a file.
 ### 2026-11-18 - Dashboard: the sheet's figures, and events
 
 **What We Worked On:**
-- The author asked for the dashboard page to mix three plans: the spreadsheet dashboard (DSH), the events calendar and comparison (EVT-04, 05) and the yearly review (YR). The author chose one page with a period and tabs (Argent, Événements, then Social), this build covering DSH and EVT with the Social tab next, and a year, a month, the last 6 or 12 months or custom days as the period.
-- On events the author chose month grids tinted by type with each event's total, bars per type to compare, and totals at my share, net of repayments.
-- Built: `my_lines()` and `event_totals()` (ADR-063, pgTAP 35), the period and figures models with tests, the server function and both tabs.
-- After seeing it, the author found it missing most of the sheet and asked for a full-width page with its information: the tiles (spent, earned, invested, remaining, net worth with its change and multiple), the cumulative and monthly charts, where the money went, income and expense reports by category with a filter, the expense split three ways, and the category table (this month, 6 and 12 months, average). The author kept a year and everything as periods, accepted the assistant's chart forms without filled lines, and kept Événements as a tab.
-- Rebuilt on `my_monthly()` (pgTAP 35 extended); the old per-category stats and the narrow layout were removed. Checked in the design gallery with invented figures, at desktop and phone width.
-- On real data the author found every figure at 0: the API cut `my_monthly` at 1000 of its 1751 rows (bugs.md); the long series are now fetched a page at a time. At the author's request the category table draws the tree's lines, and on Tout shows a total per year and the yearly average.
+- The author asked for one dashboard page mixing the spreadsheet's dashboard (DSH), events (EVT-04, 05) and the yearly review (YR): one page with a period and tabs (Argent, Événements, then Social).
+- Built: `my_lines()` and `event_totals()` (ADR-063, pgTAP 35), the period and figures models with tests, both tabs.
+- After seeing it, the author found most of the sheet missing and asked for a full-width page with its information: the tiles, the cumulative and monthly charts, reports by category, the three-way split and the category table. Rebuilt on `my_monthly()`, checked in the gallery.
+- On real data every figure was 0: the API cut `my_monthly` at 1000 rows (bugs.md); long series are now fetched a page at a time.
 
 **What Could We Do Better:**
 - The first version followed the requirement rows instead of the sheet the author works from; reading the sheet's layout first would have saved a rebuild.
@@ -279,14 +275,11 @@ Short record of each working session: what the author asked, what was decided an
 ### 2026-11-18 - List counts, list loaders, docs anonymized
 
 **What We Worked On:**
-- The author asked for the number of items on every list: a shared `ListCount` beside the page title (the transactions' filtered total). After trying it the author asked for smaller figures, and for Patrimoine's count beside its title like the other pages instead of on the list's controls.
-- The author asked for a sort by number of transactions on Magasins, with the count where a transaction shows its amount, and whether the category filter was needed. The assistant said no, since the category sort does its job; the filter was removed (MER-06). After trying it the author asked to remove the count and the new sort too.
-- The author found no loader at the end of a list still loading: a shared `ListEnd` spins in every list that grows on scroll.
-- The author found that searching a parent category hid its sub-categories: a match now keeps its branch, in the picker and on Catégories (CAT-09).
-- On /transactions, at the author's request: a spinner over the list while a new filter loads, the calendar icon centred in its tab, and 24px between the bubbles, the chips and the list; then, at the author's request, the pending and owed bubbles got the same space above them as the chips.
-- The author asked to anonymize the docs and shorten the long sessions entries. Real people, places, merchants, employers and amounts were taken out of sessions.md, bugs.md and three design docs; nine entries were rewritten short.
-- The author asked for invented names in the tests: pgTAP 19, 20 and 21 and two import unit tests now use made-up people, aliases and a group, and test 20 an invented rent; the same names replaced "Maman" and a real alias in six migration comments and one code comment. "Ben & Flo" stays, as it is a restaurant's name.
-- The author asked to remove the real data from git history and to anonymize amounts too. The last real figures left the docs (a holding's return, the employer rate, the gridline step), and the real institutions left the tests, in every spelling (the author caught one). The assistant prepared a `git filter-repo` rewrite (journal docs replaced by their anonymized version in every commit, a replacement list for the rest) and checked it on a throwaway clone; the author asked the assistant to run it, then force-pushed. The push's CI failed on em dashes, formatting and an e2e selector, and the author asked why keys showed in the e2e log (the local stack's throwaway ones, now silenced): fixed, see bugs.md.
+- A shared `ListCount` beside every list's title (the transactions' filtered total), made smaller after trying it.
+- On Magasins, a sort by number of transactions was built, then removed at the author's request; the category filter went, since the category sort does its job (MER-06).
+- A shared `ListEnd` spins at the end of every list that grows on scroll. A category search keeps the match's branch (CAT-09). On /transactions, a spinner while a filter loads and even spacing above the list.
+- The author asked to anonymize the docs and the tests: real people, places, merchants, employers and amounts left sessions.md, bugs.md, the design docs, pgTAP 19 to 21, two import tests and migration comments.
+- The author asked to remove the real data from git history: a `git filter-repo` rewrite, checked on a throwaway clone and run by the assistant at the author's request; the author force-pushed. The push's CI failures (em dashes, formatting, an e2e selector) were fixed (bugs.md).
 
 **What Went Well:**
 - The end loader and the spacing were checked on the gallery's transactions specimen at phone width.
@@ -294,7 +287,6 @@ Short record of each working session: what the author asked, what was decided an
 **What Could We Do Better:**
 - A stray `git stash` was created and dropped while running a test; the working tree was not affected.
 - A search for an institution name read the git-ignored real data folder into the transcript; searches must exclude `src/data/`.
-
 ### 2026-11-18 - Investment return on the hub row
 
 **What We Worked On:**
@@ -597,18 +589,18 @@ Short record of each working session: what the author asked, what was decided an
 ### 2026-11-10 - The import format
 
 **What We Worked On:**
-- The author asked how the spreadsheet should be divided for an import of currencies, people, events, merchants, categories and fees, then asked to start the format from scratch with everything created on demand: ADR-033, import.md rewritten, IMP-06.
-- A local converter (outside the repo) turned the Aspire export into the import files, reviewed in many rounds by the author, who corrected the assistant on what is a person, a trip, a merchant or a category. Decisions: drop nothing, import starting balances (ADR-034), accept archived categories up to their archive day (ADR-035), reimbursements read by hand rather than by score.
-- Database: `import_batch` (check, dry run, write, set-based to fit the 8-second API limit) and `import_undo`, ADR-036. The assistant wrongly believed an event needs a start date and built around it; the author corrected it.
-- Screen: the author chose a steps layout from three previews and gave eleven rounds of feedback (two steps, a stepper after a Figma reference, merges and edits of new items, aliases kept on merge, an error card paired with the done card). The author said the import being built is the wizard, narrowing IMP-03 (ADR-037).
-- Bugs found: the first letter typed in a combobox was lost in every sheet (an unstable callback); merges and aliases were lost after an import error (now kept in browser storage); a late-rent repayment above the expense was wrongly refused, then fixed in `save_transaction`.
+- The author asked how to divide the spreadsheet for an import, then to start the format from scratch with everything created on demand: ADR-033, import.md rewritten, IMP-06.
+- A local converter (outside the repo) turned the Aspire export into the import files over many rounds; the author corrected what is a person, a trip, a merchant or a category. Decisions: drop nothing, import starting balances (ADR-034), accept archived categories up to their archive day (ADR-035), read reimbursements by hand.
+- Database: `import_batch` (check, dry run, write, set-based for the 8-second API limit) and `import_undo` (ADR-036). The assistant wrongly assumed an event needs a start date.
+- Screen: a steps layout chosen from three previews, then eleven rounds of feedback. The author said this import is the wizard, narrowing IMP-03 (ADR-037).
+- Bugs: the first letter typed in a combobox lost, merges lost after an import error, a repayment above the expense refused.
 
 **What Could We Do Better:**
 - A rolled-back trial does not run deferred constraints, so early trials hid `people_sum_mismatch`.
-- The assistant refused repayments above the expense and deleted links from the data; the author said that is normal and the fix is in the code.
+- The assistant refused repayments above the expense; the author said that is normal and the fix is in the code.
 
 **Friction Points:**
-- `db lint` cannot see temporary tables (solved with a no-op pragma function); the import first ran 6 s against an 8 s limit, so guest-only people lines were made set-based (4.4 to 5.1 s).
+- `db lint` cannot see temporary tables (a no-op pragma function); guest-only people lines were made set-based to fit the time limit.
 - The data folder was not git-ignored, so real data could have been committed. Fixed.
 
 **Key Takeaways:**

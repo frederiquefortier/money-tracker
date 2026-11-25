@@ -1,15 +1,6 @@
 # UI conventions
 
-Rules every screen follows. A screen that disagrees with them is wrong until the author says otherwise. The shared components that implement them are in `src/app/src/components/`; reasons and rejected options are in [design-decisions.md](design-decisions.md). Layout follows [00-layout-reference.md](00-layout-reference.md), the look [01-visual-direction.md](01-visual-direction.md).
-
-## Screens still to build
-
-| Spec | Requirements |
-|---|---|
-| [First run](17-first-run.md) | SET-01 |
-| [Export](18-export.md) | IMP-04, SEC-04 |
-
-Everything else in phases 1 to 3 is built; read the code.
+Rules every screen follows. A screen that disagrees with them is wrong until the author says otherwise. The shared components that implement them are in `src/app/src/components/`; reasons and rejected options are in [design-decisions.md](design-decisions.md). The look is in [01-visual-direction.md](01-visual-direction.md). Built screens have no spec: read the code. The one spec left is for a screen not built yet, [First run](17-first-run.md).
 
 ## Rules
 
@@ -35,4 +26,4 @@ Everything else in phases 1 to 3 is built; read the code.
 
 ## Format of a spec (for screens not yet built)
 
-Purpose, requirement IDs, a phone-width sketch only if the layout is not obvious, behaviour and edge cases, open questions for the author. No data section, no copy tables: the code and the i18n files hold those.
+Purpose, requirement IDs, a phone-width sketch only if the layout is not obvious, behaviour and edge cases, open questions for the author. No data section, no copy tables: the code and the i18n files hold those. Once the screen is built, its rules that the code cannot say move to [domain-rules.md](../../01_building/domain-rules.md) or design-decisions.md, and the spec is deleted.

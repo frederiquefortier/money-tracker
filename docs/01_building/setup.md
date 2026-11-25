@@ -4,32 +4,22 @@ From an empty Supabase project to a deployed app, in order: tables exist only on
 applied the migrations (ADR-017), which needs the repository and its secrets. Commands run
 from `src/app` unless stated.
 
-## 0. Prerequisites
+## 1. Prerequisites
 
 - Node 24 through nvm (`nvm use` reads `src/app/.nvmrc`), then `npm ci` in `src/app`.
 - `age` and `age-keygen` in `~/.local/bin`.
 - A Supabase project, `money-tracker`, region Canada (`ca-central-1`), free plan, JWT
   signing key ECC (Project Settings, JWT Keys).
 
-## 1. Commit
+## 2. GitHub repository
 
-Commit everything on `main`. Nothing is pushed yet.
-
-## 2. GitHub repository, first CI run
-
-1. On github.com, **New repository**: `money-tracker`, **Private**, nothing generated.
-2. Connect and push:
-   ```
-   git remote add origin <the URL GitHub shows>
-   git push -u origin main
-   ```
-3. **Actions** tab: `docs`, `app` and `database` green, `backup` skipped, and `migrate`
-   red with "SUPABASE_DB_URL is not set". Expected until step 4.
-4. If `database` fails, the "pgTAP" step's log names the test.
+A private repository, nothing generated; push `main`. The first CI run has `migrate` red
+("SUPABASE_DB_URL is not set") until step 4. If `database` fails, the "pgTAP" step's log
+names the test.
 
 ## 3. Backup key
 
-In a terminal, from the home folder (not the repo):
+From the home folder (not the repo):
 
 ```
 age-keygen -o money-tracker-backup.key
@@ -44,45 +34,30 @@ The private key never goes into GitHub, the repo, or a conversation with the ass
 
 ## 4. GitHub secrets and variable
 
-In the repository: **Settings → Secrets and variables → Actions**.
+**Settings → Secrets and variables → Actions.**
 
-**Secrets** tab, **New repository secret**, twice:
+| Secret | Value |
+|---|---|
+| `BACKUP_AGE_RECIPIENT` | The `age1…` public key from step 3 |
+| `SUPABASE_DB_URL` | The **Session pooler** connection string (Supabase, **Connect**, Connection string, Session pooler), with the database password in place of `[YOUR-PASSWORD]` |
 
-| Name | Value | Where to find it |
-|---|---|---|
-| `BACKUP_AGE_RECIPIENT` | The `age1…` public key | Step 3 |
-| `SUPABASE_DB_URL` | The **Session pooler** connection string, with the database password filled in | Supabase dashboard, project page, **Connect** button at the top, **Connection string**, method **Session pooler**. It looks like `postgresql://postgres.<ref>:<password>@aws-…pooler.supabase.com:5432/postgres`. Replace `[YOUR-PASSWORD]` with the database password chosen when the project was created (reset it under Project Settings, Database, if lost). |
-
-Use the Session pooler, not the direct connection: the direct one is IPv6 only on the free
-plan, and GitHub's runners have no IPv6.
-
-**The database password must be letters and digits only** (32+ characters from the password
-manager). The connection string is a URL, so characters like `@ : / # ? %` in the password
-change its meaning and the connection fails as "authentication failed"
-([learnings.md](learnings.md)). Test the string locally first, from `src/app`:
+Use the Session pooler: the direct connection is IPv6 only on the free plan, and GitHub's
+runners have no IPv6. **The database password must be letters and digits only**: characters
+like `@ : / # ? %` change the URL's meaning and fail as "authentication failed"
+([learnings.md](learnings.md)). Test the string first:
 `npx supabase --workdir .. migration list --db-url "…"`.
 
-**Variables** tab: `BACKUP_ENABLED` = `true`. Add it last; it lets `backup` run, and
-`migrate` applies migrations only after a backup.
+**Variable** `BACKUP_ENABLED` = `true`, added last: it lets `backup` run, and `migrate`
+applies migrations only after a backup.
 
 ## 5. First migration
 
-**Actions → ci → Run workflow → branch `main` → Run workflow.**
-
-Expected, in order: `docs`, `app`, `database` green, then `backup` green, then `migrate`
-green.
-
-Check:
-- The run's summary page lists an artifact named `money-tracker-<date>.tar.gz.age`.
-- Supabase dashboard, **Table Editor**: a `profiles` table exists (empty).
-
-If `backup` fails on the connection, the `SUPABASE_DB_URL` value is the usual cause: special
-characters in the password, `[YOUR-PASSWORD]` brackets left in, plain `postgres` instead of
-`postgres.<ref>` as the user, or the direct connection string instead of the pooler.
+**Actions → ci → Run workflow** on `main`. `backup` then `migrate` go green, the run lists a
+`money-tracker-<date>.tar.gz.age` artifact, and the Table Editor shows an empty `profiles`.
+A `backup` failing on the connection is almost always the `SUPABASE_DB_URL` value (special
+characters, brackets left in, `postgres` instead of `postgres.<ref>`, or the direct string).
 
 ## 6. Link the CLI and push the auth settings
-
-`--workdir ..` points the CLI at `src/supabase`.
 
 ```
 npx supabase login                       # once per machine, token in the keychain
@@ -95,56 +70,38 @@ limit, the email templates and the site URL.
 
 ## 7. Local app
 
-```
-cp .env.example .env.local
-```
-Fill in, from the Supabase dashboard:
-- `SUPABASE_URL`: **Connect** dialog, or Project Settings, Data API, the project URL
-  (`https://<ref>.supabase.co`).
-- `SUPABASE_PUBLISHABLE_KEY`: Project Settings, **API Keys**, the **publishable** key
-  (`sb_publishable_…`). Never the secret key.
-- `SUPABASE_DB_PASSWORD`: the database password set when the project was created
-  (Project Settings, Database, to reset it). Only `npm run db:push` reads it (ADR-022).
-- `SUPABASE_SECRET_KEY`: Project Settings, API Keys, a **secret** key (`sb_secret_…`).
-  Only `npm run rates` reads it: the daily rates job, run once from the laptop. The first
-  run loads every rate since 2018.
+`cp .env.example .env.local`, then fill in from the Supabase dashboard (Project Settings):
 
-```
-npm run dev
-```
-The app is at http://localhost:3000 and shows the sign-in page.
+- `SUPABASE_URL`: Data API, the project URL (`https://<ref>.supabase.co`).
+- `SUPABASE_PUBLISHABLE_KEY`: API Keys, the **publishable** key (`sb_publishable_…`).
+- `SUPABASE_DB_PASSWORD`: the database password. Only `npm run db:push` reads it (ADR-022).
+- `SUPABASE_SECRET_KEY`: API Keys, a **secret** key (`sb_secret_…`). Only `npm run rates`
+  reads it.
 
-After a migration, `npm run db:types` regenerates `src/lib/database.gen.ts` from the
-linked project (ADR-023).
+`npm run dev` serves http://localhost:3000. After a migration, `npm run db:types`
+regenerates `src/lib/database.gen.ts` from the linked project (ADR-023).
 
 ## 8. Accounts
 
-**Owner, by invitation.** Dashboard, **Authentication → Users → Add user → Send
-invitation**. Open the email's link, **Continuer**, choose a password, then scan the QR code
-into two apps (phone and password manager) and enter the code.
+Dashboard, **Authentication → Users → Add user → Send invitation**. Open the email's link,
+**Continuer**, choose a password, then scan the QR code into two apps (phone and password
+manager) and enter the code.
 
 ## 9. Netlify
 
-1. app.netlify.com, **Add new project → Import an existing project → GitHub**, authorize,
-   pick `money-tracker`.
-2. **Base directory**: `src/app`. Build command and publish directory come from
-   `netlify.toml` (`npm run build`, `dist/client`).
-3. **Environment variables**, before the first deploy: `SUPABASE_URL` and
-   `SUPABASE_PUBLISHABLE_KEY`, same values as `.env.local`, available to Functions. Then
-   `SUPABASE_SECRET_KEY` (Project Settings, API Keys, a **secret** key, `sb_secret_…`),
-   scoped to **Functions only**: the rates job reads it, the app never does.
-4. Deploy. The site gets an address like `https://<name>.netlify.app`.
-5. **Deploy previews off** (ADR-017): Project configuration, Build & deploy, Branches and
-   deploy contexts, Deploy previews: none.
-6. `site_url` in `config.toml` is the Netlify address; `config push` after changing it, so
-   email links open the deployed app.
-7. Turn off the Netlify toolbar: its injected script has no nonce, so the CSP blocks it.
-8. **Rates backfill.** The `rates` scheduled function runs daily at 17:00 UTC and starts
-   from the last stored day, so its first run loads everything since 2018. Once the
-   currencies migration is applied, run it once by hand: Logs, Functions, `rates`, **Run
-   now**. If it times out, run it again; it resumes where it stopped.
+1. **Add new project → Import an existing project → GitHub**, pick `money-tracker`.
+   **Base directory** `src/app`; the rest comes from `netlify.toml`.
+2. **Environment variables**, before the first deploy: `SUPABASE_URL` and
+   `SUPABASE_PUBLISHABLE_KEY` as in `.env.local`, available to Functions; `SUPABASE_SECRET_KEY`
+   scoped to **Functions only** (the rates job reads it, the app never does).
+3. Deploy. **Deploy previews off** (ADR-017): Build & deploy, Branches and deploy contexts.
+4. Set `site_url` in `config.toml` to the Netlify address and `config push`, so email links
+   open the deployed app.
+5. Turn off the Netlify toolbar: its injected script has no nonce, so the CSP blocks it.
+6. **Rates backfill.** The `rates` scheduled function runs daily at 17:00 UTC from the last
+   stored day, so its first run loads everything since 2018. Run it once by hand (Logs,
+   Functions, `rates`, **Run now**); if it times out, run it again, it resumes.
 
 ## 10. After setup
 
 - First weekend of each month: the backup routine in [security.md](security.md#backups).
-- Before the spreadsheet is retired: one restore test (roadmap, phase 1 gate).

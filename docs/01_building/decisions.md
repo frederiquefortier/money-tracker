@@ -64,21 +64,19 @@ Technical and structural choices, with the alternatives that were rejected. Chec
 ### ADR-073: TanStack Query caches the reads made outside loaders (2026-11-25)
 
 **Context:**
-- The heat map showed its skeleton on every visit while the charts showed at once. The charts come from the dashboard's loader, which the router caches; the heat map fetches one year at a time from the component, with a hand-made cache that dropped the current year after each answer.
-- Nine reads work that way (the heat map, the filter options and empty filters, a rate, the matched event, the adjustment's balance, owed lines in two places, the export counts), each a `useEffect` with its own guard against late answers and no cache. ADR-011 had chosen loaders over TanStack Query; the author asked to adopt it for all nine.
+- Nine reads (the heat map, the filter options, a rate, the matched event, the adjustment's balance, owed lines, the export counts) were fetched from components, each a `useEffect` with its own guard and no cache, so the heat map showed its skeleton on every visit. The author asked to adopt TanStack Query for all nine.
 
 **Decision:**
 - Supersedes ADR-011's line on data loading and cache for these reads. Pages keep their router loaders.
-- A `QueryClient` per router, given by the router's `Wrap`, with the loaders' 30 s stale time and no retry. Each read is a `useQuery` keyed by what it asks (`['year-activity', year]`, `['rate', from, to, date]`); a past year of the heat map stays fresh for the visit.
-- `useRefresh`, which every save calls, marks every query stale with the router: those on screen load again behind their last answer, the others when next shown. `useSessionReload` empties the cache on sign-in and sign-out.
+- A `QueryClient` per router, with the loaders' 30 s stale time and no retry; each read a `useQuery` keyed by what it asks.
+- `useRefresh`, called by every save, marks every query stale; `useSessionReload` empties the cache on sign-in and sign-out.
 
 **Alternatives Considered:**
-- A key carrying the transaction count (`heatmap-{year}-{count}`) -> The browser would ask for the count on each visit, and an edit keeps the count.
-- A hand-made cache in the heat map's hook -> The same work again for the eight other reads.
-- Query for the loaders too -> Two ways to load a page; the loaders already cache and preload on hover.
+- A key carrying the transaction count -> A request for the count on each visit, and an edit keeps the count.
+- A hand-made cache -> The same work again for eight reads.
+- Query for the loaders too -> Two ways to load a page.
 
 **Consequences:**
-- A read already seen shows its last answer at once, and its skeleton only the first time.
 - A new read outside a loader is a `useQuery`, never a `useEffect`.
 
 ### ADR-072: Pages, charts and transactions load as skeletons (2026-11-25)
@@ -103,24 +101,23 @@ Technical and structural choices, with the alternatives that were rejected. Chec
 ### ADR-071: Privacy mode hides figures in a fixed shape, saved in a cookie (2026-11-25)
 
 **Context:**
-- The author uses the app where others can see the screen (improvements.md, 2026-11-12) and asked for privacy mode (SET-08).
+- The author uses the app where others can see the screen and asked for privacy mode (SET-08).
 
 **Decision:**
-- A shield button in the top bar: crossed out while figures show, whole while they are hidden. On, every amount shows as "##,## $" / "$##.##" and every percent as "## %", whatever its size or sign, so the shape gives nothing away. The currency stays. The digits never reach the page: `Money`, `Percent` and `useMoneyText` (amounts in dialogs and tags) render the mask, and `Money` drops its hover detail. Chart axes keep their width without labels; tooltips go through `Money`.
-- Saved per browser in an httpOnly `figures-hidden` cookie, read with the session, so a page load renders hidden from the server. The switch acts at once in a React context; the cookie follows.
+- A shield in the top bar. On, every amount shows as "##,## $" and every percent as "## %", whatever its size or sign; the currency stays. `Money`, `Percent` and `useMoneyText` render the mask, so the digits never reach the page. Chart axes lose their labels.
+- Saved in an httpOnly `figures-hidden` cookie read with the session, so a load renders hidden from the server.
 - Forms being filled, memos, names and the tab title stay shown.
 
 **Alternatives Considered:**
-- Browser storage, as ACC-07 sorts -> Read after mount, so the real figures would flash on every load.
-- On the profile -> The concern is the screen in front of the author, a device, as the language cookie is.
-- A CSS blur -> The number stays in the page text, readable on copy or by a screen reader.
-- Bullets in place of the digits, one per figure -> A "-" or a short mask still said which way and roughly how much.
-- Hiding memos and names too -> Lists would read as masks only; left for later.
-- The eye, as banking apps use -> On the net worth page it already means an item left out of the chart (ADR-058), so two eyes would do different things there.
+- Browser storage -> The real figures would flash on every load.
+- On the profile -> The concern is a device's screen.
+- A CSS blur -> The number stays in the page text.
+- Bullets per digit -> The mask's length and sign still told the size and direction.
+- Hiding memos and names -> Lists would read as masks only.
+- The eye -> It already means an item left out of the net worth chart (ADR-058).
 
 **Consequences:**
-- A chart still shows proportions and trends, without any figure.
-- Every new way of showing an amount has to go through `Money`, `Percent` or `useMoneyText`.
+- Every new way of showing an amount goes through `Money`, `Percent` or `useMoneyText`.
 
 ### ADR-070: The default excluded categories open from a settings icon (2026-11-25)
 
@@ -181,24 +178,23 @@ Supersedes ADR-009 for the rates; HexaRate still validates an added currency.
 ### ADR-067: The export is one SQL function, zipped by the server (2026-11-24)
 
 **Context:**
-- IMP-04 and the cold backup (security.md) need the user's data in the import format, and export then import must give it back. The spec named three files; the format now has nine (ADR-050).
+- IMP-04 and the cold backup need the user's data in the import format, and export then import must give it back. The format has nine files (ADR-050).
 
 **Decision:**
-- `export_data()` (security invoker) returns one jsonb with the rows of every file, values as text. One value, so PostgREST's 1,000-row limit does not apply.
-- The server function writes the CSVs the user ticked (`toCsv`, the mirror of `parseCsv`) and zips those that have rows with Node's `zlib` (deflate and `crc32`) and a small writer of the zip format (`zip.server.ts`). The zip comes back as base64, since a server function answers in JSON, and downloads as `export-YYYY-MM-DD.zip`. No dependency.
-- `export_counts()` counts the rows of `export_data()`, so the Exporter tab shows what each file holds; it is fetched when the tab opens (about 0.35 s for the whole history).
-- A transaction's ref is its import ref, or its id. A holding's key is its name or type and its institution, numbered on a clash.
-- A pgTAP test imports an invented history, exports it, imports that into an empty account and compares the two exports.
+- `export_data()` (security invoker) returns one jsonb with every file's rows as text: one value, so the 1,000-row limit does not apply. `export_counts()` gives each file's row count for the Exporter tab.
+- The server function writes the ticked CSVs (`toCsv`, the mirror of `parseCsv`) and zips them with Node's `zlib` and a small zip writer, returned as base64. No dependency.
+- A transaction's ref is its import ref or its id; a holding's key is its name or type and institution, numbered on a clash.
+- A pgTAP test imports, exports, imports into an empty account and compares the two exports.
 
 **Alternatives Considered:**
-- Queries per table from the server function -> Paging past 1,000 rows per table, and joins rebuilt in TypeScript.
-- One download per file, no archive (the first version) -> The author asked for one zip; the browser also asked to allow several downloads.
-- JSZip or fflate -> A dependency for what Node's zlib already does; only the container is written by hand, tested with `unzip`.
-- A server route streaming the zip -> Leaves the server functions (ADR-006) for a file of a few hundred kilobytes.
+- Queries per table -> Paging past 1,000 rows, joins rebuilt in TypeScript.
+- One download per file -> The author asked for one zip.
+- JSZip or fflate -> A dependency for what zlib does.
+- A route streaming the zip -> Leaves the server functions (ADR-006) for a small file.
 
 **Consequences:**
-- What the format cannot hold is lost on a round trip: listed in import.md (Export).
-- The whole export is built in memory, fine at this size; no zip64, so it stops at 4 GB.
+- What the format cannot hold is lost on a round trip (import.md).
+- Built in memory, no zip64: fine at this size.
 
 ---
 
@@ -274,23 +270,21 @@ Supersedes ADR-009 for the rates; HexaRate still validates an added currency.
 ### ADR-062: An investment's row shows its return over the range, deposits left out (2026-11-18)
 
 **Context:**
-- An investment's row on the hub showed two look-alike figures: its lifetime profit ("+12 000 $ (30 %)") under the name, and its change in value over the range ("▲ 6,0 %/an") under the value. The first ignored the range tabs; the second counted every deposit as growth, so a plan fed monthly looked like a great investment.
-- The author asked for a senior designer's review of the row and approved one figure per row, following the range, measured as a return.
+- An investment's row showed two look-alike figures: its lifetime profit, which ignored the range, and its change in value over the range, which counted every deposit as growth. The author asked for one figure per row, following the range, measured as a return.
 
 **Decision:**
-- On an investment, the figure under the value is its return over the range: the gain is the change in value less the money put in (linked transactions, external contributions, transfers in) plus the money taken out, and the percent is over the start value plus each flow weighted by the share of the range it was in (modified Dietz). On Tout, past a year, both are per year and the percent is compounded, as for the other rows.
-- A holding with no value at the range's start begins at its first money in, earlier flows counting at the start.
-- `holding_flows()` gives each investment's flows by day in the display currency at that day's rate, null with a missing rate; the browser computes the return for whatever range is picked.
-- The lifetime profit leaves the row. Opening an investment's chart shows, over it and to the right, Placé, Retiré (when above 0) and Profit total in amount and percent, since it opened whatever the range (author, 2026-11-18); its subtitle no longer shows what was withdrawn. Accounts, other assets and debts keep their change in value.
+- Under an investment's value: its return over the range, the change in value less the money put in plus the money taken out, over the start value plus each flow weighted by its share of the range (modified Dietz). On Tout, past a year, per year and compounded.
+- A holding with no value at the range's start begins at its first money in.
+- `holding_flows()` gives each investment's flows by day in the display currency; the browser computes the return for any range.
+- The lifetime profit leaves the row: Placé, Retiré and Profit total show over the opened chart. Accounts, assets and debts keep their change in value.
 
 **Alternatives Considered:**
-- A time-weighted return chained month by month -> Values are entered by hand, often months apart; a deposit before the next value reads as a loss that month and a jump later.
-- The return computed in SQL per range -> Eight ranges per holding on every load, or a round trip per tab.
-- Keeping the lifetime profit in the subtitle with a label -> Two figures, two periods on one row; Tout already gives the return since the start.
+- A time-weighted return chained month by month -> Values are typed months apart, so a deposit reads as a loss, then a jump.
+- The return in SQL per range -> Eight ranges per holding on every load, or a round trip per tab.
+- The lifetime profit in the subtitle with a label -> Two periods on one row.
 
 **Consequences:**
-- The return's percent is a float (weights and a root); it is shown only, never summed (ADR-004). The gain amount stays exact.
-- The lifetime figures need the chart opened; the row carries the range's return only.
+- The percent is a float, shown only, never summed (ADR-004); the gain amount stays exact.
 
 ### ADR-061: One net worth page, the subpages merged into it (2026-11-17)
 
@@ -454,21 +448,18 @@ Supersedes ADR-009 for the rates; HexaRate still validates an added currency.
 ### ADR-052: An invited person carries no amount of their own (2026-11-12)
 
 **Context:**
-- "Invited" means the author paid for the person. The check on `transaction_people` still wanted a part above zero for every line but Moi and With, so a gift or an item bought for someone (the whole amount on Moi, their part at 0) could only be saved as a With line, which says the person was there, not that the author paid for them. The author found the amount requirement meaningless for the state.
+- "Invited" means the author paid for the person, but the check wanted a part above zero, so a gift (the whole amount on Moi) could only be saved as a With line, which says the person was there, not paid for.
 
 **Decision:**
-- An invited person is "with me, and I paid for them": a step above With, no amount of their own, the transaction amount is what the author paid for everyone. `transaction_people_value_check` therefore lets `invited` lines have a part of 0, like `me` and `with`. Owes and From lines still need a part (or an unknown amount for owes).
-- Applied 2026-11-12 by `npm run db:push`; the 42 "pour" rows (gifts, items for someone) are Moi at the whole amount and the person invited at 0.
-- No change to `save_transaction`, the parts sum or the deferred checks. The form already sends 0.
+- An invited person is "with me, and I paid for them": no amount of their own, a part of 0 allowed, like `me` and `with`. Owes and From lines still need a part (or an unknown amount for owes).
+- Every invited line was set to 0 on 2026-11-12; Moi holds the whole amount, less what others owe back. The form and the import write invited lines at 0.
 
 **Alternatives Considered:**
-- Keep "with" for gifts -> The person page and the label say "with me", not "paid for".
-- A tiny positive part -> Rounds to 0 in some amounts and not in others.
+- Keep "with" for gifts -> The person page says "with me", not "paid for".
+- A tiny positive part -> Rounds to 0 in some amounts and not others.
 
 **Consequences:**
 - A transaction whose lines are all 0 still fails the sum check (the form prevents it).
-- Every invited line was set to a part of 0 on 2026-11-12 (DUO, TRIO and QUATUOR rows included: DUO means the author paid for both). Moi holds the whole amount, less what others owe back. The form treats an invited person like a With line: no part field, no share in the preview, sent with a part of 0 (a nameless invited line keeps its head count). The import does the same (`20261112150000_import_invited_without_part.sql`, test 29): an invited person is written with a part of 0 and Moi has the whole amount.
-- Migration `20261112140000_invited_without_part.sql`, test `28_invited_without_part.test.sql`.
 
 ---
 
@@ -493,71 +484,65 @@ Supersedes ADR-009 for the rates; HexaRate still validates an added currency.
 ### ADR-050: Holdings join the import in the same batch (2026-11-12)
 
 **Context:**
-- The author wants eight years of net-worth history (values, employer contributions, a TFSA moving to another institution) in the app through the CSV import, not typed one entry at a time (IMP-02). Part of the history is estimated: the employer share of an employer plan is not on any account, and a Swiss second pillar was filled in from its balance.
+- The author wants eight years of net-worth history (values, employer contributions, a move between institutions) through the CSV import (IMP-02). Part of it is estimated.
 
 **Decision:**
-- `import_batch` takes four more optional arrays: `holdings`, `snapshots`, `contributions`, `holding_transfers`. A new function, `import_holdings(payload, batch)`, checks them (no batch) and writes them (with the batch), so `import_batch` keeps one transaction, one summary and one undo. Its errors join the others, by file and line.
-- A holding is matched by type, institution and name, the app's version is kept, and the other files name a holding by a key from holdings.csv. Lines already in the app are skipped, so a file can be sent twice.
-- `import_batch_id` on holdings, values, contributions and transfers; `import_undo` removes them, and a holding only when nothing else points at it.
-- An estimate is entered as a normal line with a label that says so ("Employer 3% (estimate)"). The app has no estimate flag.
+- `import_batch` takes four more optional arrays: `holdings`, `snapshots`, `contributions`, `holding_transfers`, checked and written by `import_holdings` inside the same transaction, summary and undo. Errors join the others, by file and line.
+- A holding is matched by type, institution and name; the app's version is kept. Lines already in are skipped, so a file can be sent twice.
+- `import_batch_id` on the four tables; the undo removes a holding only when nothing else points at it.
+- An estimate is a normal line with a label that says so; no estimate flag.
 
 **Alternatives Considered:**
-- A second function and a second request for the holdings -> Two transactions: a bad holdings file could leave the transactions in and the net worth out, against ADR-012.
-- A `holding` column on transactions.csv now -> Needs the 800-line import function to link rows already imported; left for when a history is imported with its holdings from the start.
-- An estimate flag on contributions -> A column for one import; the label does the job.
+- A second request for the holdings -> Two transactions, so half an import could stay (ADR-012).
+- A `holding` column on transactions.csv now -> Links rows already imported; left for later.
+- An estimate flag -> A column for one import.
 
 **Consequences:**
-- The summary shows holdings counts and the holdings to create; they cannot be merged or edited in the screen.
-- Existing transactions that pay into a holding are linked by hand or by a one-off update.
-- The export (IMP-04) must write these files too for the round trip to hold.
+- New holdings cannot be merged or edited in the summary.
+- The export must write these files for the round trip to hold.
 
 ---
 
 ### ADR-049: Transfers between holdings are dated entries (2026-11-12)
 
 **Context:**
-- The author closes an account at one institution and moves the money to another holding, new or existing. The author asked for a transfer to have a date, "like a transaction", and chose a dated entry on both holdings over moving the history.
+- The author closes an account at one institution and moves the money to another holding, and asked for the transfer to have a date, "like a transaction", instead of moving the history.
 
 **Decision:**
-- A `holding_transfers` table: from, to, date, amount above zero. Both holdings are investments in the same currency, so one amount serves both; neither is closed before the date. RLS and a pgTAP test come with it.
-- Amended the same day, supersedes ADR-045 on "placed": a withdrawal used to be subtracted from placed, which shrank the basis and inflated the percent. Placed is now only money in (linked expenses, external contributions, transfers in) and never goes down. `holding_totals` gains `withdrawn` (linked incomes, transfers out). Profit is latest value + withdrawn - placed; percent is over placed. A transfer is withdrawn on the source and placed on the target. History stays on the holding that earned it. The row shows "Retiré" only above zero.
-- A holding with a transfer cannot be deleted (foreign keys without cascade). More generally, a holding with any history (transactions, values, external contributions, transfers) can only be archived; the server checks it, so the delete icon is muted.
-- The currency lock and the closing date also look at transfers.
-- On the page, values, external contributions and transfers each have an icon and a sheet of their own; the holding form carries no lists. "Contribution de l'employeur ou de l'État" is renamed "contribution externe".
+- `holding_transfers`: from, to, date, amount above zero, between two investments in one currency. RLS and a pgTAP test.
+- Supersedes ADR-045 on "placed": subtracting withdrawals shrank the basis and inflated the percent. Placed is money in only and never goes down; `withdrawn` is money out; profit is latest value + withdrawn - placed, percent over placed. A transfer is withdrawn on the source and placed on the target.
+- A holding with any history can only be archived; the currency lock and the closing date count transfers too.
+- Values, external contributions and transfers each have their own sheet; the holding form carries no lists.
 
 **Alternatives Considered:**
-- Move the linked transactions and contributions to the target -> Rewrites history, and the author wanted a dated entry.
-- Allow different currencies with two amounts -> More form and no use case yet; listed in improvements if needed.
+- Move the linked transactions and contributions to the target -> Rewrites history.
+- Two currencies with two amounts -> More form, no use case yet.
 
 **Consequences:**
-- A transfer has no edit; delete and add again.
-- Export and import do not carry transfers yet (as with the link, ADR-045).
+- A transfer has no edit: delete and add again.
 
 ---
 
 ### ADR-048: Holdings by country and type, optional name, no exclusion flag (2026-11-12)
 
 **Context:**
-- After trying the first holdings screens the author asked for: the country to come first and the type to follow from it, with a text box when no type is predefined; a name that is not mandatory; the "leave out of net worth" choice to move from the holding to the chart filters; no holdings filter in the transactions list. This changes parts of ADR-045.
+- After trying the first holdings screens the author asked for the country first with the type following from it, a text box when no type is predefined, an optional name, the "leave out of net worth" choice on the chart instead of the holding, and no holdings filter in the transactions list.
 
 **Decision:**
-- `holdings` gets a required `country`. `type` becomes optional; a typed type goes in `type_label`, with exactly one of the two set. `kind` is stored on the holding: for a predefined type the database sets it from the type, for a typed one the user chooses it (placement, asset or debt).
-- `name` becomes optional. An unnamed holding reads "type · institution · currency". Names stay unique among open named holdings, ignoring case and accents.
-- `exclude_from_net_worth` is dropped. The hub totals count every open holding and account. Leaving some out is a filter of the phase 5 chart, remembered per browser (NW-05).
-- The `holding_ids` and `without_holding` arguments of `list_transactions` are dropped. The "n transactions sans placement" count stays on the holdings page and links to the transactions list on the investment categories. The row keeps the holding, now as its name, type labels, institution and currency, so the client composes the label ("type currency (institution)" when unnamed).
-- The holdings page groups by institution, with each drawer's total.
-- Amended 2026-11-12: an unnamed holding reads "type en currency (institution)" ("REER en CAD (Desjardins)"), not "type currency (institution)".
-- Supersedes ADR-045 on: the exclusion flag, the name being required, the type list, and the list filter and unlinked count. The rest of ADR-045 stands.
+- `holdings` gets a required `country`. A type is predefined (`type`) or typed (`type_label`), exactly one; `kind` comes from the type, or is chosen for a typed one.
+- `name` is optional. An unnamed holding reads "type en currency (institution)". Names stay unique among open named holdings, ignoring case and accents.
+- `exclude_from_net_worth` is dropped: leaving items out is a chart filter kept per browser (NW-05).
+- The holdings filter of `list_transactions` is dropped; the "n transactions sans placement" count links to the list on the investment categories.
+- Supersedes ADR-045 on the exclusion flag, the required name, the type list, and the list filter. The rest stands.
 
 **Alternatives Considered:**
-- Keep the exclusion flag and add the chart filter -> Two ways to leave something out, and a headline total that silently differs from the page.
+- Keep the flag and add the chart filter -> Two ways to leave something out, and a total that silently differs.
 - A free-text type always -> No kind, no profit logic, no translations.
-- Keep the holdings filter for finding unlinked contributions -> The author's call: the category filter is enough, opened from the count's link.
+- Keep the holdings filter -> The author's call: the category filter is enough.
 
 **Consequences:**
-- A migration changes the table, rebuilds `holding_totals`, drops the filter arguments and changes the list row's holding column.
-- A typed type is not translated (user-typed content is never translated).
-- The link lists every investment transaction, linked ones included; the ones without a holding tag are the ones to link.
+- A typed type is never translated (user-typed content).
+- The count's link lists linked investment transactions too; the ones without a holding tag are the ones to link.
 
 ---
 
@@ -585,71 +570,66 @@ Supersedes ADR-009 for the rates; HexaRate still validates an added currency.
 ### ADR-046: One Net worth tab with the accounts and the holdings as subpages (2026-11-12)
 
 **Context:**
-- Holdings were planned as their own Placements page. Accounts and holdings are both parts of net worth, but their rows, actions and grouping differ. The author wanted one place for net worth, a dashboard feel, and the chart in phase 5.
+- Holdings were planned as their own page. Accounts and holdings are both parts of net worth, with different rows, actions and grouping. The author wanted one place for net worth, with the phase 5 chart.
 
 **Decision:**
-- The Comptes tab becomes "Net worth" (English in both languages). `/net-worth` is a hub: a total card, a slot for the phase 5 chart and a link card for each subpage with its own total. `/net-worth/accounts` is the accounts page moved, `/net-worth/holdings` is the new holdings page. Their sheets keep their own URLs below the page.
-- The tab stays active on all three paths. Each subpage has a back link to the hub (the rule of no back link had no use case before this).
-- The total counts open accounts and the open holdings not left out of net worth; a missing rate gives a dash per figure (ADR-004). The hub has no schema of its own.
-- `/accounts` has no redirect (one user, ADR-021).
+- The Comptes tab becomes "Net worth" (English in both languages). `/net-worth` is a hub with a total and a link card per subpage; `/net-worth/accounts` and `/net-worth/holdings` are the subpages, each with a back link to the hub.
+- A missing rate gives a dash per figure (ADR-004). The hub has no schema of its own.
 
 **Alternatives Considered:**
-- Keep `/accounts` and add `/holdings` as two more pages -> The tab needs a rule to stay active over unrelated paths, and nothing ties the totals together.
-- One merged list of accounts and holdings -> Blurs two models with different actions.
+- `/accounts` and `/holdings` as two more pages -> Nothing ties the totals together.
+- One merged list -> Blurs two models with different actions.
 - A tab for each -> Five tabs on a phone bar.
 
 **Consequences:**
-- Five links change (the tab, the transfer form, the account row, the institution group, the route files). The e2e specs use no `/accounts` path.
-- The Dashboard tab is untouched; whether it shows net worth is left open.
+- The subpages were merged into the hub later (ADR-061).
 
 ---
 
 ### ADR-045: Holdings, their values, and an optional holding on an investment transaction (2026-11-11)
 
 **Context:**
-- NW-01 to NW-03 need investments, assets and debts with dated values, and the money the owner put into each. The money already exists as transactions on investment-kind categories. Bank accounts count through their balance, not as holdings (database.md).
+- NW-01 to NW-03 need investments, assets and debts with dated values, and the money put into each. That money already exists as transactions on investment-kind categories. Bank accounts count through their balance, not as holdings.
 
 **Decision:**
-- Tables: `holding_types` (reference, loaded from `holding-types.csv`, kind investment, asset or debt), `holdings` (type, name, optional institution, country, currency, `opened_on`, `closed_on`, `exclude_from_net_worth`), `holding_snapshots` (date and amount in the holding's currency, one per date) and `holding_contributions` (employer or government money, date, amount, label). Every foreign key to a user table includes `user_id` (ADR-005), every table has RLS and a pgTAP test.
-- `transactions.holding_id` is optional. A trigger allows it only on an expense or an income whose category is investment-kind, so a contribution is an expense and a withdrawal is an income. My own contributions are never entered twice.
-- A `holding_totals` view returns placed, latest value, profit and percent, converted with `exchange_rate`, null when a rate is missing and never a partial sum (ADR-004). Placed is the linked expenses minus the linked incomes plus the contributions, each converted at its own date.
-- Snapshots (NW-02) and the exclusion flag (NW-05) come with the holdings instead of phase 5, so the page shows profit from the start. The net worth chart (NW-04) stays in phase 5.
-- Debts have values only. A loan payment does not link to a debt holding.
-- The import format does not change. The history was imported before holdings existed, so the author links past contributions by hand, helped by a count of investment transactions without a holding and a transactions filter on them.
+- Tables: `holding_types` (reference), `holdings`, `holding_snapshots` (one value per date, in the holding's currency) and `holding_contributions` (employer or government money). Composite keys (ADR-005), RLS and a pgTAP test each.
+- `transactions.holding_id` is optional, allowed only on an expense or an income on investment-kind categories, so my own contributions are never entered twice.
+- `holding_totals` returns placed, latest value, profit and percent, each flow converted at its own date, null with a missing rate (ADR-004).
+- Snapshots and the exclusion flag come now instead of phase 5; the chart (NW-04) stays in phase 5. Debts have values only.
+- The import format does not change; past contributions are linked by hand, helped by a count of investment transactions without a holding.
 
 **Alternatives Considered:**
-- A transfer to the holding, as if it were an account -> Holdings would need a balance and a currency per leg, and it blurs the line between accounts and holdings.
-- Only the category, one investment category per holding -> Renaming or merging a category silently breaks the totals.
-- A current value field now, snapshots in phase 5 -> A migration to unwind it, and no history.
-- A `holding` column in the import now -> More format work for a history that is already in.
+- A transfer to the holding, as to an account -> Holdings would need balances, and accounts and holdings blur.
+- One investment category per holding -> Renaming or merging a category silently breaks the totals.
+- A current value field now, snapshots later -> A migration to unwind, and no history.
+- A `holding` column in the import now -> Format work for a history already in.
 
 **Consequences:**
-- Export then import no longer reproduces the data exactly: the link is lost. Revisit when the export is built (IMP-04), by adding an optional `holding` column then.
-- Placed depends on exchange rates at each transaction date, so a missing rate empties the profit instead of showing a wrong one.
-- A holding with transactions cannot be deleted, only archived.
+- Export then import loses the link (revisit with IMP-04).
+- A missing rate empties the profit instead of showing a wrong one.
+- A holding with transactions can only be archived.
 
 ---
 
 ### ADR-044: End-to-end tests with Playwright, on a local stack, in CI (2026-11-11)
 
 **Context:**
-- The unit tests cover the pure logic and pgTAP covers the database. Nothing exercised a request from the browser through a server function to an RPC, nor the sign-in with MFA. The development machine cannot run the local stack (ADR-014), and the hosted project holds the owner's account (ADR-021).
+- Unit tests cover the logic and pgTAP the database; nothing ran a request from the browser through a server function, nor the sign-in with MFA. The laptop cannot run the local stack (ADR-014), and the hosted project holds the owner's account (ADR-021).
 
 **Decision:**
-- `@playwright/test`, specs in `src/app/e2e/`, run by a CI job on a local Supabase stack (the one the pgTAP job already starts). The job is non-blocking at first (`continue-on-error`): it gates nothing, and the `migrate` job does not wait for it.
-- A setup project creates one test user through the Auth admin API, signs in through the screen, enrols TOTP from the secret the screen shows, and keeps the session. The TOTP code is computed with `node:crypto` (RFC 6238), no library.
-- The specs: sign-in (wrong password, password without code, password with code, a cross-site write is refused), the import of the example files, a new expense. They run in order on one worker, since the import creates the accounts and categories the form needs.
-- `e2e/env.ts` refuses any Supabase URL that is not `localhost` or `127.0.0.1`.
+- `@playwright/test` in `src/app/e2e/`, run by a CI job on the local stack the pgTAP job starts. Non-blocking at first (`continue-on-error`).
+- A setup project creates a test user through the Auth admin API, signs in, enrols TOTP from the screen's secret (computed with `node:crypto`) and keeps the session.
+- Specs: sign-in cases and a refused cross-site write, the import of the example files, a new expense, in order on one worker.
+- `e2e/env.ts` refuses any URL that is not `localhost` or `127.0.0.1`.
 
 **Alternatives Considered:**
-- Against the hosted project -> Test entries among real data (ADR-021).
-- Seeding the test user's factor directly in SQL -> Skips the enrolment screen, the one most worth testing.
-- A TOTP library (otplib) -> Fifteen lines of `node:crypto` (ADR-011).
+- The hosted project -> Test entries among real data.
+- Seeding the factor in SQL -> Skips the enrolment screen.
+- otplib -> Fifteen lines of `node:crypto` (ADR-011).
 
 **Consequences:**
-- The specs could not be run on the laptop. They were written from the screens and tuned on the first CI runs; expect selector fixes. The job uploads the HTML report and traces.
-- To gate merges, remove `continue-on-error` from the job and add it to the `migrate` job's `needs`.
-- To run locally, someone with Docker sets `E2E_SUPABASE_URL`, `E2E_PUBLISHABLE_KEY` and `E2E_SECRET_KEY` from `supabase status` and runs `npm run e2e` from `src/app`.
+- To gate merges, remove `continue-on-error` and add the job to `migrate`'s `needs`.
+- To run locally, someone with Docker sets the `E2E_*` variables from `supabase status` and runs `npm run e2e`.
 
 ---
 
