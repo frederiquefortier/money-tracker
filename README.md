@@ -1,6 +1,4 @@
-# Money Tracker
-
-[![Netlify Status](https://api.netlify.com/api/v1/badges/aa42b944-4059-4292-b1cb-7d800a522410/deploy-status)](https://app.netlify.com/projects/ff-money-tracker/deploys)
+# Money Tracker [![Netlify Status](https://api.netlify.com/api/v1/badges/aa42b944-4059-4292-b1cb-7d800a522410/deploy-status)](https://app.netlify.com/projects/ff-money-tracker/deploys)
 
 A private money tracker that keeps every transaction in its own currency, along
 with who it was with and what it was for. It turns eight years of spreadsheet history into an interactive
@@ -54,18 +52,17 @@ A person on a transaction has a role, and the role decides what the money means:
 
 ## Problem
 
-A budgeting spreadsheet grows one patch at a time. This one started in 2018, was rebuilt in
-2023 on Aspire Budgeting (an envelope-budgeting template, used here without the envelopes),
-and kept gaining pieces: investment categories handled their own way, new dashboards and new
-ways to present the data, then multi-currency support after a move from Canada to
+A budgeting spreadsheet grows one patch at a time. This one started in 2018, was started over in
+2023 on Aspire Budgeting (an envelope-budgeting template, that I used without the envelopes),
+and kept gaining pieces: investment categories handled their own way, new dashboards, then multi-currency support after a move from Canada to
 Switzerland. Each change was layered on the last until the sheet was too messy to extend.
 
-A spreadsheet also has nowhere to record the merchant, who a dinner was with or which trip a
+That spreadsheet also has nowhere to record the merchant, who a dinner was with or which trip a
 purchase belonged to, other than a memo column. The questions that matter most, like the real
 cost of a trip or who still owes what, can't be asked of it.
 
 The features were first written as user stories, then tried in a prototype on Lovable. This
-repo is the rewrite, on a stack I control. My role was product owner, and I was after
+repo is the rewrite on a stack I control. My role was product owner, and I was after
 development speed for an internal tool I use every month.
 
 ## Goals
