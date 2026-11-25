@@ -24,9 +24,10 @@ import {
   getImportTargets,
 } from '#/server/import'
 import { listPagePending } from '#/components/layout/page-pending'
+import { ImportSkeleton } from '#/components/import/import-skeleton'
 
 export const Route = createFileRoute('/_authed/data/import')({
-  ...listPagePending((t) => t('import.title')),
+  ...listPagePending((t) => t('import.title'), { body: ImportSkeleton }),
   loader: async () => {
     const [batches, targets, holdingTypes] = await Promise.all([
       getImports(),

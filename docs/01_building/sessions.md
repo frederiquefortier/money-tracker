@@ -4,6 +4,15 @@ Short record of each working session: what the author asked, what was decided an
 
 <!-- Newest first: a new session goes directly below this line. Template at the bottom. -->
 
+### 2026-11-25 - Skeletons at the end of lists and on each page
+
+**What We Worked On:**
+- The author asked which places still use the spinner and which could use a skeleton: buttons, the loading sheet and the end of lists. The author chose the end of lists. `ListEnd` now shows a skeleton row (ADR-075), in the gallery.
+- The author asked why merchants and other pages loaded as a list of checkboxes, and to check each one. Those pages fell back to the filter sheet's `SkeletonRows`. Each now has its own skeleton, with its search, tabs and rows at their height (ADR-075), in the gallery.
+
+**What Could We Do Better:**
+- Not seen in the browser: the gallery needs a signed-in session.
+
 ### 2026-11-25 - Drawers on load, archived order, pending rates
 
 **What We Worked On:**

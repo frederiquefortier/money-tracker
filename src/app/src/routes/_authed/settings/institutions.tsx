@@ -6,10 +6,13 @@ import { ListPage } from '#/components/layout/list-page'
 import { EmptyState, ListCard } from '#/components/lists/list-card'
 import { getInstitutions } from '#/server/institutions'
 import { listPagePending } from '#/components/layout/page-pending'
+import { InstitutionsSkeleton } from '#/components/institutions/institutions-skeleton'
 import { Revealed } from '#/components/lists/revealed'
 
 export const Route = createFileRoute('/_authed/settings/institutions')({
-  ...listPagePending((t) => t('settings.institutions')),
+  ...listPagePending((t) => t('settings.institutions'), {
+    body: InstitutionsSkeleton,
+  }),
   loader: () => getInstitutions(),
   component: Institutions,
 })

@@ -11,6 +11,13 @@ import {
   SkeletonRows,
 } from '#/components/feedback/skeleton'
 import { Spinner } from '#/components/feedback/spinner'
+import { MerchantsSkeleton } from '#/components/merchants/merchants-skeleton'
+import { PeopleSkeleton } from '#/components/people/list/people-skeleton'
+import { EventsSkeleton } from '#/components/events/list/events-skeleton'
+import { InstitutionsSkeleton } from '#/components/institutions/institutions-skeleton'
+import { CurrenciesSkeleton } from '#/components/currencies/currencies-skeleton'
+import { CategoriesSkeleton } from '#/components/categories/list/categories-skeleton'
+import { ImportSkeleton } from '#/components/import/import-skeleton'
 
 // Invented colours, as an event type would carry.
 const EVENT_COLORS = ['#2563eb', '#16a34a', '#db2777', '#ca8a04', '#7c3aed']
@@ -66,6 +73,56 @@ export function DisplaySection() {
           <SkeletonCard chart="h-40" />
         </div>
       </Specimen>
+      <PageSkeletons />
     </GallerySection>
   )
+}
+
+const PAGE_SKELETONS = [
+  {
+    name: 'MerchantsSkeleton',
+    source: 'merchants/merchants-skeleton.tsx',
+    Body: MerchantsSkeleton,
+  },
+  {
+    name: 'PeopleSkeleton',
+    source: 'people/list/people-skeleton.tsx',
+    Body: PeopleSkeleton,
+  },
+  {
+    name: 'EventsSkeleton',
+    source: 'events/list/events-skeleton.tsx',
+    Body: EventsSkeleton,
+  },
+  {
+    name: 'InstitutionsSkeleton',
+    source: 'institutions/institutions-skeleton.tsx',
+    Body: InstitutionsSkeleton,
+  },
+  {
+    name: 'CurrenciesSkeleton',
+    source: 'currencies/currencies-skeleton.tsx',
+    Body: CurrenciesSkeleton,
+  },
+  {
+    name: 'CategoriesSkeleton',
+    source: 'categories/list/categories-skeleton.tsx',
+    Body: CategoriesSkeleton,
+  },
+  {
+    name: 'ImportSkeleton',
+    source: 'import/import-skeleton.tsx',
+    Body: ImportSkeleton,
+  },
+]
+
+/** The body each list page shows while its loader runs. */
+function PageSkeletons() {
+  return PAGE_SKELETONS.map(({ name, source, Body }) => (
+    <Specimen key={name} name={name} source={source}>
+      <div className="w-full max-w-lg">
+        <Body />
+      </div>
+    </Specimen>
+  ))
 }

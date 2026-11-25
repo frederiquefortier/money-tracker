@@ -4,6 +4,24 @@ Technical and structural choices, with the alternatives that were rejected. Chec
 
 <!-- Newest first: a new ADR goes directly below this line. Template at the bottom. -->
 
+### ADR-075: Each list page and list end loads in its own shape (2026-11-25)
+
+**Context:**
+- ADR-072 kept a spinner at the end of every list except transactions. The author asked for a skeleton there too.
+- ADR-072 gave the settings and data pages `SkeletonRows`, made for the filter sheet's check list: a checkbox on every row of pages that have none. The author asked to check each page's skeleton.
+
+**Decision:**
+- Supersedes ADR-072's spinner for the ends of lists. `ListEnd` shows one row of two bars at a list row's height, unless the list passes its own `placeholder` (transactions keep their skeleton day). Every `Revealed` list, the merchants page, the merchant filter and the combobox get it.
+- Supersedes ADR-072's `SkeletonRows` for the other pages. `listPagePending` has no default body: each page passes its own skeleton, next to its rows (`MerchantsSkeleton`, `PeopleSkeleton`, `EventsSkeleton`, `InstitutionsSkeleton`, `CurrenciesSkeleton`, `CategoriesSkeleton`, `ImportSkeleton`). The list pages draw the search and tabs they have, then their rows through `SkeletonListPage` and `SkeletonNameRow`, at the rows' height. `SkeletonRows` stays for the filter sheet.
+- `Spinner` stays for an action under way in its button and a sheet loading.
+
+**Alternatives Considered:**
+- A skeleton fitted to each list's end -> One more shape per list to keep in step, for a row that shows a moment at most.
+- Keep a default body -> A new page would get a shape that is not its own without anyone noticing.
+
+**Consequences:**
+- In the combobox the row is a little taller than an option.
+
 ### ADR-074: The net worth hub's folded groups are saved in a cookie (2026-11-25)
 
 **Context:**

@@ -18,11 +18,12 @@ import { getMerchants } from '#/server/merchants'
 import { indexById, oneOf } from '#/lib/shared/collections'
 import { matcher } from '#/lib/shared/search'
 import { listPagePending } from '#/components/layout/page-pending'
+import { MerchantsSkeleton } from '#/components/merchants/merchants-skeleton'
 import { useRevealed } from '#/hooks/app/use-revealed'
 import { ListEnd } from '#/components/lists/list-end'
 
 export const Route = createFileRoute('/_authed/settings/merchants')({
-  ...listPagePending((t) => t('merchants.title')),
+  ...listPagePending((t) => t('merchants.title'), { body: MerchantsSkeleton }),
   loader: async () => {
     const [merchants, categories] = await Promise.all([
       getMerchants(),

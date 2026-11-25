@@ -34,9 +34,12 @@ import { getCategories } from '#/server/categories'
 import { indexById, oneOf } from '#/lib/shared/collections'
 import { foldForSearch } from '#/lib/shared/search'
 import { listPagePending } from '#/components/layout/page-pending'
+import { CategoriesSkeleton } from '#/components/categories/list/categories-skeleton'
 
 export const Route = createFileRoute('/_authed/settings/categories')({
-  ...listPagePending((t) => t('categories.title')),
+  ...listPagePending((t) => t('categories.title'), {
+    body: CategoriesSkeleton,
+  }),
   loader: () => getCategories(),
   component: Categories,
 })

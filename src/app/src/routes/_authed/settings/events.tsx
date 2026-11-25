@@ -32,10 +32,11 @@ import { byName, oneOf } from '#/lib/shared/collections'
 import { todayIso } from '#/lib/shared/format'
 import { matcher } from '#/lib/shared/search'
 import { listPagePending } from '#/components/layout/page-pending'
+import { EventsSkeleton } from '#/components/events/list/events-skeleton'
 import { Revealed } from '#/components/lists/revealed'
 
 export const Route = createFileRoute('/_authed/settings/events')({
-  ...listPagePending((t) => t('events.title')),
+  ...listPagePending((t) => t('events.title'), { body: EventsSkeleton }),
   loader: async () => {
     const [events, people, categories] = await Promise.all([
       getEvents(),

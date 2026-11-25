@@ -5,6 +5,7 @@ import { CheckList } from '#/components/forms/check-list'
 import type { CheckNode } from '#/components/forms/check-list'
 import { CreateButton } from '#/components/forms/create-row'
 import { EmptyState, ListCard } from '#/components/lists/list-card'
+import { ListEnd } from '#/components/lists/list-end'
 import { MessageCard } from '#/components/layout/message-card'
 import { Money } from '#/components/display/money'
 import { cn } from '#/lib/utils'
@@ -47,6 +48,16 @@ export function ListsSection() {
               </li>
             ))}
             <CreateButton label="New account" onClick={() => {}} />
+          </ListCard>
+        </div>
+      </Specimen>
+      <Specimen name="ListEnd" source="lists/list-end.tsx">
+        <div className="w-full max-w-lg">
+          <ListCard>
+            <li className="flex items-center gap-3 px-4 py-3">
+              <span className="flex-1 font-semibold">Camille Tremblay</span>
+            </li>
+            <ListEnd sentinel={() => {}} as="li" />
           </ListCard>
         </div>
       </Specimen>

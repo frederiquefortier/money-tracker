@@ -92,3 +92,82 @@ export function SkeletonCard({ chart = 'h-64' }: { chart?: string }) {
     </div>
   )
 }
+
+/**
+ * A list page's body while it loads: the search field and the tab bar it has, then
+ * `count` rows in a list card, each drawn by `row`.
+ */
+export function SkeletonListPage({
+  search = false,
+  tabs = 0,
+  count = 6,
+  row,
+}: {
+  search?: boolean
+  tabs?: number
+  count?: number
+  row: (i: number) => React.ReactNode
+}) {
+  const { t } = useTranslation()
+  return (
+    <div
+      className="flex flex-col gap-4"
+      role="status"
+      aria-label={t('common.loading')}
+    >
+      {search && (
+        <Skeleton className="block h-11 w-full rounded-field md:h-9" />
+      )}
+      {tabs > 0 && <SkeletonTabs count={tabs} />}
+      <ul className={cn(cardSurface, 'divide-y')} aria-hidden>
+        {Array.from({ length: count }, (_, i) => row(i))}
+      </ul>
+    </div>
+  )
+}
+
+/**
+ * A `ListRow` while it loads: its lead (a badge or avatar, at its size), the name, and
+ * the line under it when the row has one. Each bar sits in a line of its text's height.
+ */
+export function SkeletonNameRow({
+  i,
+  lead,
+  detail = true,
+}: {
+  i: number
+  lead?: string
+  detail?: boolean
+}) {
+  return (
+    <li className="flex items-center gap-3 py-3 pr-2 pl-4">
+      {lead && <Skeleton className={cn('flex-none rounded-full', lead)} />}
+      <span className="flex min-w-0 flex-1 flex-col">
+        <span>
+          <Skeleton className={i % 2 ? 'w-28' : 'w-36'} />
+        </span>
+        {detail && (
+          <span className="text-sm">
+            <Skeleton className={i % 3 ? 'w-24' : 'w-32'} />
+          </span>
+        )}
+      </span>
+    </li>
+  )
+}
+
+/** A `TabList` while its page loads, one cell per tab. */
+export function SkeletonTabs({ count }: { count: number }) {
+  return (
+    <div
+      className="grid auto-cols-fr grid-flow-col gap-1 rounded-xl bg-secondary p-1"
+      aria-hidden
+    >
+      {Array.from({ length: count }, (_, i) => (
+        <span key={i} className="py-1.5 text-center text-sm">
+          <Skeleton className="w-20 bg-card" />
+        </span>
+      ))}
+    </div>
+  )
+}

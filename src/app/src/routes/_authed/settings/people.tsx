@@ -31,10 +31,11 @@ import { byName, newestFirst, oneOf } from '#/lib/shared/collections'
 import { matcher } from '#/lib/shared/search'
 import type { Balance } from '#/lib/people/owed'
 import { listPagePending } from '#/components/layout/page-pending'
+import { PeopleSkeleton } from '#/components/people/list/people-skeleton'
 import { Revealed } from '#/components/lists/revealed'
 
 export const Route = createFileRoute('/_authed/settings/people')({
-  ...listPagePending((t) => t('people.title')),
+  ...listPagePending((t) => t('people.title'), { body: PeopleSkeleton }),
   loader: async () => {
     const [people, balances] = await Promise.all([getPeople(), getBalances()])
     return { ...people, balances }

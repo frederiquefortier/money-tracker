@@ -8,9 +8,12 @@ import { ListPage } from '#/components/layout/list-page'
 import { useMyCurrencies } from '#/hooks/currencies/use-my-currencies'
 import { getCurrencySettings } from '#/server/currencies'
 import { listPagePending } from '#/components/layout/page-pending'
+import { CurrenciesSkeleton } from '#/components/currencies/currencies-skeleton'
 
 export const Route = createFileRoute('/_authed/settings/currencies')({
-  ...listPagePending((t) => t('currencies.title')),
+  ...listPagePending((t) => t('currencies.title'), {
+    body: CurrenciesSkeleton,
+  }),
   loader: () => getCurrencySettings(),
   component: Currencies,
 })
